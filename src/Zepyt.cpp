@@ -2,7 +2,8 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL_image.h>
-
+#include <SDL_ttf.h>
+#include <atomic>
 int main(int argc, char *argv[])
 {
  
@@ -14,6 +15,12 @@ int main(int argc, char *argv[])
 	if (IMG_Init(IMG_INIT_PNG) == 0) {
 		std::cout << "Error SDL2_image Initialization";
 		return 2;
+	}
+
+	if(TTF_Init() < 0)
+	{
+		std::cout<< "Font error" << '\n';
+		return 3;
 	}
 
 	SDL_Window* window = SDL_CreateWindow("First program", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL);
@@ -41,6 +48,11 @@ int main(int argc, char *argv[])
 	}
 
 	SDL_FreeSurface(lettuce_sur);
+	TTF_Font* font  = TTF_OpenFont("assets/font.ttf",1000);
+	SDL_Color fg = {255,255,255,255};
+	SDL_Color bg = {0,0,0,0};
+	SDL_Surface* surf = TTF_RenderText_Blended(font,"test test",fg);
+	SDL_Texture* text = SDL_CreateTextureFromSurface(renderer,surf);
 
 	while (true) {
 		SDL_Event e;
@@ -51,16 +63,30 @@ int main(int argc, char *argv[])
 		}
 
 		SDL_RenderClear(renderer);
-		SDL_RenderCopy(renderer, lettuce_tex, nullptr, nullptr);
-		SDL_RenderPresent(renderer);
-	}
+        SDL_Rect rect1 = {0,0,100,100};
+		SDL_RenderCopy(renderer, lettuce_tex, nullptr, &rect1);
+        rect1 = {100,100,100,100};
 
+        SDL_RenderCopy(renderer, lettuce_tex, nullptr, &rect1);
+		
+	
+		
+		SDL_Rect textRect = {0,0,300,300};
+		SDL_RenderCopy(renderer,text,nullptr,&textRect);	
+		SDL_RenderPresent(renderer);
+
+		
+	
+	}
+	SDL_DestroyTexture(text);
+	SDL_FreeSurface(surf);
+	TTF_CloseFont(font);
 	SDL_DestroyTexture(lettuce_tex);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	IMG_Quit();
 	SDL_Quit();
-
+	TTF_Quit();
 	return 0;
 }
 
