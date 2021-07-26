@@ -8,7 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
-find_package(SDL2_TTF REQUIRED)
+find_package(SDL2_ttf REQUIRED)
 
 add_executable(Zepyt "src/Zepyt.cpp")
 
