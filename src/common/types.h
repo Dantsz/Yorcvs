@@ -35,7 +35,7 @@ class Vec2
         x = other.x;
         y = other.y;
     }
-    constexpr ~Vec2() = default;//trivially destructuted
+    ~Vec2() = default;//trivially destructuted
     constexpr Vec2& operator=(const Vec2& other) = default;
     constexpr Vec2& operator=(Vec2&& other) noexcept = default;
     //Adition
