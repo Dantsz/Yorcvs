@@ -7,7 +7,7 @@
 #include "assetmanager/assetmanager.h"
 //Initialize
 
-
+#include "common/types.h"
 
 SDL_Window* window;
 inline SDL_Renderer* renderer;
@@ -19,12 +19,14 @@ SDL_Surface* surf;
 SDL_Texture* text;
 SDL_Surface* lettuce_sur;
 std::shared_ptr<SDL_Texture> lettuce_tex;
-
+Vec2<int> vectest;
 
 
 ///Test
 int init()
 {
+	
+	std::cin>> vectest;
 	 if (SDL_Init(SDL_INIT_VIDEO ) < 0) {
 		std::cout << "Error SDL2 Initialization : " << SDL_GetError();
 		return 1;
@@ -96,7 +98,7 @@ void run()
 		
 	
 		
-		SDL_Rect textRect = {0,0,300,300};
+		SDL_Rect textRect = {vectest.x,vectest.y,300,300};
 		
 		SDL_RenderCopy(renderer,text,nullptr,&textRect);
 
