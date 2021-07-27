@@ -38,3 +38,4 @@ compile_commands.json
 src/a.html
 src/a.js
 src/a.wasm
+doc/

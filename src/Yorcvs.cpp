@@ -17,7 +17,7 @@ SDL_Surface* surf;
 SDL_Texture* text;
 SDL_Surface* lettuce_sur;
 SDL_Texture* lettuce_tex;
-
+///Test
 int init()
 {
 	 if (SDL_Init(SDL_INIT_VIDEO ) < 0) {
