@@ -55,7 +55,10 @@ int init()
 
 	
 	lettuce_tex = texManager.loadFromFile("assets/lettuce.png");
-	
+	lettuce_tex = texManager.loadFromFile("assets/lettuce.png");
+	texManager.loadFromFile("assets/lettuce.png");
+	texManager.loadFromFile("assets/lettuce.png");
+	texManager.loadFromFile("assets/lettuce.png");
 	if (lettuce_tex == NULL) {
 		std::cout << "Error creating texture";
 	

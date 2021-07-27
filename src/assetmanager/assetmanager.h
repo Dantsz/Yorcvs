@@ -6,6 +6,7 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <string>
+#include <iostream>
 /**
  * @brief Manages resources to reduce reading multiple times from the disk
  * 
@@ -55,6 +56,7 @@ class assetManager<SDL_Texture>
     public:
     std::shared_ptr<SDL_Texture> loadFromFile(const std::string& path)
     {
+
       if(path.empty())
       {
              return nullptr;
@@ -70,6 +72,7 @@ class assetManager<SDL_Texture>
       SDL_Surface* surf = IMG_Load(path.c_str());
       //can't use make_shared because SDL_Texture is not a complete type?
       auto texture = std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(renderer,surf),[](SDL_Texture* tex){SDL_DestroyTexture(tex);});
+      assetMap.insert({path,texture});
       return texture;
      
 
