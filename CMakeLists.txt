@@ -5,7 +5,22 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+message(STATUS ${CMAKE_SYSTEM_NAME})
+#set SDL for windows
+if(WIN32)
+    set(SDL2MAIN_LIBRARY "C:/SDL2/lib/x64/SDL2main.lib")
+    set(SDL2_INCLUDE_DIR "C:/SDL2/include")
+    set(SDL2_LIBRARY "C:/SDL2/lib/x64/SDL2.lib")
+    set(SDL2_IMAGE_INCLUDE_DIR "C:/SDL2_image/include")
+    set(SDL2_IMAGE_LIBRARY "C:/SDL2_image/lib/x64/SDL2_image.lib")
+    set(SDL2_TTF_INCLUDE_DIR "C:/SDL2_ttf/include")
+    set(SDL2_TTF_LIBRARY "C:/SDL2_ttf/lib/x64/SDL2_ttf.lib")
+endif()
+ 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
+
+
+
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
@@ -19,5 +34,5 @@ target_link_libraries(${PROJECT_NAME} SDL2::Main SDL2::Image SDL2::TTF)
 target_compile_options(Zepyt PRIVATE
 $<$<CXX_COMPILER_ID:MSVC>:/W4>
 $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -pedantic>
-$<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -pedantic >
+$<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -pedantic>
 )

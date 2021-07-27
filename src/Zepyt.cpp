@@ -1,13 +1,26 @@
 
 #include <iostream>
+#ifdef __EMSCRIPTEM__
+	#include <emscripten.h>
+#endif
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <atomic>
-int main(int argc, char *argv[])
+//Initialize
+SDL_Window* window;
+SDL_Renderer* renderer;
+TTF_Font* font;
+SDL_Color fg = {255,255,255,255};
+SDL_Color bg = {0,0,0,0};
+SDL_Surface* surf;
+SDL_Texture* text;
+SDL_Surface* lettuce_sur;
+SDL_Texture* lettuce_tex;
+
+int init()
 {
- 
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0) {
+	 if (SDL_Init(SDL_INIT_VIDEO ) < 0) {
 		std::cout << "Error SDL2 Initialization : " << SDL_GetError();
 		return 1;
 	}
@@ -23,42 +36,46 @@ int main(int argc, char *argv[])
 		return 3;
 	}
 
-	SDL_Window* window = SDL_CreateWindow("First program", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL);
+	window  = SDL_CreateWindow("First program", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL);
 	if (window == NULL) {
 		std::cout << "Error window creation";
 		return 3;
 	}
 
-	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer == NULL) {
 		std::cout << "Error renderer creation";
 		return 4;
 	}
 
-	SDL_Surface* lettuce_sur = IMG_Load("assets/lettuce.png");
-	if (lettuce_sur == NULL) {
-		std::cout << "Error loading image: " << IMG_GetError();
-		return 5;
-	}
-
-	SDL_Texture* lettuce_tex = SDL_CreateTextureFromSurface(renderer, lettuce_sur);
+	std::cout<<"begin\n";
+	lettuce_sur = IMG_Load("assets/lettuce.png");
+	lettuce_tex = SDL_CreateTextureFromSurface(renderer, lettuce_sur);
 	if (lettuce_tex == NULL) {
 		std::cout << "Error creating texture";
-		return 6;
+	
 	}
-
 	SDL_FreeSurface(lettuce_sur);
-	TTF_Font* font  = TTF_OpenFont("assets/font.ttf",1000);
-	SDL_Color fg = {255,255,255,255};
-	SDL_Color bg = {0,0,0,0};
-	SDL_Surface* surf = TTF_RenderText_Blended(font,"test test",fg);
-	SDL_Texture* text = SDL_CreateTextureFromSurface(renderer,surf);
 
-	while (true) {
+	std::cout<< "Opening Fonts\n";
+	font  = TTF_OpenFont("assets/font.ttf",1000);
+
+	std::cout<< "Creating textures\n";
+	surf = TTF_RenderText_Blended(font,"test test",fg);
+	text = SDL_CreateTextureFromSurface(renderer,surf);
+	std::cout<<"Running";
+
+	return 0;
+}
+
+void run()
+{
+	
+	
 		SDL_Event e;
 		if (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
-				break;
+				
 			}
 		}
 
@@ -72,12 +89,17 @@ int main(int argc, char *argv[])
 	
 		
 		SDL_Rect textRect = {0,0,300,300};
-		SDL_RenderCopy(renderer,text,nullptr,&textRect);	
-		SDL_RenderPresent(renderer);
-
 		
-	
-	}
+		SDL_RenderCopy(renderer,text,nullptr,&textRect);
+
+
+			
+		SDL_RenderPresent(renderer);
+}
+
+
+int cleanup()
+{
 	SDL_DestroyTexture(text);
 	SDL_FreeSurface(surf);
 	TTF_CloseFont(font);
@@ -86,7 +108,22 @@ int main(int argc, char *argv[])
 	SDL_DestroyWindow(window);
 	IMG_Quit();
 	SDL_Quit();
-	TTF_Quit();
+	TTF_Quit();	
+	return 0;
+}
+
+int main(int argc,char** argv)
+{
+ 	init();
+	#ifdef __EMSCRIPTEM__
+		emscripten_set_main_loop(run,0,1);
+	#else
+		while(true)
+		{
+			run();
+		}
+	#endif
+	cleanup();
 	return 0;
 }
 
