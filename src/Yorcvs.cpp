@@ -3,20 +3,25 @@
 #ifdef __EMSCRIPTEM__
 	#include <emscripten.h>
 #endif
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
 #include <atomic>
+#include "assetmanager/assetmanager.h"
 //Initialize
+
+
+
 SDL_Window* window;
-SDL_Renderer* renderer;
+inline SDL_Renderer* renderer;
+assetManager<SDL_Texture> texManager;
 TTF_Font* font;
 SDL_Color fg = {255,255,255,255};
 SDL_Color bg = {0,0,0,0};
 SDL_Surface* surf;
 SDL_Texture* text;
 SDL_Surface* lettuce_sur;
-SDL_Texture* lettuce_tex;
+std::shared_ptr<SDL_Texture> lettuce_tex;
+
+
+
 ///Test
 int init()
 {
@@ -48,9 +53,9 @@ int init()
 		return 4;
 	}
 
-	std::cout<<"begin\n";
-	lettuce_sur = IMG_Load("assets/lettuce.png");
-	lettuce_tex = SDL_CreateTextureFromSurface(renderer, lettuce_sur);
+	
+	lettuce_tex = texManager.loadFromFile("assets/lettuce.png");
+	
 	if (lettuce_tex == NULL) {
 		std::cout << "Error creating texture";
 	
@@ -81,10 +86,10 @@ void run()
 
 		SDL_RenderClear(renderer);
         SDL_Rect rect1 = {0,0,100,100};
-		SDL_RenderCopy(renderer, lettuce_tex, nullptr, &rect1);
+		SDL_RenderCopy(renderer, lettuce_tex.get(), nullptr, &rect1);
         rect1 = {100,100,100,100};
 
-        SDL_RenderCopy(renderer, lettuce_tex, nullptr, &rect1);
+        SDL_RenderCopy(renderer, lettuce_tex.get(), nullptr, &rect1);
 		
 	
 		
@@ -103,7 +108,7 @@ int cleanup()
 	SDL_DestroyTexture(text);
 	SDL_FreeSurface(surf);
 	TTF_CloseFont(font);
-	SDL_DestroyTexture(lettuce_tex);
+	SDL_DestroyTexture(lettuce_tex.get());
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	IMG_Quit();
