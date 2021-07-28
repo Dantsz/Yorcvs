@@ -1,4 +1,4 @@
-# Yorcvs
+# Yorcvs [![Build](https://github.com/Dantsz/Yorcvs/actions/workflows/cmake.yml/badge.svg)](https://github.com/Dantsz/Yorcvs/actions/workflows/cmake.yml)
 C++ game project
 ## Dependencies
 |Dependency|Version|
