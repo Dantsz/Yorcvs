@@ -39,3 +39,8 @@ src/a.html
 src/a.js
 src/a.wasm
 doc/
+CMakeSettings.json
+.vs/
+html/
+latex/
+out/

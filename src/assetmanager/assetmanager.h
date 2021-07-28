@@ -22,7 +22,7 @@ class assetManager
     /**
      * @brief Loads the resource from the diosk and returns a pointer to it. Returns nullptr if the file is not found
      * 
-     * @param path 
+     * @param path path to resource
      * @return std::shared_ptr<assetType> 
      */
     std::shared_ptr<assetType> loadFromFile(const std::string& path)
@@ -85,3 +85,5 @@ class assetManager<SDL_Texture>
     private:
     std::unordered_map<std::string,std::shared_ptr<SDL_Texture>> assetMap{};
 };
+
+

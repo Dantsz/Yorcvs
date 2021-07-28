@@ -19,14 +19,15 @@ SDL_Surface* surf;
 SDL_Texture* text;
 SDL_Surface* lettuce_sur;
 std::shared_ptr<SDL_Texture> lettuce_tex;
-Vec2<int> vectest;
+Yorcvs::Vec2<int> vectest = {0,0};
 
+bool isRunning = true;
 
 ///Test
 int init()
 {
 	
-	std::cin>> vectest;
+	
 	 if (SDL_Init(SDL_INIT_VIDEO ) < 0) {
 		std::cout << "Error SDL2 Initialization : " << SDL_GetError();
 		return 1;
@@ -85,7 +86,7 @@ void run()
 		SDL_Event e;
 		if (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
-				
+				isRunning = false;
 			}
 		}
 
@@ -102,8 +103,7 @@ void run()
 		
 		SDL_RenderCopy(renderer,text,nullptr,&textRect);
 
-
-			
+	
 		SDL_RenderPresent(renderer);
 }
 
@@ -128,7 +128,7 @@ int main(int argc,char** argv)
 	#ifdef __EMSCRIPTEM__
 		emscripten_set_main_loop(run,0,1);
 	#else
-		while(true)
+		while(isRunning)
 		{
 			run();
 		}
