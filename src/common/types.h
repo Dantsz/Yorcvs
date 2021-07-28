@@ -10,7 +10,7 @@
 #pragma once
 #include <iostream>
 #include <cmath>
-namespace Yorcvs
+namespace yorcvs
 {
     /**
      * @brief 2D vector class
@@ -262,14 +262,14 @@ namespace Yorcvs
 
     //Overloads for streams
     template<typename T>
-    std::ostream& operator<<(std::ostream& os, const Yorcvs::Vec2<T>& vec)
+    std::ostream& operator<<(std::ostream& os, const yorcvs::Vec2<T>& vec)
     {
         os << vec.x << ' ' << vec.y;
         return os;
     }
 
     template<typename T>
-    std::istream& operator >> (std::istream& is,Yorcvs::Vec2<T>& vec)
+    std::istream& operator >> (std::istream& is,yorcvs::Vec2<T>& vec)
     {
         is >> vec.x;
         is.ignore(1,' ');

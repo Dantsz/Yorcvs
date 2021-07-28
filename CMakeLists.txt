@@ -27,7 +27,10 @@ find_package(SDL2_ttf REQUIRED)
 
 set(YorcvsALLFILES "src/Yorcvs.cpp"
 
-                  "src/assetmanager/assetmanager.h")
+                  "src/assetmanager/assetmanager.h"
+                  "src/common/types.h"
+                  "src/render/render.h"
+                  "src/render/renderSDL2.h")
 
 add_executable(Yorcvs ${YorcvsALLFILES})
 

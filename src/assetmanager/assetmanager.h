@@ -7,6 +7,9 @@
 #include <SDL_ttf.h>
 #include <string>
 #include <iostream>
+namespace yorcvs
+{
+
 /**
  * @brief Manages resources to reduce reading multiple times from the disk
  * 
@@ -15,7 +18,7 @@
  * 
  */
 template<typename assetType>
-class assetManager
+class AssetManager
 {
     public:
 
@@ -35,55 +38,21 @@ class assetManager
     */
     void refresh()
     {
-
+        
     }
+    /**
+     * @brief Clears the assetmanager
+     * 
+     */
+    void cleanup()
+    {
+        
+    }
+
     private:
 
     std::unordered_map<const char*,std::shared_ptr<assetType>> assetMap;
 };
 
-//SDL TEXTURE MANAGER
-//default_delete needs to be specialized for SDL_Texture to be used with STL
-extern SDL_Renderer* renderer;
-template <>
-struct std::default_delete<SDL_Texture>{
-    void operator()(SDL_Texture* p) { SDL_DestroyTexture(p); }
-};
 
-template<>
-class assetManager<SDL_Texture>
-{
-    public:
-    std::shared_ptr<SDL_Texture> loadFromFile(const std::string& path)
-    {
-
-      if(path.empty())
-      {
-             return nullptr;
-      }
-      //search for the texture in the map
-      const auto rez = assetMap.find(path);
-      //return  it if it's there
-      if(rez != assetMap.end())
-      {
-          return rez->second;
-      }
-      
-      SDL_Surface* surf = IMG_Load(path.c_str());
-      //can't use make_shared because SDL_Texture is not a complete type?
-      auto texture = std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(renderer,surf),[](SDL_Texture* tex){SDL_DestroyTexture(tex);});
-      assetMap.insert({path,texture});
-      return texture;
-     
-
-            
-    }
-    void refresh()
-    {
-
-    }
-    private:
-    std::unordered_map<std::string,std::shared_ptr<SDL_Texture>> assetMap{};
-};
-
-
+}
