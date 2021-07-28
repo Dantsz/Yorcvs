@@ -15,7 +15,7 @@ namespace Yorcvs
     /**
      * @brief 2D vector class
      * 
-     * @tparam T 
+     * @tparam T Type should be arithmetic
      */
     template<typename T>
     class Vec2
@@ -172,13 +172,88 @@ namespace Yorcvs
     /**
      * @brief 2D rectangle class
      * 
-     * @tparam T 
+     * @tparam T type should be arithmetic
      */
     template<typename T>
     class Rect
     {
         public:
-        
+        constexpr Rect()
+        {
+           x = static_cast<T>(0);
+           y = static_cast<T>(0);
+           w = static_cast<T>(0);
+           h = static_cast<T>(0);
+        }
+        constexpr Rect(T px , T py , T pw , T ph)
+        {
+            x = px;
+            y = py;
+            w = pw;
+            h = ph;
+        }
+        constexpr Rect(const Rect& other)
+        {
+            x = other.x;
+            y = other.y;
+            w = other.w;
+            h = other.h;
+        }
+        constexpr Rect(Rect&& other) noexcept
+        {
+            x = other.x;
+            y = other.y;
+            w = other.w;
+            h = other.h;
+        }
+        constexpr Rect(const Vec2<T> position,const Vec2<T> dimension)
+        {
+            x = position.x;
+            y = position.y;
+            w = dimension.x;
+            h = dimension.y;
+        }
+        constexpr Rect(const Vec2<T>& position,const Vec2<T> dimension)
+        {
+            x = position.x;
+            y = position.y;
+            w = dimension.x;
+            h = dimension.y;
+        }
+        ~Rect() = default;
+        constexpr Rect& operator=(const Rect& other) = default;
+        constexpr Rect& operator=(Rect&& other) noexcept = default;
+
+
+        constexpr bool operator==(const Rect& other)
+        {
+            return(x == other.x && y == other.y && w  == other.w && h == other.h);
+        }
+        constexpr bool operator!=(const Rect& other)
+        {
+            return(x != other.x || y != other.y || w  != other.w || h != other.h);
+        }
+        /**
+         * @brief Get the parameters of the rectangle
+         * 
+         * @return constexpr Vec2<T>
+         */
+        constexpr Vec2<T> getPosition()
+        {
+            return Vec2<T>(x,y);
+        }
+        /**
+         * @brief Get the dimension of the rectangle
+         * 
+         * @return constexpr Vec2<T> 
+         */
+        constexpr Vec2<T> getDimension()
+        {   
+            return Vec2<T>(w,h);
+        }
+
+
+
         T x, y;
         T w, h;
     };
