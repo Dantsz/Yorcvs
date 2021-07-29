@@ -26,7 +26,6 @@ template <>
      void operator()(SDL_Texture* p) 
      { 
          SDL_DestroyTexture(p);
-         std::cout<<"Ded\n";
      }
    };
 
@@ -188,14 +187,17 @@ namespace yorcvs
 
             void drawSprite(const std::string& path,const Rect<float>& dstRect ,const Rect<size_t>& srcRect , double angle = 0.0 )
             {
-                SDL_Rect sourceR = {static_cast<int>(srcRect.x),static_cast<int>(srcRect.y),static_cast<int>(srcRect.w),static_cast<int>(srcRect.h)};
-                SDL_FRect dest = {dstRect.x,dstRect.y,dstRect.w,dstRect.h};
-                SDL_RenderCopyExF(renderer,
-                                  assetm.loadFromFile(path,renderer).get(),
-                                  &sourceR,
-                                  &dest,
-                                  angle,nullptr,
-                                  SDL_FLIP_NONE);
+                if (!isMinimized)
+                {
+                    SDL_Rect sourceR = { static_cast<int>(srcRect.x),static_cast<int>(srcRect.y),static_cast<int>(srcRect.w),static_cast<int>(srcRect.h) };
+                    SDL_FRect dest = { dstRect.x,dstRect.y,dstRect.w,dstRect.h };
+                    SDL_RenderCopyExF(renderer,
+                        assetm.loadFromFile(path, renderer).get(),
+                        &sourceR,
+                        &dest,
+                        angle, nullptr,
+                        SDL_FLIP_NONE);
+                }
             }
 
 
@@ -213,8 +215,11 @@ namespace yorcvs
 
             void drawText(const Text<yorcvs::SDL2>& text,const Rect<float>& dstRect) const
             {
-                SDL_FRect dest = {dstRect.x,dstRect.y,dstRect.w,dstRect.h};
-                SDL_RenderCopyF(renderer,text.SDLtex.get(),nullptr,&dest);
+                if (!isMinimized)
+                {
+                    SDL_FRect dest = { dstRect.x,dstRect.y,dstRect.w,dstRect.h };
+                    SDL_RenderCopyF(renderer, text.SDLtex.get(), nullptr, &dest);
+                }
             }
 
             void setTextMessage(Text<yorcvs::SDL2>& text , const std::string& message)

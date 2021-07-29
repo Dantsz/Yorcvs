@@ -44,3 +44,6 @@ CMakeSettings.json
 html/
 latex/
 out/
+yorcvs.srctrlprj
+yorcvs.srctrlbm
+yorcvs.srctrldb
