@@ -13,7 +13,7 @@
 
 
 static yorcvs::Window<yorcvs::SDL2> r;
-yorcvs::Texture<yorcvs::SDL2>* text;
+yorcvs::Text<yorcvs::SDL2>* text;
 bool isRunning = true;
 std::shared_ptr<TTF_Font> fontest;
 
@@ -23,7 +23,7 @@ static int init()
 {
 
 	r.Init("TEst",960,500);
-	text = new yorcvs::Texture<yorcvs::SDL2>(r.createText(std::string("assets/font.ttf"),"TEST111\n11",255,255,255,255,32,100));
+	text = new yorcvs::Text<yorcvs::SDL2>(r.createText(std::string("assets/font.ttf"),"TEST111\n11",255,255,255,255,32,100));
 	
 	return 0;
 }

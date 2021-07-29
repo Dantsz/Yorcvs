@@ -23,7 +23,7 @@
 template <>
  struct std::default_delete<SDL_Texture>
    {
-     void operator()(SDL_Texture* p) { SDL_DestroyTexture(p); }
+     void operator()(SDL_Texture* p) { SDL_DestroyTexture(p);}
    };
 
 template<>
@@ -90,6 +90,7 @@ namespace yorcvs
     template<>
     class Text<SDL2>
     {
+        public:
         std::unique_ptr<SDL_Texture> SDLtex;
         std::string message;
         std::string fontPath;
@@ -191,20 +192,19 @@ namespace yorcvs
             }
 
          
-            yorcvs::Texture<yorcvs::SDL2> createText(const std::string& path,const std::string& message, uint8_t r, uint8_t g, uint8_t b, uint8_t a,size_t charSize,size_t lineLength)
+            yorcvs::Text<yorcvs::SDL2> createText(const std::string& path,const std::string& message, uint8_t r, uint8_t g, uint8_t b, uint8_t a,size_t charSize,size_t lineLength)
             {
                
                 TTF_Font* font = TTF_OpenFont(path.c_str(),static_cast<int>(charSize));
                 SDL_Surface* textSurf = TTF_RenderText_Blended_Wrapped(font,message.c_str(),{r,g,b,a},static_cast<uint32_t>(lineLength));
-                Texture<yorcvs::SDL2> tex;
-                tex.SDLtex =  std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(renderer,textSurf),[](SDL_Texture* p){ SDL_DestroyTexture(p);
-                std::cout<<"DESTROYYYYYYYYYED\n";});    
+                Text<yorcvs::SDL2> tex;
+                tex.SDLtex =  std::unique_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(renderer,textSurf));    
                 SDL_FreeSurface(textSurf);
                 TTF_CloseFont(font);
                 return tex;
             }
 
-            void drawText(const Texture<yorcvs::SDL2>& texture,const Rect<float>& dstRect) const
+            void drawText(const Text<yorcvs::SDL2>& texture,const Rect<float>& dstRect) const
             {
                 SDL_FRect dest = {dstRect.x,dstRect.y,dstRect.w,dstRect.h};
                 SDL_RenderCopyF(renderer,texture.SDLtex.get(),nullptr,&dest);

@@ -21,10 +21,10 @@ namespace yorcvs
     };
     */
 
-     /** Texture for drawing sprite
-     * @brief 
+     /**
+     * @brief - Texture for drawing sprite
      * 
-     * @tparam interface 
+     * @tparam interface - interface the texture uses
      */
     template<typename interface>
     class Texture
@@ -32,9 +32,9 @@ namespace yorcvs
 
     };
     /**
-     * @brief Contains data for rendering text
+     * @brief -Contains data for rendering text
      * 
-     * @tparam interface 
+     * @tparam interface - interface used for text
      */
     template<typename interface>
     class Text
@@ -45,7 +45,7 @@ namespace yorcvs
     /**
      * @brief Windows that can render sprites and text to the screen
      * 
-     * @tparam interface
+     * @tparam interface -interface used to implement the window
      */
     template<typename interface>
     class Window
