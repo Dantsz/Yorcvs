@@ -39,7 +39,7 @@ target_link_libraries(${PROJECT_NAME} SDL2::Main SDL2::Image SDL2::TTF)
 
 
 target_compile_options(Yorcvs PRIVATE
-$<$<CXX_COMPILER_ID:MSVC>:/Wall /fsanitize-address /Zi >
+$<$<CXX_COMPILER_ID:MSVC>:/Wall /fsanitize=address /Zi >
 $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op>
 $<$<CXX_COMPILER_ID:Clang>:-Weverything -Wshadow -Wformat=2 -Wno-c++98-compat-pedantic -Wno-c++98-compat -Wpedantic>
 )
