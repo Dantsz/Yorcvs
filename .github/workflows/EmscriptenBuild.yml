@@ -28,6 +28,6 @@ jobs:
         
       #Compile emscripten
       - name: Compile
-        working-directory: ${{github.workspace}
+        working-directory: ${{github.workspace}}
         run: ./buildEmscripten.sh
       
