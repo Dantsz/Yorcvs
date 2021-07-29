@@ -13,11 +13,9 @@
 
 static yorcvs::Window<yorcvs::SDL2> r;
 yorcvs::Text<yorcvs::SDL2>* text;
-bool isRunning = true;
 int count = 0 ;
 yorcvs::Texture<yorcvs::SDL2> tee2;
-int c[3];
-int p[2];
+
 ///Test
 static int init()
 {
