@@ -69,10 +69,11 @@ namespace yorcvs
              * @param g - green
              * @param b - blue
              * @param a - alpha
+             * @param charSize - the resolution of a glyph
              * @param lineLength - length of a line before a break
              * @return std::shared_ptr<Texture<interfaceWindow>> - the texture to be passed to draw_texture
              */
-            Texture<interface> createTextTexture(const std::string& path,const std::string& message, uint8_t r, uint8_t g, uint8_t b, uint8_t a,size_t lineLength);
+            Texture<interface> createTextTexture(const std::string& path,const std::string& message, uint8_t r, uint8_t g, uint8_t b, uint8_t a,size_t charSize,size_t lineLength);
 
             void drawText(const Texture<interface>& texture,const Rect<float>& dstRect);
             /**

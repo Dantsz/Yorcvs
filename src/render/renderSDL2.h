@@ -69,50 +69,7 @@ template<>
         private:
         std::unordered_map<std::string,std::shared_ptr<SDL_Texture>> assetMap{};
  };
- //for FONTS Surfaces
- template <>
- struct std::default_delete<TTF_Font>
-   {
-     void operator()(TTF_Font* p) { TTF_CloseFont(p); }
-   };
 
- template<>
- class yorcvs::AssetManager<TTF_Font>
- {
-     public:
-        std::shared_ptr<TTF_Font> loadFromFile(const std::string& path)
-        {
-            if(path.empty())
-            {
-                return nullptr;
-            }
-            const auto rez = assetMap.find(path);
-            if(rez != assetMap.end())
-            {
-                return rez->second;
-            }
-            
-            auto font = std::shared_ptr<TTF_Font>(TTF_OpenFont(path.c_str(),pointSize),[](TTF_Font* f){TTF_CloseFont(f);});
-            assetMap.insert({path,font});
-            return font;
-        }
-        void refresh()
-        {
-
-        }
-
-        void cleanup()
-        {
-            for(auto it : assetMap)
-            {
-                it.second.reset();
-            }
-        }
-
-     private:
-        static constexpr int pointSize = 64;
-        std::unordered_map<std::string,std::shared_ptr<TTF_Font>> assetMap{};
- };
 
 namespace yorcvs
 {   
@@ -167,7 +124,7 @@ namespace yorcvs
                     }
             }
 
-            void setSize(size_t width, size_t height)
+            void setSize(size_t width, size_t height) const
             {
                 SDL_SetWindowSize(sdlWindow,static_cast<int>(width),static_cast<int>(height));
             }
@@ -195,35 +152,36 @@ namespace yorcvs
             }
 
          
-            yorcvs::Texture<yorcvs::SDL2> createTextTexture(const std::string& path,const std::string& message, uint8_t r, uint8_t g, uint8_t b, uint8_t a,size_t lineLength)
+            yorcvs::Texture<yorcvs::SDL2> createTextTexture(const std::string& path,const std::string& message, uint8_t r, uint8_t g, uint8_t b, uint8_t a,size_t charSize,size_t lineLength)
             {
-                auto fnt = fontmanager.loadFromFile(path);
-                SDL_Surface* textSurf = TTF_RenderText_Blended_Wrapped(fnt.get(),message.c_str(),{r,g,b,a},static_cast<uint32_t>(lineLength));
+               
+                TTF_Font* font = TTF_OpenFont(path.c_str(),static_cast<int>(charSize));
+                SDL_Surface* textSurf = TTF_RenderText_Blended_Wrapped(font,message.c_str(),{r,g,b,a},static_cast<uint32_t>(lineLength));
                 Texture<yorcvs::SDL2> tex;
                 tex.SDLtex =  std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(renderer,textSurf),[](SDL_Texture* p){ SDL_DestroyTexture(p);});    
                 SDL_FreeSurface(textSurf);
-
+                TTF_CloseFont(font);
                 return tex;
             }
 
-            void drawText(const Texture<yorcvs::SDL2>& texture,const Rect<float>& dstRect) 
+            void drawText(const Texture<yorcvs::SDL2>& texture,const Rect<float>& dstRect) const
             {
                 SDL_FRect dest = {dstRect.x,dstRect.y,dstRect.w,dstRect.h};
                 SDL_RenderCopyF(renderer,texture.SDLtex.get(),nullptr,&dest);
             }
 
 
-            void present()
+            void present() const
             {
                 SDL_RenderPresent(renderer);
             }
 
-            void clear()
+            void clear() const
             {
                 SDL_RenderClear(renderer);
             }
 
-        public:
+        private:
         SDL_Window* sdlWindow = nullptr;    
         SDL_Renderer* renderer = nullptr;
         AssetManager<SDL_Texture> assetm{};

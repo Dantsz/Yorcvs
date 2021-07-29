@@ -41,5 +41,5 @@ target_link_libraries(${PROJECT_NAME} SDL2::Main SDL2::Image SDL2::TTF)
 target_compile_options(Yorcvs PRIVATE
 $<$<CXX_COMPILER_ID:MSVC>:/W4 /fsanitize=undefined /Zi>
 $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -pedantic>
-$<$<CXX_COMPILER_ID:Clang>:-Weverything -Wno-c++98-compat-pedantic -Wno-c++98-compat -pedantic>
+$<$<CXX_COMPILER_ID:Clang>:-Weverything -Wall -Wextra -Wno-c++98-compat-pedantic -Wno-c++98-compat -pedantic>
 )
