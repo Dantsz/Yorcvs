@@ -22,12 +22,9 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       - uses: mymindstorm/setup-emsdk@v9
-
-      - name: Verify Emscripten
-        run: emcc -v
         
       #Compile emscripten
       - name: Compile
         working-directory: ${{github.workspace}}
-        run: ./buildEmscripten.sh
+        run: sudo bash buildEmscripten.sh
       
