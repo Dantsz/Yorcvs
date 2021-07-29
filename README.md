@@ -1,4 +1,4 @@
-# Yorcvs [![Build](https://github.com/Dantsz/Yorcvs/actions/workflows/cmake.yml/badge.svg)](https://github.com/Dantsz/Yorcvs/actions/workflows/cmake.yml)
+# Yorcvs [![Build](https://github.com/Dantsz/Yorcvs/actions/workflows/cmake.yml/badge.svg)](https://github.com/Dantsz/Yorcvs/actions/workflows/cmake.yml) [![Emscripten Build](https://github.com/Dantsz/Yorcvs/actions/workflows/EmscriptenBuild.yml/badge.svg)](https://github.com/Dantsz/Yorcvs/actions/workflows/EmscriptenBuild.yml)
 C++ game project
 ## Dependencies
 |Dependency|Version|
