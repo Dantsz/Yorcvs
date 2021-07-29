@@ -119,16 +119,48 @@ namespace yorcvs
             void setTextMessage(const Text<interface>& text , const std::string& message);
 
 
+            /**
+             * @brief Set the Text Color 
+             * 
+             * @param text - text object
+             * @param r - red
+             * @param g - green
+             * @param b - blue
+             * @param a - alpha
+             */
+            void setTextColor(const Text<interface>& text , uint8_t r , uint8_t g, uint8_t b, uint8_t a);
 
 
+            /**
+             * @brief Set the Text Char Size 
+             * 
+             * @param text - text
+             * @param charSize - the new size
+             */
+            void setTextCharSize(const Text<interface>& text, size_t charSize);
 
-
+            /**
+             * @brief Set the Text Line Length 
+             * 
+             * @param text - text
+             * @param lineLength - new length of message before a new line
+             */
+            void setTextLineLength(const Text<interface>& text,size_t lineLength);
+            
+            /**
+             * @brief Set the Text Font 
+             * 
+             * @param text - text 
+             * @param fontPath - path to the new font
+             */
+            void setTextFont(const Text<interface>& text , const std::string& fontPath);
 
             /**
              * @brief Clears the screen
              * 
              */
             void clear();
+
             /**
              * @brief draws rendered sprites to the screen
              * 

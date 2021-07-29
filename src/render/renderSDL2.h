@@ -99,8 +99,8 @@ namespace yorcvs
         std::string message;
         std::string fontPath;
         SDL_Color color = {255,255,255,255};
-        int charSize;
-        uint32_t lineLength;
+        int charSize = 0;
+        uint32_t lineLength = 0;
     };
 
     /**
@@ -225,7 +225,28 @@ namespace yorcvs
 
             }
 
-            
+            void setTextColor(Text<yorcvs::SDL2>& text , uint8_t r , uint8_t g, uint8_t b, uint8_t a)
+            {
+               text.color = {r,g,b,a};
+               setupTexture(text);
+            }
+            void setTextCharSize(Text<yorcvs::SDL2>& text, size_t charSize)
+            {
+               text.charSize = static_cast<int>(charSize);
+               setupTexture(text);
+            }
+            void setTextLineLength(Text<yorcvs::SDL2>& text,size_t lineLength)
+            {
+                text.lineLength = static_cast<uint32_t>(lineLength);
+                setupTexture(text);
+            }
+            void setTextFont(Text<yorcvs::SDL2>& text , const std::string& fontPath)
+            {
+                text.fontPath = fontPath;
+                setupTexture(text);
+            }
+
+
 
             void present() const
             {

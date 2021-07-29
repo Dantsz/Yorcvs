@@ -9,8 +9,7 @@
 
 #include "common/types.h"
 #include "render/renderSDL2.h"
-
-
+#include <cstdlib>
 
 static yorcvs::Window<yorcvs::SDL2> r;
 yorcvs::Text<yorcvs::SDL2>* text;
@@ -40,8 +39,11 @@ void run()
 
 	yorcvs::Rect<float> textdst = {100,200,100,100};
 	r.setTextMessage(*text,std::to_string(count));
-	r.drawText(*text,textdst);
 
+
+
+	r.drawText(*text,textdst);
+	r.setTextColor(*text,rand()%255,rand()%255,rand()%255,255);
 
 
 	r.present();
