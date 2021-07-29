@@ -16,9 +16,11 @@ yorcvs::Texture<yorcvs::SDL2> tee2;
 static int init()
 {
 
+
+
+
     r.Init("TEst", 960, 500);
-    text = new yorcvs::Text<yorcvs::SDL2>(
-        r.createText(std::string("assets/font.ttf"), "TEST111\n11", 255, 255, 255, 255, 32, 100));
+    text = new yorcvs::Text<yorcvs::SDL2>(r.createText(std::string("assets/font.ttf"), "TEST111\n11", 255, 255, 255, 255, 32, 100));//NOLINT
 
     return 0;
 }

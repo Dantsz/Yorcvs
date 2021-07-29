@@ -94,8 +94,8 @@ template <typename interface> class Window
      * @return std::shared_ptr<Texture<interfaceWindow>> - the texture to be
      * passed to draw_texture
      */
-    Text<interface> createText(const std::string &path, const std::string &message, uint8_t r, uint8_t g, uint8_t b,
-                               uint8_t a, size_t charSize, size_t lineLength);
+    Text<interface> createText(const std::string &path, const std::string &message, unsigned char r, unsigned char g, unsigned char b,
+                               unsigned char a, size_t charSize, size_t lineLength);
 
     /**
      * @brief Draws the text to the screen, fitting it in dstRect

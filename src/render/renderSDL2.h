@@ -187,8 +187,8 @@ template <> class Window<yorcvs::SDL2>
         }
     }
 
-    yorcvs::Text<yorcvs::SDL2> createText(const std::string &path, const std::string &message, uint8_t r, uint8_t g,
-                                          uint8_t b, uint8_t a, size_t charSize, size_t lineLength)
+    yorcvs::Text<yorcvs::SDL2> createText(const std::string &path, const std::string &message, unsigned char r, unsigned char g,
+                                          unsigned char b, unsigned char a, size_t charSize, size_t lineLength)
     {
         Text<yorcvs::SDL2> text;
         text.fontPath = path;
@@ -216,7 +216,7 @@ template <> class Window<yorcvs::SDL2>
         setupTexture(text);
     }
 
-    void setTextColor(Text<yorcvs::SDL2> &text, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+    void setTextColor(Text<yorcvs::SDL2> &text, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
     {
         text.color = {r, g, b, a};
         setupTexture(text);
