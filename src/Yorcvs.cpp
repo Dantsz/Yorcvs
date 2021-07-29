@@ -16,7 +16,7 @@ static yorcvs::Window<yorcvs::SDL2> r;
 yorcvs::Text<yorcvs::SDL2>* text;
 bool isRunning = true;
 std::shared_ptr<TTF_Font> fontest;
-
+int count = 0 ;
 yorcvs::Texture<yorcvs::SDL2> tee2;
 ///Test
 static int init()
@@ -30,7 +30,7 @@ static int init()
 
 void run()
 {
-	
+	count++;
 	
 	r.handleEvents();
 	yorcvs::Rect<float> dst = {0,0,100,100};
@@ -39,6 +39,7 @@ void run()
 	r.drawSprite("assets/lettuce.png",dst,src);
 
 	yorcvs::Rect<float> textdst = {100,200,100,100};
+	r.setTextMessage(*text,std::to_string(count));
 	r.drawText(*text,textdst);
 
 

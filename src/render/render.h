@@ -1,3 +1,13 @@
+/**
+ * @file render.h
+ * @author Dansz
+ * @brief Basic 2D rendering 
+ * @version 0.1
+ * @date 2021-07-29
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
 #pragma once
 #include <type_traits>
 #include <string>
@@ -5,11 +15,14 @@
 #include <cstdint>
 namespace yorcvs
 {   
-    /**
-     * @brief Contains information about the api used for rendering
-     * 
-     *  
-     
+  
+    /*
+    Interface = api used to draw to the screen
+    How to:
+    Specialize window,texture,and text with a class(concept) and implement their methods using the api
+    */
+
+    /* Concepts are still not supported yet
     template<typename T>
     concept Interface = requires(T interface)
     {
@@ -21,11 +34,11 @@ namespace yorcvs
     };
     */
 
-     /**
-     * @brief - Texture for drawing sprite
-     * 
-     * @tparam interface - interface the texture uses
-     */
+    /**
+    * @brief - Texture for drawing sprite
+    * 
+    * @tparam interface - interface the texture uses
+    */
     template<typename interface>
     class Texture
     {
@@ -45,7 +58,7 @@ namespace yorcvs
     /**
      * @brief Windows that can render sprites and text to the screen
      * 
-     * @tparam interface -interface used to implement the window
+     * @tparam interface -interface used to implement the window, 
      */
     template<typename interface>
     class Window
@@ -70,6 +83,7 @@ namespace yorcvs
              * @param angle  -angle of the texture(default is 0)
              */
             void drawSprite(const std::string& path,const yorcvs::Rect<float>& dstRect ,const yorcvs::Rect<size_t>& srcRect , double angle = 0.0 );
+
             /**
              * @brief Create a Text Texture object
              * 
@@ -84,8 +98,32 @@ namespace yorcvs
              * @return std::shared_ptr<Texture<interfaceWindow>> - the texture to be passed to draw_texture
              */
             Text<interface> createText(const std::string& path,const std::string& message, uint8_t r, uint8_t g, uint8_t b, uint8_t a,size_t charSize,size_t lineLength);
+        
 
-            void drawText(const Text<interface>& texture,const Rect<float>& dstRect);
+            /**
+             * @brief Draws the text to the screen, fitting it in dstRect
+             * 
+             * @param text - Text created using creaText method
+             * @param dstRect - A rectangle
+             */
+            void drawText(const Text<interface>& text,const Rect<float>& dstRect);
+
+
+
+            /**
+             * @brief Set the Text Message 
+             * 
+             * @param text - the text to be set
+             * @param message - new message
+             */
+            void setTextMessage(const Text<interface>& text , const std::string& message);
+
+
+
+
+
+
+
             /**
              * @brief Clears the screen
              * 
