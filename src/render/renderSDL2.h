@@ -87,6 +87,13 @@ namespace yorcvs
         std::shared_ptr<SDL_Texture> SDLtex;
     };
 
+    template<>
+    class Text<SDL2>
+    {
+        std::unique_ptr<SDL_Texture> SDLtex;
+        std::string message;
+        std::string fontPath;
+    };
 
     /**
      * @brief interfaceWindow that uses SDL2 api
@@ -148,6 +155,7 @@ namespace yorcvs
                    {
                        //QUIT EVENT
                        case SDL_QUIT:
+                       isActive = false;
                        break;
 
                        case SDL_WINDOWEVENT:
@@ -169,6 +177,7 @@ namespace yorcvs
 
                 }
             }
+
             void drawSprite(const std::string& path,const Rect<float>& dstRect ,const Rect<size_t>& srcRect , double angle = 0.0 )
             {
                 SDL_Rect sourceR = {static_cast<int>(srcRect.x),static_cast<int>(srcRect.y),static_cast<int>(srcRect.w),static_cast<int>(srcRect.h)};
@@ -182,13 +191,14 @@ namespace yorcvs
             }
 
          
-            yorcvs::Texture<yorcvs::SDL2> createTextTexture(const std::string& path,const std::string& message, uint8_t r, uint8_t g, uint8_t b, uint8_t a,size_t charSize,size_t lineLength)
+            yorcvs::Texture<yorcvs::SDL2> createText(const std::string& path,const std::string& message, uint8_t r, uint8_t g, uint8_t b, uint8_t a,size_t charSize,size_t lineLength)
             {
                
                 TTF_Font* font = TTF_OpenFont(path.c_str(),static_cast<int>(charSize));
                 SDL_Surface* textSurf = TTF_RenderText_Blended_Wrapped(font,message.c_str(),{r,g,b,a},static_cast<uint32_t>(lineLength));
                 Texture<yorcvs::SDL2> tex;
-                tex.SDLtex =  std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(renderer,textSurf),[](SDL_Texture* p){ SDL_DestroyTexture(p);});    
+                tex.SDLtex =  std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(renderer,textSurf),[](SDL_Texture* p){ SDL_DestroyTexture(p);
+                std::cout<<"DESTROYYYYYYYYYED\n";});    
                 SDL_FreeSurface(textSurf);
                 TTF_CloseFont(font);
                 return tex;
@@ -200,6 +210,7 @@ namespace yorcvs
                 SDL_RenderCopyF(renderer,texture.SDLtex.get(),nullptr,&dest);
             }
 
+            
 
             void present() const
             {
@@ -217,6 +228,7 @@ namespace yorcvs
                  }
             }
 
+        bool isActive = true;
         private:
         SDL_Window* sdlWindow = nullptr;    
         SDL_Renderer* renderer = nullptr;

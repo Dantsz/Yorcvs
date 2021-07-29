@@ -13,7 +13,7 @@
 
 
 static yorcvs::Window<yorcvs::SDL2> r;
-static yorcvs::Texture<yorcvs::SDL2> text;
+yorcvs::Texture<yorcvs::SDL2>* text;
 bool isRunning = true;
 std::shared_ptr<TTF_Font> fontest;
 
@@ -23,7 +23,7 @@ static int init()
 {
 
 	r.Init("TEst",960,500);
-	text = r.createTextTexture(std::string("assets/font.ttf"),"TEST111\n11",255,255,255,255,32,100);
+	text = new yorcvs::Texture<yorcvs::SDL2>(r.createText(std::string("assets/font.ttf"),"TEST111\n11",255,255,255,255,32,100));
 	
 	return 0;
 }
@@ -39,7 +39,7 @@ void run()
 	r.drawSprite("assets/lettuce.png",dst,src);
 
 	yorcvs::Rect<float> textdst = {100,200,100,100};
-	r.drawText(text,textdst);
+	r.drawText(*text,textdst);
 
 
 
@@ -49,7 +49,8 @@ void run()
 
 
 int cleanup()
-{
+{	
+	delete text;
 	r.cleanup();
 }
 
@@ -61,7 +62,7 @@ int main(int argc,char** argv)
 		std::cout<<"running EMSCRIPTEM";
 		emscripten_set_main_loop(run,0,1);
 	#else
-		while(isRunning)
+		while(r.isActive)
 		{
 			run();
 		}

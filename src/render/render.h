@@ -20,9 +20,24 @@ namespace yorcvs
        
     };
     */
-   
+
+     /** Texture for drawing sprite
+     * @brief 
+     * 
+     * @tparam interface 
+     */
     template<typename interface>
     class Texture
+    {
+
+    };
+    /**
+     * @brief Contains data for rendering text
+     * 
+     * @tparam interface 
+     */
+    template<typename interface>
+    class Text
     {
 
     };
@@ -30,7 +45,7 @@ namespace yorcvs
     /**
      * @brief Windows that can render sprites and text to the screen
      * 
-     * @tparam interface - the underlying wrapper
+     * @tparam interface
      */
     template<typename interface>
     class Window
@@ -68,9 +83,9 @@ namespace yorcvs
              * @param lineLength - length of a line before a break
              * @return std::shared_ptr<Texture<interfaceWindow>> - the texture to be passed to draw_texture
              */
-            Texture<interface> createTextTexture(const std::string& path,const std::string& message, uint8_t r, uint8_t g, uint8_t b, uint8_t a,size_t charSize,size_t lineLength);
+            Text<interface> createText(const std::string& path,const std::string& message, uint8_t r, uint8_t g, uint8_t b, uint8_t a,size_t charSize,size_t lineLength);
 
-            void drawText(const Texture<interface>& texture,const Rect<float>& dstRect);
+            void drawText(const Text<interface>& texture,const Rect<float>& dstRect);
             /**
              * @brief Clears the screen
              * 
@@ -82,6 +97,10 @@ namespace yorcvs
              */
             void present();
 
+
+
+         
+            bool isActive;
         private:
             
 
