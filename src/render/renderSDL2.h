@@ -124,6 +124,8 @@ namespace yorcvs
                     }
             }
 
+
+
             void setSize(size_t width, size_t height) const
             {
                 SDL_SetWindowSize(sdlWindow,static_cast<int>(width),static_cast<int>(height));
@@ -138,7 +140,35 @@ namespace yorcvs
                 SDL_Quit();
                 TTF_Quit();	
             }
+            void handleEvents()
+            {
+                while(SDL_PollEvent(&event) == 1)
+                {
+                   switch(event.type)
+                   {
+                       //QUIT EVENT
+                       case SDL_QUIT:
+                       break;
 
+                       case SDL_WINDOWEVENT:
+                        if(event.window.event == SDL_WINDOWEVENT_RESTORED)
+                        {
+                            isMinimized  = false;
+                        } 
+                        else if(event.window.event == SDL_WINDOWEVENT_MINIMIZED)
+                        {
+                            isMinimized = true;
+                        }
+
+                       break;
+
+                       default:
+                       break;
+
+                   }
+
+                }
+            }
             void drawSprite(const std::string& path,const Rect<float>& dstRect ,const Rect<size_t>& srcRect , double angle = 0.0 )
             {
                 SDL_Rect sourceR = {static_cast<int>(srcRect.x),static_cast<int>(srcRect.y),static_cast<int>(srcRect.w),static_cast<int>(srcRect.h)};
@@ -173,12 +203,18 @@ namespace yorcvs
 
             void present() const
             {
-                SDL_RenderPresent(renderer);
+                if(!isMinimized)
+                {
+                     SDL_RenderPresent(renderer);
+                }
             }
 
             void clear() const
             {
-                SDL_RenderClear(renderer);
+                 if(!isMinimized)
+                 {
+                      SDL_RenderClear(renderer);
+                 }
             }
 
         private:
@@ -186,7 +222,8 @@ namespace yorcvs
         SDL_Renderer* renderer = nullptr;
         AssetManager<SDL_Texture> assetm{};
         AssetManager<TTF_Font> fontmanager{};
-     
+        bool isMinimized = false;
+        SDL_Event event{};
     };
     
     

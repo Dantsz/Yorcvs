@@ -32,12 +32,7 @@ void run()
 {
 	
 	
-	SDL_Event e;
-	if (SDL_PollEvent(&e)) {
-		if (e.type == SDL_QUIT) {
-			isRunning = false;
-		}
-	}
+	r.handleEvents();
 	yorcvs::Rect<float> dst = {0,0,100,100};
 	yorcvs::Rect<size_t> src = {0,0,212,229};
 	r.clear();
@@ -56,7 +51,6 @@ void run()
 int cleanup()
 {
 	r.cleanup();
-	return 0;
 }
 
 int main(int argc,char** argv)

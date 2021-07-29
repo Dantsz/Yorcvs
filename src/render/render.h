@@ -36,20 +36,15 @@ namespace yorcvs
     class Window
     {
         public:
-            void Init(const char* name , size_t w , size_t h)
-            {
-                
-            }
-            void setSize(size_t w,size_t h)
-            {
-               
-            }
-            void cleanup()
-            {
-               
-            }
+            void Init(const char* name , size_t w , size_t h);
+            void setSize(size_t w,size_t h);
+            void cleanup();
 
-
+            /**
+             * @brief Handles window events
+             * 
+             */
+            void handleEvents();
 
             /**
              * @brief Renders a sprite to the screen with the specified parameters
