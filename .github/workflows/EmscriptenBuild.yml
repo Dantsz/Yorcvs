@@ -29,5 +29,5 @@ jobs:
       #Compile emscripten
       - name: Compile
         working-directory: ${{github.workspace}}
-        run: sudo ./buildEmscripten.sh
+        run: sudo bash buildEmscripten.sh
       
