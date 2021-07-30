@@ -1,7 +1,7 @@
 /**
  * @file render.h
  * @author Dansz
- * @brief Basic 2D rendering
+ * @brief Basic 2D rendering and input handling
  * @version 0.1
  * @date 2021-07-29
  *
@@ -159,6 +159,10 @@ template <typename interface> class Window
      *
      */
     void present();
+    
+
+
+
 
     bool isActive;
 

@@ -33,8 +33,8 @@ set(YorcvsALLFILES "src/Yorcvs.cpp"
                   "src/common/log.h"
                  
 
-                  "src/render/render.h"
-                  "src/render/renderSDL2.h")
+                  "src/window/window.h"
+                  "src/window/windowSDL2.h")
 
 add_executable(Yorcvs ${YorcvsALLFILES})
 

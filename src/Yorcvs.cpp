@@ -3,7 +3,7 @@
 #include <emscripten.h>
 #endif
 
-#include "render/renderSDL2.h"
+#include "window/windowSDL2.h"
 
 #include <cstdlib>
 

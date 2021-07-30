@@ -1,7 +1,7 @@
 /**
  * @file renderSDL2.h
  * @author Dansz
- * @brief SDL2 renderer interface for yorcvs
+ * @brief SDL2 interface for yorcvs
  * @version 0.1
  * @date 2021-07-28
  *
@@ -11,7 +11,7 @@
 #pragma once
 #include "../assetmanager/assetmanager.h"
 #include "../common/log.h"
-#include "render.h"
+#include "window.h"
 
 #include <SDL.h>
 #include <SDL_image.h>
