@@ -287,7 +287,7 @@ template <> class Window<yorcvs::SDL2>
     {
         int x,y;
         SDL_GetMouseState(&x,&y);
-        return Vec2(static_cast<float>(x),static_cast<float>(y));
+        return Vec2<float>(static_cast<float>(x),static_cast<float>(y));
     }
 
 
