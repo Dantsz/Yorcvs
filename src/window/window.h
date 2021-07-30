@@ -160,7 +160,18 @@ template <typename interface> class Window
      */
     void present();
     
+   
 
+    //INPUT
+
+
+    /**
+     * @brief Get the cursor position on the screen 
+     * 
+     * @return yorcvs::Vec2<float> - the position
+     */
+    yorcvs::Vec2<float> getCursorPosition();
+    
 
 
 

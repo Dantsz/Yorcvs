@@ -282,6 +282,18 @@ template <> class Window<yorcvs::SDL2>
             SDL_RenderClear(renderer);
         }
     }
+    
+    yorcvs::Vec2<float> getCursorPosition()
+    {
+        int x,y;
+        SDL_GetMouseState(&x,&y);
+        return Vec2(static_cast<float>(x),static_cast<float>(y));
+    }
+
+
+
+
+
 
     bool isActive = true;
 

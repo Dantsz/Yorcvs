@@ -28,6 +28,10 @@ void run()
     count++;
 
     r.handleEvents();
+
+    std::cout<< r.getCursorPosition() << '\n';
+
+
     yorcvs::Rect<float> dst = {0, 0, 100, 100};
     yorcvs::Rect<size_t> src = {0, 0, 212, 229};
     r.clear();
@@ -40,6 +44,7 @@ void run()
     r.setTextColor(*text, rand() % 255, rand() % 255, rand() % 255, 255);
 
     r.present();
+
 }
 
 int cleanup()
