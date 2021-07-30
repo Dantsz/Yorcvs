@@ -13,10 +13,12 @@
 #include "../common/log.h"
 #include "window.h"
 
+#include <vector>
+
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
-
+#include <functional> // callbacks need to be stored in a vector
 // SDL TEXTURE MANAGER
 // default_delete needs to be specialized for SDL_Texture to be used with STL
 
@@ -102,6 +104,25 @@ template <> class Text<yorcvs::SDL2>
     uint32_t lineLength = 0;
 };
 
+template <> class Callback<yorcvs::SDL2>
+{
+    public:
+    std::function<void(const SDL_Event&)> func;
+};
+
+
+template <> class Key<yorcvs::SDL2>
+{
+    public:
+    Key<yorcvs::SDL2>() = default;
+    Key<yorcvs::SDL2>(SDL_Scancode scancode)
+    {
+        sdlScancode = scancode;
+    }
+
+    SDL_Scancode sdlScancode;
+};
+
 /**
  * @brief interfaceWindow that uses SDL2 api
  *
@@ -178,6 +199,10 @@ template <> class Window<yorcvs::SDL2>
     {
         while (SDL_PollEvent(&event) == 1)
         {
+            for(const auto& f : callbacks)
+            {
+                f.func(event);
+            }
             switch (event.type)
             {
             // QUIT EVENT
@@ -282,18 +307,32 @@ template <> class Window<yorcvs::SDL2>
             SDL_RenderClear(renderer);
         }
     }
-    
-    yorcvs::Vec2<float> getCursorPosition()
+    // sdl doesn't need the window to get cursor position so this is static
+    static yorcvs::Vec2<float> getCursorPosition()
     {
-        int x,y;
+        int x {};
+        int y {};
         SDL_GetMouseState(&x,&y);
-        return Vec2<float>(static_cast<float>(x),static_cast<float>(y));
+        return Vec2<float>(static_cast<float>(x), static_cast<float>(y));
     }
 
+    size_t registerCallback(const Callback<yorcvs::SDL2>& callback)
+    {
+        callbacks.push_back(callback);
+        return callbacks.size() - 1;
+    }
 
-
-
-
+    void unregisterCallback(size_t  index)
+    {
+        callbacks.erase(callbacks.begin() + static_cast<ptrdiff_t>(index));//TODO: static cast looks ugly
+    }
+    //this can take a SDL_scancode directly
+    //
+    bool isKeyPressed(yorcvs::Key<yorcvs::SDL2> key)
+    {
+        unsigned char const* keys = SDL_GetKeyboardState(nullptr);
+		return keys[key.sdlScancode] ? 1 : 0;
+    }
 
     bool isActive = true;
 
@@ -313,6 +352,7 @@ template <> class Window<yorcvs::SDL2>
     AssetManager<TTF_Font> fontmanager{};
     bool isMinimized = false;
     SDL_Event event{};
+    std::vector<Callback<yorcvs::SDL2>> callbacks{};
 };
 
 } // namespace yorcvs

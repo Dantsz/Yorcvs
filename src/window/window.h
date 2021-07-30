@@ -12,6 +12,8 @@
 #include "../common/types.h"
 #include <string>
 
+
+
 namespace yorcvs
 {
 
@@ -51,6 +53,28 @@ template <typename interface> class Text
 {
 };
 
+
+/**
+ * @brief Called in the event loop
+ * 
+ */
+template <typename interface> class Callback
+{
+
+};
+
+
+/**
+ * @brief Class for specifying which key should be check as being pressed
+ * @note Is currently no api-independent
+ */
+template<typename interface> class Key
+{
+
+};
+
+
+
 /**
  * @brief Windows that can render sprites and text to the screen
  *
@@ -63,11 +87,7 @@ template <typename interface> class Window
     void setSize(size_t w, size_t h);
     void cleanup();
 
-    /**
-     * @brief Handles window events
-     *
-     */
-    void handleEvents();
+
 
     /**
      * @brief Renders a sprite to the screen with the specified parameters
@@ -164,6 +184,11 @@ template <typename interface> class Window
 
     //INPUT
 
+    /**
+    * @brief Handles window events
+    *
+    */
+    void handleEvents();
 
     /**
      * @brief Get the cursor position on the screen 
@@ -172,6 +197,38 @@ template <typename interface> class Window
      */
     yorcvs::Vec2<float> getCursorPosition();
     
+
+    /**
+     * @brief Represents a key 
+     * 
+     * @param key - the key to be checked
+     * @return true -  the key is pressed
+     * @return false - the key is not pressed
+     * @note  Currently has no api-independent way of specifying which key to be checked
+     */
+    
+    bool isKeyPressed(yorcvs::Key<interface> key);
+
+
+    /**
+     * @brief Adds the callback to the event loop and will execute each time handleEvent is being called 
+     * 
+     * @param callback - the callback 
+     * 
+     * 
+     * @return size_t - the index of the callback in the vector in case it shouldn't remain for the duration of the loop
+     * NOTE: CALLBACKS MUST PROBABLY CONTAIN API SPECIFIC HANDLING OF EVENTS
+     */
+    size_t registerCallback(const Callback<interface>& callback);
+
+
+    /**
+     * @brief Deletes the callback from the callback array
+     * 
+     * @param index - index returned from resgisterCallBack
+     * 
+     */
+    void unregisterCallback(size_t index);
 
 
 

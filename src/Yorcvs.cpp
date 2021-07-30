@@ -19,7 +19,15 @@ static int init()
     r.Init("TEst", 960, 500);
     text = new yorcvs::Text<yorcvs::SDL2>(
         r.createText("assets/font.ttf", "TEST111\n11", 255, 255, 255, 255, 32, 100)); // NOLINT
-
+     r.registerCallback({
+        [&](const SDL_Event& e)
+        {
+            if(e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT)
+            {
+                yorcvs::log(std::string("MOUSE CLICKED AT ") + std::to_string(r.getCursorPosition().x) + std::to_string(r.getCursorPosition().y));
+            }
+        }
+    });
     return 0;
 }
 
@@ -28,11 +36,16 @@ void run()
     count++;
 
     r.handleEvents();
-
-    std::cout<< r.getCursorPosition() << '\n';
+   
 
 
     yorcvs::Rect<float> dst = {0, 0, 100, 100};
+    if(r.isKeyPressed(SDL_SCANCODE_W))
+    {
+        dst.x += 100;
+        dst.y += 100;
+    }
+    
     yorcvs::Rect<size_t> src = {0, 0, 212, 229};
     r.clear();
     r.drawSprite("assets/lettuce.png", dst, src);
@@ -42,7 +55,7 @@ void run()
 
     r.drawText(*text, textdst);
     r.setTextColor(*text, rand() % 255, rand() % 255, rand() % 255, 255);
-
+   
     r.present();
 
 }
