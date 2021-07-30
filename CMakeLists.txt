@@ -26,9 +26,13 @@ find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 
 set(YorcvsALLFILES "src/Yorcvs.cpp"
-
+                
                   "src/assetmanager/assetmanager.h"
+
                   "src/common/types.h"
+                  "src/common/log.h"
+                 
+
                   "src/render/render.h"
                   "src/render/renderSDL2.h")
 

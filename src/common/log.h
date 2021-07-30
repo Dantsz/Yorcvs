@@ -9,10 +9,30 @@
  *
  */
 #pragma once
+#include <iostream>
 #include <string>
-namespace yocvs
+
+namespace yorcvs
 {
 
-    void log(const std::string &message, size_t level = 0);
+enum MSGSEVERITY : size_t
+{
 
+    INFO = 0,
+    WARNING = 1,
+    ERROR = 2,
+};
+
+/**
+ * @brief Simple function to print a message
+ *
+ * @param message - message to log
+ * @param level - level of severity
+ */
+template <typename T = std::string> void log(const T &message, MSGSEVERITY level = INFO)
+{
+    // TODO: std::format
+    std::cout << "Severity  " << level << ": Message " << message << '\n';
 }
+
+} // namespace yorcvs

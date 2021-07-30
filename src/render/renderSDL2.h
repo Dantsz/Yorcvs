@@ -10,7 +10,9 @@
  */
 #pragma once
 #include "../assetmanager/assetmanager.h"
+#include "../common/log.h"
 #include "render.h"
+
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
@@ -44,6 +46,8 @@ template <> class yorcvs::AssetManager<SDL_Texture>
             return rez->second;
         }
 
+        yorcvs::log(std::string("Loading SDL2 texture : ") + path);
+
         SDL_Surface *surf = IMG_Load(path.c_str());
         // can't use make_shared because SDL_Texture is not a complete type?
         auto texture = std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(renderer, surf),
@@ -59,6 +63,7 @@ template <> class yorcvs::AssetManager<SDL_Texture>
     {
         for (auto it : assetMap)
         {
+            yorcvs::log(std::string("Unloading SDL2 texture") + it.first);
             it.second.reset();
         }
     }
@@ -70,19 +75,23 @@ template <> class yorcvs::AssetManager<SDL_Texture>
 namespace yorcvs
 {
 
+/**
+ * @brief Interface concept for defining rendering objects that are implemented using SDL2
+ *
+ */
 class SDL2
 {
   public:
     const char *name = "SDL2";
 };
 
-template <> class Texture<SDL2>
+template <> class Texture<yorcvs::SDL2>
 {
   public:
     std::shared_ptr<SDL_Texture> SDLtex;
 };
 
-template <> class Text<SDL2>
+template <> class Text<yorcvs::SDL2>
 {
   public:
     std::unique_ptr<SDL_Texture> SDLtex = nullptr;
@@ -103,31 +112,51 @@ template <> class Window<yorcvs::SDL2>
   public:
     void Init(const std::string &name, size_t width, size_t height)
     {
+        SDL_version sdlversion{};
+        SDL_GetVersion(&sdlversion);
+
+        const SDL_version *sdlimageversion = IMG_Linked_Version();
+        const SDL_version *sdlttfversion = TTF_Linked_Version();
+        // TODO : replace with std::format
+        yorcvs::log(std::string("Using SDL2 rendering\n") +
+                        "COMPILED with SDL2 version: " + std::to_string(SDL_MAJOR_VERSION) + ' ' +
+                        std::to_string(SDL_MINOR_VERSION) + ' ' + std::to_string(SDL_PATCHLEVEL) + '\n' +
+                        "LINKED SDL2 version: " + std::to_string(sdlversion.major) + ' ' +
+                        std::to_string(sdlversion.minor) + ' ' + std::to_string(sdlversion.patch) + '\n' +
+                        "COMPILED with SDL2_image version : " + std::to_string(SDL_IMAGE_MAJOR_VERSION) + ' ' +
+                        std::to_string(SDL_IMAGE_MINOR_VERSION) + ' ' + std::to_string(SDL_IMAGE_PATCHLEVEL) + '\n' +
+                        "LINKED SDL2_image version : " + std::to_string(sdlimageversion->major) + ' ' +
+                        std::to_string(sdlimageversion->minor) + ' ' + std::to_string(sdlimageversion->patch) + '\n' +
+                        "COMPILED with SDL2_ttf version : " + std::to_string(SDL_TTF_COMPILEDVERSION) + '\n' +
+                        "LINKED with SDL2_ttf version: " + std::to_string(sdlttfversion->major) + ' ' +
+                        std::to_string(sdlttfversion->minor) + ' ' + std::to_string(sdlttfversion->patch) + '\n',
+                    yorcvs::INFO);
+
         if (SDL_Init(SDL_INIT_VIDEO) < 0)
         {
-            std::cout << "Error SDL2 Initialization : " << SDL_GetError();
+            yorcvs::log("Error initializing SDL2", yorcvs::ERROR);
         }
 
         if (IMG_Init(IMG_INIT_PNG) == 0)
         {
-            std::cout << "Error SDL2_image Initialization";
+            yorcvs::log("Error initializing SDL2_image", yorcvs::ERROR);
         }
         if (TTF_Init() < 0)
         {
-            std::cout << "Font error" << '\n';
+            yorcvs::log("Error initializing SDL2_TTF", yorcvs::ERROR);
         }
 
         sdlWindow = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                      static_cast<int>(width), static_cast<int>(height), SDL_WINDOW_OPENGL);
         if (sdlWindow == nullptr)
         {
-            std::cout << "Error window creation";
+            yorcvs::log("Error creating SDL2 window", yorcvs::ERROR);
         }
 
         renderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
         if (renderer == nullptr)
         {
-            std::cout << "Error renderer creation";
+            yorcvs::log("Error creating SDL2 renderer", yorcvs::ERROR);
         }
     }
 
@@ -187,8 +216,9 @@ template <> class Window<yorcvs::SDL2>
         }
     }
 
-    yorcvs::Text<yorcvs::SDL2> createText(const std::string &path, const std::string &message, unsigned char r, unsigned char g,
-                                          unsigned char b, unsigned char a, size_t charSize, size_t lineLength)
+    yorcvs::Text<yorcvs::SDL2> createText(const std::string &path, const std::string &message, unsigned char r,
+                                          unsigned char g, unsigned char b, unsigned char a, size_t charSize,
+                                          size_t lineLength)
     {
         Text<yorcvs::SDL2> text;
         text.fontPath = path;

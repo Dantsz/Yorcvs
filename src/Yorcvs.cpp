@@ -9,18 +9,16 @@
 
 static yorcvs::Window<yorcvs::SDL2> r;
 yorcvs::Text<yorcvs::SDL2> *text;
-int count = 0;
+static int count = 0;
 yorcvs::Texture<yorcvs::SDL2> tee2;
 
 /// Test
 static int init()
 {
 
-
-
-
     r.Init("TEst", 960, 500);
-    text = new yorcvs::Text<yorcvs::SDL2>(r.createText(std::string("assets/font.ttf"), "TEST111\n11", 255, 255, 255, 255, 32, 100));//NOLINT
+    text = new yorcvs::Text<yorcvs::SDL2>(
+        r.createText("assets/font.ttf", "TEST111\n11", 255, 255, 255, 255, 32, 100)); // NOLINT
 
     return 0;
 }
