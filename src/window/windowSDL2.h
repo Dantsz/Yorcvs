@@ -195,12 +195,13 @@ template <> class Window<yorcvs::SDL2>
     void drawSprite(const std::string &path, const Rect<float> &dstRect, const Rect<size_t> &srcRect,
                     double angle = 0.0)
     {
+        
         if (!isMinimized)
         {
             SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
                                 static_cast<int>(srcRect.h)};
-            SDL_FRect dest = {dstRect.x, dstRect.y, dstRect.w, dstRect.h};
-            SDL_RenderCopyExF(renderer, assetm->loadFromFile(path).get(), &sourceR, &dest, angle, nullptr,
+            SDL_Rect dest = {dstRect.x, dstRect.y, dstRect.w, dstRect.h};
+            SDL_RenderCopyEx(renderer, assetm->loadFromFile(path).get(), &sourceR, &dest, angle, nullptr,
                               SDL_FLIP_NONE);
         }
     }
@@ -223,8 +224,8 @@ template <> class Window<yorcvs::SDL2>
     {
         if (!isMinimized)
         {
-            SDL_FRect dest = {dstRect.x, dstRect.y, dstRect.w, dstRect.h};
-            SDL_RenderCopyF(renderer, text.SDLtex.get(), nullptr, &dest);
+            SDL_Rect dest = {dstRect.x, dstRect.y, dstRect.w, dstRect.h};
+            SDL_RenderCopy(renderer, text.SDLtex.get(), nullptr, &dest);
         }
     }
 
