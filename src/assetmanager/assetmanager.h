@@ -31,9 +31,9 @@ template <typename assetType> class AssetManager
      * Returns nullptr if the file is not found
      *
      * @param path path to resource
-     * @return std::shared_ptr<assetType>
+     * @return std::shared_ptr<assetType> pointer to the resource or nulllptr if it couldn't be found
      */
-    std::shared_ptr<assetType> loadFromFile(const std::string &path)
+    [[nodiscard]]std::shared_ptr<assetType> loadFromFile(const std::string &path)
     {
         if (path.empty())
         {
@@ -48,7 +48,14 @@ template <typename assetType> class AssetManager
             return rez->second;
         }
         yorcvs::log(std::string("Loading asset : ") + path);
-        std::shared_ptr<assetType> shrptr = std::shared_ptr<assetType>(ctor(path), dtor);
+
+        assetType* ptr = ctor(path);
+        if(ptr == nullptr)
+        {
+          yorcvs::log("Could not create specified resource",yorcvs::ERROR);
+          return nullptr;
+        }
+        std::shared_ptr<assetType> shrptr = std::shared_ptr<assetType>(ptr, dtor);
         assetMap.insert({path, shrptr});
         return shrptr;
     }

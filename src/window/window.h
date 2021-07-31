@@ -15,25 +15,6 @@
 namespace yorcvs
 {
 
-/*
-Interface = api used to draw to the screen
-How to:
-Specialize window,texture,and text with a class(concept) and implement their
-methods using the api
-*/
-
-/* Concepts are still not supported yet
-template<typename T>
-concept Interface = requires(T interface)
-{
-    {
-        interface.name
-    }->std::same_as<const char*>;
-
-
-};
-*/
-
 /**
  * @brief - Texture for drawing sprite
  *

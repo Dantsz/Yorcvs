@@ -58,8 +58,12 @@ class Timer
         return mStarted;
     }
 
-    // Gets the timer's time
-    // If the templates are  not changed, it's compatible with Timer::get_ticks
+    /**
+     * @brief Returns the time passed since timer was started
+     * 
+     * @tparam return_type - what type should be returned
+     * @tparam cast_format - what unit of measure should be used(nanosecond,milisecond,second) , by default it's millisecond
+     */
     template <typename return_type = size_t, typename cast_format = std::chrono::milliseconds>
     [[nodiscard]] return_type getTicks() const
     {

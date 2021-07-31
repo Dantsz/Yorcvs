@@ -272,12 +272,10 @@ template <> class Window<yorcvs::SDL2>
         }
     }
     // sdl doesn't need the window to get cursor position so this is static
-    static yorcvs::Vec2<float> getCursorPosition()
+    yorcvs::Vec2<float> getCursorPosition()
     {
-        int x{};
-        int y{};
-        SDL_GetMouseState(&x, &y);
-        return Vec2<float>(static_cast<float>(x), static_cast<float>(y));
+        SDL_GetMouseState(&mouseX, &mouseY);
+        return Vec2<float>(static_cast<float>(mouseX), static_cast<float>(mouseY));
     }
 
     size_t registerCallback(const Callback<yorcvs::SDL2> &callback)
@@ -292,9 +290,9 @@ template <> class Window<yorcvs::SDL2>
     }
     // this can take a SDL_scancode directly
     //
-    static bool isKeyPressed(yorcvs::Key<yorcvs::SDL2> key)
+    [[nodiscard]] bool isKeyPressed(yorcvs::Key<yorcvs::SDL2> key)
     {
-        unsigned char const *keys = SDL_GetKeyboardState(nullptr);
+        keys = SDL_GetKeyboardState(nullptr);
         // TODO: REPLACE WITH SPAN?
         return keys[key.sdlScancode] ? 1 : 0; // NOLINT
     }
@@ -318,6 +316,9 @@ template <> class Window<yorcvs::SDL2>
     bool isMinimized = false;
     SDL_Event event{};
     std::vector<Callback<yorcvs::SDL2>> callbacks{};
+    unsigned char const *keys;
+    int mouseX{};
+    int mouseY{};
 };
 
 } // namespace yorcvs
