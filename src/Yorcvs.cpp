@@ -3,9 +3,10 @@
 #include <emscripten.h>
 #endif
 
+#include "common/timer.h"
 #include "window/windowSDL2.h"
-
 #include <cstdlib>
+
 
 static yorcvs::Window<yorcvs::SDL2> r;
 yorcvs::Text<yorcvs::SDL2> *text;
@@ -31,6 +32,9 @@ static int init()
 
 void run()
 {
+    yorcvs::Timer timy;
+    timy.start();
+
     count++;
 
     r.handleEvents();
@@ -53,6 +57,7 @@ void run()
     r.setTextColor(*text, rand() % 255, rand() % 255, rand() % 255, 255);
 
     r.present();
+    yorcvs::log(timy.getTicks());
 }
 
 int cleanup()
