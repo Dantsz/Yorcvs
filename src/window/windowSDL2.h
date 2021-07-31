@@ -30,51 +30,6 @@ template <> struct std::default_delete<SDL_Texture>
     }
 };
 
-/*
-template <> class yorcvs::AssetManager<SDL_Texture>
-{
-  public:
-    std::shared_ptr<SDL_Texture> loadFromFile(const std::string &path, SDL_Renderer *renderer)
-    {
-
-        if (path.empty())
-        {
-            return nullptr;
-        }
-        // search for the texture in the map
-        const auto rez = assetMap.find(path);
-        // return  it if it's there
-        if (rez != assetMap.end())
-        {
-            return rez->second;
-        }
-
-        yorcvs::log(std::string("Loading SDL2 texture : ") + path);
-
-        SDL_Surface *surf = IMG_Load(path.c_str());
-        // can't use make_shared because SDL_Texture is not a complete type?
-        auto texture = std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(renderer, surf),
-                                                    [](SDL_Texture *tex) { SDL_DestroyTexture(tex); });
-        assetMap.insert({path, texture});
-        return texture;
-    }
-    void refresh()
-    {
-    }
-
-    void cleanup()
-    {
-        for (auto it : assetMap)
-        {
-            yorcvs::log(std::string("Unloading SDL2 texture") + it.first);
-            it.second.reset();
-        }
-    }
-
-  private:
-    std::unordered_map<std::string, std::shared_ptr<SDL_Texture>> assetMap{};
-};*/
-
 namespace yorcvs
 {
 
