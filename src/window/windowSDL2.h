@@ -198,9 +198,10 @@ template <> class Window<yorcvs::SDL2>
         
         if (!isMinimized)
         {
+            //NOTE: SDL_rendercopyF exists for >SDL 2.0.10 
             SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
                                 static_cast<int>(srcRect.h)};
-            SDL_Rect dest = {dstRect.x, dstRect.y, dstRect.w, dstRect.h};
+            SDL_Rect dest = {static_cast<int>(dstRect.x), static_cast<int>(dstRect.y),static_cast<int>(dstRect.w),static_cast<int>(dstRect.h)};
             SDL_RenderCopyEx(renderer, assetm->loadFromFile(path).get(), &sourceR, &dest, angle, nullptr,
                               SDL_FLIP_NONE);
         }
@@ -224,7 +225,8 @@ template <> class Window<yorcvs::SDL2>
     {
         if (!isMinimized)
         {
-            SDL_Rect dest = {dstRect.x, dstRect.y, dstRect.w, dstRect.h};
+            //NOTE: SDL_rendercopyF exists for >SDL 2.0.10 
+            SDL_Rect dest = {static_cast<int>(dstRect.x), static_cast<int>(dstRect.y),static_cast<int>(dstRect.w),static_cast<int>(dstRect.h)};
             SDL_RenderCopy(renderer, text.SDLtex.get(), nullptr, &dest);
         }
     }

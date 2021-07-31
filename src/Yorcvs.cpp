@@ -12,7 +12,8 @@ static yorcvs::Window<yorcvs::SDL2> r;
 yorcvs::Text<yorcvs::SDL2> *text;
 static int count = 0;
 yorcvs::Texture<yorcvs::SDL2> tee2;
-
+yorcvs::Timer timy;
+size_t FT = 0;
 /// Test
 static int init()
 {
@@ -27,13 +28,15 @@ static int init()
                         std::to_string(r.getCursorPosition().y));
         }
     }});
+    
     return 0;
+    
 }
 
 void run()
 {
-    yorcvs::Timer timy;
     timy.start();
+   
 
     count++;
 
@@ -51,13 +54,13 @@ void run()
     r.drawSprite("assets/lettuce.png", dst, src);
 
     yorcvs::Rect<float> textdst = {0, 0, 100, 100};
-    r.setTextMessage(*text, std::to_string(count));
+    r.setTextMessage(*text, std::to_string(FT));
 
     r.drawText(*text, textdst);
     r.setTextColor(*text, rand() % 255, rand() % 255, rand() % 255, 255);
 
     r.present();
-    yorcvs::log(timy.getTicks());
+    FT = timy.getTicks();
 }
 
 int cleanup()

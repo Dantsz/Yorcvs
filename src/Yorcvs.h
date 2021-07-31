@@ -10,4 +10,12 @@
  */
 #pragma once
 
+class yorcvsAPP
+{
+    public:
+
+    private:
+
+
+};
 
