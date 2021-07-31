@@ -64,12 +64,32 @@ template <typename interface> class Window
      * @brief Renders a sprite to the screen with the specified parameters
      *
      * @param path -path to the texture
-     * @param dstRect -part of the scree the sprite should occupy
+     * @param dstRect -part of the screen the sprite should occupy
      * @param srcRect -part of the texture to be drawn
      * @param angle  -angle of the texture(default is 0)
      */
     void drawSprite(const std::string &path, const yorcvs::Rect<float> &dstRect, const yorcvs::Rect<size_t> &srcRect,
                     double angle = 0.0);
+
+    /**
+     * @brief Creates a Texture object,
+     *  
+     * @param path - path to the texture
+     * @return Texture<interface>
+     * NOTE: CREATED TEXTURE IS MANAGED BY THE WINDOW CLASS
+     */
+    Texture<interface> createTexture(const std::string &path);
+  
+    /**
+     * @brief Renders the texture to the screen
+     *
+     * @param texture -the texture object
+     * @param dstRect -part of the srceen the sprite will be drawn at
+     * @param srcRect -what part of the sprite to draw
+     * @param angle - angle of the sprite
+     */
+    void drawTexture(const Texture<interface> &texture, const yorcvs::Rect<float> &dstRect,
+                     const yorcvs::Rect<size_t> &srcRect, double angle = 0.0);
 
     /**
      * @brief Create a Text Texture object

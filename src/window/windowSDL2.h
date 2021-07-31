@@ -194,8 +194,7 @@ template <> class Window<yorcvs::SDL2>
 
     void drawSprite(const std::string &path, const Rect<float> &dstRect, const Rect<size_t> &srcRect,
                     double angle = 0.0)
-    {
-        
+    {  
         if (!isMinimized)
         {
             //NOTE: SDL_rendercopyF exists for >SDL 2.0.10 
@@ -207,7 +206,28 @@ template <> class Window<yorcvs::SDL2>
         }
     }
 
-    yorcvs::Text<yorcvs::SDL2> createText(const std::string &path, const std::string &message, unsigned char r,
+    [[nodiscard]]Texture<yorcvs::SDL2> createTexture(const std::string &path)
+    {
+        Texture<yorcvs::SDL2> tex;
+        tex.SDLtex = assetm->loadFromFile(path);
+        return tex;
+    }
+    void drawSprite(const Texture<yorcvs::SDL2>& texture, const yorcvs::Rect<float> &dstRect, const yorcvs::Rect<size_t> &srcRect,double angle = 0.0)
+    {
+        if(!isMinimized)
+        {
+            //NOTE: SDL_rendercopyF exists for >SDL 2.0.10 
+            SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
+                                static_cast<int>(srcRect.h)};
+            SDL_Rect dest = {static_cast<int>(dstRect.x), static_cast<int>(dstRect.y),static_cast<int>(dstRect.w),static_cast<int>(dstRect.h)};
+            SDL_RenderCopyEx(renderer, texture.SDLtex.get(), &sourceR, &dest, angle, nullptr,
+                              SDL_FLIP_NONE);
+        }
+    }
+  
+
+
+    [[nodiscard]]Text<yorcvs::SDL2> createText(const std::string &path, const std::string &message, unsigned char r,
                                           unsigned char g, unsigned char b, unsigned char a, size_t charSize,
                                           size_t lineLength)
     {
