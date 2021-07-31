@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 
     init();
 #ifdef __EMSCRIPTEN__
-    std::cout << "running EMSCRIPTEM";
+    yorcvs::log("running EMSCRIPTEM");
     emscripten_set_main_loop(run, 0, 1);
 #else
     while (r.isActive)

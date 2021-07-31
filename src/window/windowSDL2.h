@@ -30,6 +30,7 @@ template <> struct std::default_delete<SDL_Texture>
     }
 };
 
+/*
 template <> class yorcvs::AssetManager<SDL_Texture>
 {
   public:
@@ -72,7 +73,7 @@ template <> class yorcvs::AssetManager<SDL_Texture>
 
   private:
     std::unordered_map<std::string, std::shared_ptr<SDL_Texture>> assetMap{};
-};
+};*/
 
 namespace yorcvs
 {
@@ -106,14 +107,13 @@ template <> class Text<yorcvs::SDL2>
 
 template <> class Callback<yorcvs::SDL2>
 {
-    public:
-    std::function<void(const SDL_Event&)> func;
+  public:
+    std::function<void(const SDL_Event &)> func;
 };
-
 
 template <> class Key<yorcvs::SDL2>
 {
-    public:
+  public:
     Key<yorcvs::SDL2>() = default;
     Key<yorcvs::SDL2>(SDL_Scancode scancode)
     {
@@ -179,6 +179,15 @@ template <> class Window<yorcvs::SDL2>
         {
             yorcvs::log("Error creating SDL2 renderer", yorcvs::ERROR);
         }
+        yorcvs::log("creating texture manager");
+        assetm = std::make_unique<yorcvs::AssetManager<SDL_Texture>>(
+            [&](const std::string &path) {
+                SDL_Surface *surf = IMG_Load(path.c_str());
+                SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, surf);
+                SDL_FreeSurface(surf);
+                return tex;
+            },
+            [](SDL_Texture *p) { SDL_DestroyTexture(p); });
     }
 
     void setSize(size_t width, size_t height) const
@@ -188,7 +197,7 @@ template <> class Window<yorcvs::SDL2>
 
     void cleanup()
     {
-        assetm.cleanup();
+        assetm->cleanup();
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(sdlWindow);
         IMG_Quit();
@@ -199,7 +208,7 @@ template <> class Window<yorcvs::SDL2>
     {
         while (SDL_PollEvent(&event) == 1)
         {
-            for(const auto& f : callbacks)
+            for (const auto &f : callbacks)
             {
                 f.func(event);
             }
@@ -236,7 +245,7 @@ template <> class Window<yorcvs::SDL2>
             SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
                                 static_cast<int>(srcRect.h)};
             SDL_FRect dest = {dstRect.x, dstRect.y, dstRect.w, dstRect.h};
-            SDL_RenderCopyExF(renderer, assetm.loadFromFile(path, renderer).get(), &sourceR, &dest, angle, nullptr,
+            SDL_RenderCopyExF(renderer, assetm->loadFromFile(path).get(), &sourceR, &dest, angle, nullptr,
                               SDL_FLIP_NONE);
         }
     }
@@ -310,28 +319,29 @@ template <> class Window<yorcvs::SDL2>
     // sdl doesn't need the window to get cursor position so this is static
     static yorcvs::Vec2<float> getCursorPosition()
     {
-        int x {};
-        int y {};
-        SDL_GetMouseState(&x,&y);
+        int x{};
+        int y{};
+        SDL_GetMouseState(&x, &y);
         return Vec2<float>(static_cast<float>(x), static_cast<float>(y));
     }
 
-    size_t registerCallback(const Callback<yorcvs::SDL2>& callback)
+    size_t registerCallback(const Callback<yorcvs::SDL2> &callback)
     {
         callbacks.push_back(callback);
         return callbacks.size() - 1;
     }
 
-    void unregisterCallback(size_t  index)
+    void unregisterCallback(size_t index)
     {
-        callbacks.erase(callbacks.begin() + static_cast<ptrdiff_t>(index));//TODO: static cast looks ugly
+        callbacks.erase(callbacks.begin() + static_cast<ptrdiff_t>(index)); // TODO: static cast looks ugly
     }
-    //this can take a SDL_scancode directly
+    // this can take a SDL_scancode directly
     //
-    bool isKeyPressed(yorcvs::Key<yorcvs::SDL2> key)
+    static bool isKeyPressed(yorcvs::Key<yorcvs::SDL2> key)
     {
-        unsigned char const* keys = SDL_GetKeyboardState(nullptr);
-		return keys[key.sdlScancode] ? 1 : 0;
+        unsigned char const *keys = SDL_GetKeyboardState(nullptr);
+        // TODO: REPLACE WITH SPAN?
+        return keys[key.sdlScancode] ? 1 : 0; // NOLINT
     }
 
     bool isActive = true;
@@ -348,8 +358,8 @@ template <> class Window<yorcvs::SDL2>
 
     SDL_Window *sdlWindow = nullptr;
     SDL_Renderer *renderer = nullptr;
-    AssetManager<SDL_Texture> assetm{};
-    AssetManager<TTF_Font> fontmanager{};
+
+    std::unique_ptr<AssetManager<SDL_Texture>> assetm = nullptr;
     bool isMinimized = false;
     SDL_Event event{};
     std::vector<Callback<yorcvs::SDL2>> callbacks{};
