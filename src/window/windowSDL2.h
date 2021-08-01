@@ -143,13 +143,15 @@ template <> class Window<yorcvs::SDL2>
         const std::string acceleratedRenderer = static_cast<bool>(renderInfo.flags & SDL_RENDERER_ACCELERATED)? "true" : "false";
         const std::string vsyncRenderer = static_cast<bool>(renderInfo.flags & SDL_RENDERER_PRESENTVSYNC)? "true" : "false";
         const std::string textureRender = static_cast<bool>(renderInfo.flags & SDL_RENDERER_TARGETTEXTURE)? "true" : "false";
-
+        //TODO: DO WITH STD::FORMAT
         yorcvs::log(std::string("====RenderInfo====\n")+
         "Renderer : " + renderInfo.name + '\n'+
         "Software Renderer: " + softwareRenderer + '\n' +
         "Accelerated Renderer: " + acceleratedRenderer + '\n' +
         "Vsync Enabled : " + vsyncRenderer + '\n' +
-        "Can render to texture: " + textureRender + '\n'
+        "Can render to texture: " + textureRender + '\n' +
+        "Maximum texture width: " + std::to_string(renderInfo.max_texture_width) + '\n' +
+        "Maximum texture height: " + std::to_string(renderInfo.max_texture_height) + '\n'
         ,yorcvs::INFO);
 
         yorcvs::log("creating texture manager");
