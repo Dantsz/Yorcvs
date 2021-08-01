@@ -93,8 +93,10 @@ template <> class Window<yorcvs::SDL2>
 
         const SDL_version *sdlimageversion = IMG_Linked_Version();
         const SDL_version *sdlttfversion = TTF_Linked_Version();
+
+
         // TODO : replace with std::format
-        yorcvs::log(std::string("Using SDL2 rendering\n") +
+        yorcvs::log(std::string("======SDL2 Version=======\nUsing SDL2 rendering\n") +
                         "COMPILED with SDL2 version: " + std::to_string(SDL_MAJOR_VERSION) + ' ' +
                         std::to_string(SDL_MINOR_VERSION) + ' ' + std::to_string(SDL_PATCHLEVEL) + '\n' +
                         "LINKED SDL2 version: " + std::to_string(sdlversion.major) + ' ' +
@@ -105,14 +107,15 @@ template <> class Window<yorcvs::SDL2>
                         std::to_string(sdlimageversion->minor) + ' ' + std::to_string(sdlimageversion->patch) + '\n' +
                         "COMPILED with SDL2_ttf version : " + std::to_string(SDL_TTF_COMPILEDVERSION) + '\n' +
                         "LINKED with SDL2_ttf version: " + std::to_string(sdlttfversion->major) + ' ' +
-                        std::to_string(sdlttfversion->minor) + ' ' + std::to_string(sdlttfversion->patch) + '\n',
+                        std::to_string(sdlttfversion->minor) + ' ' + std::to_string(sdlttfversion->patch) + '\n'
+                        + "=============\n ",
                     yorcvs::INFO);
 
         if (SDL_Init(SDL_INIT_VIDEO) < 0)
         {
             yorcvs::log("Error initializing SDL2", yorcvs::ERROR);
         }
-
+    
         if (IMG_Init(IMG_INIT_PNG) == 0)
         {
             yorcvs::log("Error initializing SDL2_image", yorcvs::ERROR);
@@ -134,6 +137,21 @@ template <> class Window<yorcvs::SDL2>
         {
             yorcvs::log("Error creating SDL2 renderer", yorcvs::ERROR);
         }
+        SDL_RendererInfo renderInfo{};
+        SDL_GetRendererInfo(renderer,&renderInfo);
+        const std::string  softwareRenderer = static_cast<bool>(renderInfo.flags & SDL_RENDERER_SOFTWARE) ? "true" : "false";
+        const std::string acceleratedRenderer = static_cast<bool>(renderInfo.flags & SDL_RENDERER_ACCELERATED)? "true" : "false";
+        const std::string vsyncRenderer = static_cast<bool>(renderInfo.flags & SDL_RENDERER_PRESENTVSYNC)? "true" : "false";
+        const std::string textureRender = static_cast<bool>(renderInfo.flags & SDL_RENDERER_TARGETTEXTURE)? "true" : "false";
+
+        yorcvs::log(std::string("====RenderInfo====\n")+
+        "Renderer : " + renderInfo.name + '\n'+
+        "Software Renderer: " + softwareRenderer + '\n' +
+        "Accelerated Renderer: " + acceleratedRenderer + '\n' +
+        "Vsync Enabled : " + vsyncRenderer + '\n' +
+        "Can render to texture: " + textureRender + '\n'
+        ,yorcvs::INFO);
+
         yorcvs::log("creating texture manager");
         assetm = std::make_unique<yorcvs::AssetManager<SDL_Texture>>(
             [&](const std::string &path) {
