@@ -55,24 +55,29 @@ class SecondTestSystem
 };
 
 
-constexpr size_t numberOfEntities = 1000;
+constexpr size_t numberOfEntities = 2000;
 int main()
 {
 
     yorcvs::ECS world{};
     world.registerComponent<Transform>();
+    world.registerComponent<Size>();
+
     TestSystem tester(&world);
     world.registerSystem<TestSystem>(tester);
+    
+
     world.addCriteriaForIteration<TestSystem,Transform>();
     SecondTestSystem secontester(&world);
     world.registerSystem<SecondTestSystem>(secontester);
-
+    world.addCriteriaForIteration<SecondTestSystem ,Transform, Size>();
+    
     std::vector<yorcvs::Entity> entities{};
-    for(size_t i = 0 ; i < numberOfEntities ; i ++ )
+    for(size_t i = 0 ; i < numberOfEntities ; i++ )
     {
         entities.emplace_back(&world);
         world.addComponent<Transform>(entities[i].id,{1.0f,2.0f,1});
-        if(i&1)
+        if(i%2 == 1)
         {
             world.addComponent<Size>(entities[i].id,{i,i});
         }
@@ -81,5 +86,22 @@ int main()
     tester.test();
     secontester.test();
 
+    for(size_t i = 0 ;i < numberOfEntities; i++)
+    {
+        if(i%2 == 0)
+        {
+            world.removeComponent<Transform>(entities[i].id);
+        }
+    }
+    assert(world.getEntitiesWithComponent<Transform>() == world.getEntitiesWithComponent<Size>());
+    assert(tester.entityList->entitiesID.size() == numberOfEntities/2);
+    for(size_t i = 1 ;i < numberOfEntities; i++)
+    {
+        if(i%2 == 1)
+        {
+            world.removeComponent<Size>(entities[i].id);
+        }
+    }
+    assert(secontester.entityList->entitiesID.empty());
     return 0;
 }

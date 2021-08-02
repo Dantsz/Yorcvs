@@ -93,7 +93,7 @@ template <typename T> class ComponentContainer final : public VContainer
 
         if (entityhascomponent.size() <= entityID || entityhascomponent[entityID] != 1)
         {
-            yorcvs::log("Cannot get component : entity doesn't own the specified type of component: " +
+            yorcvs::log("Cannot get component : entity " + std::to_string(entityID)  + " doesn't own the specified type of component: " +
                             std::string(typeid(T).name()),
                         yorcvs::ERROR);
         }
@@ -107,7 +107,7 @@ template <typename T> class ComponentContainer final : public VContainer
         // if the entity doesn't have this type of component throw exception
         if (entityhascomponent.size() <= entityID || entityhascomponent[entityID] != 1)
         {
-            yorcvs::log("Cannot delete component: the entity doesn't have this type of component : " +
+            yorcvs::log("Cannot delete component: the entity " + std::to_string(entityID) + " doesn't have this type of component : " +
                             std::string(typeid(T).name()),
                         yorcvs::ERROR);
         }
