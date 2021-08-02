@@ -10,7 +10,7 @@ template <typename T> typename std::vector<T>::iterator insertSorted(std::vector
 {
     if (std::binary_search(vec.begin(), vec.end(), item))
     {
-                return vec.end();
+        return vec.end();
     }
     auto upperBound = std::upper_bound(vec.begin(), vec.end(), item);
     return vec.insert(upperBound, item);
@@ -23,7 +23,7 @@ class ECS; // forward declaration
 
 /**
  * @brief Contains a list of entities matching parents signature
- * 
+ *
  */
 class EntitySystemList
 {
@@ -53,7 +53,7 @@ class SystemManager
         // if the system is already present //  throw
         if (typetosystem.find(systemType) != typetosystem.end())
         {
-			yorcvs::log("Unable to register system: system is already registered.",yorcvs::ERROR);
+            yorcvs::log("Unable to register system: system is already registered.", yorcvs::ERROR);
         }
         std::shared_ptr<EntitySystemList> systemEVec = std::make_shared<EntitySystemList>();
         typetosystem.insert({systemType, systemEVec});
@@ -69,7 +69,7 @@ class SystemManager
         // if the system is not found  //throw
         if (typetosystem.find(systemType) == typetosystem.end())
         {
-			yorcvs::log("Unable to set the signature: system does not exist.",yorcvs::ERROR);
+            yorcvs::log("Unable to set the signature: system does not exist.", yorcvs::ERROR);
         }
 
         typetosignature[systemType] = signature;
@@ -84,7 +84,7 @@ class SystemManager
         // if the system is not found  //throw
         if (typetosystem.find(systemType) == typetosystem.end())
         {
-			yorcvs::log("Unable to fetch the signature: system does not exist.");
+            yorcvs::log("Unable to fetch the signature: system does not exist.");
         }
 
         return typetosignature[systemType];
@@ -98,7 +98,6 @@ class SystemManager
             it.second->entitiesID.erase(
                 std::remove(it.second->entitiesID.begin(), it.second->entitiesID.end(), entityID),
                 it.second->entitiesID.end());
-            
         }
     }
 
@@ -117,10 +116,8 @@ class SystemManager
             }
             else
             {
-                system->entitiesID.erase(
-                    std::remove(system->entitiesID.begin(), system->entitiesID.end(), entityID),
-                    system->entitiesID.end());
-                
+                system->entitiesID.erase(std::remove(system->entitiesID.begin(), system->entitiesID.end(), entityID),
+                                         system->entitiesID.end());
             }
         }
     }
@@ -144,11 +141,12 @@ class SystemManager
     }
     /**
      * @brief compares the signature of an entity to a specific system and if they are compatible
-     * 
+     *
      * @param entity_s The entity
      * @param system_s The system
      * @return true the entity has all the systems components
-     * @return false if the system has a component but the entity does not or if the system signature doesn't match the entity
+     * @return false if the system has a component but the entity does not or if the system signature doesn't match the
+     * entity
      */
     static bool compareEntityToSystem(const std::vector<bool> &entity_s, const std::vector<bool> &system_s)
     {

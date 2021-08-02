@@ -1,21 +1,22 @@
 #pragma once
+#include "../common/log.h"
 #include <algorithm>
 #include <vector>
-#include "../common/log.h"
+
 // thanks to Austin Morlan for providing a ECS template
 
 namespace yorcvs
 {
 /**
  * @brief Manages entity ids
- * 
+ *
  */
 class EntityManager
 {
   public:
     /**
      * @brief  takes a freed or makes a new one if there's no id
-     * 
+     *
      * @return size_t ID of the new entity
      */
     size_t addEntity()
@@ -36,26 +37,26 @@ class EntityManager
         return id;
     }
     /**
-     * @brief deletes an entity, removes all components 
-     * 
+     * @brief deletes an entity, removes all components
+     *
      * @param id id of the entity
      */
-    void deleteEntity(const size_t id) 
+    void deleteEntity(const size_t id)
     {
 
         if (id > lowestUnallocatedID)
         {
-            yorcvs::log("Invalid id for deletion : id doesn't exist",yorcvs::ERROR);
+            yorcvs::log("Invalid id for deletion : id doesn't exist", yorcvs::ERROR);
         }
         // if the id appears in the delted entities
         if (std::binary_search(freedIndices.begin(), freedIndices.end(), id))
         {
-            yorcvs::log("Invalid id deletion : id is not a valid entity",yorcvs::ERROR);
+            yorcvs::log("Invalid id deletion : id is not a valid entity", yorcvs::ERROR);
         }
 
         entitySignatures[id].clear();
         // push the freed id into the queue
-        
+
         freedIndices.push_back(id);
         // the vector is always sorted in order to check if id apears in it using binary search
         std::sort(freedIndices.begin(), freedIndices.end());
@@ -63,7 +64,7 @@ class EntityManager
 
     /**
      * @brief Set the signature of an entity
-     * 
+     *
      * @param id id of the entity
      * @param signature new signature
      *
@@ -73,7 +74,7 @@ class EntityManager
 
         if (id > lowestUnallocatedID)
         {
-            yorcvs::log("Cannot set id signature  : id doesn't exist",yorcvs::ERROR);
+            yorcvs::log("Cannot set id signature  : id doesn't exist", yorcvs::ERROR);
             return;
         }
         // if the id appears in the delted entities
@@ -88,20 +89,21 @@ class EntityManager
 
     /**
      * @brief Returns the signature object
-     * 
+     *
      * @param id id of the entity
-     * @return std::vector<bool>& signature 
+     * @return std::vector<bool>& signature
      */
     std::vector<bool> &getSignature(const size_t id)
     {
         if (id > lowestUnallocatedID)
         {
-            yorcvs::log("Cannot fetch entity signature : id : " + std::to_string(id) + "doesn't exist",yorcvs::ERROR);
+            yorcvs::log("Cannot fetch entity signature : id : " + std::to_string(id) + "doesn't exist", yorcvs::ERROR);
         }
         // if the id appears in the delted entities
         if (std::binary_search(freedIndices.begin(), freedIndices.end(), id))
         {
-            yorcvs::log("Cannot fetch entity signature : id: " + std::to_string(id) + "is not a valid entity",yorcvs::ERROR);
+            yorcvs::log("Cannot fetch entity signature : id: " + std::to_string(id) + "is not a valid entity",
+                        yorcvs::ERROR);
         }
 
         return entitySignatures[id];

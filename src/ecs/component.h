@@ -1,11 +1,11 @@
 #pragma once
 
-
+#include "entity.h"
 #include <memory>
 #include <queue>
-#include <vector>
-#include "entity.h"
 #include <unordered_map>
+#include <vector>
+
 
 #include "../common/log.h"
 // thanks to Austin Morlan for providing a ECS template
@@ -19,10 +19,10 @@ class VContainer
 {
   public:
     virtual ~VContainer() = default;
-    VContainer(VContainer& other) = default;
-    VContainer(VContainer&& other) = default;
-    VContainer& operator=(VContainer& other) = delete;
-    VContainer& operator=(VContainer&& other) = delete;
+    VContainer(VContainer &other) = default;
+    VContainer(VContainer &&other) = default;
+    VContainer &operator=(VContainer &other) = delete;
+    VContainer &operator=(VContainer &&other) = delete;
 
     virtual void addComponent(size_t entityID) = 0;
     virtual void OnEntityDestroyed(size_t entityID) noexcept = 0;
@@ -38,16 +38,14 @@ class VContainer
 template <typename T> class ComponentContainer final : public VContainer
 {
   public:
-
-
     // update a specific component
-    void addComponent(const size_t entityID,const T& component) 
+    void addComponent(const size_t entityID, const T &component)
     {
 
         // if the entity does have this type of component throw exception
         if (entityhascomponent.size() > entityID && entityhascomponent[entityID] == 1)
         {
-            yorcvs::log("Trying to add an component to an entity which already has it",yorcvs::ERROR);
+            yorcvs::log("Trying to add an component to an entity which already has it", yorcvs::ERROR);
         }
         // if there isn't any free space,create one
         if (freeIndex.empty())
@@ -78,14 +76,14 @@ template <typename T> class ComponentContainer final : public VContainer
         }
     }
     /**
-    * @brief Adds a default intialize component to the entity
-    * 
-    * @param entityID 
-    */
-    void addComponent(const size_t entityID) override  
+     * @brief Adds a default intialize component to the entity
+     *
+     * @param entityID
+     */
+    void addComponent(const size_t entityID) override
     {
         T newComponent{};
-        addComponent(entityID,newComponent);
+        addComponent(entityID, newComponent);
     }
 
     T &getComponent(const size_t entityID)
@@ -93,7 +91,9 @@ template <typename T> class ComponentContainer final : public VContainer
 
         if (entityhascomponent.size() <= entityID || entityhascomponent[entityID] != 1)
         {
-            yorcvs::log("Cannot get component : entity doesn't own the specified type of component: " + std::string(typeid(T).name()),yorcvs::ERROR);
+            yorcvs::log("Cannot get component : entity doesn't own the specified type of component: " +
+                            std::string(typeid(T).name()),
+                        yorcvs::ERROR);
         }
 
         return components[entitytocomponent[entityID]];
@@ -105,7 +105,9 @@ template <typename T> class ComponentContainer final : public VContainer
         // if the entity doesn't have this type of component throw exception
         if (entityhascomponent.size() <= entityID || entityhascomponent[entityID] != 1)
         {
-            yorcvs::log("Cannot delete component: the entity doesn't have this type of component : " + std::string(typeid(T).name()) ,yorcvs::ERROR); 
+            yorcvs::log("Cannot delete component: the entity doesn't have this type of component : " +
+                            std::string(typeid(T).name()),
+                        yorcvs::ERROR);
         }
 
         // get the index of the removed entity
@@ -129,13 +131,13 @@ template <typename T> class ComponentContainer final : public VContainer
         return true;
     }
 
-    void OnEntityDestroyed(const size_t entityID)  noexcept override  // this function never throws exception because not finding the component of the entity is  intended
+    void OnEntityDestroyed(const size_t entityID) noexcept
+        override // this function never throws exception because not finding the component of the entity is  intended
     {
         // there is already an exception to point if something happens
         removeComponent(entityID);
         // add more relevant code
     }
-
 
     void copyEntityComponent(const size_t dstID, const size_t srcID) override
     {
@@ -147,8 +149,6 @@ template <typename T> class ComponentContainer final : public VContainer
 
     // the next component's index to be used
     std::queue<size_t> freeIndex{};
-
-
 };
 
 // handles all components
@@ -175,7 +175,7 @@ class ComponentManager
         }
         else
         {
-            yorcvs::log("Component " + std::string(componentid) + " already registered",yorcvs::ERROR);
+            yorcvs::log("Component " + std::string(componentid) + " already registered", yorcvs::ERROR);
         }
     }
 
@@ -200,7 +200,8 @@ class ComponentManager
 
         if (component_type.find(component_name) == component_type.end())
         {
-            yorcvs::log("Cannot fetch component id" + std::string(component_name) + " : invalid component",yorcvs::ERROR);
+            yorcvs::log("Cannot fetch component id" + std::string(component_name) + " : invalid component",
+                        yorcvs::ERROR);
         }
         return component_type[component_name];
     }
@@ -210,15 +211,14 @@ class ComponentManager
     {
         for (auto const &i : componentContainers)
         {
-            if(i.second->entityhascomponent.size() <= entityID)
+            if (i.second->entityhascomponent.size() <= entityID)
             {
                 continue;
             }
-            if(i.second->entityhascomponent[entityID])
+            if (i.second->entityhascomponent[entityID])
             {
-                 i.second->OnEntityDestroyed(entityID);
+                i.second->OnEntityDestroyed(entityID);
             }
-         
         }
     }
 
@@ -239,27 +239,30 @@ class ComponentManager
         }
         return std::static_pointer_cast<ComponentContainer<T>>(componentContainers[componentid]);
     }
-        
+
     /**
-     * @brief Copies the component data from one entity to the other, if the destination doesn't have the component it adds it
-     * 
+     * @brief Copies the component data from one entity to the other, if the destination doesn't have the component it
+     * adds it
+     *
      * @param dstEntityID Destination
      * @param srcEntityID Source
      */
-    void entityCopyComponentToEntity(const size_t dstEntityID , const size_t srcEntityID)
+    void entityCopyComponentToEntity(const size_t dstEntityID, const size_t srcEntityID)
     {
-        //delete all components of destination
+        // delete all components of destination
         OnEntityDestroyed(dstEntityID);
-        for(const auto& container : componentContainers )
+        for (const auto &container : componentContainers)
         {
-            if(container.second->entityhascomponent.size() > srcEntityID && container.second->entityhascomponent[srcEntityID])
+            if (container.second->entityhascomponent.size() > srcEntityID &&
+                container.second->entityhascomponent[srcEntityID])
             {
-                if(container.second->entityhascomponent.size() <= dstEntityID || !container.second->entityhascomponent[dstEntityID])
+                if (container.second->entityhascomponent.size() <= dstEntityID ||
+                    !container.second->entityhascomponent[dstEntityID])
                 {
-                    //add a default constructed component to the entity
+                    // add a default constructed component to the entity
                     container.second->addComponent(dstEntityID);
                 }
-                container.second->copyEntityComponent(dstEntityID,srcEntityID);
+                container.second->copyEntityComponent(dstEntityID, srcEntityID);
             }
         }
     }
