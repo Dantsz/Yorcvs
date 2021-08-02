@@ -226,6 +226,21 @@ template <> class Window<yorcvs::SDL2>
         }
     }
 
+
+    void drawSprite(const std::string &path, const yorcvs::Vec2<float>& dstRectPos , const yorcvs::Vec2<float>& dstRectSize, const yorcvs::Rect<size_t> &srcRect,
+                    double angle = 0.0)
+    {
+        if (!isMinimized)
+        {
+            //NOTE: SDL_rendercopyF exists for >SDL 2.0.10 
+            SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
+                                static_cast<int>(srcRect.h)};
+            SDL_Rect dest = {static_cast<int>(dstRectPos.x), static_cast<int>(dstRectPos.y),static_cast<int>(dstRectSize.x),static_cast<int>(dstRectSize.y)};
+            SDL_RenderCopyEx(renderer, assetm->loadFromFile(path).get(), &sourceR, &dest, angle, nullptr,
+                              SDL_FLIP_NONE);
+        }
+    }
+
     [[nodiscard]]Texture<yorcvs::SDL2> createTexture(const std::string &path)
     {
         Texture<yorcvs::SDL2> tex;
@@ -245,7 +260,19 @@ template <> class Window<yorcvs::SDL2>
         }
     }
   
-
+    void drawTexture(const Texture<yorcvs::SDL2> &texture, const yorcvs::Vec2<float>& dstRectPos ,const yorcvs::Vec2<float>& dstRectSize,
+                     const yorcvs::Rect<size_t> &srcRect, double angle = 0.0)
+    {
+        if(!isMinimized)
+        {
+            //NOTE: SDL_rendercopyF exists for >SDL 2.0.10 
+            SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
+                                static_cast<int>(srcRect.h)};
+            SDL_Rect dest = {static_cast<int>(dstRectPos.x), static_cast<int>(dstRectPos.y),static_cast<int>(dstRectSize.x),static_cast<int>(dstRectSize.y)};
+            SDL_RenderCopyEx(renderer, texture.SDLtex.get(), &sourceR, &dest, angle, nullptr,
+                              SDL_FLIP_NONE);
+        }
+    }
 
     [[nodiscard]]Text<yorcvs::SDL2> createText(const std::string &path, const std::string &message, unsigned char r,
                                           unsigned char g, unsigned char b, unsigned char a, size_t charSize,

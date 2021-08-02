@@ -63,12 +63,24 @@ template <typename interface> class Window
     /**
      * @brief Renders a sprite to the screen with the specified parameters
      *
-     * @param path -path to the texture
-     * @param dstRect -part of the screen the sprite should occupy
-     * @param srcRect -part of the texture to be drawn
-     * @param angle  -angle of the texture(default is 0)
+     * @param path path to the texture
+     * @param dstRect part of the screen the sprite should occupy
+     * @param srcRect part of the texture to be drawn
+     * @param angle angle of the texture(default is 0)
      */
     void drawSprite(const std::string &path, const yorcvs::Rect<float> &dstRect, const yorcvs::Rect<size_t> &srcRect,
+                    double angle = 0.0);
+
+    /**
+     * @brief Renders a sprite to the screen with the specified parameters
+     * 
+     * @param path path to the texture
+     * @param dstRectPos position of the texture
+     * @param dstRectSize size of the texture
+     * @param srcRect  part of the texture to be drawn
+     * @param angle angle of the texture(default is 0)
+     */
+    void drawSprite(const std::string &path, const yorcvs::Vec2<float>& dstRectPos , const yorcvs::Vec2<float>& dstRectSize, const yorcvs::Rect<size_t> &srcRect,
                     double angle = 0.0);
 
     /**
@@ -83,26 +95,38 @@ template <typename interface> class Window
     /**
      * @brief Renders the texture to the screen
      *
-     * @param texture -the texture object
-     * @param dstRect -part of the srceen the sprite will be drawn at
-     * @param srcRect -what part of the sprite to draw
-     * @param angle - angle of the sprite
+     * @param texture the texture object
+     * @param dstRect part of the srceen the sprite will be drawn at
+     * @param srcRect what part of the sprite to draw
+     * @param angle  angle of the sprite
      */
     void drawTexture(const Texture<interface> &texture, const yorcvs::Rect<float> &dstRect,
                      const yorcvs::Rect<size_t> &srcRect, double angle = 0.0);
 
     /**
+     * @brief Renders the texture to the screen
+     * 
+     * @param texture the texture object
+     * @param dstRectPos position of the texture
+     * @param dstRectSize size of the texture
+     * @param srcRect what part of the sprite to draw
+     * @param angle angle of the sprite
+     */
+    void drawTexture(const Texture<interface> &texture, const yorcvs::Vec2<float>& dstRectPos ,const yorcvs::Vec2<float>& dstRectSize,
+                     const yorcvs::Rect<size_t> &srcRect, double angle = 0.0);
+
+    /**
      * @brief Create a Text Texture object
      *
-     * @param path - path to the font to be used
-     * @param message - the message to display
-     * @param r - red
-     * @param g - green
-     * @param b - blue
-     * @param a - alpha
-     * @param charSize - the resolution of a glyph
-     * @param lineLength - length of a line before a break
-     * @return std::shared_ptr<Texture<interfaceWindow>> - the texture to be
+     * @param path  path to the font to be used
+     * @param message  the message to display
+     * @param r  red
+     * @param g  green
+     * @param b  blue
+     * @param a  alpha
+     * @param charSize  the resolution of a glyph
+     * @param lineLength  length of a line before a break
+     * @return std::shared_ptr<Texture<interfaceWindow>>  the texture 
      * passed to draw_texture
      */
     Text<interface> createText(const std::string &path, const std::string &message, unsigned char r, unsigned char g,
