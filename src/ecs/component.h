@@ -18,7 +18,9 @@ constexpr size_t maxComponentID = std::numeric_limits<size_t>::max();
 class VContainer
 {
   public:
+    
     virtual ~VContainer() = default;
+    VContainer() = default;
     VContainer(VContainer &other) = default;
     VContainer(VContainer &&other) = default;
     VContainer &operator=(VContainer &other) = delete;
