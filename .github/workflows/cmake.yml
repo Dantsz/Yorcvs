@@ -29,7 +29,7 @@ jobs:
     - name: install gcc10
       run: sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
     - name: set gcc10 as default
-      run: sudo update-alternatives --config gcc 1
+      run: sudo update-alternatives --config gcc;1
     #dependencies
     - name: install sdl2
       run: sudo apt-get install libsdl2-dev
