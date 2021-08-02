@@ -4,7 +4,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 message(STATUS ${CMAKE_SYSTEM_NAME})
 #set SDL for windows
 if(WIN32)
@@ -32,11 +32,19 @@ set(YorcvsALLFILES "src/Yorcvs.cpp"
                   "src/common/types.h"
                   "src/common/log.h"
                   "src/common/timer.h" 
+                  
+                  "src/ecs/component.h"
+                  "src/ecs/entity.h"
+                  "src/ecs/system.h"
+                  "src/ecs/ecs.h"
+                  
 
                   "src/window/window.h"
                   "src/window/windowSDL2.h")
 
 add_executable(Yorcvs ${YorcvsALLFILES})
+
+
 
 target_link_libraries(${PROJECT_NAME} SDL2::Main SDL2::Image SDL2::TTF)
 

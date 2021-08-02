@@ -7,7 +7,7 @@
 #include "window/windowSDL2.h"
 #include <cstdlib>
 #include "Yorcvs.h"
-
+#include "ecs/ecs.h"
 static yorcvs::Window<yorcvs::SDL2> r;
 yorcvs::Text<yorcvs::SDL2> *text;
 yorcvs::Texture<yorcvs::SDL2> lettuce{};

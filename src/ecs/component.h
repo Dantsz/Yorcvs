@@ -18,14 +18,20 @@ constexpr size_t maxComponentID = std::numeric_limits<size_t>::max();
 class VContainer
 {
   public:
-    virtual void addComponent(const size_t& entityID) = 0;
-    virtual void OnEntityDestroyed(const size_t entityID) noexcept = 0;
-    virtual void copyEntityComponent(const size_t dstID, const size_t srcID) = 0;
+    virtual ~VContainer() = default;
+    VContainer(VContainer& other) = default;
+    VContainer(VContainer&& other) = default;
+    VContainer& operator=(VContainer& other) = delete;
+    VContainer& operator=(VContainer&& other) = delete;
+
+    virtual void addComponent(size_t entityID) = 0;
+    virtual void OnEntityDestroyed(size_t entityID) noexcept = 0;
+    virtual void copyEntityComponent(size_t dstID, size_t srcID) = 0;
 
     // lookup the component of a entity
     // lookup the entity to component, it's now done through 2 vectors
-    std::vector<bool> entityhascomponent;
-    std::vector<size_t> entitytocomponent;
+    std::vector<bool> entityhascomponent{};
+    std::vector<size_t> entitytocomponent{};
 };
 
 // contains..components
@@ -76,7 +82,7 @@ template <typename T> class ComponentContainer final : public VContainer
     * 
     * @param entityID 
     */
-    void addComponent(const size_t& entityID) override  
+    void addComponent(const size_t entityID) override  
     {
         T newComponent{};
         addComponent(entityID,newComponent);
@@ -137,10 +143,10 @@ template <typename T> class ComponentContainer final : public VContainer
     }
 
     // components vector
-    std::vector<T> components;
+    std::vector<T> components{};
 
     // the next component's index to be used
-    std::queue<size_t> freeIndex;
+    std::queue<size_t> freeIndex{};
 
 
 };
@@ -235,10 +241,11 @@ class ComponentManager
     }
         
     /**
-    * @brief Copies the component data from one entity to the other, if the destination doesn't have the component it adds it
-    * 
-    * @param otherEntityID 
-    */
+     * @brief Copies the component data from one entity to the other, if the destination doesn't have the component it adds it
+     * 
+     * @param dstEntityID Destination
+     * @param srcEntityID Source
+     */
     void entityCopyComponentToEntity(const size_t dstEntityID , const size_t srcEntityID)
     {
         //delete all components of destination
@@ -260,10 +267,10 @@ class ComponentManager
     // the largest id
     size_t topComponentType = 0;
     // type -> id
-    std::unordered_map<const char *, size_t> component_type;
+    std::unordered_map<const char *, size_t> component_type{};
 
     // contains
-    std::unordered_map<const char *, std::shared_ptr<yorcvs::VContainer>> componentContainers;
+    std::unordered_map<const char *, std::shared_ptr<yorcvs::VContainer>> componentContainers{};
 };
 
 } // namespace yorcvs

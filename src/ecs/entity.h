@@ -23,7 +23,7 @@ class EntityManager
         // if there isn't any in the the queue,create a new one and a new entry in the signature list
         if (freedIndices.empty())
         {
-            entitySignatures.push_back(std::vector<bool>());
+            entitySignatures.emplace_back();
             return lowestUnallocatedID++;
         }
 
@@ -38,7 +38,7 @@ class EntityManager
     /**
      * @brief deletes an entity, removes all components 
      * 
-     * @param id 
+     * @param id id of the entity
      */
     void deleteEntity(const size_t id) 
     {
@@ -64,9 +64,9 @@ class EntityManager
     /**
      * @brief Set the signature of an entity
      * 
-     * @param id 
-     * @param signature 
-     * @return * sets 
+     * @param id id of the entity
+     * @param signature new signature
+     *
      */
     void setSignature(const size_t id, const std::vector<bool> &signature)
     {
@@ -89,8 +89,8 @@ class EntityManager
     /**
      * @brief Returns the signature object
      * 
-     * @param id 
-     * @return std::vector<bool>& 
+     * @param id id of the entity
+     * @return std::vector<bool>& signature 
      */
     std::vector<bool> &getSignature(const size_t id)
     {

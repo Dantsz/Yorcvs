@@ -4,12 +4,14 @@
 #include <algorithm>
 #include <concepts>
 #include <memory>
-
+#include <unordered_map>
 
 template <typename T> typename std::vector<T>::iterator insertSorted(std::vector<T> &vec, T const &item)
 {
-    if (std::binary_search(vec.begin(), vec.end(), item) == true)
-        return vec.end();
+    if (std::binary_search(vec.begin(), vec.end(), item))
+    {
+                return vec.end();
+    }
     auto upperBound = std::upper_bound(vec.begin(), vec.end(), item);
     return vec.insert(upperBound, item);
 }
@@ -127,12 +129,16 @@ class SystemManager
     static bool compareSignatures(const std::vector<bool> &signature1, const std::vector<bool> &signature2)
     {
         if (signature1.size() != signature2.size())
+        {
             return false;
+        }
         for (size_t i = 0; i < signature1.size(); i++)
         {
             // if a signature  is missing somewhere
             if (signature1[i] != signature2[i])
+            {
                 return false;
+            }
         }
         return true;
     }
@@ -144,26 +150,30 @@ class SystemManager
      * @return true the entity has all the systems components
      * @return false if the system has a component but the entity does not or if the system signature doesn't match the entity
      */
-    static bool compareEntityToSystem(const std::vector<bool> &entity_s, const std::vector<bool> system_s)
+    static bool compareEntityToSystem(const std::vector<bool> &entity_s, const std::vector<bool> &system_s)
     {
 
         /// if the system signature doesn't match the entity
         if (system_s.size() > entity_s.size())
+        {
             return false;
+        }
         // if a signature has a system but the entity does not
         // return false
         for (size_t i = 0; i < system_s.size(); i++)
         {
             if (system_s[i] && !entity_s[i])
+            {
                 return false;
+            }
         }
         return true;
     }
 
     // get the signature of a system based on type
-    std::unordered_map<const char *, std::vector<bool>> typetosignature;
+    std::unordered_map<const char *, std::vector<bool>> typetosignature{};
     // get the system based on type
-    std::unordered_map<const char *, std::shared_ptr<EntitySystemList>> typetosystem;
+    std::unordered_map<const char *, std::shared_ptr<EntitySystemList>> typetosystem{};
 };
 
 } // namespace yorcvs
