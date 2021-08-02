@@ -9,7 +9,7 @@ class CollisionSystem
     {
         world = parent;
         //is this legal?
-        world->registerComponent<hitboxComponent>();
+        //world->registerComponent<hitboxComponent>();
         world->registerComponent<positionComponent>();
 
         world->registerSystem<CollisionSystem>(*this);

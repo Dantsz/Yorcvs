@@ -290,7 +290,7 @@ class ECS
     /**
      * @brief  add the components to the system <sys> as a criteria for iteration , if the entity doen't have the components  specified , it will not iterate ovr them     
      * 
-     * @return template <typename sys> 
+     * 
      */
 
     template <typename sys> void addCriteriaForIteration()

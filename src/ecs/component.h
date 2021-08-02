@@ -80,7 +80,7 @@ template <typename T> class ComponentContainer final : public VContainer
     /**
      * @brief Adds a default intialize component to the entity
      *
-     * @param entityID
+     * @param entityID entity to add component to
      */
     void addComponent(const size_t entityID) override
     {
@@ -183,15 +183,29 @@ class ComponentManager
 
     template <typename T> void addComponent(const size_t entityID, T &component)
     {
-
+        if(getContainer<T>() == nullptr)
+        {
+            yorcvs::log(std::string("Component") + typeid(T).name() + " has not been registered yet !!!!", yorcvs::ERROR);
+            return;
+        }
         getContainer<T>()->addComponent(entityID, component);
     }
     template <typename T> void removeComponent(const size_t entityID)
-    {
+    {   
+        if(getContainer<T>() == nullptr)
+        {
+            yorcvs::log(std::string("Component") + typeid(T).name() + " has not been registered yet !!!!", yorcvs::ERROR);
+            return;
+        }
         getContainer<T>()->removeComponent(entityID);
     }
     template <typename T> T &getComponent(const size_t entityID)
     {
+        if(getContainer<T>() == nullptr)
+        {
+           yorcvs::log(std::string("Component") + typeid(T).name() + " has not been registered yet !!!!", yorcvs::ERROR);
+           exit(120);
+        }
         return getContainer<T>()->getComponent(entityID);
     }
 
