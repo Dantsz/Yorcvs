@@ -11,7 +11,7 @@ class CollisionSystem
         //is this legal?
         world->registerComponent<hitboxComponent>();
         world->registerComponent<positionComponent>();
-        world->registerComponent<positionComponent>();
+ 
         world->registerSystem<CollisionSystem>(*this);
         
         world->addCriteriaForIteration<CollisionSystem, positionComponent, hitboxComponent>();

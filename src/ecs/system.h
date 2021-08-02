@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <memory>
 #include <unordered_map>
-#include <concepts>
 
 template <typename T> typename std::vector<T>::iterator insertSorted(std::vector<T> &vec, T const &item)
 {
@@ -50,10 +49,11 @@ class SystemManager
     {
         const char *systemType = typeid(T).name();
 
-        // if the system is already present //  throw
+        // if the system is already present
         if (typetosystem.find(systemType) != typetosystem.end())
         {
             yorcvs::log("Unable to register system: system is already registered.", yorcvs::ERROR);
+            return false;
         }
         std::shared_ptr<EntitySystemList> systemEVec = std::make_shared<EntitySystemList>();
         typetosystem.insert({systemType, systemEVec});
