@@ -1,10 +1,15 @@
 cmake_minimum_required(VERSION 3.12)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 project(ECSTest)
-
-add_executable(ECSTestEntitiesAndComponents ECSTestEntitiesAndComponents.cpp)
-
 enable_testing()
 
+add_executable(ECSTestEntitiesAndComponents ECSTestEntitiesAndComponents.cpp)
 add_test(ECSTestEntitiesAndComponents ECSTestEntitiesAndComponents)
+
+add_executable(ECSComponentCreationDeletion ECSComponentCreationDeletion.cpp)
+add_test(ECSComponentCreationDeletion ECSComponentCreationDeletion)
+
+add_executable(ECSsystems ECSsystems.cpp)
+add_test(ECSsystems ECSsystems)

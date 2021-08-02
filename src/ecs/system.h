@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <memory>
 #include <unordered_map>
+#include <concepts>
 
 template <typename T> typename std::vector<T>::iterator insertSorted(std::vector<T> &vec, T const &item)
 {
