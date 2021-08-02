@@ -23,7 +23,7 @@ jobs:
     - name: reps
       run : sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu `lsb_release -sc` main universe restricted multiverse"
     - name: install clang
-      run: sudp apt-get install clang
+      run: sudo apt-get install clang
     - name: update
       run: sudo apt-get update -y -qq
     #dependencies
