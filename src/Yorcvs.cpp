@@ -22,6 +22,7 @@ static int init()
 {
     
     r.Init("TEst", 960, 500);
+   
 
     world.addComponent<hitboxComponent>(tim.id,{{10,10,200,200}});
     world.addComponent<positionComponent>(tim.id,{{100,100}});
@@ -61,8 +62,10 @@ int main(int argc, char **argv)
     yorcvs::log("running EMSCRIPTEM");
     emscripten_set_main_loop(run, 0, 1);
 #else
+    yorcvs::Entity jim = tim;
+    world.getComponent<positionComponent>(jim.id).position.x = 200;
     while (r.isActive)
-    {
+    {   
         run();
     }
 #endif

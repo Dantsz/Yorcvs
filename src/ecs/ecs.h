@@ -458,7 +458,7 @@ class Entity
         parent = other.parent;
         id = parent->createEntityID();
         parent->entityCopyComponentToEntity(id,other.id);
-        yorcvs::log("The copy constructor for an Entity has been called: this might be an unecesary expensive option",yorcvs::WARNING);
+        yorcvs::log("The copy constructor for an Entity " + std::to_string(id) + " has been called: this might be an unecesary expensive option",yorcvs::WARNING);
     }
     Entity(Entity&& other) noexcept
     {
@@ -470,7 +470,7 @@ class Entity
     {
         parent = other.parent;
         parent->entityCopyComponentToEntity(id,other.id);
-        yorcvs::log("The copy assginment operator for an Entity has been called: this might be an unecesary expensive option",yorcvs::WARNING);
+        yorcvs::log("The copy assginment operator for Entity" + std::to_string(id) + " has been called: this might be an unecesary expensive option",yorcvs::WARNING);
         return *this;
     }
 
@@ -488,7 +488,7 @@ class Entity
         {
             parent->destroyEntity(id);
         }
-           yorcvs::log("Destroyed entity with id: " + std::to_string(id), yorcvs::INFO);
+        yorcvs::log("Destroyed entity with id: " + std::to_string(id), yorcvs::INFO);
     }
 
     size_t id = 0;

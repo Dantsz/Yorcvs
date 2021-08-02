@@ -9,14 +9,14 @@ class CollisionSystem
     {
         world = parent;
         //is this legal?
-        //world->registerComponent<hitboxComponent>();
+        world->registerComponent<hitboxComponent>();
         world->registerComponent<positionComponent>();
-
+        world->registerComponent<positionComponent>();
         world->registerSystem<CollisionSystem>(*this);
         
         world->addCriteriaForIteration<CollisionSystem, positionComponent, hitboxComponent>();
     }
-    void update(float dt, yorcvs::Window<yorcvs::SDL2>* testWindow)
+    void update(float dt, yorcvs::Window<yorcvs::SDL2>* testWindow) 
     {
         for(const auto& ID : entityList->entitiesID)
         {
