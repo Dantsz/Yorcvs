@@ -26,5 +26,5 @@ jobs:
       #Compile emscripten
       - name: Compile
         working-directory: ${{github.workspace}}
-        run: em++ src/Yorcvs.cpp -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["png"]'  -s USE_SDL_TTF=2  --embed-file assets  -s ALLOW_MEMORY_GROWTH=1 -o a.html
+        run: em++ src/Yorcvs.cpp -std=c++20 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["png"]'  -s USE_SDL_TTF=2  --embed-file assets  -s ALLOW_MEMORY_GROWTH=1 -o a.html
       
