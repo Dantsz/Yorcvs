@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <memory>
 #include <unordered_map>
-
+#include <concepts>
 
 template <typename T> typename std::vector<T>::iterator insertSorted(std::vector<T> &vec, T const &item)
 {
@@ -37,7 +37,7 @@ class EntitySystemList
 template <typename systemt>
 concept systemT = requires(systemt sys)
 {
-    //std::same_as<decltype(sys.entityList), std::shared_ptr<yorcvs::EntitySystemList>>;
+    std::same_as<decltype(sys.entityList), std::shared_ptr<yorcvs::EntitySystemList>>;
     {sys.entityList->entitiesID[0]};
     {sys.entityList->entitiesID.size()};
 };
