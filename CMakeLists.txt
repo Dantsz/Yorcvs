@@ -38,6 +38,7 @@ set(YorcvsALLFILES "src/Yorcvs.cpp"
                   "src/ecs/system.h"
                   "src/ecs/ecs.h"
                   
+                  "src/components.h"
 
                   "src/window/window.h"
                   "src/window/windowSDL2.h")
