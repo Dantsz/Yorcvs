@@ -12,6 +12,7 @@
 static yorcvs::Window<yorcvs::SDL2> r;
 static yorcvs::ECS world{};
 static CollisionSystem collisionS{&world};
+static VelocitySystem velocityS{&world};
 yorcvs::Entity tim{&world};
 
 
@@ -26,7 +27,7 @@ static int init()
 
     world.add_component<hitboxComponent>(tim.id,{{10,10,200,200}});
     world.add_component<positionComponent>(tim.id,{{100,100}});
-
+    world.add_component<velocityComponent>(tim.id,{{1.0f,0.0f},{0.5f,0.5f}});
     return 0;
     
 }
@@ -42,7 +43,7 @@ void run()
     
     r.clear();
     collisionS.render(1.0f,&r);
-
+    velocityS.update(1.0f);
     r.present();
     FT = timy.get_ticks();
 }
@@ -62,8 +63,7 @@ int main(int argc, char **argv)
     yorcvs::log("running EMSCRIPTEM");
     emscripten_set_main_loop(run, 0, 1);
 #else
-    yorcvs::Entity jim = tim;
-    world.get_component<positionComponent>(jim.id).position.x = 200;
+
     while (r.isActive)
     {   
         run();

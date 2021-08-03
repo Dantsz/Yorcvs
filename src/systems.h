@@ -17,7 +17,7 @@ class CollisionSystem
         {
         world->register_component<positionComponent>();
         }
-        
+
  
         world->register_system<CollisionSystem>(*this);
         
@@ -42,4 +42,36 @@ class CollisionSystem
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS* world;
     
+};
+
+class VelocitySystem
+{
+    public:
+    VelocitySystem(yorcvs::ECS* parent)
+    {
+        world = parent;
+        if(!world->is_component_registered<positionComponent>())
+        {
+            world->register_component<positionComponent>(); 
+        }
+        if(!world->is_component_registered<velocityComponent>())
+        {
+            world->register_component<velocityComponent>();
+        }
+        world->register_system<VelocitySystem>(*this);
+        world->add_criteria_for_iteration<VelocitySystem,positionComponent,velocityComponent>();
+
+    }
+    void update(float dt)
+    {
+        for(const auto& ID : entityList->entitiesID)
+        {
+            yorcvs::Vec2<float> posOF = world->get_component<velocityComponent>(ID).dir * world->get_component<velocityComponent>(ID).vel;
+            posOF *= dt;
+            world->get_component<positionComponent>(ID).position += posOF;
+        }
+        
+    }
+    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    yorcvs::ECS* world;
 };
