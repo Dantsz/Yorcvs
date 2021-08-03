@@ -158,7 +158,7 @@ template <> class Window<yorcvs::SDL2>
         assetm = std::make_unique<yorcvs::AssetManager<SDL_Texture>>(
             [&](const std::string &path) {
                 SDL_Surface *surf = IMG_Load(path.c_str());
-                SDL_Texture *tex = SDL_create_textureFromSurface(renderer, surf);
+                SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, surf);
                 SDL_FreeSurface(surf);
                 return tex;
             },
@@ -374,7 +374,7 @@ template <> class Window<yorcvs::SDL2>
     {
         TTF_Font *font = TTF_OpenFont(text.fontPath.c_str(), text.charSize);
         SDL_Surface *textSurf = TTF_RenderText_Blended_Wrapped(font, text.message.c_str(), text.color, text.lineLength);
-        text.SDLtex = std::unique_ptr<SDL_Texture>(SDL_create_textureFromSurface(renderer, textSurf));
+        text.SDLtex = std::unique_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(renderer, textSurf));
         SDL_FreeSurface(textSurf);
         TTF_CloseFont(font);
     }
