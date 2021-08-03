@@ -11,24 +11,24 @@ int main()
 {
 
     yorcvs::ECS world{};
-    world.registerComponent<Transform>();
+    world.register_component<Transform>();
     yorcvs::Entity position(&world);
     
-    world.addComponent<Transform>(position.id,{1.0f,1.0f});
+    world.add_component<Transform>(position.id,{1.0f,1.0f});
 
-    assert(world.getEntitiesWithComponent<Transform>() == 1);
+    assert(world.get_entities_with_component<Transform>() == 1);
 
-    assert(world.getComponent<Transform>(position.id).id == 0);
+    assert(world.get_component<Transform>(position.id).id == 0);
 
-    world.getComponent<Transform>(position.id).id = 42;
+    world.get_component<Transform>(position.id).id = 42;
     yorcvs::Entity second = position;
 
-    assert(world.getComponent<Transform>(second.id).id == 42);
+    assert(world.get_component<Transform>(second.id).id == 42);
 
-    world.getComponent<Transform>(second.id).id = 120;
+    world.get_component<Transform>(second.id).id = 120;
 
-    assert(world.getComponent<Transform>(second.id).id == 120);
-    assert(world.getComponent<Transform>(position.id).id == 42);
+    assert(world.get_component<Transform>(second.id).id == 120);
+    assert(world.get_component<Transform>(position.id).id == 42);
 
     return 0;
 }

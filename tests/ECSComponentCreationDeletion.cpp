@@ -11,18 +11,18 @@ int main()
 {
 
     yorcvs::ECS world{};
-    world.registerComponent<Transform>();
+    world.register_component<Transform>();
 
     
     std::vector<yorcvs::Entity> entities{};
     for(auto i = 0 ; i < 100 ; i ++)
     {
         entities.emplace_back(&world);
-        world.addComponent<Transform>(entities[i].id,{1.0f,1.0f,i});
+        world.add_component<Transform>(entities[i].id,{1.0f,1.0f,i});
     }
-    assert(world.getEntitiesWithComponent<Transform>() == 100);
-    world.destroyEntity(0);
-    assert(world.getEntitiesWithComponent<Transform>() == 99);
-    assert(world.hasComponents<Transform>(0) == 0);
+    assert(world.get_entities_with_component<Transform>() == 100);
+    world.destroy_entity(0);
+    assert(world.get_entities_with_component<Transform>() == 99);
+    assert(world.has_components<Transform>(0) == 0);
     return 0;
 }

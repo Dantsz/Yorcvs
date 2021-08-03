@@ -158,14 +158,14 @@ template <> class Window<yorcvs::SDL2>
         assetm = std::make_unique<yorcvs::AssetManager<SDL_Texture>>(
             [&](const std::string &path) {
                 SDL_Surface *surf = IMG_Load(path.c_str());
-                SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, surf);
+                SDL_Texture *tex = SDL_create_textureFromSurface(renderer, surf);
                 SDL_FreeSurface(surf);
                 return tex;
             },
             [](SDL_Texture *p) { SDL_DestroyTexture(p); });
     }
 
-    void setSize(size_t width, size_t height) const
+    void set_size(size_t width, size_t height) const
     {
         SDL_SetWindowSize(sdlWindow, static_cast<int>(width), static_cast<int>(height));
     }
@@ -179,7 +179,7 @@ template <> class Window<yorcvs::SDL2>
         SDL_Quit();
         TTF_Quit();
     }
-    void handleEvents()
+    void handle_events()
     {
         while (SDL_PollEvent(&event) == 1)
         {
@@ -212,7 +212,7 @@ template <> class Window<yorcvs::SDL2>
         }
     }
 
-    void drawSprite(const std::string &path, const Rect<float> &dstRect, const Rect<size_t> &srcRect,
+    void draw_sprite(const std::string &path, const Rect<float> &dstRect, const Rect<size_t> &srcRect,
                     double angle = 0.0)
     {  
         if (!isMinimized)
@@ -221,13 +221,13 @@ template <> class Window<yorcvs::SDL2>
             SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
                                 static_cast<int>(srcRect.h)};
             SDL_Rect dest = {static_cast<int>(dstRect.x), static_cast<int>(dstRect.y),static_cast<int>(dstRect.w),static_cast<int>(dstRect.h)};
-            SDL_RenderCopyEx(renderer, assetm->loadFromFile(path).get(), &sourceR, &dest, angle, nullptr,
+            SDL_RenderCopyEx(renderer, assetm->load_from_file(path).get(), &sourceR, &dest, angle, nullptr,
                               SDL_FLIP_NONE);
         }
     }
 
 
-    void drawSprite(const std::string &path, const yorcvs::Vec2<float>& dstRectPos , const yorcvs::Vec2<float>& dstRectSize, const yorcvs::Rect<size_t> &srcRect,
+    void draw_sprite(const std::string &path, const yorcvs::Vec2<float>& dstRectPos , const yorcvs::Vec2<float>& dstRectSize, const yorcvs::Rect<size_t> &srcRect,
                     double angle = 0.0)
     {
         if (!isMinimized)
@@ -236,18 +236,18 @@ template <> class Window<yorcvs::SDL2>
             SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
                                 static_cast<int>(srcRect.h)};
             SDL_Rect dest = {static_cast<int>(dstRectPos.x), static_cast<int>(dstRectPos.y),static_cast<int>(dstRectSize.x),static_cast<int>(dstRectSize.y)};
-            SDL_RenderCopyEx(renderer, assetm->loadFromFile(path).get(), &sourceR, &dest, angle, nullptr,
+            SDL_RenderCopyEx(renderer, assetm->load_from_file(path).get(), &sourceR, &dest, angle, nullptr,
                               SDL_FLIP_NONE);
         }
     }
 
-    [[nodiscard]]Texture<yorcvs::SDL2> createTexture(const std::string &path)
+    [[nodiscard]]Texture<yorcvs::SDL2> create_texture(const std::string &path)
     {
         Texture<yorcvs::SDL2> tex;
-        tex.SDLtex = assetm->loadFromFile(path);
+        tex.SDLtex = assetm->load_from_file(path);
         return tex;
     }
-    void drawSprite(const Texture<yorcvs::SDL2>& texture, const yorcvs::Rect<float> &dstRect, const yorcvs::Rect<size_t> &srcRect,double angle = 0.0)
+    void draw_sprite(const Texture<yorcvs::SDL2>& texture, const yorcvs::Rect<float> &dstRect, const yorcvs::Rect<size_t> &srcRect,double angle = 0.0)
     {
         if(!isMinimized)
         {
@@ -260,7 +260,7 @@ template <> class Window<yorcvs::SDL2>
         }
     }
   
-    void drawTexture(const Texture<yorcvs::SDL2> &texture, const yorcvs::Vec2<float>& dstRectPos ,const yorcvs::Vec2<float>& dstRectSize,
+    void draw_texture(const Texture<yorcvs::SDL2> &texture, const yorcvs::Vec2<float>& dstRectPos ,const yorcvs::Vec2<float>& dstRectSize,
                      const yorcvs::Rect<size_t> &srcRect, double angle = 0.0)
     {
         if(!isMinimized)
@@ -274,7 +274,7 @@ template <> class Window<yorcvs::SDL2>
         }
     }
 
-    [[nodiscard]]Text<yorcvs::SDL2> createText(const std::string &path, const std::string &message, unsigned char r,
+    [[nodiscard]]Text<yorcvs::SDL2> create_text(const std::string &path, const std::string &message, unsigned char r,
                                           unsigned char g, unsigned char b, unsigned char a, size_t charSize,
                                           size_t lineLength)
     {
@@ -288,7 +288,7 @@ template <> class Window<yorcvs::SDL2>
         return text;
     }
 
-    void drawText(const Text<yorcvs::SDL2> &text, const Rect<float> &dstRect) const
+    void draw_text(const Text<yorcvs::SDL2> &text, const Rect<float> &dstRect) const
     {
         if (!isMinimized)
         {
@@ -298,29 +298,29 @@ template <> class Window<yorcvs::SDL2>
         }
     }
 
-    void setTextMessage(Text<yorcvs::SDL2> &text, const std::string &message)
+    void set_text_message(Text<yorcvs::SDL2> &text, const std::string &message)
     {
         text.message = message;
         text.SDLtex.reset();
         setupTexture(text);
     }
 
-    void setTextColor(Text<yorcvs::SDL2> &text, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+    void set_text_color(Text<yorcvs::SDL2> &text, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
     {
         text.color = {r, g, b, a};
         setupTexture(text);
     }
-    void setTextCharSize(Text<yorcvs::SDL2> &text, size_t charSize)
+    void set_text_char_size(Text<yorcvs::SDL2> &text, size_t charSize)
     {
         text.charSize = static_cast<int>(charSize);
         setupTexture(text);
     }
-    void setTextLineLength(Text<yorcvs::SDL2> &text, size_t lineLength)
+    void set_text_line_length(Text<yorcvs::SDL2> &text, size_t lineLength)
     {
         text.lineLength = static_cast<uint32_t>(lineLength);
         setupTexture(text);
     }
-    void setTextFont(Text<yorcvs::SDL2> &text, const std::string &fontPath)
+    void set_text_font(Text<yorcvs::SDL2> &text, const std::string &fontPath)
     {
         text.fontPath = fontPath;
         setupTexture(text);
@@ -342,25 +342,25 @@ template <> class Window<yorcvs::SDL2>
         }
     }
     // sdl doesn't need the window to get cursor position so this is static
-    yorcvs::Vec2<float> getCursorPosition()
+    yorcvs::Vec2<float> get_cursor_position()
     {
         SDL_GetMouseState(&mouseX, &mouseY);
         return Vec2<float>(static_cast<float>(mouseX), static_cast<float>(mouseY));
     }
 
-    size_t registerCallback(const Callback<yorcvs::SDL2> &callback)
+    size_t register_callback(const Callback<yorcvs::SDL2> &callback)
     {
         callbacks.push_back(callback);
         return callbacks.size() - 1;
     }
 
-    void unregisterCallback(size_t index)
+    void unregister_callback(size_t index)
     {
         callbacks.erase(callbacks.begin() + static_cast<ptrdiff_t>(index)); // TODO: static cast looks ugly
     }
     // this can take a SDL_scancode directly
     //
-    [[nodiscard]] bool isKeyPressed(yorcvs::Key<yorcvs::SDL2> key)
+    [[nodiscard]] bool is_key_pressed(yorcvs::Key<yorcvs::SDL2> key)
     {
         keys = SDL_GetKeyboardState(nullptr);
         // TODO: REPLACE WITH SPAN?
@@ -374,7 +374,7 @@ template <> class Window<yorcvs::SDL2>
     {
         TTF_Font *font = TTF_OpenFont(text.fontPath.c_str(), text.charSize);
         SDL_Surface *textSurf = TTF_RenderText_Blended_Wrapped(font, text.message.c_str(), text.color, text.lineLength);
-        text.SDLtex = std::unique_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(renderer, textSurf));
+        text.SDLtex = std::unique_ptr<SDL_Texture>(SDL_create_textureFromSurface(renderer, textSurf));
         SDL_FreeSurface(textSurf);
         TTF_CloseFont(font);
     }

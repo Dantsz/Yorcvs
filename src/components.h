@@ -15,7 +15,10 @@ struct positionComponent
 {
     yorcvs::Vec2<float> position;
 };
-struct velocityComponent;
+struct velocityComponent
+{
+    yorcvs::Vec2<float> vel;
+};
 
 
 struct healthComponent

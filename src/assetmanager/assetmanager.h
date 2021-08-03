@@ -33,7 +33,7 @@ template <typename assetType> class AssetManager
      * @param path path to resource
      * @return std::shared_ptr<assetType> pointer to the resource or nulllptr if it couldn't be found
      */
-    [[nodiscard]]std::shared_ptr<assetType> loadFromFile(const std::string &path)
+    [[nodiscard]]std::shared_ptr<assetType> load_from_file(const std::string &path)
     {
         if (path.empty())
         {

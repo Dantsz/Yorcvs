@@ -5,14 +5,14 @@
 #include <memory>
 #include <unordered_map>
 
-template <typename T> typename std::vector<T>::iterator insertSorted(std::vector<T> &vec, T const &item)
+template <typename T> typename std::vector<T>::iterator insert_sorted(std::vector<T> &vec, T const &item)
 {
     if (std::binary_search(vec.begin(), vec.end(), item))
     {
         return vec.end();
     }
-    auto upperBound = std::upper_bound(vec.begin(), vec.end(), item);
-    return vec.insert(upperBound, item);
+    auto upper_bound = std::upper_bound(vec.begin(), vec.end(), item);
+    return vec.insert(upper_bound, item);
 }
 
 namespace yorcvs
@@ -45,7 +45,7 @@ class SystemManager
 {
   public:
     // creates a system of type T and puts it in the map
-    template <systemT T> bool registerSystem(T &system)
+    template <systemT T> bool register_system(T &system)
     {
         const char *systemType = typeid(T).name();
 
@@ -57,12 +57,12 @@ class SystemManager
         }
         std::shared_ptr<EntitySystemList> systemEVec = std::make_shared<EntitySystemList>();
         typetosystem.insert({systemType, systemEVec});
-        setSignature<T>(std::vector<bool>{});
+        set_signature<T>(std::vector<bool>{});
         system.entityList = systemEVec;
         return true;
     }
     // sets the signature of the system with type T
-    template <systemT T> void setSignature(const std::vector<bool> &signature)
+    template <systemT T> void set_signature(const std::vector<bool> &signature)
     {
         const char *systemType = typeid(T).name();
 
@@ -76,7 +76,7 @@ class SystemManager
     }
 
     // gets signature of a system
-    template <systemT T> std::vector<bool> getSystemSignature()
+    template <systemT T> std::vector<bool> get_system_signature()
     {
 
         const char *systemType = typeid(T).name();
@@ -102,17 +102,17 @@ class SystemManager
     }
 
     // Notify each system that an entity's signature changed
-    void onEntitySignatureChange(const size_t entityID, std::vector<bool> &signature)
+    void on_entity_signature_change(const size_t entityID, std::vector<bool> &signature)
     {
         for (auto const &it : typetosystem)
         {
             auto const &type = it.first;
             auto const &system = it.second;
             auto const &systemSignature = typetosignature[type];
-            if (compareEntityToSystem(signature, systemSignature))
+            if (compare_entity_to_system(signature, systemSignature))
             {
                 // TODO : MAKE A METHOD TO SYSTEM , method needs to be virtual /Onewntitierase/insert
-                insertSorted(system->entitiesID, entityID);
+                insert_sorted(system->entitiesID, entityID);
             }
             else
             {
@@ -123,7 +123,7 @@ class SystemManager
     }
 
     // compare the signature//return 1  if they are equal
-    static bool compareSignatures(const std::vector<bool> &signature1, const std::vector<bool> &signature2)
+    static bool compare_signatures(const std::vector<bool> &signature1, const std::vector<bool> &signature2)
     {
         if (signature1.size() != signature2.size())
         {
@@ -148,7 +148,7 @@ class SystemManager
      * @return false if the system has a component but the entity does not or if the system signature doesn't match the
      * entity
      */
-    static bool compareEntityToSystem(const std::vector<bool> &entity_s, const std::vector<bool> &system_s)
+    static bool compare_entity_to_system(const std::vector<bool> &entity_s, const std::vector<bool> &system_s)
     {
 
         /// if the system signature doesn't match the entity

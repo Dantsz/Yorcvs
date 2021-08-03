@@ -42,7 +42,7 @@ class Timer
      * @return true the timer is paused
      * @return false it's not paused
      */
-    [[nodiscard]] bool isPaused() const
+    [[nodiscard]] bool is_paused() const
     {
         return mStopped;
     }
@@ -53,7 +53,7 @@ class Timer
      * @return true
      * @return false
      */
-    [[nodiscard]] bool isStarted() const
+    [[nodiscard]] bool is_started() const
     {
         return mStarted;
     }
@@ -65,7 +65,7 @@ class Timer
      * @tparam cast_format - what unit of measure should be used(nanosecond,milisecond,second) , by default it's millisecond
      */
     template <typename return_type = size_t, typename cast_format = std::chrono::milliseconds>
-    [[nodiscard]] return_type getTicks() const
+    [[nodiscard]] return_type get_ticks() const
     {
         if (mStopped)
         {

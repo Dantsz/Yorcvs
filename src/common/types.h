@@ -138,7 +138,7 @@ template <typename T> class Vec2
      *
      * @return constexpr Vec2
      */
-    constexpr Vec2 getNormalized()
+    constexpr Vec2 get_normalized()
     {
         return Vec2(x / norm(), y / norm());
     }
@@ -150,7 +150,7 @@ template <typename T> class Vec2
      */
     constexpr Vec2 &normalize()
     {
-        *this = getNormalized();
+        *this = get_normalized();
         return *this;
     }
     /**
@@ -159,7 +159,7 @@ template <typename T> class Vec2
      * @param other other vector
      * @return constexpr T
      */
-    constexpr T dotProduct(const Vec2 &other)
+    constexpr T dot_product(const Vec2 &other)
     {
         return (x * other.x + y * other.y);
     }
@@ -234,7 +234,7 @@ template <typename T> class Rect
      *
      * @return constexpr Vec2<T>
      */
-    constexpr Vec2<T> getPosition()
+    constexpr Vec2<T> get_position()
     {
         return Vec2<T>(x, y);
     }
@@ -243,7 +243,7 @@ template <typename T> class Rect
      *
      * @return constexpr Vec2<T>
      */
-    constexpr Vec2<T> getDimension()
+    constexpr Vec2<T> get_dimension()
     {
         return Vec2<T>(w, h);
     }

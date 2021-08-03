@@ -41,7 +41,7 @@ class EntityManager
      *
      * @param id id of the entity
      */
-    void deleteEntity(const size_t id)
+    void delete_entity(const size_t id)
     {
 
         if (id > lowestUnallocatedID)
@@ -69,7 +69,7 @@ class EntityManager
      * @param signature new signature
      *
      */
-    void setSignature(const size_t id, const std::vector<bool> &signature)
+    void set_signature(const size_t id, const std::vector<bool> &signature)
     {
 
         if (id > lowestUnallocatedID)
@@ -93,7 +93,7 @@ class EntityManager
      * @param id id of the entity
      * @return std::vector<bool>& signature
      */
-    std::vector<bool> &getSignature(const size_t id)
+    std::vector<bool> &get_signature(const size_t id)
     {
         if (id > lowestUnallocatedID)
         {

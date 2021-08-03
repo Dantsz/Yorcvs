@@ -9,21 +9,26 @@ class CollisionSystem
     {
         world = parent;
         //is this legal?
-        world->registerComponent<hitboxComponent>();
-        world->registerComponent<positionComponent>();
+        world->register_component<hitboxComponent>();
+        world->register_component<positionComponent>();
  
-        world->registerSystem<CollisionSystem>(*this);
+        world->register_system<CollisionSystem>(*this);
         
-        world->addCriteriaForIteration<CollisionSystem, positionComponent, hitboxComponent>();
+        world->add_criteria_for_iteration<CollisionSystem, positionComponent, hitboxComponent>();
     }
-    void update(float dt, yorcvs::Window<yorcvs::SDL2>* testWindow) 
+    void update(float elapsedTime)
+    {
+        
+    }
+
+    void render(float dt, yorcvs::Window<yorcvs::SDL2>* testWindow) 
     {
         for(const auto& ID : entityList->entitiesID)
         {
-            yorcvs::Vec2<float> pos = world->getComponent<positionComponent>(ID).position;
-            pos += {world->getComponent<hitboxComponent>(ID).hitbox.x,world->getComponent<hitboxComponent>(ID).hitbox.y};
-            yorcvs::Vec2<float> size = {world->getComponent<hitboxComponent>(ID).hitbox.w,world->getComponent<hitboxComponent>(ID).hitbox.h};
-            testWindow->drawSprite("assets/lettuce.png",pos,size,{0,0,200,200});
+            yorcvs::Vec2<float> pos = world->get_component<positionComponent>(ID).position;
+            pos += {world->get_component<hitboxComponent>(ID).hitbox.x,world->get_component<hitboxComponent>(ID).hitbox.y};
+            yorcvs::Vec2<float> size = {world->get_component<hitboxComponent>(ID).hitbox.w,world->get_component<hitboxComponent>(ID).hitbox.h};
+            testWindow->draw_sprite("assets/lettuce.png",pos,size,{0,0,200,200});
         }
     }
 

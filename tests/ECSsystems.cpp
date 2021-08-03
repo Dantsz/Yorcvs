@@ -25,7 +25,7 @@ class TestSystem
     {
         for(const auto& i : entityList->entitiesID)
         {
-            assert(parent->getComponent<Transform>(i).id == 1);
+            assert(parent->get_component<Transform>(i).id == 1);
         }
     }
  
@@ -45,8 +45,8 @@ class SecondTestSystem
     {
         for(const auto& i : entityList->entitiesID)
         {
-            assert(parent->getComponent<Transform>(i).id == 1);
-            assert(parent->getComponent<Size>(i).w == parent->getComponent<Size>(i).h);
+            assert(parent->get_component<Transform>(i).id == 1);
+            assert(parent->get_component<Size>(i).w == parent->get_component<Size>(i).h);
         }
     }
  
@@ -60,26 +60,26 @@ int main()
 {
 
     yorcvs::ECS world{};
-    world.registerComponent<Transform>();
-    world.registerComponent<Size>();
+    world.register_component<Transform>();
+    world.register_component<Size>();
 
     TestSystem tester(&world);
-    world.registerSystem<TestSystem>(tester);
+    world.register_system<TestSystem>(tester);
     
 
-    world.addCriteriaForIteration<TestSystem,Transform>();
+    world.add_criteria_for_iteration<TestSystem,Transform>();
     SecondTestSystem secontester(&world);
-    world.registerSystem<SecondTestSystem>(secontester);
-    world.addCriteriaForIteration<SecondTestSystem ,Transform, Size>();
+    world.register_system<SecondTestSystem>(secontester);
+    world.add_criteria_for_iteration<SecondTestSystem ,Transform, Size>();
     
     std::vector<yorcvs::Entity> entities{};
     for(size_t i = 0 ; i < numberOfEntities ; i++ )
     {
         entities.emplace_back(&world);
-        world.addComponent<Transform>(entities[i].id,{1.0f,2.0f,1});
+        world.add_component<Transform>(entities[i].id,{1.0f,2.0f,1});
         if(i%2 == 1)
         {
-            world.addComponent<Size>(entities[i].id,{i,i});
+            world.add_component<Size>(entities[i].id,{i,i});
         }
     }
 
@@ -90,16 +90,16 @@ int main()
     {
         if(i%2 == 0)
         {
-            world.removeComponent<Transform>(entities[i].id);
+            world.remove_component<Transform>(entities[i].id);
         }
     }
-    assert(world.getEntitiesWithComponent<Transform>() == world.getEntitiesWithComponent<Size>());
+    assert(world.get_entities_with_component<Transform>() == world.get_entities_with_component<Size>());
     assert(tester.entityList->entitiesID.size() == numberOfEntities/2);
     for(size_t i = 1 ;i < numberOfEntities; i++)
     {
         if(i%2 == 1)
         {
-            world.removeComponent<Size>(entities[i].id);
+            world.remove_component<Size>(entities[i].id);
         }
     }
     assert(secontester.entityList->entitiesID.empty());

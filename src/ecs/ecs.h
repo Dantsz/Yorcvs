@@ -32,7 +32,7 @@ class ECS
         entitymanager = std::make_unique<yorcvs::EntityManager>();
         systemmanager = std::make_unique<yorcvs::SystemManager>();
     }
-    ~ECS()
+    ~ECS() noexcept
     {
         yorcvs::log("Destroying ECS",yorcvs::INFO);
         componentmanager.reset();
@@ -44,12 +44,12 @@ class ECS
      * @brief Create a Entity ID object
      * 
      * @return size_t the ID of the entity
-     * NOTE: IDs created by this function are not managed by the ecs and should be freed using destroyEntity
+     * NOTE: IDs created by this function are not managed by the ecs and should be freed using destroy_entity
      */
-    [[nodiscard]] size_t createEntityID()
+    [[nodiscard]] size_t create_entity_ID()
     {
         size_t ID = entitymanager->addEntity();
-        systemmanager->onEntitySignatureChange(ID, entitymanager->getSignature(ID));
+        systemmanager->on_entity_signature_change(ID, entitymanager->get_signature(ID));
 
         return ID;
     }
@@ -58,10 +58,10 @@ class ECS
      * 
      * @param id ID of the entity
      */
-    void destroyEntity(const size_t id)
+    void destroy_entity(const size_t id)
     {
-        entitymanager->deleteEntity(id);
-        componentmanager->OnEntityDestroyed(id);
+        entitymanager->delete_entity(id);
+        componentmanager->on_entity_destroyed(id);
         systemmanager->OnEntityDestroy(id);
     }
     /**
@@ -70,18 +70,18 @@ class ECS
      * @param entityID Entity ID
      * @return std::vector<bool> List of all components, 1 if they have the component  or 0 otherwise
      */
-    std::vector<bool> getEntitySignature(const size_t entityID)
+    std::vector<bool> get_entity_signature(const size_t entityID)
     {
-        return entitymanager->getSignature(entityID);
+        return entitymanager->get_signature(entityID);
     }
     /**
      * @brief Registers a component making the ECS aware of it
      * 
      * @tparam T The component object
      */
-    template <typename T> void registerComponent()
+    template <typename T> void register_component()
     {
-        componentmanager->registerComponent<T>();
+        componentmanager->register_component<T>();
     }
 
     /**
@@ -91,10 +91,10 @@ class ECS
      * @tparam secondT  Another component 
      * @tparam OtherT  The rest
      */
-    template <typename T, typename secondT, typename... OtherT> void registerComponent()
+    template <typename T, typename secondT, typename... OtherT> void register_component()
     {
-        componentmanager->registerComponent<T>();
-        registerComponent<secondT, OtherT...>();
+        componentmanager->register_component<T>();
+        register_component<secondT, OtherT...>();
     }
 
     /**
@@ -104,7 +104,7 @@ class ECS
      * @return true the component is registered
      * @return false it's not registered
      */
-    template <typename T> bool isComponentRegistered()
+    template <typename T> bool is_component_registered()
     {
         const char *component_name = typeid(T).name();
         return (componentmanager->component_type.find(component_name) != componentmanager->component_type.end());
@@ -116,13 +116,13 @@ class ECS
      * @param entityID ID of the entity
      * @param component Component
      */
-    template <typename T> void addComponent(const size_t entityID,T component)
+    template <typename T> void add_component(const size_t entityID,T component)
     {
         // add the component
-        componentmanager->addComponent<T>(entityID, component);
+        componentmanager->add_component<T>(entityID, component);
         // modify the signature to match the new addition
-        std::vector<bool> e_signature = entitymanager->getSignature(entityID);
-        size_t component_type = componentmanager->getComponentID<T>();
+        std::vector<bool> e_signature = entitymanager->get_signature(entityID);
+        size_t component_type = componentmanager->get_component_ID<T>();
         // while the vector of signature doesn't have elements until the current component add 0 to the signature
         while (e_signature.size() <= component_type)
         {
@@ -130,8 +130,8 @@ class ECS
         }
         // add the new signature
         e_signature[component_type] = 1;
-        entitymanager->setSignature(entityID, e_signature);
-        systemmanager->onEntitySignatureChange(entityID, e_signature);
+        entitymanager->set_signature(entityID, e_signature);
+        systemmanager->on_entity_signature_change(entityID, e_signature);
     }
     /**
      * @brief Adds multiple components to and entity
@@ -143,13 +143,13 @@ class ECS
      * @param other Other components
      */
     template <typename T, typename... Other>
-    void addComponent(const size_t entityID,T component, const Other &...other)
+    void add_component(const size_t entityID,T component, const Other &...other)
     {
         // add the component
-        componentmanager->addComponent<T>(entityID, component);
+        componentmanager->add_component<T>(entityID, component);
         // modify the signature to match the new addition
-        std::vector<bool> e_signature = entitymanager->getSignature(entityID);
-        size_t component_type = componentmanager->getComponentID<T>();
+        std::vector<bool> e_signature = entitymanager->get_signature(entityID);
+        size_t component_type = componentmanager->get_component_ID<T>();
         // while the vector of signature doesn't have elements until the current component add 0 to the signature
         while (e_signature.size() <= component_type)
         {
@@ -157,9 +157,9 @@ class ECS
         }
         // add the new signature
         e_signature[component_type] = 1;
-        entitymanager->setSignature(entityID, e_signature);
-        systemmanager->onEntitySignatureChange(entityID, e_signature);
-        addComponent<Other...>(entityID, other...);
+        entitymanager->set_signature(entityID, e_signature);
+        systemmanager->on_entity_signature_change(entityID, e_signature);
+        add_component<Other...>(entityID, other...);
     }
     /**
      * @brief Removes component T from the entity
@@ -167,14 +167,14 @@ class ECS
      * @tparam T Component 
      * @param entityID entity
      */
-    template <typename T> void removeComponent(const size_t entityID)
+    template <typename T> void remove_component(const size_t entityID)
     {
 
-        std::vector<bool> &e_signature = entitymanager->getSignature(entityID);
-        size_t component_type = componentmanager->getComponentID<T>();
+        std::vector<bool> &e_signature = entitymanager->get_signature(entityID);
+        size_t component_type = componentmanager->get_component_ID<T>();
         e_signature[component_type] = 0;
-        systemmanager->onEntitySignatureChange(entityID, e_signature);
-        componentmanager->removeComponent<T>(entityID);
+        systemmanager->on_entity_signature_change(entityID, e_signature);
+        componentmanager->remove_component<T>(entityID);
     }
     /**
      * @brief Removes two or more components from the entity
@@ -184,16 +184,16 @@ class ECS
      * @tparam Other other components type
      * @param entityID the ID of the entity
      */
-    template <typename T, typename secondT, typename... Other> void removeComponent(const size_t entityID)
+    template <typename T, typename secondT, typename... Other> void remove_component(const size_t entityID)
     {
 
-        std::vector<bool> &e_signature = entitymanager->getSignature(entityID);
-        size_t component_type = componentmanager->getComponentID<T>();
+        std::vector<bool> &e_signature = entitymanager->get_signature(entityID);
+        size_t component_type = componentmanager->get_component_ID<T>();
         e_signature[component_type] = 0;
-        systemmanager->onEntitySignatureChange(entityID, e_signature);
-        componentmanager->removeComponent<T>(entityID);
+        systemmanager->on_entity_signature_change(entityID, e_signature);
+        componentmanager->remove_component<T>(entityID);
 
-        removeComponent<secondT, Other...>(entityID);
+        remove_component<secondT, Other...>(entityID);
     }
     /**
      * @brief Checks if an entity has a component
@@ -203,9 +203,9 @@ class ECS
      * @return true it has the component
      * @return false it dowsn't
      */
-    template <typename T> bool hasComponents(const size_t entityID)
+    template <typename T> bool has_components(const size_t entityID)
     {
-        return componentmanager->getContainer<T>()->hasComponent(entityID);
+        return componentmanager->get_container<T>()->has_component(entityID);
     }
     /**
      * @brief Checks if an entity has all the components specified
@@ -217,11 +217,11 @@ class ECS
      * @return true it has all of them
      * @return false it's missing one or more
      */
-    template <typename T, typename secondT, typename... Other> bool hasComponents(const size_t entityID)
+    template <typename T, typename secondT, typename... Other> bool has_components(const size_t entityID)
     {
-        if (!componentmanager->getContainer<T>()->hasComponent(entityID))
+        if (!componentmanager->get_container<T>()->has_component(entityID))
             return 0;
-        return hasComponents<secondT, Other...>(entityID);
+        return has_components<secondT, Other...>(entityID);
     }
     /**
      * @brief Returns a reference tthe component of the entity
@@ -230,9 +230,9 @@ class ECS
      * @param entityID ID of the entity
      * @return T& the component
      */
-    template <typename T> T &getComponent(const size_t entityID)
+    template <typename T> T &get_component(const size_t entityID)
     {
-        return componentmanager->getComponent<T>(entityID);
+        return componentmanager->get_component<T>(entityID);
     }
 
 
@@ -242,12 +242,12 @@ class ECS
      * @tparam T The system type
      * @param sys Reference to an instance of type system
      */
-    template <typename T> void registerSystem(T &sys)
+    template <typename T> void register_system(T &sys)
     {
         // if registering the system succeded
-        if (systemmanager->registerSystem<T>(sys))
+        if (systemmanager->register_system<T>(sys))
         {
-            onSystemSignatureChange<T>();
+            on_system_signature_change<T>();
         }
         return;
     }
@@ -271,9 +271,9 @@ class ECS
      * @tparam T System type
      * @param signature New system signature
      */
-    template <typename T> void setSystemSignature(std::vector<bool> &signature)
+    template <typename T> void set_system_signature(std::vector<bool> &signature)
     {
-        systemmanager->setSignature<T>(signature);
+        systemmanager->set_signature<T>(signature);
     }
 
     /**
@@ -282,9 +282,9 @@ class ECS
      * @tparam T The system
      * @return std::vector<bool> Value of the systems signature
      */
-    template <typename T> std::vector<bool> getSystemSignature()
+    template <typename T> std::vector<bool> get_system_signature()
     {
-        return systemmanager->getSystemSignature<T>();
+        return systemmanager->get_system_signature<T>();
     }
 
     /**
@@ -293,10 +293,10 @@ class ECS
      * 
      */
 
-    template <typename sys> void addCriteriaForIteration()
+    template <typename sys> void add_criteria_for_iteration()
     {
         // update signature when all components have been added
-        onSystemSignatureChange<sys>();
+        on_system_signature_change<sys>();
     }
     /**
      * @brief Adds more components at once
@@ -305,12 +305,12 @@ class ECS
      * @tparam comp first components
      * @tparam comps other components
      */
-    template <typename sys, typename comp, typename... comps> void addCriteriaForIteration()
+    template <typename sys, typename comp, typename... comps> void add_criteria_for_iteration()
     {
         // get the current signature of sys
-        std::vector<bool> signature = getSystemSignature<sys>();
+        std::vector<bool> signature = get_system_signature<sys>();
         // get the id of the component
-        size_t componentID = getComponentID<comp>();
+        size_t componentID = get_component_ID<comp>();
         // modify the signature to fit the new component
         while (signature.size() <= componentID)
         {
@@ -319,14 +319,14 @@ class ECS
         // mark the component as being a part of the system
         signature[componentID] = 1;
         // set the new signature
-        setSystemSignature<sys>(signature);
+        set_system_signature<sys>(signature);
 
-        addCriteriaForIteration<sys, comps...>();
+        add_criteria_for_iteration<sys, comps...>();
     }
 
-    template <typename sys> void setCriteriaForIteration()
+    template <typename sys> void set_criteria_for_iteration()
     {
-        onSystemSignatureChange<sys>();
+        on_system_signature_change<sys>();
     }
     /**
      * @brief Sets the Criteria For Iteration,removes other criteria 
@@ -335,10 +335,10 @@ class ECS
      * @tparam comp First component
      * @tparam comps Other components
      */
-    template <typename sys, typename comp, typename... comps> void setCriteriaForIteration()
+    template <typename sys, typename comp, typename... comps> void set_criteria_for_iteration()
     {
         // get the current signature of sys
-        std::vector<bool> signature = getSystemSignature<sys>();
+        std::vector<bool> signature = get_system_signature<sys>();
 
         // reset criteria
 
@@ -348,7 +348,7 @@ class ECS
         }
 
         // get the id of the component
-        size_t componentID = getComponentID<comp>();
+        size_t componentID = get_component_ID<comp>();
         // modify the signature to fit the new component
         while (signature.size() <= componentID)
         {
@@ -357,7 +357,7 @@ class ECS
         // mark the component as being a part of the system
         signature[componentID] = 1;
         // set the new signature
-        setSystemSignature<sys>(signature);
+        set_system_signature<sys>(signature);
     }
 
     
@@ -369,10 +369,10 @@ class ECS
      * NOTE: This is might be costly
      */
     template<typename T>
-    size_t getEntitiesWithComponent()
+    size_t get_entities_with_component()
     {
         //get component index
-        size_t cIndex = componentmanager->getComponentID<T>();
+        size_t cIndex = componentmanager->get_component_ID<T>();
         size_t entities = 0;
         //unused entites have an emtpy signature so a false pozitive should happen
         for(const auto& i : entitymanager->entitySignatures)
@@ -386,11 +386,11 @@ class ECS
 
     }
 
-    void entityCopyComponentToEntity(const size_t dstEntityID , const size_t srcEntityID)
+    void copy_component_to_from_entity(const size_t dstEntityID , const size_t srcEntityID)
     {
-        componentmanager->entityCopyComponentToEntity(dstEntityID,srcEntityID);
-        std::vector<bool> newSignature = getEntitySignature(srcEntityID);
-        systemmanager->onEntitySignatureChange(dstEntityID,newSignature);
+        componentmanager->copy_component_to_from_entity(dstEntityID,srcEntityID);
+        std::vector<bool> newSignature = get_entity_signature(srcEntityID);
+        systemmanager->on_entity_signature_change(dstEntityID,newSignature);
     }
   
 
@@ -404,13 +404,13 @@ class ECS
     // only used for debbuging
     template <typename comp, typename returnType = size_t> returnType get_maximum_component_count()
     {
-        return componentmanager->getContainer<comp>()->components.size();
+        return componentmanager->get_container<comp>()->components.size();
     }
-    template <typename T> size_t getComponentID()
+    template <typename T> size_t get_component_ID()
     {
-        return componentmanager->getComponentID<T>();
+        return componentmanager->get_component_ID<T>();
     }
-    template <typename T> void onSystemSignatureChange()
+    template <typename T> void on_system_signature_change()
     {
         const char *systemType = typeid(T).name();
         // add matching entities to it
@@ -418,11 +418,11 @@ class ECS
 
         for (size_t entity = 0; entity < entitymanager->lowestUnallocatedID; entity++)
         {
-            if (systemmanager->compareEntityToSystem(entitymanager->entitySignatures[entity],
-                                                         systemmanager->getSystemSignature<T>()))
+            if (systemmanager->compare_entity_to_system(entitymanager->entitySignatures[entity],
+                                                         systemmanager->get_system_signature<T>()))
             {
                 // TODO : MAKE A METHOD TO SYSTEM , method needs to be virtual /Onewntitierase/insert
-                insertSorted(systemmanager->typetosystem.at(systemType)->entitiesID, entity);
+                insert_sorted(systemmanager->typetosystem.at(systemType)->entitiesID, entity);
             }
             else
             {
@@ -449,15 +449,15 @@ class Entity
     Entity(ECS *ecs)
     {   
         parent = ecs; 
-        id = parent->createEntityID();
+        id = parent->create_entity_ID();
         yorcvs::log("Created entity with id: " + std::to_string(id), yorcvs::INFO);
     }
   
     Entity(const Entity& other)
     {
         parent = other.parent;
-        id = parent->createEntityID();
-        parent->entityCopyComponentToEntity(id,other.id);
+        id = parent->create_entity_ID();
+        parent->copy_component_to_from_entity(id,other.id);
         yorcvs::log("The copy constructor for an Entity " + std::to_string(id) + " has been called: this might be an unecesary expensive option",yorcvs::WARNING);
     }
     Entity(Entity&& other) noexcept
@@ -467,9 +467,13 @@ class Entity
         other.parent = nullptr;
     }   
     Entity &operator=(const Entity &other)
-    {
+    {   
+        if(this == &other)
+        {
+            return *this;
+        }
         parent = other.parent;
-        parent->entityCopyComponentToEntity(id,other.id);
+        parent->copy_component_to_from_entity(id,other.id);
         yorcvs::log("The copy assginment operator for Entity" + std::to_string(id) + " has been called: this might be an unecesary expensive option",yorcvs::WARNING);
         return *this;
     }
@@ -482,11 +486,11 @@ class Entity
         return *this;
     }
 
-    ~Entity()
+    ~Entity() noexcept
     {
         if(parent != nullptr)
         {
-            parent->destroyEntity(id);
+            parent->destroy_entity(id);
         }
         yorcvs::log("Destroyed entity with id: " + std::to_string(id), yorcvs::INFO);
     }

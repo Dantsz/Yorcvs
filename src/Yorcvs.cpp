@@ -24,8 +24,8 @@ static int init()
     r.Init("TEst", 960, 500);
    
 
-    world.addComponent<hitboxComponent>(tim.id,{{10,10,200,200}});
-    world.addComponent<positionComponent>(tim.id,{{100,100}});
+    world.add_component<hitboxComponent>(tim.id,{{10,10,200,200}});
+    world.add_component<positionComponent>(tim.id,{{100,100}});
 
     return 0;
     
@@ -38,13 +38,13 @@ void run()
 
 
 
-    r.handleEvents();
+    r.handle_events();
     
     r.clear();
-    collisionS.update(1.0f,&r);
+    collisionS.render(1.0f,&r);
 
     r.present();
-    FT = timy.getTicks();
+    FT = timy.get_ticks();
 }
 
 int cleanup()
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
     emscripten_set_main_loop(run, 0, 1);
 #else
     yorcvs::Entity jim = tim;
-    world.getComponent<positionComponent>(jim.id).position.x = 200;
+    world.get_component<positionComponent>(jim.id).position.x = 200;
     while (r.isActive)
     {   
         run();

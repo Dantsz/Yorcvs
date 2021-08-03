@@ -57,7 +57,7 @@ template <typename interface> class Window
 {
   public:
     void Init(const char *name, size_t w, size_t h);
-    void setSize(size_t w, size_t h);
+    void set_size(size_t w, size_t h);
     void cleanup();
 
     /**
@@ -68,7 +68,7 @@ template <typename interface> class Window
      * @param srcRect part of the texture to be drawn
      * @param angle angle of the texture(default is 0)
      */
-    void drawSprite(const std::string &path, const yorcvs::Rect<float> &dstRect, const yorcvs::Rect<size_t> &srcRect,
+    void draw_sprite(const std::string &path, const yorcvs::Rect<float> &dstRect, const yorcvs::Rect<size_t> &srcRect,
                     double angle = 0.0);
 
     /**
@@ -80,7 +80,7 @@ template <typename interface> class Window
      * @param srcRect  part of the texture to be drawn
      * @param angle angle of the texture(default is 0)
      */
-    void drawSprite(const std::string &path, const yorcvs::Vec2<float>& dstRectPos , const yorcvs::Vec2<float>& dstRectSize, const yorcvs::Rect<size_t> &srcRect,
+    void draw_sprite(const std::string &path, const yorcvs::Vec2<float>& dstRectPos , const yorcvs::Vec2<float>& dstRectSize, const yorcvs::Rect<size_t> &srcRect,
                     double angle = 0.0);
 
     /**
@@ -90,7 +90,7 @@ template <typename interface> class Window
      * @return Texture<interface>
      * NOTE: CREATED TEXTURE IS MANAGED BY THE WINDOW CLASS
      */
-    Texture<interface> createTexture(const std::string &path);
+    Texture<interface> create_texture(const std::string &path);
   
     /**
      * @brief Renders the texture to the screen
@@ -100,7 +100,7 @@ template <typename interface> class Window
      * @param srcRect what part of the sprite to draw
      * @param angle  angle of the sprite
      */
-    void drawTexture(const Texture<interface> &texture, const yorcvs::Rect<float> &dstRect,
+    void draw_texture(const Texture<interface> &texture, const yorcvs::Rect<float> &dstRect,
                      const yorcvs::Rect<size_t> &srcRect, double angle = 0.0);
 
     /**
@@ -112,7 +112,7 @@ template <typename interface> class Window
      * @param srcRect what part of the sprite to draw
      * @param angle angle of the sprite
      */
-    void drawTexture(const Texture<interface> &texture, const yorcvs::Vec2<float>& dstRectPos ,const yorcvs::Vec2<float>& dstRectSize,
+    void draw_texture(const Texture<interface> &texture, const yorcvs::Vec2<float>& dstRectPos ,const yorcvs::Vec2<float>& dstRectSize,
                      const yorcvs::Rect<size_t> &srcRect, double angle = 0.0);
 
     /**
@@ -129,7 +129,7 @@ template <typename interface> class Window
      * @return std::shared_ptr<Texture<interfaceWindow>>  the texture 
      * passed to draw_texture
      */
-    Text<interface> createText(const std::string &path, const std::string &message, unsigned char r, unsigned char g,
+    Text<interface> create_text(const std::string &path, const std::string &message, unsigned char r, unsigned char g,
                                unsigned char b, unsigned char a, size_t charSize, size_t lineLength);
 
     /**
@@ -138,7 +138,7 @@ template <typename interface> class Window
      * @param text - Text created using creaText method
      * @param dstRect - A rectangle
      */
-    void drawText(const Text<interface> &text, const Rect<float> &dstRect);
+    void draw_text(const Text<interface> &text, const Rect<float> &dstRect);
 
     /**
      * @brief Set the Text Message
@@ -146,7 +146,7 @@ template <typename interface> class Window
      * @param text - the text to be set
      * @param message - new message
      */
-    void setTextMessage(const Text<interface> &text, const std::string &message);
+    void set_text_message(const Text<interface> &text, const std::string &message);
 
     /**
      * @brief Set the Text Color
@@ -157,7 +157,7 @@ template <typename interface> class Window
      * @param b - blue
      * @param a - alpha
      */
-    void setTextColor(const Text<interface> &text, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+    void set_text_color(const Text<interface> &text, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 
     /**
      * @brief Set the Text Char Size
@@ -165,7 +165,7 @@ template <typename interface> class Window
      * @param text - text
      * @param charSize - the new size
      */
-    void setTextCharSize(const Text<interface> &text, size_t charSize);
+    void set_text_char_size(const Text<interface> &text, size_t charSize);
 
     /**
      * @brief Set the Text Line Length
@@ -173,7 +173,7 @@ template <typename interface> class Window
      * @param text - text
      * @param lineLength - new length of message before a new line
      */
-    void setTextLineLength(const Text<interface> &text, size_t lineLength);
+    void set_text_line_length(const Text<interface> &text, size_t lineLength);
 
     /**
      * @brief Set the Text Font
@@ -181,7 +181,7 @@ template <typename interface> class Window
      * @param text - text
      * @param fontPath - path to the new font
      */
-    void setTextFont(const Text<interface> &text, const std::string &fontPath);
+    void set_text_font(const Text<interface> &text, const std::string &fontPath);
 
     /**
      * @brief Clears the screen
@@ -201,14 +201,14 @@ template <typename interface> class Window
      * @brief Handles window events
      *
      */
-    void handleEvents();
+    void handle_events();
 
     /**
      * @brief Get the cursor position on the screen
      *
      * @return yorcvs::Vec2<float> - the position
      */
-    yorcvs::Vec2<float> getCursorPosition();
+    yorcvs::Vec2<float> get_cursor_position();
 
     /**
      * @brief Represents a key
@@ -219,7 +219,7 @@ template <typename interface> class Window
      * @note  Currently has no api-independent way of specifying which key to be checked
      */
 
-    bool isKeyPressed(yorcvs::Key<interface> key);
+    bool is_key_pressed(yorcvs::Key<interface> key);
 
     /**
      * @brief Adds the callback to the event loop and will execute each time handleEvent is being called
@@ -230,7 +230,7 @@ template <typename interface> class Window
      * @return size_t - the index of the callback in the vector in case it shouldn't remain for the duration of the loop
      * NOTE: CALLBACKS MUST PROBABLY CONTAIN API SPECIFIC HANDLING OF EVENTS
      */
-    size_t registerCallback(const Callback<interface> &callback);
+    size_t register_callback(const Callback<interface> &callback);
 
     /**
      * @brief Deletes the callback from the callback array
@@ -238,7 +238,7 @@ template <typename interface> class Window
      * @param index - index returned from resgisterCallBack
      *
      */
-    void unregisterCallback(size_t index);
+    void unregister_callback(size_t index);
 
     bool isActive;
 

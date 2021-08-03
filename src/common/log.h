@@ -29,7 +29,7 @@ enum MSGSEVERITY : size_t
  * @param message - message to log
  * @param level - level of severity
  */
-template <typename T = std::string> void log(const T &message, MSGSEVERITY level = INFO)
+template <typename T = std::string> void log(const T &message, MSGSEVERITY level = INFO) noexcept
 {
     // TODO: std::format
     std::cout << "Severity  " << level << ": Message " << message << '\n';
