@@ -8,9 +8,16 @@ class CollisionSystem
     CollisionSystem(yorcvs::ECS* parent)
     {
         world = parent;
-        //is this legal?
-        world->register_component<hitboxComponent>();
+        //is this legal? yee
+        if(!world->is_component_registered<hitboxComponent>())
+        {
+            world->register_component<hitboxComponent>();
+        }
+        if(!world->is_component_registered<positionComponent>())
+        {
         world->register_component<positionComponent>();
+        }
+        
  
         world->register_system<CollisionSystem>(*this);
         

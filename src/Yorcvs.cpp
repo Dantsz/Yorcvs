@@ -21,7 +21,7 @@ size_t FT = 0;
 static int init()
 {
     
-    r.Init("TEst", 960, 500);
+    r.init("TEst", 960, 500);
    
 
     world.add_component<hitboxComponent>(tim.id,{{10,10,200,200}});

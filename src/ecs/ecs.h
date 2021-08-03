@@ -1,10 +1,11 @@
 #pragma once
 #include <memory>
 
+#include "../common/log.h"
 #include "component.h"
 #include "entity.h"
 #include "system.h"
-#include "../common/log.h"
+
 /*The ECS is heaviley isnpired by AUSTIN MORLAN's implementation , but it has a bit more functionality and ease of use.
   It's a bit more 'loose'. It's minimal and doesn't have very specific function so it may be interchangeable with other
   ECS.
@@ -14,35 +15,54 @@ namespace yorcvs
 {
 /**
  * @brief Main part of the ecs, that createsd entities , registers components and systems
- * 
+ *
  */
 class ECS
 {
   public:
-
-
     /**
      * @brief Initializez the ECS
-     * 
+     *
      */
     ECS()
-    {   
-        yorcvs::log("Initializing ECS",yorcvs::INFO);
+    {
+        yorcvs::log("Initializing ECS", yorcvs::INFO);
         componentmanager = std::make_unique<yorcvs::ComponentManager>();
         entitymanager = std::make_unique<yorcvs::EntityManager>();
         systemmanager = std::make_unique<yorcvs::SystemManager>();
     }
+    ECS(ECS &&other) noexcept
+    {
+        this->componentmanager = std::move(other.componentmanager);
+        this->entitymanager = std::move(other.entitymanager);
+        this->systemmanager = std::move(other.systemmanager);
+
+    }
+    ECS(const ECS& other) = delete;//copy would be so expensive  the copy constructor will probably be called by accident
+
     ~ECS() noexcept
     {
-        yorcvs::log("Destroying ECS",yorcvs::INFO);
-        componentmanager.reset();
-        entitymanager.reset();
-        systemmanager.reset();
+        yorcvs::log("Destroying ECS", yorcvs::INFO);
+        if (componentmanager != nullptr)
+        {
+            componentmanager.reset();
+        }
+        if (entitymanager != nullptr)
+        {
+            entitymanager.reset();
+        }
+        if (systemmanager != nullptr)
+        {
+            systemmanager.reset();
+        }
     }
+
+   
+
     // assigns a new id for an entity
     /**
      * @brief Create a Entity ID object
-     * 
+     *
      * @return size_t the ID of the entity
      * NOTE: IDs created by this function are not managed by the ecs and should be freed using destroy_entity
      */
@@ -55,7 +75,7 @@ class ECS
     }
     /**
      * @brief Frees an entity ID and removes it's components
-     * 
+     *
      * @param id ID of the entity
      */
     void destroy_entity(const size_t id)
@@ -65,8 +85,8 @@ class ECS
         systemmanager->OnEntityDestroy(id);
     }
     /**
-     * @brief Get the Entity Signature 
-     * 
+     * @brief Get the Entity Signature
+     *
      * @param entityID Entity ID
      * @return std::vector<bool> List of all components, 1 if they have the component  or 0 otherwise
      */
@@ -76,7 +96,7 @@ class ECS
     }
     /**
      * @brief Registers a component making the ECS aware of it
-     * 
+     *
      * @tparam T The component object
      */
     template <typename T> void register_component()
@@ -86,9 +106,9 @@ class ECS
 
     /**
      * @brief Registers multiple components in the same function call
-     * 
+     *
      * @tparam T A component
-     * @tparam secondT  Another component 
+     * @tparam secondT  Another component
      * @tparam OtherT  The rest
      */
     template <typename T, typename secondT, typename... OtherT> void register_component()
@@ -99,7 +119,7 @@ class ECS
 
     /**
      * @brief Checks if a component is registered
-     * 
+     *
      * @tparam T component
      * @return true the component is registered
      * @return false it's not registered
@@ -111,12 +131,12 @@ class ECS
     }
     /**
      * @brief Adds a component to an entity
-     * 
+     *
      * @tparam T Component type
      * @param entityID ID of the entity
      * @param component Component
      */
-    template <typename T> void add_component(const size_t entityID,T component)
+    template <typename T> void add_component(const size_t entityID, T component)
     {
         // add the component
         componentmanager->add_component<T>(entityID, component);
@@ -135,15 +155,15 @@ class ECS
     }
     /**
      * @brief Adds multiple components to and entity
-     * 
+     *
      * @tparam T first component type
      * @tparam Other other components type
-     * @param entityID The ID the entity 
-     * @param component First component 
+     * @param entityID The ID the entity
+     * @param component First component
      * @param other Other components
      */
     template <typename T, typename... Other>
-    void add_component(const size_t entityID,T component, const Other &...other)
+    void add_component(const size_t entityID, T component, const Other &...other)
     {
         // add the component
         componentmanager->add_component<T>(entityID, component);
@@ -163,8 +183,8 @@ class ECS
     }
     /**
      * @brief Removes component T from the entity
-     * 
-     * @tparam T Component 
+     *
+     * @tparam T Component
      * @param entityID entity
      */
     template <typename T> void remove_component(const size_t entityID)
@@ -178,7 +198,7 @@ class ECS
     }
     /**
      * @brief Removes two or more components from the entity
-     * 
+     *
      * @tparam T first component type
      * @tparam secondT second component type
      * @tparam Other other components type
@@ -197,7 +217,7 @@ class ECS
     }
     /**
      * @brief Checks if an entity has a component
-     * 
+     *
      * @tparam T The component type
      * @param entityID Id of the entity
      * @return true it has the component
@@ -209,7 +229,7 @@ class ECS
     }
     /**
      * @brief Checks if an entity has all the components specified
-     * 
+     *
      * @tparam T fiest component type
      * @tparam secondT second component type
      * @tparam Other other components tpye
@@ -225,7 +245,7 @@ class ECS
     }
     /**
      * @brief Returns a reference tthe component of the entity
-     * 
+     *
      * @tparam T the type of component
      * @param entityID ID of the entity
      * @return T& the component
@@ -235,10 +255,9 @@ class ECS
         return componentmanager->get_component<T>(entityID);
     }
 
-
     /**
      * @brief Registers a system so the ECS can track which entities should be used by the system
-     * 
+     *
      * @tparam T The system type
      * @param sys Reference to an instance of type system
      */
@@ -253,9 +272,9 @@ class ECS
     }
     /**
      * @brief Checks if a system is registered
-     * 
+     *
      * @tparam T The system
-     * @return true It is 
+     * @return true It is
      * @return false It is not
      */
     template <typename T> bool is_system_registered()
@@ -267,7 +286,7 @@ class ECS
 
     /**
      * @brief Sets the signature of a system
-     * 
+     *
      * @tparam T System type
      * @param signature New system signature
      */
@@ -278,7 +297,7 @@ class ECS
 
     /**
      * @brief Returns the signature of a system
-     * 
+     *
      * @tparam T The system
      * @return std::vector<bool> Value of the systems signature
      */
@@ -288,9 +307,10 @@ class ECS
     }
 
     /**
-     * @brief  add the components to the system <sys> as a criteria for iteration , if the entity doen't have the components  specified , it will not iterate ovr them     
-     * 
-     * 
+     * @brief  add the components to the system <sys> as a criteria for iteration , if the entity doen't have the
+     * components  specified , it will not iterate ovr them
+     *
+     *
      */
 
     template <typename sys> void add_criteria_for_iteration()
@@ -300,7 +320,7 @@ class ECS
     }
     /**
      * @brief Adds more components at once
-     * 
+     *
      * @tparam sys the system
      * @tparam comp first components
      * @tparam comps other components
@@ -329,9 +349,9 @@ class ECS
         on_system_signature_change<sys>();
     }
     /**
-     * @brief Sets the Criteria For Iteration,removes other criteria 
-     * 
-     * @tparam sys The system 
+     * @brief Sets the Criteria For Iteration,removes other criteria
+     *
+     * @tparam sys The system
      * @tparam comp First component
      * @tparam comps Other components
      */
@@ -360,39 +380,35 @@ class ECS
         set_system_signature<sys>(signature);
     }
 
-    
     /**
      * @brief Get the number of entities that have the specified component
-     * 
-     * @tparam T Component 
+     *
+     * @tparam T Component
      * @return size_t The number of entities with that component
      * NOTE: This is might be costly
      */
-    template<typename T>
-    size_t get_entities_with_component()
+    template <typename T> size_t get_entities_with_component()
     {
-        //get component index
+        // get component index
         size_t cIndex = componentmanager->get_component_ID<T>();
         size_t entities = 0;
-        //unused entites have an emtpy signature so a false pozitive should happen
-        for(const auto& i : entitymanager->entitySignatures)
+        // unused entites have an emtpy signature so a false pozitive should happen
+        for (const auto &i : entitymanager->entitySignatures)
         {
-            if(i.size() > cIndex)
+            if (i.size() > cIndex)
             {
-             entities += static_cast<size_t>(i[cIndex]);
+                entities += static_cast<size_t>(i[cIndex]);
             }
         }
         return entities;
-
     }
 
-    void copy_component_to_from_entity(const size_t dstEntityID , const size_t srcEntityID)
+    void copy_component_to_from_entity(const size_t dstEntityID, const size_t srcEntityID)
     {
-        componentmanager->copy_component_to_from_entity(dstEntityID,srcEntityID);
+        componentmanager->copy_component_to_from_entity(dstEntityID, srcEntityID);
         std::vector<bool> newSignature = get_entity_signature(srcEntityID);
-        systemmanager->on_entity_signature_change(dstEntityID,newSignature);
+        systemmanager->on_entity_signature_change(dstEntityID, newSignature);
     }
-  
 
   private:
     std::unique_ptr<yorcvs::ComponentManager> componentmanager;
@@ -419,7 +435,7 @@ class ECS
         for (size_t entity = 0; entity < entitymanager->lowestUnallocatedID; entity++)
         {
             if (systemmanager->compare_entity_to_system(entitymanager->entitySignatures[entity],
-                                                         systemmanager->get_system_signature<T>()))
+                                                        systemmanager->get_system_signature<T>()))
             {
                 // TODO : MAKE A METHOD TO SYSTEM , method needs to be virtual /Onewntitierase/insert
                 insert_sorted(systemmanager->typetosystem.at(systemType)->entitiesID, entity);
@@ -432,12 +448,9 @@ class ECS
                                                    systemmanager->typetosystem.at(systemType)->entitiesID.end(),
                                                    entity),
                                        systemmanager->typetosystem.at(systemType)->entitiesID.end());
-
-                
             }
         }
     }
-
 };
 /**
  * @brief RAII wrapper for ids
@@ -447,34 +460,38 @@ class Entity
 {
   public:
     Entity(ECS *ecs)
-    {   
-        parent = ecs; 
+    {
+        parent = ecs;
         id = parent->create_entity_ID();
         yorcvs::log("Created entity with id: " + std::to_string(id), yorcvs::INFO);
     }
-  
-    Entity(const Entity& other)
+
+    Entity(const Entity &other)
     {
         parent = other.parent;
         id = parent->create_entity_ID();
-        parent->copy_component_to_from_entity(id,other.id);
-        yorcvs::log("The copy constructor for an Entity " + std::to_string(id) + " has been called: this might be an unecesary expensive option",yorcvs::WARNING);
+        parent->copy_component_to_from_entity(id, other.id);
+        yorcvs::log("The copy constructor for an Entity " + std::to_string(id) +
+                        " has been called: this might be an unecesary expensive option",
+                    yorcvs::WARNING);
     }
-    Entity(Entity&& other) noexcept
+    Entity(Entity &&other) noexcept
     {
         parent = other.parent;
         id = other.id;
         other.parent = nullptr;
-    }   
+    }
     Entity &operator=(const Entity &other)
-    {   
-        if(this == &other)
+    {
+        if (this == &other)
         {
             return *this;
         }
         parent = other.parent;
-        parent->copy_component_to_from_entity(id,other.id);
-        yorcvs::log("The copy assginment operator for Entity" + std::to_string(id) + " has been called: this might be an unecesary expensive option",yorcvs::WARNING);
+        parent->copy_component_to_from_entity(id, other.id);
+        yorcvs::log("The copy assginment operator for Entity" + std::to_string(id) +
+                        " has been called: this might be an unecesary expensive option",
+                    yorcvs::WARNING);
         return *this;
     }
 
@@ -488,7 +505,7 @@ class Entity
 
     ~Entity() noexcept
     {
-        if(parent != nullptr)
+        if (parent != nullptr)
         {
             parent->destroy_entity(id);
         }
@@ -496,8 +513,8 @@ class Entity
     }
 
     size_t id = 0;
-   
+
   private:
-     ECS *parent; // non-owning pointer to parent
+    ECS *parent; // non-owning pointer to parent
 };
 } // namespace yorcvs

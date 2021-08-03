@@ -86,7 +86,7 @@ template <> class Key<yorcvs::SDL2>
 template <> class Window<yorcvs::SDL2>
 {
   public:
-    void Init(const std::string &name, size_t width, size_t height)
+    void init(const std::string &name, size_t width, size_t height)
     {
         SDL_version sdlversion{};
         SDL_GetVersion(&sdlversion);
@@ -284,7 +284,7 @@ template <> class Window<yorcvs::SDL2>
         text.color = {r, g, b, a};
         text.charSize = static_cast<int>(charSize);
         text.lineLength = static_cast<uint32_t>(lineLength);
-        setupTexture(text);
+        setup_texture(text);
         return text;
     }
 
@@ -302,28 +302,28 @@ template <> class Window<yorcvs::SDL2>
     {
         text.message = message;
         text.SDLtex.reset();
-        setupTexture(text);
+        setup_texture(text);
     }
 
     void set_text_color(Text<yorcvs::SDL2> &text, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
     {
         text.color = {r, g, b, a};
-        setupTexture(text);
+        setup_texture(text);
     }
     void set_text_char_size(Text<yorcvs::SDL2> &text, size_t charSize)
     {
         text.charSize = static_cast<int>(charSize);
-        setupTexture(text);
+        setup_texture(text);
     }
     void set_text_line_length(Text<yorcvs::SDL2> &text, size_t lineLength)
     {
         text.lineLength = static_cast<uint32_t>(lineLength);
-        setupTexture(text);
+        setup_texture(text);
     }
     void set_text_font(Text<yorcvs::SDL2> &text, const std::string &fontPath)
     {
         text.fontPath = fontPath;
-        setupTexture(text);
+        setup_texture(text);
     }
 
     void present() const
@@ -370,7 +370,7 @@ template <> class Window<yorcvs::SDL2>
     bool isActive = true;
 
   private:
-    void setupTexture(yorcvs::Text<yorcvs::SDL2> &text)
+    void setup_texture(yorcvs::Text<yorcvs::SDL2> &text)
     {
         TTF_Font *font = TTF_OpenFont(text.fontPath.c_str(), text.charSize);
         SDL_Surface *textSurf = TTF_RenderText_Blended_Wrapped(font, text.message.c_str(), text.color, text.lineLength);
