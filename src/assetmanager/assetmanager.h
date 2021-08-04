@@ -20,11 +20,16 @@ template <typename assetType> class AssetManager
 
   public:
     AssetManager() = default;
+    AssetManager(const AssetManager& other) = delete;
+    AssetManager(AssetManager&& other) = delete;
     AssetManager(std::function<assetType *(const std::string &path)> pCtor, std::function<void(assetType *)> pDtor)
     {
         ctor = pCtor;
         dtor = pDtor;
     }
+    AssetManager& operator=(const AssetManager& other) = delete;
+    AssetManager& operator=(AssetManager&& other) = delete;
+    ~AssetManager() = default;
 
     /**
      * @brief Loads the resource from the diosk and returns a pointer to it.

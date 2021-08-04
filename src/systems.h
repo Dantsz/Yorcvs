@@ -23,7 +23,7 @@ class CollisionSystem
         world->add_criteria_for_iteration<CollisionSystem, positionComponent, hitboxComponent>();
     }
    
-    void update(float elapsedTime) // checks and resolves collisions
+    void update(float elapsedTime) const // checks and resolves collisions
     {
         yorcvs::Rect<float> rectA{};
         yorcvs::Rect<float> rectB{};

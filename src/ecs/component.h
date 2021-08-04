@@ -203,7 +203,7 @@ class ComponentManager
         }
         get_container<T>()->remove_component(entityID);
     }
-    template <typename T> T &get_component(const size_t entityID)
+    template <typename T> T &get_component(const size_t entityID) 
     {
         if(get_container<T>() == nullptr)
         {
@@ -214,7 +214,7 @@ class ComponentManager
     }
 
     // gets the id of a component in the manager
-    template <typename T> size_t get_component_ID()
+    template <typename T> [[nodiscard]]size_t get_component_ID()
     {
         const char *component_name = typeid(T).name();
 

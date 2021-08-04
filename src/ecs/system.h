@@ -76,7 +76,7 @@ class SystemManager
     }
 
     // gets signature of a system
-    template <systemT T> std::vector<bool> get_system_signature()
+    template <systemT T> [[nodiscard]]std::vector<bool> get_system_signature() 
     {
 
         const char *systemType = typeid(T).name();

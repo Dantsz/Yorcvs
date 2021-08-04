@@ -125,7 +125,7 @@ class ECS
      * @return true the component is registered
      * @return false it's not registered
      */
-    template <typename T> bool is_component_registered()
+    template <typename T> [[nodiscard]]bool is_component_registered() const
     {
         const char *component_name = typeid(T).name();
         return (componentmanager->component_type.find(component_name) != componentmanager->component_type.end());
@@ -278,7 +278,7 @@ class ECS
      * @return true It is
      * @return false It is not
      */
-    template <typename T> bool is_system_registered()
+    template <typename T> [[nodiscard]]bool is_system_registered() const
     {
         const char *systemType = typeid(T).name();
 
@@ -302,7 +302,7 @@ class ECS
      * @tparam T The system
      * @return std::vector<bool> Value of the systems signature
      */
-    template <typename T> std::vector<bool> get_system_signature()
+    template <typename T> [[nodiscard]]std::vector<bool> get_system_signature() const
     {
         return systemmanager->get_system_signature<T>();
     }
@@ -388,7 +388,7 @@ class ECS
      * @return size_t The number of entities with that component
      * NOTE: This is might be costly
      */
-    template <typename T> size_t get_entities_with_component()
+    template <typename T> size_t get_entities_with_component() const
     {
         // get component index
         size_t cIndex = componentmanager->get_component_ID<T>();
