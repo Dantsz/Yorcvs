@@ -126,10 +126,14 @@ template <typename T> class ComponentContainer final : public VContainer
     // checks if entity has component
     bool has_component(const size_t entityID)
     {
-        if (entityhas_component.size() < entityID)
+        if (entityhas_component.size() <= entityID)
+        {
             return false;
+        }
         if (entityhas_component[entityID] == 0)
+        {
             return false;
+        }
         return true;
     }
 

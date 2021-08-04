@@ -7,7 +7,6 @@
  */
 struct hitboxComponent
 {   
-    
     yorcvs::Rect<float> hitbox;
 };
 
@@ -17,9 +16,10 @@ struct positionComponent
 };
 struct velocityComponent
 {   
-    yorcvs::Vec2<float> dir;
     yorcvs::Vec2<float> vel;
 };
+
+struct playerMovementControlledComponent{};
 
 
 struct healthComponent

@@ -26,6 +26,9 @@ find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 
 set(YorcvsALLFILES "src/Yorcvs.cpp"
+                  "src/Yorcvs.h"
+                  "src/systemsSDL2.h"
+                  "src/systems.h"
                 
                   "src/assetmanager/assetmanager.h"
 
@@ -41,7 +44,8 @@ set(YorcvsALLFILES "src/Yorcvs.cpp"
                   "src/components.h"
 
                   "src/window/window.h"
-                  "src/window/windowSDL2.h")
+                  "src/window/windowSDL2.h"
+                    )
 
 add_executable(Yorcvs ${YorcvsALLFILES})
 

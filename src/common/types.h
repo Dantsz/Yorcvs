@@ -45,7 +45,7 @@ template <typename T> class Vec2
     constexpr Vec2 &operator=(const Vec2 &other) = default;
     constexpr Vec2 &operator=(Vec2 &&other) noexcept = default;
     // Adition
-    constexpr Vec2 operator+(const Vec2 &other)
+    constexpr Vec2 operator+(const Vec2 &other) const
     {
         return Vec2(x + other.x, y + other.y);
     }
@@ -55,8 +55,9 @@ template <typename T> class Vec2
         y += other.y;
         return *this;
     }
+
     // Subtraction
-    constexpr Vec2 operator-(const Vec2 &other)
+    constexpr Vec2 operator-(const Vec2 &other) const
     {
         return Vec2(x - other.x, y - other.y);
     }
@@ -67,11 +68,11 @@ template <typename T> class Vec2
         return *this;
     }
     // Multiplication
-    constexpr Vec2 operator*(const Vec2 &other)
+    constexpr Vec2 operator*(const Vec2 &other) const
     {
         return Vec2(x * other.x, y * other.y);
     }
-    constexpr Vec2 operator*(const T &other)
+    constexpr Vec2 operator*(const T &other) const
     {
         return Vec2(x * other, y * other);
     }
@@ -210,7 +211,7 @@ template <typename T> class Rect
         w = dimension.x;
         h = dimension.y;
     }
-    constexpr Rect(const Vec2<T> &position, const Vec2<T> dimension)
+    constexpr Rect(const Vec2<T> &position, const Vec2<T>& dimension)
     {
         x = position.x;
         y = position.y;
@@ -234,7 +235,7 @@ template <typename T> class Rect
      *
      * @return constexpr Vec2<T>
      */
-    constexpr Vec2<T> get_position()
+    constexpr Vec2<T> get_position() const
     {
         return Vec2<T>(x, y);
     }
@@ -243,11 +244,11 @@ template <typename T> class Rect
      *
      * @return constexpr Vec2<T>
      */
-    constexpr Vec2<T> get_dimension()
+    constexpr Vec2<T> get_dimension() const
     {
         return Vec2<T>(w, h);
     }
-
+    
     T x, y;
     T w, h;
 };
