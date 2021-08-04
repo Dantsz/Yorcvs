@@ -91,11 +91,11 @@ template <typename T> class Vec2
         return *this;
     }
     // Division
-    constexpr Vec2 operator/(const Vec2 &other)
+    constexpr Vec2 operator/(const Vec2 &other) const
     {
         return Vec2(x / other.x, y / other.y);
     }
-    constexpr Vec2 operator/(const T &other)
+    constexpr Vec2 operator/(const T &other) const
     {
         return Vec2(x / other, y / other);
     }
@@ -114,12 +114,12 @@ template <typename T> class Vec2
         return *this;
     }
 
-    constexpr bool operator==(const Vec2 &other)
+    constexpr bool operator==(const Vec2 &other) const
     {
         return (x == other.x && y == other.y);
     }
 
-    constexpr bool operator!=(const Vec2 &other)
+    constexpr bool operator!=(const Vec2 &other) const
     {
         return (x != other.x || y != other.y);
     }
@@ -129,7 +129,7 @@ template <typename T> class Vec2
      *
      * @return constexpr T
      */
-    constexpr T norm()
+    constexpr T norm() const
     {
         return static_cast<T>(std::sqrt(x * x + y * y));
     }
@@ -139,7 +139,7 @@ template <typename T> class Vec2
      *
      * @return constexpr Vec2
      */
-    constexpr Vec2 get_normalized()
+    constexpr Vec2 get_normalized() const
     {
         return Vec2(x / norm(), y / norm());
     }
@@ -160,7 +160,7 @@ template <typename T> class Vec2
      * @param other other vector
      * @return constexpr T
      */
-    constexpr T dot_product(const Vec2 &other)
+    constexpr T dot_product(const Vec2 &other) const
     {
         return (x * other.x + y * other.y);
     }
@@ -222,11 +222,11 @@ template <typename T> class Rect
     constexpr Rect &operator=(const Rect &other) = default;
     constexpr Rect &operator=(Rect &&other) noexcept = default;
 
-    constexpr bool operator==(const Rect &other)
+    constexpr bool operator==(const Rect &other) const
     {
         return (x == other.x && y == other.y && w == other.w && h == other.h);
     }
-    constexpr bool operator!=(const Rect &other)
+    constexpr bool operator!=(const Rect &other) const
     {
         return (x != other.x || y != other.y || w != other.w || h != other.h);
     }
@@ -256,13 +256,13 @@ template <typename T> class Rect
 } // namespace yorcvs
 
 // Overloads for streams
-template <typename T> std::ostream &operator<<(std::ostream &os, const yorcvs::Vec2<T> &vec)
+template <typename T> std::ostream &operator<<(std::ostream &os, const yorcvs::Vec2<T> &vec) const
 {
     os << vec.x << ' ' << vec.y;
     return os;
 }
 
-template <typename T> std::istream &operator>>(std::istream &is, yorcvs::Vec2<T> &vec)
+template <typename T> std::istream &operator>>(std::istream &is, yorcvs::Vec2<T> &vec) const
 {
     is >> vec.x;
     is.ignore(1, ' ');
