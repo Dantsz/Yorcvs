@@ -10,12 +10,6 @@
  */
 #pragma once
 
-class yorcvsAPP
-{
-    public:
-
-    private:
-
-
-};
-
+int init();
+void run();
+int cleanup();

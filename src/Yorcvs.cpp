@@ -2,7 +2,7 @@
 #ifdef __EMSCRIPTEN__
     #include <emscripten.h>
 #endif
-
+#include "Yorcvs.h"
 #include "common/timer.h"
 #include "window/windowSDL2.h"
 #include <cstdlib>
@@ -26,7 +26,7 @@ float lag = 0.0f;
 
 size_t FT;
 /// Test
-static int init()
+int init()
 {
     
     r.init("TEst", 960, 500);
@@ -82,7 +82,7 @@ int cleanup()
     return 0;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char **argv) //NOLINT
 {
 
     init();
