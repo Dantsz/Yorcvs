@@ -48,7 +48,7 @@ class CollisionSystem
         }
     }
 
-    void render(yorcvs::Window<yorcvs::SDL2> *testWindow)
+    void render(yorcvs::Window<yorcvs::SDL2> *testWindow) const
     {
         for (const auto &ID : entityList->entitiesID)
         {
@@ -87,7 +87,7 @@ class VelocitySystem
         world->register_system<VelocitySystem>(*this);
         world->add_criteria_for_iteration<VelocitySystem, positionComponent, velocityComponent>();
     }
-    void update(float dt)
+    void update(float dt) const
     {
         for (const auto &ID : entityList->entitiesID)
         {

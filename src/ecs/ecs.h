@@ -39,7 +39,8 @@ class ECS
 
     }
     ECS(const ECS& other) = delete;//copy would be so expensive  the copy constructor will probably be called by accident
-
+    ECS& operator=(const ECS& other) = delete;
+    ECS& operator=(ECS&& other) = delete;
     ~ECS() noexcept
     {
         yorcvs::log("Destroying ECS", yorcvs::INFO);

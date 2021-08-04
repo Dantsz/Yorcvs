@@ -32,7 +32,7 @@ class VContainer
 
     // lookup the component of a entity
     // lookup the entity to component, it's now done through 2 vectors
-    std::vector<bool> entityhas_component{};
+    std::vector<bool> entity_has_component{};
     std::vector<size_t> entitytocomponent{};
 };
 
@@ -45,7 +45,7 @@ template <typename T> class ComponentContainer final : public VContainer
     {
 
         // if the entity does have this type of component throw exception
-        if (entityhas_component.size() > entityID && entityhas_component[entityID] == 1)
+        if (entity_has_component.size() > entityID && entity_has_component[entityID] == 1)
         {
             yorcvs::log("Trying to add an component to an entity which already has it", yorcvs::ERROR);
         }
@@ -57,10 +57,10 @@ template <typename T> class ComponentContainer final : public VContainer
             while (entitytocomponent.size() <= entityID)
             {
                 entitytocomponent.push_back(0);
-                entityhas_component.push_back(0);
+                entity_has_component.push_back(0);
             }
             entitytocomponent[entityID] = components.size() - 1;
-            entityhas_component[entityID] = 1;
+            entity_has_component[entityID] = 1;
         }
         else // just take an unused component
         {
@@ -70,10 +70,10 @@ template <typename T> class ComponentContainer final : public VContainer
             while (entitytocomponent.size() < entityID)
             {
                 entitytocomponent.push_back(0);
-                entityhas_component.push_back(0);
+                entity_has_component.push_back(0);
             }
             entitytocomponent[entityID] = freeIndex.front();
-            entityhas_component[entityID] = 1;
+            entity_has_component[entityID] = 1;
             freeIndex.pop();
         }
     }
@@ -91,7 +91,7 @@ template <typename T> class ComponentContainer final : public VContainer
     T &get_component(const size_t entityID)
     {
 
-        if (entityhas_component.size() <= entityID || entityhas_component[entityID] != 1)
+        if (entity_has_component.size() <= entityID || entity_has_component[entityID] != 1)
         {
             yorcvs::log("Cannot get component : entity " + std::to_string(entityID)  + " doesn't own the specified type of component: " +
                             std::string(typeid(T).name()),
@@ -105,7 +105,7 @@ template <typename T> class ComponentContainer final : public VContainer
     {
 
         // if the entity doesn't have this type of component throw exception
-        if (entityhas_component.size() <= entityID || entityhas_component[entityID] != 1)
+        if (entity_has_component.size() <= entityID || entity_has_component[entityID] != 1)
         {
             yorcvs::log("Cannot delete component: the entity " + std::to_string(entityID) + " doesn't have this type of component : " +
                             std::string(typeid(T).name()),
@@ -120,17 +120,17 @@ template <typename T> class ComponentContainer final : public VContainer
 
         // delete the entity from the registries
 
-        entityhas_component[entityID] = 0;
+        entity_has_component[entityID] = 0;
     }
 
     // checks if entity has component
-    bool has_component(const size_t entityID)
+    [[nodiscard]]bool has_component(const size_t entityID) const
     {
-        if (entityhas_component.size() <= entityID)
+        if (entity_has_component.size() <= entityID)
         {
             return false;
         }
-        if (entityhas_component[entityID] == 0)
+        if (entity_has_component[entityID] == 0)
         {
             return false;
         }
@@ -231,11 +231,11 @@ class ComponentManager
     {
         for (auto const &i : componentContainers)
         {
-            if (i.second->entityhas_component.size() <= entityID)
+            if (i.second->entity_has_component.size() <= entityID)
             {
                 continue;
             }
-            if (i.second->entityhas_component[entityID])
+            if (i.second->entity_has_component[entityID])
             {
                 i.second->on_entity_destroyed(entityID);
             }
@@ -273,11 +273,11 @@ class ComponentManager
         on_entity_destroyed(dstEntityID);
         for (const auto &container : componentContainers)
         {
-            if (container.second->entityhas_component.size() > srcEntityID &&
-                container.second->entityhas_component[srcEntityID])
+            if (container.second->entity_has_component.size() > srcEntityID &&
+                container.second->entity_has_component[srcEntityID])
             {
-                if (container.second->entityhas_component.size() <= dstEntityID ||
-                    !container.second->entityhas_component[dstEntityID])
+                if (container.second->entity_has_component.size() <= dstEntityID ||
+                    !container.second->entity_has_component[dstEntityID])
                 {
                     // add a default constructed component to the entity
                     container.second->add_component(dstEntityID);
