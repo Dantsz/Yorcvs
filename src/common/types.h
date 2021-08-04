@@ -256,13 +256,13 @@ template <typename T> class Rect
 } // namespace yorcvs
 
 // Overloads for streams
-template <typename T> std::ostream &operator<<(std::ostream &os, const yorcvs::Vec2<T> &vec) const
+template <typename T> std::ostream &operator<<(std::ostream &os, const yorcvs::Vec2<T> &vec) 
 {
     os << vec.x << ' ' << vec.y;
     return os;
 }
 
-template <typename T> std::istream &operator>>(std::istream &is, yorcvs::Vec2<T> &vec) const
+template <typename T> std::istream &operator>>(std::istream &is, yorcvs::Vec2<T> &vec) 
 {
     is >> vec.x;
     is.ignore(1, ' ');

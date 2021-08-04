@@ -2,7 +2,6 @@
 #include "components.h"
 #include "ecs/ecs.h"
 #include "window/windowSDL2.h"
-#include <format>
 class CollisionSystem
 {
   public:
