@@ -2,6 +2,7 @@
 #include "components.h"
 #include "ecs/ecs.h"
 #include "window/windowSDL2.h"
+#include <array>
 class CollisionSystem
 {
   public:
@@ -22,27 +23,108 @@ class CollisionSystem
 
         world->add_criteria_for_iteration<CollisionSystem, positionComponent, hitboxComponent>();
     }
-   
+
     void update(float elapsedTime) const // checks and resolves collisions
     {
         yorcvs::Rect<float> rectA{};
         yorcvs::Rect<float> rectB{};
+
         for (const auto &IDA : entityList->entitiesID)
         {
-            rectA.x = world->get_component<positionComponent>(IDA).position.x;
-            rectA.y = world->get_component<positionComponent>(IDA).position.y;
-            rectA.w = world->get_component<hitboxComponent>(IDA).hitbox.w;
-            rectA.h = world->get_component<hitboxComponent>(IDA).hitbox.h;
-
-            for (const auto &IDB : entityList->entitiesID)
+            if (world->has_components<velocityComponent>(IDA))
             {
-                rectB.x = world->get_component<positionComponent>(IDB).position.x;
-                rectB.y = world->get_component<positionComponent>(IDB).position.y;
-                rectB.w = world->get_component<hitboxComponent>(IDB).hitbox.w;
-                rectB.h = world->get_component<hitboxComponent>(IDB).hitbox.h;
-                if (IDA != IDB && AABBColision(rectA, rectB))
+                std::array<bool, 4> collisions{false, false, false, false};
+                rectA.x = world->get_component<positionComponent>(IDA).position.x;
+                rectA.y = world->get_component<positionComponent>(IDA).position.y;
+                rectA.w = world->get_component<hitboxComponent>(IDA).hitbox.w;
+                rectA.h = world->get_component<hitboxComponent>(IDA).hitbox.h;
+                yorcvs::Vec2<float> &rectAvel = world->get_component<velocityComponent>(IDA).vel;
+                for (const auto &IDB : entityList->entitiesID)
                 {
-                    yorcvs::log("Collision between " + std::to_string(IDA) + " and " + std::to_string(IDB));
+
+                    rectB.x = world->get_component<positionComponent>(IDB).position.x;
+                    rectB.y = world->get_component<positionComponent>(IDB).position.y;
+                    rectB.w = world->get_component<hitboxComponent>(IDB).hitbox.w;
+                    rectB.h = world->get_component<hitboxComponent>(IDB).hitbox.h;
+                    if (IDA != IDB)
+                    {
+                        // left to right
+                        if (rectA.x + rectA.w <= rectB.x && rectA.x + rectA.w + (rectAvel.x * elapsedTime) > rectB.x &&
+                            rectA.y + rectA.h > rectB.y && rectA.y - rectB.y < rectB.h)
+                        {
+                            rectAvel.x = (rectB.x - rectA.x - rectA.w) / elapsedTime;
+                            collisions[0] = true;
+                        }
+                        // right to left
+                        if (rectA.x >= rectB.x + rectB.w && rectA.x + (rectAvel.x * elapsedTime) < rectB.x + rectB.w &&
+                            rectA.y + rectA.h > rectB.y && rectA.y - rectB.y < rectB.h)
+                        {
+                            rectAvel.x = (rectB.x + rectB.w - rectA.x) / elapsedTime;
+                            collisions[1] = true;
+                        }
+                        // up to down
+                        if (rectA.y + rectA.h <= rectB.y && rectA.y + rectA.h + (rectAvel.y * elapsedTime) > rectB.y &&
+                            rectA.x - rectB.x < rectB.w && rectA.x + rectA.w > rectB.x)
+                        {
+                            rectAvel.y = (rectB.y - rectA.y - rectA.h) / elapsedTime;
+                            collisions[2] = true;
+                        }
+                        // down to up
+                        if (rectA.y >= rectB.y + rectB.h && rectA.y + (rectAvel.y * elapsedTime) < rectB.y + rectB.h &&
+                            rectA.x - rectB.x < rectB.w && rectA.x + rectA.w > rectB.x)
+                        {
+                            rectAvel.y = (rectB.y + rectB.h - rectA.y) / elapsedTime;
+                            collisions[3] = true;
+                        }
+
+
+                        // top right corner
+                        if (rectB.x < rectA.x + rectA.w + (rectAvel.x * elapsedTime) && rectB.h < rectA.y + rectA.h + (rectAvel.y * elapsedTime) 
+                            && rectA.x < rectB.x && rectA.y < rectB.y)
+                        {
+                            rectAvel.x = (rectB.x - (rectA.x +rectA.w))/elapsedTime;
+                            rectAvel.y = (rectB.y - (rectA.y+ rectA.h))/elapsedTime;
+                            collisions[0] = true;
+                            collisions[3] = true;
+                        }
+                        //top left corner
+                        if(rectB.x + rectB.w > rectA.x + (rectAvel.x * elapsedTime) && rectA.y + rectA.h +  (rectAvel.y * elapsedTime) > rectB.h &&
+                           rectA.x + (rectAvel.x * elapsedTime) > rectB.x && rectA.y < rectB.y )
+                           { 
+
+                            rectAvel.x = ((rectB.x + rectB.w) - rectA.x)/elapsedTime;
+                            rectAvel.y = ((rectA.y + rectA.h) - rectB.y)/elapsedTime;   
+                            collisions[1] = true;
+                            collisions[3] = true;
+
+                           }
+                        //bottom right corner
+                        if(rectB.x < rectA.x + rectA.w + (rectAvel.x * elapsedTime) &&  (rectB.y + rectB.h)  > rectA.y +  (rectAvel.y * elapsedTime) &&
+                          rectA.x < rectB.x && rectA.y + rectA.h > rectB.h)
+                          {
+                            rectAvel.x = (rectB.x - (rectA.x +rectA.w))/elapsedTime;
+                            rectAvel.y = ( (rectB.y + rectB.h) - rectA.y)/elapsedTime;   
+                            collisions[0] = true;
+                            collisions[2] = true;
+                        
+                          }
+                        //bottom left corner
+                        if(rectB.x + rectB.w > rectA.x + (rectAvel.x * elapsedTime) && (rectB.y + rectB.h)  > rectA.y +  (rectAvel.y * elapsedTime) &&
+                        rectA.x > rectB.x  && rectB.y < rectA.y)
+                        {
+                            rectAvel.x = ((rectB.x + rectB.w) - rectA.x)/elapsedTime;
+                            rectAvel.y = ( (rectB.y + rectB.h) - rectA.y)/elapsedTime;   
+                            collisions[1] = true;
+                            collisions[2] = true;
+                        }
+
+
+                    }
+                    if (collisions[0] == true || collisions[1] == true || collisions[2]  == true || collisions[3]  == true)
+                    {
+                        std::cout << collisions[0] << ' ' << collisions[1] << ' ' << collisions[2] << ' '
+                                  << collisions[3] << '\n';
+                    }
                 }
             }
         }
@@ -59,11 +141,6 @@ class CollisionSystem
                                         world->get_component<hitboxComponent>(ID).hitbox.h};
             testWindow->draw_sprite("assets/lettuce.png", pos, size, {0, 0, 200, 200});
         }
-    }
-    static constexpr bool AABBColision(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB)
-    {
-        return ((rectA.x + rectA.w > rectB.x) && (rectA.x < rectB.x + rectB.w) && (rectA.y + rectA.h > rectB.y) &&
-                (rectA.y < rectB.y + rectB.h));
     }
 
     std::shared_ptr<yorcvs::EntitySystemList> entityList;

@@ -17,7 +17,8 @@ static VelocitySystem velocityS{&world};
 static PlayerMovementControl pcS{&world,&r};
 yorcvs::Entity tim{&world};
 yorcvs::Entity jim{&world};
-
+yorcvs::Entity dim{&world};
+yorcvs::Entity pim{&world};
 yorcvs::Timer timy;
 float prevTime = 0.0f;
 float curTime = 0.0f;
@@ -32,13 +33,19 @@ int init()
     r.init("TEst", 960, 500);
    
 
-    world.add_component<hitboxComponent>(tim.id,{{10,10,200,200}});
+    world.add_component<hitboxComponent>(tim.id,{{0,0,100,100}});
     world.add_component<positionComponent>(tim.id,{{100,100}});
     world.add_component<velocityComponent>(tim.id,{{0.0f,0.0f}});
     world.add_component<playerMovementControlledComponent>(tim.id,{});
 
-    world.add_component<hitboxComponent>(jim.id,{{0,0,200,200}});
+    world.add_component<hitboxComponent>(jim.id,{{0,0,100,100}});
     world.add_component<positionComponent>(jim.id,{{500,100}});
+
+    world.add_component<hitboxComponent>(pim.id,{{0,0,100,100}});
+    world.add_component<positionComponent>(pim.id,{{600,100}});
+
+    world.add_component<hitboxComponent>(dim.id,{{0,0,100,100}});
+    world.add_component<positionComponent>(dim.id,{{500,200}});
 
     timy.start();
     return 0;
@@ -59,8 +66,9 @@ void run()
     while(lag >= msPF)
     {
       pcS.update();
-      velocityS.update(lag);
       collisionS.update(lag);
+      velocityS.update(lag);
+      
       lag -= msPF;
     }
 
