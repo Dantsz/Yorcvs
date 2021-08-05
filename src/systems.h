@@ -33,7 +33,7 @@ class CollisionSystem
         {
             if (world->has_components<velocityComponent>(IDA))
             {
-                std::array<bool, 4> collisions{false, false, false, false};
+            
                 rectA.x = world->get_component<positionComponent>(IDA).position.x;
                 rectA.y = world->get_component<positionComponent>(IDA).position.y;
                 rectA.w = world->get_component<hitboxComponent>(IDA).hitbox.w;
@@ -48,88 +48,128 @@ class CollisionSystem
                     rectB.h = world->get_component<hitboxComponent>(IDB).hitbox.h;
                     if (IDA != IDB)
                     {
-                        // left to right
-                        if (rectA.x + rectA.w <= rectB.x && rectA.x + rectA.w + (rectAvel.x * elapsedTime) > rectB.x &&
-                            rectA.y + rectA.h > rectB.y && rectA.y - rectB.y < rectB.h)
-                        {
-                            rectAvel.x = (rectB.x - rectA.x - rectA.w) / elapsedTime;
-                            collisions[0] = true;
-                        }
-                        // right to left
-                        if (rectA.x >= rectB.x + rectB.w && rectA.x + (rectAvel.x * elapsedTime) < rectB.x + rectB.w &&
-                            rectA.y + rectA.h > rectB.y && rectA.y - rectB.y < rectB.h)
-                        {
-                            rectAvel.x = (rectB.x + rectB.w - rectA.x) / elapsedTime;
-                            collisions[1] = true;
-                        }
-                        // up to down
-                        if (rectA.y + rectA.h <= rectB.y && rectA.y + rectA.h + (rectAvel.y * elapsedTime) > rectB.y &&
-                            rectA.x - rectB.x < rectB.w && rectA.x + rectA.w > rectB.x)
-                        {
-                            rectAvel.y = (rectB.y - rectA.y - rectA.h) / elapsedTime;
-                            collisions[2] = true;
-                        }
-                        // down to up
-                        if (rectA.y >= rectB.y + rectB.h && rectA.y + (rectAvel.y * elapsedTime) < rectB.y + rectB.h &&
-                            rectA.x - rectB.x < rectB.w && rectA.x + rectA.w > rectB.x)
-                        {
-                            rectAvel.y = (rectB.y + rectB.h - rectA.y) / elapsedTime;
-                            collisions[3] = true;
-                        }
 
+                        // left to right
+                        check_collision_left_right(rectA, rectB, rectAvel, elapsedTime);
+                        // right to left
+                        check_collision_right_left(rectA, rectB, rectAvel, elapsedTime);
+                        // up to down
+                        check_collision_up_down(rectA, rectB, rectAvel, elapsedTime);
+                        // down to up
+                        check_collision_down_up(rectA, rectB, rectAvel, elapsedTime);
 
                         // top right corner
-                        if (rectB.x < rectA.x + rectA.w + (rectAvel.x * elapsedTime) && rectB.h < rectA.y + rectA.h + (rectAvel.y * elapsedTime) 
-                            && rectA.x < rectB.x && rectA.y < rectB.y)
-                        {
-                            rectAvel.x = (rectB.x - (rectA.x +rectA.w))/elapsedTime;
-                            rectAvel.y = (rectB.y - (rectA.y+ rectA.h))/elapsedTime;
-                            collisions[0] = true;
-                            collisions[3] = true;
-                        }
-                        //top left corner
-                        if(rectB.x + rectB.w > rectA.x + (rectAvel.x * elapsedTime) && rectA.y + rectA.h +  (rectAvel.y * elapsedTime) > rectB.h &&
-                           rectA.x + (rectAvel.x * elapsedTime) > rectB.x && rectA.y < rectB.y )
-                           { 
-
-                            rectAvel.x = ((rectB.x + rectB.w) - rectA.x)/elapsedTime;
-                            rectAvel.y = ((rectA.y + rectA.h) - rectB.y)/elapsedTime;   
-                            collisions[1] = true;
-                            collisions[3] = true;
-
-                           }
-                        //bottom right corner
-                        if(rectB.x < rectA.x + rectA.w + (rectAvel.x * elapsedTime) &&  (rectB.y + rectB.h)  > rectA.y +  (rectAvel.y * elapsedTime) &&
-                          rectA.x < rectB.x && rectA.y + rectA.h > rectB.h)
-                          {
-                            rectAvel.x = (rectB.x - (rectA.x +rectA.w))/elapsedTime;
-                            rectAvel.y = ( (rectB.y + rectB.h) - rectA.y)/elapsedTime;   
-                            collisions[0] = true;
-                            collisions[2] = true;
-                        
-                          }
-                        //bottom left corner
-                        if(rectB.x + rectB.w > rectA.x + (rectAvel.x * elapsedTime) && (rectB.y + rectB.h)  > rectA.y +  (rectAvel.y * elapsedTime) &&
-                        rectA.x > rectB.x  && rectB.y < rectA.y)
-                        {
-                            rectAvel.x = ((rectB.x + rectB.w) - rectA.x)/elapsedTime;
-                            rectAvel.y = ( (rectB.y + rectB.h) - rectA.y)/elapsedTime;   
-                            collisions[1] = true;
-                            collisions[2] = true;
-                        }
-
-
-                    }
-                    if (collisions[0] == true || collisions[1] == true || collisions[2]  == true || collisions[3]  == true)
-                    {
-                        std::cout << collisions[0] << ' ' << collisions[1] << ' ' << collisions[2] << ' '
-                                  << collisions[3] << '\n';
+                        check_collision_corner_top_right(rectA, rectB, rectAvel, elapsedTime);
+                        // top left corner
+                        check_collision_corner_top_left(rectA, rectB, rectAvel, elapsedTime);
+                        // bottom right corner
+                        check_collision_corner_bottom_right(rectA, rectB, rectAvel, elapsedTime);
+                        // bottom left corner
+                        check_collision_corner_bottom_left(rectA, rectB, rectAvel, elapsedTime);
                     }
                 }
             }
         }
     }
 
+    static bool check_collision_left_right(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
+                                           yorcvs::Vec2<float> &rectAvel, float elapsedTime)
+    {
+        if (rectA.x + rectA.w <= rectB.x && rectA.x + rectA.w + (rectAvel.x * elapsedTime) > rectB.x &&
+            rectA.y + rectA.h > rectB.y && rectA.y - rectB.y < rectB.h)
+        {
+            rectAvel.x = (rectB.x - rectA.x - rectA.w) / elapsedTime;
+            return true;
+        }
+        return false;
+    }
+    static bool check_collision_right_left(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
+                                           yorcvs::Vec2<float> &rectAvel, float elapsedTime)
+    {
+        if (rectA.x >= rectB.x + rectB.w && rectA.x + (rectAvel.x * elapsedTime) < rectB.x + rectB.w &&
+            rectA.y + rectA.h > rectB.y && rectA.y - rectB.y < rectB.h)
+        {
+            rectAvel.x = (rectB.x + rectB.w - rectA.x) / elapsedTime;
+            return true;
+        }
+        return false;
+    }
+    static bool check_collision_up_down(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
+                                        yorcvs::Vec2<float> &rectAvel, float elapsedTime)
+    {
+        if (rectA.y + rectA.h <= rectB.y && rectA.y + rectA.h + (rectAvel.y * elapsedTime) > rectB.y &&
+            rectA.x - rectB.x < rectB.w && rectA.x + rectA.w > rectB.x)
+        {
+            rectAvel.y = (rectB.y - rectA.y - rectA.h) / elapsedTime;
+            return true;
+        }
+        return false;
+    }
+    static bool check_collision_down_up(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
+                                        yorcvs::Vec2<float> &rectAvel, float elapsedTime)
+    {
+        if (rectA.y >= rectB.y + rectB.h && rectA.y + (rectAvel.y * elapsedTime) < rectB.y + rectB.h &&
+            rectA.x - rectB.x < rectB.w && rectA.x + rectA.w > rectB.x)
+        {
+            rectAvel.y = (rectB.y + rectB.h - rectA.y) / elapsedTime;
+            return true;
+        }
+        return false;
+    }
+
+    static bool check_collision_corner_top_right(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
+                                                 yorcvs::Vec2<float> &rectAvel, float elapsedTime)
+    {
+        if (rectB.x + rectB.w > rectA.x + (rectAvel.x * elapsedTime) &&
+            rectA.y + rectA.h + (rectAvel.y * elapsedTime) > rectB.h &&
+            rectA.x + (rectAvel.x * elapsedTime) > rectB.x && rectA.y < rectB.y)
+        {
+
+            rectAvel.x = ((rectB.x + rectB.w) - rectA.x) / elapsedTime;
+            rectAvel.y = ((rectA.y + rectA.h) - rectB.y) / elapsedTime;
+            return true;
+        }
+        return false;
+    }
+    static bool check_collision_corner_top_left(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
+                                                yorcvs::Vec2<float> &rectAvel, float elapsedTime)
+    {
+        if (rectB.x + rectB.w > rectA.x + (rectAvel.x * elapsedTime) &&
+            rectA.y + rectA.h + (rectAvel.y * elapsedTime) > rectB.h &&
+            rectA.x + (rectAvel.x * elapsedTime) > rectB.x && rectA.y < rectB.y)
+        {
+
+            rectAvel.x = ((rectB.x + rectB.w) - rectA.x) / elapsedTime;
+            rectAvel.y = ((rectA.y + rectA.h) - rectB.y) / elapsedTime;
+            return true;
+        }
+        return false;
+    }
+    static bool check_collision_corner_bottom_right(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
+                                                    yorcvs::Vec2<float> &rectAvel, float elapsedTime)
+    {
+        if (rectB.x < rectA.x + rectA.w + (rectAvel.x * elapsedTime) &&
+            (rectB.y + rectB.h) > rectA.y + (rectAvel.y * elapsedTime) && rectA.x < rectB.x &&
+            rectA.y + rectA.h > rectB.h)
+        {
+            rectAvel.x = (rectB.x - (rectA.x + rectA.w)) / elapsedTime;
+            rectAvel.y = ((rectB.y + rectB.h) - rectA.y) / elapsedTime;
+            return true;
+        }
+        return false;
+    }
+    static bool check_collision_corner_bottom_left(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
+                                                   yorcvs::Vec2<float> &rectAvel, float elapsedTime)
+    {
+        if (rectB.x + rectB.w > rectA.x + (rectAvel.x * elapsedTime) &&
+            (rectB.y + rectB.h) > rectA.y + (rectAvel.y * elapsedTime) && rectA.x > rectB.x && rectB.y < rectA.y)
+        {
+            rectAvel.x = ((rectB.x + rectB.w) - rectA.x) / elapsedTime;
+            rectAvel.y = ((rectB.y + rectB.h) - rectA.y) / elapsedTime;
+            return true;
+        }
+        return false;
+    }
     void render(yorcvs::Window<yorcvs::SDL2> *testWindow) const
     {
         for (const auto &ID : entityList->entitiesID)
@@ -177,4 +217,8 @@ class VelocitySystem
 
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;
+};
+
+class AnimationSystem
+{
 };

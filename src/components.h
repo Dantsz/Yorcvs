@@ -1,6 +1,9 @@
 #pragma once
 #include "common/types.h"
-
+#include "window/windowSDL2.h"
+namespace yorcvs{
+using graphics = yorcvs::SDL2;
+}
 /**
  * @brief Represent a hitbox (x and y represents offset from positionComponent)
  * 
@@ -28,7 +31,14 @@ struct healthComponent
     float maxHP;
 };
 
+struct spriteComponent
+{
+    yorcvs::Rect<size_t> rect;
+    size_t frames;
+    float speed;// in milliseconds
+    yorcvs::Texture<yorcvs::graphics> texture;
+};
 
-struct bodyTextureComponent;
+
 struct defensiveStatsComponent;
 struct offensiveStatsComponent;

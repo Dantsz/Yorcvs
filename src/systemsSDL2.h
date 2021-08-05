@@ -28,7 +28,7 @@ class PlayerMovementControl
         world->add_criteria_for_iteration<PlayerMovementControl,playerMovementControlledComponent,velocityComponent>();
     }   
 
-    void update()
+    void update() const
     {
         bool w_pressed = window->is_key_pressed({SDL_SCANCODE_W});
         bool a_pressed = window->is_key_pressed({SDL_SCANCODE_A});
