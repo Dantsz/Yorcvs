@@ -67,6 +67,10 @@ class SpriteSystem
     }
     void renderSprites() const
     {
+        std::sort(entityList->entitiesID.begin(), entityList->entitiesID.end(),[&](size_t ID1 , size_t ID2){
+            return (world->get_component<spriteComponent>(ID1).offset.y + world->get_component<positionComponent>(ID1).position.y) < 
+            (world->get_component<spriteComponent>(ID2).offset.y + world->get_component<positionComponent>(ID2).position.y);
+        });
         for(const auto& ID : entityList->entitiesID)
         {
             window->draw_texture(world->get_component<spriteComponent>(ID).texture,
@@ -74,6 +78,9 @@ class SpriteSystem
             world->get_component<spriteComponent>(ID).size,world->get_component<spriteComponent>(ID).dstRect,
             0.0);
         }
+        std::sort(entityList->entitiesID.begin(), entityList->entitiesID.end(),[&](size_t ID1 , size_t ID2){
+            return ID1 < ID2;
+        });
     }
 
     std::shared_ptr<yorcvs::EntitySystemList> entityList;

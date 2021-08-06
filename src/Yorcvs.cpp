@@ -34,7 +34,7 @@ int init()
     r.init("TEst", 960, 500);
    
 
-    world.add_component<hitboxComponent>(tim.id,{{75,35,20,45}});
+    world.add_component<hitboxComponent>(tim.id,{{75,75,20,45}});
     world.add_component<positionComponent>(tim.id,{{100,100}});
     world.add_component<velocityComponent>(tim.id,{{0.0f,0.0f}});
     world.add_component<playerMovementControlledComponent>(tim.id,{});
