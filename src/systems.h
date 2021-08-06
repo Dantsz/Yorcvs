@@ -33,9 +33,11 @@ class CollisionSystem
         {
             if (world->has_components<velocityComponent>(IDA))
             {
-            
-                rectA.x = world->get_component<positionComponent>(IDA).position.x + world->get_component<hitboxComponent>(IDA).hitbox.x;
-                rectA.y = world->get_component<positionComponent>(IDA).position.y + world->get_component<hitboxComponent>(IDA).hitbox.y;
+
+                rectA.x = world->get_component<positionComponent>(IDA).position.x +
+                          world->get_component<hitboxComponent>(IDA).hitbox.x;
+                rectA.y = world->get_component<positionComponent>(IDA).position.y +
+                          world->get_component<hitboxComponent>(IDA).hitbox.y;
                 rectA.w = world->get_component<hitboxComponent>(IDA).hitbox.w;
                 rectA.h = world->get_component<hitboxComponent>(IDA).hitbox.h;
                 yorcvs::Vec2<float> &rectAvel = world->get_component<velocityComponent>(IDA).vel;
@@ -44,8 +46,10 @@ class CollisionSystem
 
                     rectB.x = world->get_component<positionComponent>(IDB).position.x;
                     rectB.y = world->get_component<positionComponent>(IDB).position.y;
-                    rectB.w = world->get_component<hitboxComponent>(IDB).hitbox.w + world->get_component<hitboxComponent>(IDB).hitbox.x;
-                    rectB.h = world->get_component<hitboxComponent>(IDB).hitbox.h + world->get_component<hitboxComponent>(IDB).hitbox.y;
+                    rectB.w = world->get_component<hitboxComponent>(IDB).hitbox.w +
+                              world->get_component<hitboxComponent>(IDB).hitbox.x;
+                    rectB.h = world->get_component<hitboxComponent>(IDB).hitbox.h +
+                              world->get_component<hitboxComponent>(IDB).hitbox.y;
                     if (IDA != IDB)
                     {
 
@@ -171,7 +175,6 @@ class CollisionSystem
         return false;
     }
 
-
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;
 };
@@ -208,11 +211,47 @@ class VelocitySystem
     yorcvs::ECS *world;
 };
 
-
-
 class AnimationSystem
 {
-    public:
+  public:
+    AnimationSystem(yorcvs::ECS *parent)
+    {
+        world = parent;
+        if (!world->is_component_registered<animationComponent>())
+        {
+            world->register_component<animationComponent>();
+        }
+        if (!world->is_component_registered<spriteComponent>())
+        {
+            world->register_component<spriteComponent>();
+        }
+        world->register_system<AnimationSystem>(*this);
+        world->add_criteria_for_iteration<AnimationSystem, animationComponent, spriteComponent>();
+    }
+
+    void update(float elapsed) const
+    {
+        for (const auto &ID : entityList->entitiesID)
+        {
+            world->get_component<animationComponent>(ID).cur_elapsed += elapsed;
+            if (world->get_component<animationComponent>(ID).cur_elapsed >
+                world->get_component<animationComponent>(ID).speed)
+            {
+                world->get_component<animationComponent>(ID).cur_frame++;
+                world->get_component<animationComponent>(ID).cur_elapsed = 0.0f;
+                if(world->get_component<animationComponent>(ID).cur_frame < world->get_component<animationComponent>(ID).frames)
+                {
+                 world->get_component<spriteComponent>(ID).srcRect.x = world->get_component<spriteComponent>(ID).srcRect.x + world->get_component<spriteComponent>(ID).srcRect.w;
+                }
+                else
+                {
+                    world->get_component<spriteComponent>(ID).srcRect.x -= world->get_component<spriteComponent>(ID).srcRect.w * (world->get_component<animationComponent>(ID).frames - 1) ;
+                    world->get_component<animationComponent>(ID).cur_frame = 0;
+                }
+                std::cout<< world->get_component<spriteComponent>(ID).srcRect.x << '\n';
+            }
+        }
+    }
 
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;

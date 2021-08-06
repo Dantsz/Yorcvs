@@ -35,13 +35,15 @@ struct spriteComponent
 {
     yorcvs::Vec2<float> offset;//position offset
     yorcvs::Vec2<float> size;// size of sprite
-    yorcvs::Rect<size_t> dstRect;//part of texture to render
+    yorcvs::Rect<size_t> srcRect;//part of texture to render
     yorcvs::Texture<yorcvs::graphics> texture;
 };
 
 struct animationComponent
 {
+    size_t cur_frame;
     size_t frames;
+    float cur_elapsed;
     float speed;// in milliseconds
 };
 

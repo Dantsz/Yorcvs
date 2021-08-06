@@ -75,7 +75,7 @@ class SpriteSystem
         {
             window->draw_texture(world->get_component<spriteComponent>(ID).texture,
             world->get_component<spriteComponent>(ID).offset + world->get_component<positionComponent>(ID).position,
-            world->get_component<spriteComponent>(ID).size,world->get_component<spriteComponent>(ID).dstRect,
+            world->get_component<spriteComponent>(ID).size,world->get_component<spriteComponent>(ID).srcRect,
             0.0);
         }
         std::sort(entityList->entitiesID.begin(), entityList->entitiesID.end(),[&](size_t ID1 , size_t ID2){
