@@ -170,18 +170,7 @@ class CollisionSystem
         }
         return false;
     }
-    void render(yorcvs::Window<yorcvs::SDL2> *testWindow) const
-    {
-        for (const auto &ID : entityList->entitiesID)
-        {
-            yorcvs::Vec2<float> pos = world->get_component<positionComponent>(ID).position;
-            pos += {world->get_component<hitboxComponent>(ID).hitbox.x,
-                    world->get_component<hitboxComponent>(ID).hitbox.y};
-            yorcvs::Vec2<float> size = {world->get_component<hitboxComponent>(ID).hitbox.w,
-                                        world->get_component<hitboxComponent>(ID).hitbox.h};
-            testWindow->draw_sprite("assets/lettuce.png", pos, size, {0, 0, 200, 200});
-        }
-    }
+
 
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;
@@ -219,6 +208,12 @@ class VelocitySystem
     yorcvs::ECS *world;
 };
 
+
+
 class AnimationSystem
 {
+    public:
+
+    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    yorcvs::ECS *world;
 };

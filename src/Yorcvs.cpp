@@ -15,6 +15,7 @@ static yorcvs::ECS world{};
 static CollisionSystem collisionS{&world};
 static VelocitySystem velocityS{&world};
 static PlayerMovementControl pcS{&world,&r};
+static SpriteSystem sprS{&world,&r};
 yorcvs::Entity tim{&world};
 yorcvs::Entity jim{&world};
 yorcvs::Entity dim{&world};
@@ -37,16 +38,19 @@ int init()
     world.add_component<positionComponent>(tim.id,{{100,100}});
     world.add_component<velocityComponent>(tim.id,{{0.0f,0.0f}});
     world.add_component<playerMovementControlledComponent>(tim.id,{});
+    world.add_component<spriteComponent>(tim.id,{{0.0f,0.0f},{100.0f,100.0f},{0,0,200,200},r.create_texture("assets/lettuce.png")});
 
     world.add_component<hitboxComponent>(jim.id,{{0,0,100,100}});
     world.add_component<positionComponent>(jim.id,{{500,100}});
+    world.add_component<spriteComponent>(jim.id,{{0.0f,0.0f},{100.0f,100.0f},{0,0,200,200},r.create_texture("assets/lettuce.png")});
 
     world.add_component<hitboxComponent>(pim.id,{{0,0,100,100}});
     world.add_component<positionComponent>(pim.id,{{600,100}});
+    world.add_component<spriteComponent>(pim.id,{{0.0f,0.0f},{100.0f,100.0f},{0,0,200,200},r.create_texture("assets/lettuce.png")});
 
     world.add_component<hitboxComponent>(dim.id,{{0,0,100,100}});
     world.add_component<positionComponent>(dim.id,{{500,200}});
-
+    world.add_component<spriteComponent>(dim.id,{{0.0f,0.0f},{100.0f,100.0f},{0,0,200,200},r.create_texture("assets/lettuce.png")});
     timy.start();
     return 0;
    
@@ -76,7 +80,7 @@ void run()
   
     
     r.clear();
-    collisionS.render(&r);
+    sprS.renderSprites();
     r.present();
 
 

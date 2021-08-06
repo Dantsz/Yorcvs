@@ -46,3 +46,37 @@ class PlayerMovementControl
     yorcvs::ECS* world;
     yorcvs::Window<yorcvs::SDL2>* window;
 };
+
+class SpriteSystem
+{
+    public:
+    SpriteSystem(yorcvs::ECS* parent,yorcvs::Window<yorcvs::SDL2>* parentWindow)
+    {
+        world = parent;
+        window = parentWindow;
+        if(!world->is_component_registered<positionComponent>())
+        {
+            world->register_component<positionComponent>();
+        }
+        if(!world->is_component_registered<spriteComponent>())
+        {
+            world->register_component<spriteComponent>();
+        }
+        world->register_system<SpriteSystem>(*this);
+        world->add_criteria_for_iteration<SpriteSystem, positionComponent, spriteComponent>();
+    }
+    void renderSprites() const
+    {
+        for(const auto& ID : entityList->entitiesID)
+        {
+            window->draw_texture(world->get_component<spriteComponent>(ID).texture,
+            world->get_component<spriteComponent>(ID).offset + world->get_component<positionComponent>(ID).position,
+            world->get_component<spriteComponent>(ID).size,world->get_component<spriteComponent>(ID).dstRect,
+            0.0);
+        }
+    }
+
+    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    yorcvs::ECS *world;
+    yorcvs::Window<yorcvs::SDL2>* window;
+};

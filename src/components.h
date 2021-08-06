@@ -33,12 +33,17 @@ struct healthComponent
 
 struct spriteComponent
 {
-    yorcvs::Rect<size_t> rect;
-    size_t frames;
-    float speed;// in milliseconds
+    yorcvs::Vec2<float> offset;//position offset
+    yorcvs::Vec2<float> size;// size of sprite
+    yorcvs::Rect<size_t> dstRect;//part of texture to render
     yorcvs::Texture<yorcvs::graphics> texture;
 };
 
+struct animationComponent
+{
+    size_t frames;
+    float speed;// in milliseconds
+};
 
 struct defensiveStatsComponent;
 struct offensiveStatsComponent;
