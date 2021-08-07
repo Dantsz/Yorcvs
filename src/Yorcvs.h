@@ -12,4 +12,5 @@
 
 int init();
 void run();
+void runMT();
 int cleanup();

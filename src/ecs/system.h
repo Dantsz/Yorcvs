@@ -52,7 +52,7 @@ class SystemManager
         // if the system is already present
         if (typetosystem.find(systemType) != typetosystem.end())
         {
-            yorcvs::log("Unable to register system: system is already registered.", yorcvs::ERROR);
+            yorcvs::log("Unable to register system: system is already registered.", yorcvs::MSGSEVERITY::ERROR);
             return false;
         }
         std::shared_ptr<EntitySystemList> systemEVec = std::make_shared<EntitySystemList>();
@@ -69,7 +69,7 @@ class SystemManager
         // if the system is not found  //throw
         if (typetosystem.find(systemType) == typetosystem.end())
         {
-            yorcvs::log("Unable to set the signature: system does not exist.", yorcvs::ERROR);
+            yorcvs::log("Unable to set the signature: system does not exist.", yorcvs::MSGSEVERITY::ERROR);
         }
 
         typetosignature[systemType] = signature;

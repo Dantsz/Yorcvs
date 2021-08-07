@@ -46,12 +46,12 @@ class EntityManager
 
         if (id > lowestUnallocatedID)
         {
-            yorcvs::log("Invalid id for deletion : id doesn't exist", yorcvs::ERROR);
+            yorcvs::log("Invalid id for deletion : id doesn't exist", yorcvs::MSGSEVERITY::ERROR);
         }
         // if the id appears in the delted entities
         if (std::binary_search(freedIndices.begin(), freedIndices.end(), id))
         {
-            yorcvs::log("Invalid id deletion : id is not a valid entity", yorcvs::ERROR);
+            yorcvs::log("Invalid id deletion : id is not a valid entity", yorcvs::MSGSEVERITY::ERROR);
         }
 
         entitySignatures[id].clear();
@@ -74,7 +74,7 @@ class EntityManager
 
         if (id > lowestUnallocatedID)
         {
-            yorcvs::log("Cannot set id signature  : id doesn't exist", yorcvs::ERROR);
+            yorcvs::log("Cannot set id signature  : id doesn't exist", yorcvs::MSGSEVERITY::ERROR);
             return;
         }
         // if the id appears in the delted entities
@@ -97,13 +97,13 @@ class EntityManager
     {
         if (id > lowestUnallocatedID)
         {
-            yorcvs::log("Cannot fetch entity signature : id : " + std::to_string(id) + "doesn't exist", yorcvs::ERROR);
+            yorcvs::log("Cannot fetch entity signature : id : " + std::to_string(id) + "doesn't exist", yorcvs::MSGSEVERITY::ERROR);
         }
         // if the id appears in the delted entities
         if (std::binary_search(freedIndices.begin(), freedIndices.end(), id))
         {
             yorcvs::log("Cannot fetch entity signature : id: " + std::to_string(id) + "is not a valid entity",
-                        yorcvs::ERROR);
+                        yorcvs::MSGSEVERITY::ERROR);
         }
 
         return entitySignatures[id];

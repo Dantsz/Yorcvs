@@ -42,7 +42,7 @@ template <typename assetType> class AssetManager
     {
         if (path.empty())
         {
-            yorcvs::log("Attempt to pass an empty string to an assetManager", yorcvs::ERROR);
+            yorcvs::log("Attempt to pass an empty string to an assetManager", yorcvs::MSGSEVERITY::ERROR);
             return nullptr;
         }
         // search for the texture in the map
@@ -57,7 +57,7 @@ template <typename assetType> class AssetManager
         assetType* ptr = ctor(path);
         if(ptr == nullptr)
         {
-          yorcvs::log("Could not create specified resource",yorcvs::ERROR);
+          yorcvs::log("Could not create specified resource from " + path,yorcvs::MSGSEVERITY::ERROR);
           return nullptr;
         }
         std::shared_ptr<assetType> shrptr = std::shared_ptr<assetType>(ptr, dtor);

@@ -240,6 +240,20 @@ template <typename interface> class Window
      */
     void unregister_callback(size_t index);
 
+    /**
+     * @brief Set the  the offset at which the drawing will happen
+     * 
+     * @param newOffset the offset
+     */
+    void set_drawing_offset(const yorcvs::Vec2<float>& newOffset);
+
+
+    /**
+    * @brief Get the window size 
+    * 
+    * @return yorcvs::Vec2<float> the size
+    */
+    yorcvs::Vec2<float> get_window_size();
     bool isActive;
 
   private:

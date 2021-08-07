@@ -134,14 +134,19 @@ template <typename T> class Vec2
         return static_cast<T>(std::sqrt(x * x + y * y));
     }
 
+    
     /**
      * @brief Get the Normalized object
      *
      * @return constexpr Vec2
      */
     constexpr Vec2 get_normalized() const
-    {
-        return Vec2(x / norm(), y / norm());
+    {       
+        if(norm() > std::numeric_limits<T>::epsilon())
+        {
+            return *this / norm();
+        }
+        return *this;
     }
 
     /**

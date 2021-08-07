@@ -26,7 +26,7 @@ class ECS
      */
     ECS()
     {
-        yorcvs::log("Initializing ECS", yorcvs::INFO);
+        yorcvs::log("Initializing ECS", yorcvs::MSGSEVERITY::INFO);
         componentmanager = std::make_unique<yorcvs::ComponentManager>();
         entitymanager = std::make_unique<yorcvs::EntityManager>();
         systemmanager = std::make_unique<yorcvs::SystemManager>();
@@ -43,7 +43,7 @@ class ECS
     ECS& operator=(ECS&& other) = delete;
     ~ECS() noexcept
     {
-        yorcvs::log("Destroying ECS", yorcvs::INFO);
+        yorcvs::log("Destroying ECS", yorcvs::MSGSEVERITY::INFO);
         if (componentmanager != nullptr)
         {
             componentmanager.reset();
@@ -464,7 +464,7 @@ class Entity
     {
         parent = ecs;
         id = parent->create_entity_ID();
-        yorcvs::log("Created entity with id: " + std::to_string(id), yorcvs::INFO);
+        yorcvs::log("Created entity with id: " + std::to_string(id), yorcvs::MSGSEVERITY::INFO);
     }
 
     Entity(const Entity &other)
@@ -474,7 +474,7 @@ class Entity
         parent->copy_component_to_from_entity(id, other.id);
         yorcvs::log("The copy constructor for an Entity " + std::to_string(id) +
                         " has been called: this might be an unecesary expensive option",
-                    yorcvs::WARNING);
+                    yorcvs::MSGSEVERITY::WARNING);
     }
     Entity(Entity &&other) noexcept
     {
@@ -492,7 +492,7 @@ class Entity
         parent->copy_component_to_from_entity(id, other.id);
         yorcvs::log("The copy assginment operator for Entity" + std::to_string(id) +
                         " has been called: this might be an unecesary expensive option",
-                    yorcvs::WARNING);
+                    yorcvs::MSGSEVERITY::WARNING);
         return *this;
     }
 
@@ -510,7 +510,7 @@ class Entity
         {
             parent->destroy_entity(id);
         }
-        yorcvs::log("Destroyed entity with id: " + std::to_string(id), yorcvs::INFO);
+        yorcvs::log("Destroyed entity with id: " + std::to_string(id), yorcvs::MSGSEVERITY::INFO);
     }
 
     size_t id = 0;

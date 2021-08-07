@@ -47,7 +47,7 @@ template <typename T> class ComponentContainer final : public VContainer
         // if the entity does have this type of component throw exception
         if (entity_has_component.size() > entityID && entity_has_component[entityID] == 1)
         {
-            yorcvs::log("Trying to add an component to an entity which already has it", yorcvs::ERROR);
+            yorcvs::log("Trying to add an component to an entity which already has it", yorcvs::MSGSEVERITY::ERROR);
         }
         // if there isn't any free space,create one
         if (freeIndex.empty())
@@ -95,7 +95,7 @@ template <typename T> class ComponentContainer final : public VContainer
         {
             yorcvs::log("Cannot get component : entity " + std::to_string(entityID)  + " doesn't own the specified type of component: " +
                             std::string(typeid(T).name()),
-                        yorcvs::ERROR);
+                        yorcvs::MSGSEVERITY::ERROR);
         }
 
         return components[entitytocomponent[entityID]];
@@ -109,7 +109,7 @@ template <typename T> class ComponentContainer final : public VContainer
         {
             yorcvs::log("Cannot delete component: the entity " + std::to_string(entityID) + " doesn't have this type of component : " +
                             std::string(typeid(T).name()),
-                        yorcvs::ERROR);
+                        yorcvs::MSGSEVERITY::ERROR);
         }
 
         // get the index of the removed entity
@@ -181,7 +181,7 @@ class ComponentManager
         }
         else
         {
-            yorcvs::log("Component " + std::string(componentid) + " already registered", yorcvs::ERROR);
+            yorcvs::log("Component " + std::string(componentid) + " already registered", yorcvs::MSGSEVERITY::ERROR);
         }
     }
 
@@ -189,7 +189,7 @@ class ComponentManager
     {
         if(get_container<T>() == nullptr)
         {
-            yorcvs::log(std::string("Component") + typeid(T).name() + " has not been registered yet !!!!", yorcvs::ERROR);
+            yorcvs::log(std::string("Component") + typeid(T).name() + " has not been registered yet !!!!", yorcvs::MSGSEVERITY::ERROR);
             return;
         }
         get_container<T>()->add_component(entityID, component);
@@ -198,7 +198,7 @@ class ComponentManager
     {   
         if(get_container<T>() == nullptr)
         {
-            yorcvs::log(std::string("Component") + typeid(T).name() + " has not been registered yet !!!!", yorcvs::ERROR);
+            yorcvs::log(std::string("Component") + typeid(T).name() + " has not been registered yet !!!!", yorcvs::MSGSEVERITY::ERROR);
             return;
         }
         get_container<T>()->remove_component(entityID);
@@ -207,7 +207,7 @@ class ComponentManager
     {
         if(get_container<T>() == nullptr)
         {
-           yorcvs::log(std::string("Component") + typeid(T).name() + " has not been registered yet !!!!", yorcvs::ERROR);
+           yorcvs::log(std::string("Component") + typeid(T).name() + " has not been registered yet !!!!", yorcvs::MSGSEVERITY::ERROR);
            exit(120);
         }
         return get_container<T>()->get_component(entityID);
@@ -221,7 +221,7 @@ class ComponentManager
         if (component_type.find(component_name) == component_type.end())
         {
             yorcvs::log("Cannot fetch component id" + std::string(component_name) + " : invalid component",
-                        yorcvs::ERROR);
+                        yorcvs::MSGSEVERITY::ERROR);
         }
         return component_type[component_name];
     }

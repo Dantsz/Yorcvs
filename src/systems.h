@@ -124,12 +124,14 @@ class CollisionSystem
     static bool check_collision_corner_top_right(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                                  yorcvs::Vec2<float> &rectAvel, float elapsedTime)
     {
-        if (rectB.x + rectB.w > rectA.x + (rectAvel.x * elapsedTime) &&
-            rectA.y + rectA.h + (rectAvel.y * elapsedTime) > rectB.h &&
-            rectA.x + (rectAvel.x * elapsedTime) > rectB.x && rectA.y < rectB.y)
+        if (rectA.x + (rectAvel.x * elapsedTime) + rectA.w > rectB.x &&
+            rectA.x + (rectAvel.x * elapsedTime) + rectA.w < (rectB.x + rectB.w)&& 
+            rectA.y + rectA.h + (rectAvel.y* elapsedTime) > rectB.y &&
+            rectA.y + rectA.h + (rectAvel.y* elapsedTime) < rectB.y + rectB.h &&
+            rectA.x < rectB.x && rectA.y < rectB.y )
         {
 
-            rectAvel.x = ((rectB.x + rectB.w) - rectA.x) / elapsedTime;
+            rectAvel.x = (rectB.x - (rectA.x + rectA.w) ) / elapsedTime;
             rectAvel.y = ((rectA.y + rectA.h) - rectB.y) / elapsedTime;
             return true;
         }
@@ -138,9 +140,9 @@ class CollisionSystem
     static bool check_collision_corner_top_left(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                                 yorcvs::Vec2<float> &rectAvel, float elapsedTime)
     {
-        if (rectB.x + rectB.w > rectA.x + (rectAvel.x * elapsedTime) &&
-            rectA.y + rectA.h + (rectAvel.y * elapsedTime) > rectB.h &&
-            rectA.x + (rectAvel.x * elapsedTime) > rectB.x && rectA.y < rectB.y)
+        if (rectA.x + (rectAvel.x * elapsedTime) > rectB.x && rectA.x + (rectAvel.x * elapsedTime) < rectB.x + rectB.w &&
+            rectA.y + rectA.h + (rectAvel.y * elapsedTime) > rectB.y && rectA.y + rectA.h + (rectAvel.y * elapsedTime) < rectB.y + rectB.h &&
+            rectA.x >= rectB.x && rectA.x + (rectAvel.x * elapsedTime) + rectA.w > rectB.x + rectB.w && rectA.y < rectB.y)
         {
 
             rectAvel.x = ((rectB.x + rectB.w) - rectA.x) / elapsedTime;
@@ -152,9 +154,12 @@ class CollisionSystem
     static bool check_collision_corner_bottom_right(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                                     yorcvs::Vec2<float> &rectAvel, float elapsedTime)
     {
-        if (rectB.x < rectA.x + rectA.w + (rectAvel.x * elapsedTime) &&
-            (rectB.y + rectB.h) > rectA.y + (rectAvel.y * elapsedTime) && rectA.x < rectB.x &&
-            rectA.y + rectA.h > rectB.h)
+        if (rectA.x + (rectAvel.x * elapsedTime) < rectB.x && rectA.x + (rectAvel.x * elapsedTime) + rectA.w > rectB.x &&
+            rectA.x + (rectAvel.x * elapsedTime) + rectA.w < rectB.x + rectB.w && rectA.x < rectB.x && 
+            rectA.y + (rectAvel.y * elapsedTime) > rectB.y &&
+            rectA.y + (rectAvel.y * elapsedTime) < rectB.y + rectB.h &&
+            rectA.y + rectA.h + (rectAvel.y * elapsedTime) > rectB.y + rectB.h)
+
         {
             rectAvel.x = (rectB.x - (rectA.x + rectA.w)) / elapsedTime;
             rectAvel.y = ((rectB.y + rectB.h) - rectA.y) / elapsedTime;
@@ -165,12 +170,14 @@ class CollisionSystem
     static bool check_collision_corner_bottom_left(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                                    yorcvs::Vec2<float> &rectAvel, float elapsedTime)
     {
-        if (rectB.x + rectB.w > rectA.x + (rectAvel.x * elapsedTime) &&
-            (rectB.y + rectB.h) > rectA.y + (rectAvel.y * elapsedTime) && rectA.x > rectB.x && rectB.y < rectA.y)
+        if (rectA.x + (rectAvel.x * elapsedTime) > rectB.x && rectA.x + (rectAvel.x * elapsedTime) < rectB.x + rectB.w &&
+            rectA.x + (rectAvel.x * elapsedTime) + rectA.w > rectB.x + rectB.w && rectA.y + (rectAvel.y * elapsedTime) > rectB.y &&
+            rectA.y + (rectAvel.y * elapsedTime) < rectB.y + rectB.h && rectA.y + (rectAvel.y * elapsedTime) + rectA.h > rectB.y + rectB.h)
         {
             rectAvel.x = ((rectB.x + rectB.w) - rectA.x) / elapsedTime;
             rectAvel.y = ((rectB.y + rectB.h) - rectA.y) / elapsedTime;
             return true;
+
         }
         return false;
     }
@@ -202,8 +209,13 @@ class VelocitySystem
         {
             yorcvs::Vec2<float> posOF = world->get_component<velocityComponent>(ID).vel;
             posOF *= dt;
+
             world->get_component<positionComponent>(ID).position += posOF;
-            world->get_component<velocityComponent>(ID) = {{0, 0}};
+            world->get_component<velocityComponent>(ID).vel = {0, 0};
+            if(posOF.norm() > std::numeric_limits<float>::epsilon())
+            {
+                world->get_component<velocityComponent>(ID).facing = {posOF.x > 0.0f,posOF.y > 0.0f};
+            }
         }
     }
 
@@ -239,16 +251,20 @@ class AnimationSystem
             {
                 world->get_component<animationComponent>(ID).cur_frame++;
                 world->get_component<animationComponent>(ID).cur_elapsed = 0.0f;
-                if(world->get_component<animationComponent>(ID).cur_frame < world->get_component<animationComponent>(ID).frames)
+                if (world->get_component<animationComponent>(ID).cur_frame <
+                    world->get_component<animationComponent>(ID).frames)
                 {
-                 world->get_component<spriteComponent>(ID).srcRect.x = world->get_component<spriteComponent>(ID).srcRect.x + world->get_component<spriteComponent>(ID).srcRect.w;
+                    world->get_component<spriteComponent>(ID).srcRect.x =
+                        world->get_component<spriteComponent>(ID).srcRect.x +
+                        world->get_component<spriteComponent>(ID).srcRect.w;
                 }
                 else
                 {
-                    world->get_component<spriteComponent>(ID).srcRect.x -= world->get_component<spriteComponent>(ID).srcRect.w * (world->get_component<animationComponent>(ID).frames - 1) ;
+                    world->get_component<spriteComponent>(ID).srcRect.x -=
+                        world->get_component<spriteComponent>(ID).srcRect.w *
+                        (world->get_component<animationComponent>(ID).frames - 1);
                     world->get_component<animationComponent>(ID).cur_frame = 0;
                 }
-                std::cout<< world->get_component<spriteComponent>(ID).srcRect.x << '\n';
             }
         }
     }

@@ -10,6 +10,8 @@
 #include "ecs/ecs.h"
 #include "systems.h"
 #include "systemsSDL2.h"
+#include <thread>
+#include <future>
 static yorcvs::Window<yorcvs::SDL2> r;
 static yorcvs::ECS world{};
 static CollisionSystem collisionS{&world};
@@ -37,7 +39,7 @@ int init()
 
     world.add_component<hitboxComponent>(tim.id,{{75,75,20,45}});
     world.add_component<positionComponent>(tim.id,{{100,100}});
-    world.add_component<velocityComponent>(tim.id,{{0.0f,0.0f}});
+    world.add_component<velocityComponent>(tim.id,{{0.0f,0.0f},{false,false}});
     world.add_component<playerMovementControlledComponent>(tim.id,{});
     world.add_component<spriteComponent>(tim.id,{{0.0f,0.0f},{160.0f,160.0f},{0,64,32,32},r.create_texture("assets/test_player_sheet.png")});
     world.add_component<animationComponent>(tim.id,{0,8,0.0f,100.0f});
@@ -63,15 +65,15 @@ void run()
 {
     float elapsed = timy.get_ticks<float,std::chrono::nanoseconds>();
     elapsed /= 1000000.0f;
-   
+    std::cout<< elapsed << '\n';
     timy.start();
     lag += elapsed;
-   
+    
     r.handle_events();
     
     while(lag >= msPF)
     {
-      pcS.update();
+      pcS.updateControls();
       collisionS.update(lag);
       velocityS.update(lag);
       animS.update(lag);
@@ -82,6 +84,7 @@ void run()
   
     
     r.clear();
+    pcS.updateAnimations();
     sprS.renderSprites();
     r.present();
 
@@ -89,6 +92,43 @@ void run()
     
 }
 
+
+
+void runMT()
+{
+    float elapsed = timy.get_ticks<float,std::chrono::nanoseconds>();
+    elapsed /= 1000000.0f;
+    //std::cout<< elapsed << '\n';
+    timy.start();
+    lag += elapsed;
+   
+    r.handle_events();
+    
+    while(lag >= msPF)
+    {
+      pcS.updateControls();
+
+      collisionS.update(lag);
+
+      auto velAsync = std::async(&VelocitySystem::update,velocityS,lag);
+      
+      auto velAnims = std::async(&AnimationSystem::update,animS,lag);
+      
+      lag -= msPF;
+      velAsync.get();
+      velAnims.get();
+    }
+
+
+  
+    
+    r.clear();
+    pcS.updateAnimations();
+    sprS.renderSprites();
+    r.present();
+
+
+}
 int cleanup()
 {
     
@@ -106,7 +146,7 @@ int main(int argc, char **argv) //NOLINT
 #else
     while (r.isActive)
     {   
-        run();
+        runMT();
     }
 #endif
     cleanup();

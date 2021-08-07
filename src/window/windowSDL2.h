@@ -109,33 +109,33 @@ template <> class Window<yorcvs::SDL2>
                         "LINKED with SDL2_ttf version: " + std::to_string(sdlttfversion->major) + ' ' +
                         std::to_string(sdlttfversion->minor) + ' ' + std::to_string(sdlttfversion->patch) + '\n'
                         + "=============\n ",
-                    yorcvs::INFO);
+                    yorcvs::MSGSEVERITY::INFO);
 
         if (SDL_Init(SDL_INIT_VIDEO) < 0)
         {
-            yorcvs::log("Error initializing SDL2", yorcvs::ERROR);
+            yorcvs::log("Error initializing SDL2", yorcvs::MSGSEVERITY::ERROR);
         }
     
         if (IMG_Init(IMG_INIT_PNG) == 0)
         {
-            yorcvs::log("Error initializing SDL2_image", yorcvs::ERROR);
+            yorcvs::log("Error initializing SDL2_image", yorcvs::MSGSEVERITY::ERROR);
         }
         if (TTF_Init() < 0)
         {
-            yorcvs::log("Error initializing SDL2_TTF", yorcvs::ERROR);
+            yorcvs::log("Error initializing SDL2_TTF", yorcvs::MSGSEVERITY::ERROR);
         }
 
         sdlWindow = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                      static_cast<int>(width), static_cast<int>(height), SDL_WINDOW_OPENGL);
         if (sdlWindow == nullptr)
         {
-            yorcvs::log("Error creating SDL2 window", yorcvs::ERROR);
+            yorcvs::log("Error creating SDL2 window", yorcvs::MSGSEVERITY::ERROR);
         }
 
         renderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
         if (renderer == nullptr)
         {
-            yorcvs::log("Error creating SDL2 renderer", yorcvs::ERROR);
+            yorcvs::log("Error creating SDL2 renderer", yorcvs::MSGSEVERITY::ERROR);
         }
         SDL_RendererInfo renderInfo{};
         SDL_GetRendererInfo(renderer,&renderInfo);
@@ -152,7 +152,7 @@ template <> class Window<yorcvs::SDL2>
         "Can render to texture: " + textureRender + '\n' +
         "Maximum texture width: " + std::to_string(renderInfo.max_texture_width) + '\n' +
         "Maximum texture height: " + std::to_string(renderInfo.max_texture_height) + '\n'
-        ,yorcvs::INFO);
+        ,yorcvs::MSGSEVERITY::INFO);
 
         yorcvs::log("creating texture manager");
         assetm = std::make_unique<yorcvs::AssetManager<SDL_Texture>>(
@@ -220,7 +220,7 @@ template <> class Window<yorcvs::SDL2>
             //NOTE: SDL_rendercopyF exists for >SDL 2.0.10 
             SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
                                 static_cast<int>(srcRect.h)};
-            SDL_Rect dest = {static_cast<int>(dstRect.x), static_cast<int>(dstRect.y),static_cast<int>(dstRect.w),static_cast<int>(dstRect.h)};
+            SDL_Rect dest = {static_cast<int>(dstRect.x - offset.x), static_cast<int>(dstRect.y - offset.y),static_cast<int>(dstRect.w),static_cast<int>(dstRect.h)};
             SDL_RenderCopyEx(renderer, assetm->load_from_file(path).get(), &sourceR, &dest, angle, nullptr,
                               SDL_FLIP_NONE);
         }
@@ -235,7 +235,7 @@ template <> class Window<yorcvs::SDL2>
             //NOTE: SDL_rendercopyF exists for >SDL 2.0.10 
             SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
                                 static_cast<int>(srcRect.h)};
-            SDL_Rect dest = {static_cast<int>(dstRectPos.x), static_cast<int>(dstRectPos.y),static_cast<int>(dstRectSize.x),static_cast<int>(dstRectSize.y)};
+            SDL_Rect dest = {static_cast<int>(dstRectPos.x - offset.x), static_cast<int>(dstRectPos.y - offset.y),static_cast<int>(dstRectSize.x),static_cast<int>(dstRectSize.y)};
             SDL_RenderCopyEx(renderer, assetm->load_from_file(path).get(), &sourceR, &dest, angle, nullptr,
                               SDL_FLIP_NONE);
         }
@@ -254,7 +254,7 @@ template <> class Window<yorcvs::SDL2>
             //NOTE: SDL_rendercopyF exists for >SDL 2.0.10 
             SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
                                 static_cast<int>(srcRect.h)};
-            SDL_Rect dest = {static_cast<int>(dstRect.x), static_cast<int>(dstRect.y),static_cast<int>(dstRect.w),static_cast<int>(dstRect.h)};
+            SDL_Rect dest = {static_cast<int>(dstRect.x - offset.x), static_cast<int>(dstRect.y - offset.y),static_cast<int>(dstRect.w),static_cast<int>(dstRect.h)};
             SDL_RenderCopyEx(renderer, texture.SDLtex.get(), &sourceR, &dest, angle, nullptr,
                               SDL_FLIP_NONE);
         }
@@ -268,7 +268,7 @@ template <> class Window<yorcvs::SDL2>
             //NOTE: SDL_rendercopyF exists for >SDL 2.0.10 
             SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
                                 static_cast<int>(srcRect.h)};
-            SDL_Rect dest = {static_cast<int>(dstRectPos.x), static_cast<int>(dstRectPos.y),static_cast<int>(dstRectSize.x),static_cast<int>(dstRectSize.y)};
+            SDL_Rect dest = {static_cast<int>(dstRectPos.x - offset.x), static_cast<int>(dstRectPos.y - offset.y),static_cast<int>(dstRectSize.x),static_cast<int>(dstRectSize.y)};
             SDL_RenderCopyEx(renderer, texture.SDLtex.get(), &sourceR, &dest, angle, nullptr,
                               SDL_FLIP_NONE);
         }
@@ -367,6 +367,23 @@ template <> class Window<yorcvs::SDL2>
         return keys[key.sdlScancode] ? 1 : 0; // NOLINT
     }
 
+    void set_drawing_offset(const yorcvs::Vec2<float>& newOffset)
+    {
+        offset = newOffset;
+    }
+
+    yorcvs::Vec2<float> get_window_size()
+    {
+        int width = 0;
+        int height = 0;
+        SDL_GetWindowSize(sdlWindow,&width,&height);
+        return yorcvs::Vec2<float>(static_cast<float>(width),static_cast<float>(height));
+    }
+    
+
+
+
+
     bool isActive = true;
 
   private:
@@ -389,6 +406,7 @@ template <> class Window<yorcvs::SDL2>
     unsigned char const *keys;
     int mouseX{};
     int mouseY{};
+    yorcvs::Vec2<float> offset = {0.0f,0.0f};
 };
 
 } // namespace yorcvs

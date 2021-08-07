@@ -12,7 +12,6 @@ struct hitboxComponent
 {   
     yorcvs::Rect<float> hitbox;
 };
-
 struct positionComponent
 {
     yorcvs::Vec2<float> position;
@@ -20,6 +19,8 @@ struct positionComponent
 struct velocityComponent
 {   
     yorcvs::Vec2<float> vel;
+    yorcvs::Vec2<bool> facing;// x - true if last velocity change was right, left if false
+                              // y - true if last velocity change was down , down if up
 };
 
 struct playerMovementControlledComponent{};

@@ -24,27 +24,71 @@ class PlayerMovementControl
         {
             world->register_component<playerMovementControlledComponent>();
         }
+        if(!world->is_component_registered<velocityComponent>())
+        {
+            world->register_component<velocityComponent>();
+        }
+        if(!world->is_component_registered<positionComponent>())
+        {
+            world->register_component<positionComponent>();
+        }
+        if(!world->is_component_registered<spriteComponent>())
+        {
+            world->register_component<spriteComponent>();
+        }
         world->register_system<PlayerMovementControl>(*this);
-        world->add_criteria_for_iteration<PlayerMovementControl,playerMovementControlledComponent,velocityComponent>();
+        world->add_criteria_for_iteration<PlayerMovementControl,playerMovementControlledComponent,velocityComponent,positionComponent,spriteComponent>();
     }   
 
-    void update() const
+    void updateControls() 
     {
-        bool w_pressed = window->is_key_pressed({SDL_SCANCODE_W});
-        bool a_pressed = window->is_key_pressed({SDL_SCANCODE_A});
-        bool s_pressed = window->is_key_pressed({SDL_SCANCODE_S});
-        bool d_pressed = window->is_key_pressed({SDL_SCANCODE_D});
+        
+        w_pressed = window->is_key_pressed({SDL_SCANCODE_W});
+        a_pressed = window->is_key_pressed({SDL_SCANCODE_A});
+        s_pressed = window->is_key_pressed({SDL_SCANCODE_S});
+        d_pressed = window->is_key_pressed({SDL_SCANCODE_D});
+
         for(const auto& ID : entityList->entitiesID)
         {
-
-          world->get_component<velocityComponent>(ID).vel += yorcvs::Vec2<float>(static_cast<float>(d_pressed) + static_cast<float>(a_pressed)*-1.0f, 
+            window->set_drawing_offset(world->get_component<positionComponent>(ID).position - (window->get_window_size()  - world->get_component<spriteComponent>(ID).size)/2);
+            dir = yorcvs::Vec2<float>(static_cast<float>(d_pressed) + static_cast<float>(a_pressed)*-1.0f, 
                                                                static_cast<float>(w_pressed)*-1.0f + static_cast<float>(s_pressed));
+            dir.normalize();
+          
+            world->get_component<velocityComponent>(ID).vel = dir;
         }
     }
-
+    void updateAnimations() const
+    {
+        for(const auto& ID : entityList->entitiesID)
+        {
+           
+            if(w_pressed || s_pressed || d_pressed)
+            {
+                world->get_component<spriteComponent>(ID).srcRect.y = 2 * world->get_component<spriteComponent>(ID).srcRect.h;
+            }
+            else if(a_pressed)
+            {
+                world->get_component<spriteComponent>(ID).srcRect.y = 3 * world->get_component<spriteComponent>(ID).srcRect.h;
+            }
+            else if( world->get_component<velocityComponent>(ID).facing.x)
+            {
+                world->get_component<spriteComponent>(ID).srcRect.y = 0 * world->get_component<spriteComponent>(ID).srcRect.h;
+            }
+            else
+            {
+                world->get_component<spriteComponent>(ID).srcRect.y = 1 * world->get_component<spriteComponent>(ID).srcRect.h;
+            }
+        }
+    }
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS* world;
     yorcvs::Window<yorcvs::SDL2>* window;
+    yorcvs::Vec2<float> dir;
+    bool w_pressed{};
+    bool a_pressed{};
+    bool s_pressed{};
+    bool d_pressed{};
 };
 
 class SpriteSystem
@@ -87,3 +131,4 @@ class SpriteSystem
     yorcvs::ECS *world;
     yorcvs::Window<yorcvs::SDL2>* window;
 };
+
