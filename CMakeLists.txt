@@ -25,26 +25,26 @@ find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 
-set(YorcvsALLFILES "src/Yorcvs.cpp"
-                  "src/Yorcvs.h"
-                  "src/systemsSDL2.h"
-                  "src/systems.h"
-                
-                  "src/assetmanager/assetmanager.h"
-
-                  "src/common/types.h"
-                  "src/common/log.h"
-                  "src/common/timer.h" 
+set(YorcvsALLFILES  "src/Yorcvs.cpp"
+                    "src/Yorcvs.h"
+                    "src/systemsSDL2.h"
+                    "src/systems.h"
                   
-                  "src/ecs/component.h"
-                  "src/ecs/entity.h"
-                  "src/ecs/system.h"
-                  "src/ecs/ecs.h"
-                  
-                  "src/components.h"
+                    "src/assetmanager/assetmanager.h"
 
-                  "src/window/window.h"
-                  "src/window/windowSDL2.h"
+                    "src/common/types.h"
+                    "src/common/log.h"
+                    "src/common/timer.h" 
+                    
+                    "src/ecs/component.h"
+                    "src/ecs/entity.h"
+                    "src/ecs/system.h"
+                    "src/ecs/ecs.h"
+                    
+                    "src/components.h"
+
+                    "src/window/window.h"
+                    "src/window/windowSDL2.h"
                     )
 
 add_executable(Yorcvs ${YorcvsALLFILES})
@@ -56,7 +56,7 @@ target_link_libraries(${PROJECT_NAME} SDL2::Main SDL2::Image SDL2::TTF)
 
 
 target_compile_options(Yorcvs PRIVATE
-$<$<CXX_COMPILER_ID:MSVC>:/Wall /fsanitize=address /Zi >
+$<$<CXX_COMPILER_ID:MSVC>:/W4 /fsanitize=address /Zi /DEBUG>
 $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -std=c++2a>
 $<$<CXX_COMPILER_ID:Clang>:-Weverything -Wshadow -Wformat=2 -Wno-c++98-compat-pedantic -Wno-c++98-compat -Wpedantic>
 )

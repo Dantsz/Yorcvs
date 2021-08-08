@@ -1,6 +1,6 @@
 /**
  * @file Yorcvs.h
- * @author your name Dantsz
+ * @author Dantsz
  * @brief 
  * @version 0.1
  * @date 2021-07-31
@@ -9,8 +9,152 @@
  * 
  */
 #pragma once
+#include "common/timer.h"
+#include "window/windowSDL2.h"
+#include <cstdlib>
+#include "Yorcvs.h"
+#include "ecs/ecs.h"
+#include "systems.h"
+#include "systemsSDL2.h"
+#include <thread>
+#include <future>
 
 int init();
 void run();
 void runMT();
 int cleanup();
+
+namespace yorcvs
+{
+    /**
+     * @brief Main game class
+     * 
+     */
+    class Application
+    {
+        public:
+        Application(): collisionS(&world), velocityS(&world),pcS(&world,&r),sprS(&world,&r),animS(&world),healthS(&world)
+        {
+           r.init("TEst", 960, 500);
+           entities.emplace_back(&world);
+                world.add_component<hitboxComponent>(entities[0].id,{{75,75,20,45}});
+                world.add_component<positionComponent>(entities[0].id,{{100,100}});
+                world.add_component<velocityComponent>(entities[0].id,{{0.0f,0.0f},{false,false}});
+                world.add_component<playerMovementControlledComponent>(entities[0].id,{});
+                world.add_component<spriteComponent>(entities[0].id,{{0.0f,0.0f},{160.0f,160.0f},{0,64,32,32},r.create_texture("assets/test_player_sheet.png")});
+                world.add_component<animationComponent>(entities[0].id,{0,8,0.0f,100.0f});
+
+           entities.emplace_back(&world);
+                world.add_component<hitboxComponent>(entities[1].id,{{0,0,160,160}});
+                world.add_component<positionComponent>(entities[1].id,{{500,100}});
+                world.add_component<spriteComponent>(entities[1].id,{{0.0f,0.0f},{160.0f,160.0f},{0,0,200,200},r.create_texture("assets/lettuce.png")});
+
+
+           entities.emplace_back(&world);
+                world.add_component<hitboxComponent>(entities[2].id,{{0,0,160,160}});
+                world.add_component<positionComponent>(entities[2].id,{{660,100}});
+                world.add_component<spriteComponent>(entities[2].id,{{0.0f,0.0f},{160.0f,160.0f},{0,0,200,200},r.create_texture("assets/lettuce.png")});
+
+            entities.emplace_back(&world);
+                world.add_component<hitboxComponent>(entities[3].id,{{0,0,160,160}});
+                world.add_component<positionComponent>(entities[3].id,{{500,260}});
+                world.add_component<spriteComponent>(entities[3].id,{{0.0f,0.0f},{160.0f,160.0f},{0,0,200,200},r.create_texture("assets/lettuce.png")});
+            counter.start();
+        }
+        void run()
+        {
+            float elapsed = counter.get_ticks<float,std::chrono::nanoseconds>();
+            elapsed /= 1000000.0f;
+           
+            counter.start();
+            lag += elapsed;
+            
+            r.handle_events();
+            
+            while(lag >= msPF)
+            {
+            pcS.updateControls();
+            collisionS.update(lag);
+            velocityS.update(lag);
+            animS.update(lag);
+            healthS.update(lag);
+            lag -= msPF;
+            }
+
+
+        
+            
+            r.clear();
+            pcS.updateAnimations();
+            sprS.renderSprites();
+            r.present();
+
+        }
+
+
+
+        void runMT()
+        {
+            float elapsed = counter.get_ticks<float,std::chrono::nanoseconds>();
+            elapsed /= 1000000.0f;
+          
+            counter.start();
+            lag += elapsed;
+        
+            r.handle_events();
+            
+            while(lag >= msPF)
+            {
+            pcS.updateControls();
+
+            collisionS.update(lag);
+
+            auto velAsync = std::async(&VelocitySystem::update,velocityS,lag);
+            
+            auto velAnims = std::async(&AnimationSystem::update,animS,lag);
+            healthS.update(lag);
+            lag -= msPF;
+            velAsync.get();
+            velAnims.get();
+            }
+
+
+        
+            
+            r.clear();
+            pcS.updateAnimations();
+            sprS.renderSprites();
+            r.present();
+
+
+        }
+
+        bool is_active()
+        {
+            return r.isActive;
+        }
+
+        ~Application()
+        {
+            r.cleanup();
+        }
+        private:
+        yorcvs::Window<yorcvs::SDL2> r;
+        yorcvs::ECS world{};
+        CollisionSystem collisionS;
+        VelocitySystem velocityS;
+        PlayerMovementControl pcS;
+        SpriteSystem sprS;
+        AnimationSystem animS;
+        HealthSystem healthS;
+
+        yorcvs::Timer counter;
+        float prevTime = 0.0f;
+        float curTime = 0.0f;
+        static constexpr float msPF = 16.6f;
+        float lag = 0.0f;
+
+        size_t FT;
+        std::vector<yorcvs::Entity> entities;
+    };
+}

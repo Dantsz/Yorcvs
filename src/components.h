@@ -30,6 +30,8 @@ struct healthComponent
 {
     float HP;
     float maxHP;
+    float health_regen;//per tick
+    bool is_dead;// no health regen if dead
 };
 
 struct spriteComponent

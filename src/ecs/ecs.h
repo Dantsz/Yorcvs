@@ -435,6 +435,7 @@ class ECS
 
         for (size_t entity = 0; entity < entitymanager->lowestUnallocatedID; entity++)
         {
+            
             if (systemmanager->compare_entity_to_system(entitymanager->entitySignatures[entity],
                                                         systemmanager->get_system_signature<T>()))
             {

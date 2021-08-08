@@ -1,6 +1,6 @@
 /**
  * @file systemsSDL2.h
- * @author your name (you@domain.com)
+ * @author 
  * @brief Systems dependent on sdl2
  * @version 0.1
  * @date 2021-08-03
@@ -8,6 +8,7 @@
  * @copyright Copyright (c) 2021
  * 
  */
+#pragma once
 #include "components.h"
 #include "ecs/ecs.h"
 #include "window/windowSDL2.h"

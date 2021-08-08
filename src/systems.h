@@ -272,3 +272,43 @@ class AnimationSystem
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;
 };
+
+class HealthSystem
+{
+    public: 
+    HealthSystem(yorcvs::ECS* parent)
+    {
+        world = parent;
+        if(!world->is_component_registered<healthComponent>())
+        {
+            world->register_component<healthComponent>();
+        }
+        world->register_system<HealthSystem>(*this);
+        world->add_criteria_for_iteration<HealthSystem, healthComponent>();
+    }
+    void update(float dt)
+    {
+        cur_time += dt;
+        if(cur_time >= update_time)
+        {
+            for(const auto& ID : entityList->entitiesID)
+            {
+                if(world->get_component<healthComponent>(ID).HP < 0.0f)
+                {
+                    world->get_component<healthComponent>(ID).is_dead = true;
+                    continue;
+                }
+                world->get_component<healthComponent>(ID).HP +=  world->get_component<healthComponent>(ID).health_regen;
+                if(world->get_component<healthComponent>(ID).HP > world->get_component<healthComponent>(ID).maxHP)
+                {
+                    world->get_component<healthComponent>(ID).HP = world->get_component<healthComponent>(ID).maxHP;
+                }
+            }
+            cur_time = 0.0f;
+        }
+    }
+    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    yorcvs::ECS *world;
+    static constexpr float update_time = 1000.0f;//update once a second
+    float cur_time = 0.0f;
+};

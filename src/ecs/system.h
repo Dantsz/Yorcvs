@@ -85,6 +85,7 @@ class SystemManager
         if (typetosystem.find(systemType) == typetosystem.end())
         {
             yorcvs::log("Unable to fetch the signature: system does not exist.");
+            return {};
         }
 
         return typetosignature[systemType];
