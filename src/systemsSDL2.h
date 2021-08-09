@@ -64,13 +64,17 @@ class PlayerMovementControl
         for(const auto& ID : entityList->entitiesID)
         {
            
-            if(w_pressed || s_pressed || d_pressed)
+            if(d_pressed)
             {
                 world->get_component<spriteComponent>(ID).srcRect.y = 2 * world->get_component<spriteComponent>(ID).srcRect.h;
             }
             else if(a_pressed)
             {
                 world->get_component<spriteComponent>(ID).srcRect.y = 3 * world->get_component<spriteComponent>(ID).srcRect.h;
+            }
+            else if(s_pressed || w_pressed)
+            {
+                world->get_component<spriteComponent>(ID).srcRect.y = (static_cast<size_t>(!world->get_component<velocityComponent>(ID).facing.x) + 2) * world->get_component<spriteComponent>(ID).srcRect.h;
             }
             else if( world->get_component<velocityComponent>(ID).facing.x)
             {

@@ -510,8 +510,9 @@ class Entity
         if (parent != nullptr)
         {
             parent->destroy_entity(id);
+            yorcvs::log("Destroyed entity with id: " + std::to_string(id), yorcvs::MSGSEVERITY::INFO);
         }
-        yorcvs::log("Destroyed entity with id: " + std::to_string(id), yorcvs::MSGSEVERITY::INFO);
+     
     }
 
     size_t id = 0;

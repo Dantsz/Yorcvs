@@ -26,6 +26,31 @@ int cleanup();
 
 namespace yorcvs
 {
+    class DebugInfo
+    {
+        public:
+        DebugInfo(yorcvs::Window<yorcvs::SDL2>* parentW, yorcvs::ECS* pECS)
+        {
+            parentWindow = parentW;
+            appECS = pECS;
+            frameTime = parentWindow->create_text("assets/font.ttf","Frame Time : ",255,255,255,255,100,1000);
+        }
+
+        void update(float ft)
+        {
+           
+            parentWindow->set_text_message(frameTime,"Frame Time : " + std::to_string(ft));
+        }
+        
+        void render() const
+        {
+            parentWindow->draw_text(frameTime,FTRect);
+        }
+        yorcvs::Window<yorcvs::SDL2>* parentWindow;
+        yorcvs::ECS* appECS;
+        yorcvs::Text<yorcvs::SDL2> frameTime;
+        yorcvs::Rect<float> FTRect = {0,0,150,25};
+    };
     /**
      * @brief Main game class
      * 
@@ -42,7 +67,7 @@ namespace yorcvs
                 world.add_component<velocityComponent>(entities[0].id,{{0.0f,0.0f},{false,false}});
                 world.add_component<playerMovementControlledComponent>(entities[0].id,{});
                 world.add_component<spriteComponent>(entities[0].id,{{0.0f,0.0f},{160.0f,160.0f},{0,64,32,32},r.create_texture("assets/test_player_sheet.png")});
-                world.add_component<animationComponent>(entities[0].id,{0,8,0.0f,100.0f});
+                world.add_component<animationComponent>(entities[0].id,{0,8,0.0f,10.0f});
 
            entities.emplace_back(&world);
                 world.add_component<hitboxComponent>(entities[1].id,{{0,0,160,160}});
@@ -65,7 +90,7 @@ namespace yorcvs
         {
             float elapsed = counter.get_ticks<float,std::chrono::nanoseconds>();
             elapsed /= 1000000.0f;
-           
+            dbInfo.update(elapsed);
             counter.start();
             lag += elapsed;
             
@@ -73,20 +98,22 @@ namespace yorcvs
             
             while(lag >= msPF)
             {
-            pcS.updateControls();
-            collisionS.update(lag);
-            velocityS.update(lag);
-            animS.update(lag);
-            healthS.update(lag);
-            lag -= msPF;
+                pcS.updateControls();
+                collisionS.update(lag);
+                velocityS.update(lag);
+                animS.update(lag);
+                healthS.update(lag);
+                pcS.updateAnimations();
+                lag -= msPF;
             }
 
 
         
             
             r.clear();
-            pcS.updateAnimations();
+
             sprS.renderSprites();
+            dbInfo.render();
             r.present();
 
         }
@@ -97,7 +124,7 @@ namespace yorcvs
         {
             float elapsed = counter.get_ticks<float,std::chrono::nanoseconds>();
             elapsed /= 1000000.0f;
-          
+            dbInfo.update(elapsed);
             counter.start();
             lag += elapsed;
         
@@ -113,6 +140,7 @@ namespace yorcvs
             
             auto velAnims = std::async(&AnimationSystem::update,animS,lag);
             healthS.update(lag);
+            pcS.updateAnimations();
             lag -= msPF;
             velAsync.get();
             velAnims.get();
@@ -122,14 +150,15 @@ namespace yorcvs
         
             
             r.clear();
-            pcS.updateAnimations();
+            
             sprS.renderSprites();
+            dbInfo.render();
             r.present();
 
 
         }
 
-        bool is_active()
+        [[nodiscard]]bool is_active() const
         {
             return r.isActive;
         }
@@ -149,12 +178,12 @@ namespace yorcvs
         HealthSystem healthS;
 
         yorcvs::Timer counter;
-        float prevTime = 0.0f;
-        float curTime = 0.0f;
+
         static constexpr float msPF = 16.6f;
         float lag = 0.0f;
 
-        size_t FT;
         std::vector<yorcvs::Entity> entities;
+        //debug stuff
+        DebugInfo dbInfo{&r,&world};
     };
 }
