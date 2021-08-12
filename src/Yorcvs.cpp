@@ -1,18 +1,16 @@
 
 #ifdef __EMSCRIPTEN__
-    #include <emscripten.h>
+#include <emscripten.h>
 #endif
 #include "Yorcvs.h"
 
-
-static yorcvs::Application* m_app;
+static yorcvs::Application *m_app;
 static void run_emscripten()
 {
     m_app->run();
 }
 
-
-int main(int argc, char **argv) //NOLINT
+int main(int argc, char **argv) // NOLINT
 {
     yorcvs::Application app;
     m_app = &app;
@@ -21,10 +19,10 @@ int main(int argc, char **argv) //NOLINT
     emscripten_set_main_loop(run_emscripten, 0, 1);
 #else
     while (app.is_active())
-    {   
+    {
         app.runMT();
     }
 #endif
-    
+
     return 0;
 }

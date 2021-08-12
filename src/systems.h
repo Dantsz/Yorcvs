@@ -1,6 +1,6 @@
 #pragma once
-#include "components.h"
 #include "common/ecs.h"
+#include "components.h"
 #include "window/windowSDL2.h"
 #include <array>
 class CollisionSystem
@@ -125,13 +125,13 @@ class CollisionSystem
                                                  yorcvs::Vec2<float> &rectAvel, float elapsedTime)
     {
         if (rectA.x + (rectAvel.x * elapsedTime) + rectA.w > rectB.x &&
-            rectA.x + (rectAvel.x * elapsedTime) + rectA.w < (rectB.x + rectB.w)&& 
-            rectA.y + rectA.h + (rectAvel.y* elapsedTime) > rectB.y &&
-            rectA.y + rectA.h + (rectAvel.y* elapsedTime) < rectB.y + rectB.h &&
-            rectA.x < rectB.x && rectA.y < rectB.y )
+            rectA.x + (rectAvel.x * elapsedTime) + rectA.w < (rectB.x + rectB.w) &&
+            rectA.y + rectA.h + (rectAvel.y * elapsedTime) > rectB.y &&
+            rectA.y + rectA.h + (rectAvel.y * elapsedTime) < rectB.y + rectB.h && rectA.x < rectB.x &&
+            rectA.y < rectB.y)
         {
 
-            rectAvel.x = (rectB.x - (rectA.x + rectA.w) ) / elapsedTime;
+            rectAvel.x = (rectB.x - (rectA.x + rectA.w)) / elapsedTime;
             rectAvel.y = ((rectA.y + rectA.h) - rectB.y) / elapsedTime;
             return true;
         }
@@ -140,9 +140,11 @@ class CollisionSystem
     static bool check_collision_corner_top_left(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                                 yorcvs::Vec2<float> &rectAvel, float elapsedTime)
     {
-        if (rectA.x + (rectAvel.x * elapsedTime) > rectB.x && rectA.x + (rectAvel.x * elapsedTime) < rectB.x + rectB.w &&
-            rectA.y + rectA.h + (rectAvel.y * elapsedTime) > rectB.y && rectA.y + rectA.h + (rectAvel.y * elapsedTime) < rectB.y + rectB.h &&
-            rectA.x >= rectB.x && rectA.x + (rectAvel.x * elapsedTime) + rectA.w > rectB.x + rectB.w && rectA.y < rectB.y)
+        if (rectA.x + (rectAvel.x * elapsedTime) > rectB.x &&
+            rectA.x + (rectAvel.x * elapsedTime) < rectB.x + rectB.w &&
+            rectA.y + rectA.h + (rectAvel.y * elapsedTime) > rectB.y &&
+            rectA.y + rectA.h + (rectAvel.y * elapsedTime) < rectB.y + rectB.h && rectA.x >= rectB.x &&
+            rectA.x + (rectAvel.x * elapsedTime) + rectA.w > rectB.x + rectB.w && rectA.y < rectB.y)
         {
 
             rectAvel.x = ((rectB.x + rectB.w) - rectA.x) / elapsedTime;
@@ -154,8 +156,9 @@ class CollisionSystem
     static bool check_collision_corner_bottom_right(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                                     yorcvs::Vec2<float> &rectAvel, float elapsedTime)
     {
-        if (rectA.x + (rectAvel.x * elapsedTime) < rectB.x && rectA.x + (rectAvel.x * elapsedTime) + rectA.w > rectB.x &&
-            rectA.x + (rectAvel.x * elapsedTime) + rectA.w < rectB.x + rectB.w && rectA.x < rectB.x && 
+        if (rectA.x + (rectAvel.x * elapsedTime) < rectB.x &&
+            rectA.x + (rectAvel.x * elapsedTime) + rectA.w > rectB.x &&
+            rectA.x + (rectAvel.x * elapsedTime) + rectA.w < rectB.x + rectB.w && rectA.x < rectB.x &&
             rectA.y + (rectAvel.y * elapsedTime) > rectB.y &&
             rectA.y + (rectAvel.y * elapsedTime) < rectB.y + rectB.h &&
             rectA.y + rectA.h + (rectAvel.y * elapsedTime) > rectB.y + rectB.h)
@@ -170,14 +173,16 @@ class CollisionSystem
     static bool check_collision_corner_bottom_left(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                                    yorcvs::Vec2<float> &rectAvel, float elapsedTime)
     {
-        if (rectA.x + (rectAvel.x * elapsedTime) > rectB.x && rectA.x + (rectAvel.x * elapsedTime) < rectB.x + rectB.w &&
-            rectA.x + (rectAvel.x * elapsedTime) + rectA.w > rectB.x + rectB.w && rectA.y + (rectAvel.y * elapsedTime) > rectB.y &&
-            rectA.y + (rectAvel.y * elapsedTime) < rectB.y + rectB.h && rectA.y + (rectAvel.y * elapsedTime) + rectA.h > rectB.y + rectB.h)
+        if (rectA.x + (rectAvel.x * elapsedTime) > rectB.x &&
+            rectA.x + (rectAvel.x * elapsedTime) < rectB.x + rectB.w &&
+            rectA.x + (rectAvel.x * elapsedTime) + rectA.w > rectB.x + rectB.w &&
+            rectA.y + (rectAvel.y * elapsedTime) > rectB.y &&
+            rectA.y + (rectAvel.y * elapsedTime) < rectB.y + rectB.h &&
+            rectA.y + (rectAvel.y * elapsedTime) + rectA.h > rectB.y + rectB.h)
         {
             rectAvel.x = ((rectB.x + rectB.w) - rectA.x) / elapsedTime;
             rectAvel.y = ((rectB.y + rectB.h) - rectA.y) / elapsedTime;
             return true;
-
         }
         return false;
     }
@@ -212,11 +217,11 @@ class VelocitySystem
 
             world->get_component<positionComponent>(ID).position += posOF;
             world->get_component<velocityComponent>(ID).vel = {0, 0};
-            if(std::abs(posOF.x) > std::numeric_limits<float>::epsilon() )
+            if (std::abs(posOF.x) > std::numeric_limits<float>::epsilon())
             {
                 world->get_component<velocityComponent>(ID).facing.x = (posOF.x > 0.0f);
             }
-            if(std::abs(posOF.y) > std::numeric_limits<float>::epsilon())
+            if (std::abs(posOF.y) > std::numeric_limits<float>::epsilon())
             {
                 world->get_component<velocityComponent>(ID).facing.y = (posOF.y > 0.0f);
             }
@@ -279,11 +284,11 @@ class AnimationSystem
 
 class HealthSystem
 {
-    public: 
-    HealthSystem(yorcvs::ECS* parent)
+  public:
+    HealthSystem(yorcvs::ECS *parent)
     {
         world = parent;
-        if(!world->is_component_registered<healthComponent>())
+        if (!world->is_component_registered<healthComponent>())
         {
             world->register_component<healthComponent>();
         }
@@ -293,17 +298,17 @@ class HealthSystem
     void update(float dt)
     {
         cur_time += dt;
-        if(cur_time >= update_time)
+        if (cur_time >= update_time)
         {
-            for(const auto& ID : entityList->entitiesID)
+            for (const auto &ID : entityList->entitiesID)
             {
-                if(world->get_component<healthComponent>(ID).HP < 0.0f)
+                if (world->get_component<healthComponent>(ID).HP < 0.0f)
                 {
                     world->get_component<healthComponent>(ID).is_dead = true;
                     continue;
                 }
-                world->get_component<healthComponent>(ID).HP +=  world->get_component<healthComponent>(ID).health_regen;
-                if(world->get_component<healthComponent>(ID).HP > world->get_component<healthComponent>(ID).maxHP)
+                world->get_component<healthComponent>(ID).HP += world->get_component<healthComponent>(ID).health_regen;
+                if (world->get_component<healthComponent>(ID).HP > world->get_component<healthComponent>(ID).maxHP)
                 {
                     world->get_component<healthComponent>(ID).HP = world->get_component<healthComponent>(ID).maxHP;
                 }
@@ -313,6 +318,6 @@ class HealthSystem
     }
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;
-    static constexpr float update_time = 1000.0f;//update once a second
+    static constexpr float update_time = 1000.0f; // update once a second
     float cur_time = 0.0f;
 };

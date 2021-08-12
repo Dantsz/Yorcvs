@@ -94,7 +94,6 @@ template <> class Window<yorcvs::SDL2>
         const SDL_version *sdlimageversion = IMG_Linked_Version();
         const SDL_version *sdlttfversion = TTF_Linked_Version();
 
-
         // TODO : replace with std::format
         yorcvs::log(std::string("======SDL2 Version=======\nUsing SDL2 rendering\n") +
                         "COMPILED with SDL2 version: " + std::to_string(SDL_MAJOR_VERSION) + ' ' +
@@ -107,15 +106,15 @@ template <> class Window<yorcvs::SDL2>
                         std::to_string(sdlimageversion->minor) + ' ' + std::to_string(sdlimageversion->patch) + '\n' +
                         "COMPILED with SDL2_ttf version : " + std::to_string(SDL_TTF_COMPILEDVERSION) + '\n' +
                         "LINKED with SDL2_ttf version: " + std::to_string(sdlttfversion->major) + ' ' +
-                        std::to_string(sdlttfversion->minor) + ' ' + std::to_string(sdlttfversion->patch) + '\n'
-                        + "=============\n ",
+                        std::to_string(sdlttfversion->minor) + ' ' + std::to_string(sdlttfversion->patch) + '\n' +
+                        "=============\n ",
                     yorcvs::MSGSEVERITY::INFO);
 
         if (SDL_Init(SDL_INIT_VIDEO) < 0)
         {
             yorcvs::log("Error initializing SDL2", yorcvs::MSGSEVERITY::ERROR);
         }
-    
+
         if (IMG_Init(IMG_INIT_PNG) == 0)
         {
             yorcvs::log("Error initializing SDL2_image", yorcvs::MSGSEVERITY::ERROR);
@@ -138,21 +137,23 @@ template <> class Window<yorcvs::SDL2>
             yorcvs::log("Error creating SDL2 renderer", yorcvs::MSGSEVERITY::ERROR);
         }
         SDL_RendererInfo renderInfo{};
-        SDL_GetRendererInfo(renderer,&renderInfo);
-        const std::string  softwareRenderer = static_cast<bool>(renderInfo.flags & SDL_RENDERER_SOFTWARE) ? "true" : "false";
-        const std::string acceleratedRenderer = static_cast<bool>(renderInfo.flags & SDL_RENDERER_ACCELERATED)? "true" : "false";
-        const std::string vsyncRenderer = static_cast<bool>(renderInfo.flags & SDL_RENDERER_PRESENTVSYNC)? "true" : "false";
-        const std::string textureRender = static_cast<bool>(renderInfo.flags & SDL_RENDERER_TARGETTEXTURE)? "true" : "false";
-        //TODO: DO WITH STD::FORMAT
-        yorcvs::log(std::string("====RenderInfo====\n")+
-        "Renderer : " + renderInfo.name + '\n'+
-        "Software Renderer: " + softwareRenderer + '\n' +
-        "Accelerated Renderer: " + acceleratedRenderer + '\n' +
-        "Vsync Enabled : " + vsyncRenderer + '\n' +
-        "Can render to texture: " + textureRender + '\n' +
-        "Maximum texture width: " + std::to_string(renderInfo.max_texture_width) + '\n' +
-        "Maximum texture height: " + std::to_string(renderInfo.max_texture_height) + '\n'
-        ,yorcvs::MSGSEVERITY::INFO);
+        SDL_GetRendererInfo(renderer, &renderInfo);
+        const std::string softwareRenderer =
+            static_cast<bool>(renderInfo.flags & SDL_RENDERER_SOFTWARE) ? "true" : "false";
+        const std::string acceleratedRenderer =
+            static_cast<bool>(renderInfo.flags & SDL_RENDERER_ACCELERATED) ? "true" : "false";
+        const std::string vsyncRenderer =
+            static_cast<bool>(renderInfo.flags & SDL_RENDERER_PRESENTVSYNC) ? "true" : "false";
+        const std::string textureRender =
+            static_cast<bool>(renderInfo.flags & SDL_RENDERER_TARGETTEXTURE) ? "true" : "false";
+        // TODO: DO WITH STD::FORMAT
+        yorcvs::log(std::string("====RenderInfo====\n") + "Renderer : " + renderInfo.name + '\n' +
+                        "Software Renderer: " + softwareRenderer + '\n' +
+                        "Accelerated Renderer: " + acceleratedRenderer + '\n' + "Vsync Enabled : " + vsyncRenderer +
+                        '\n' + "Can render to texture: " + textureRender + '\n' +
+                        "Maximum texture width: " + std::to_string(renderInfo.max_texture_width) + '\n' +
+                        "Maximum texture height: " + std::to_string(renderInfo.max_texture_height) + '\n',
+                    yorcvs::MSGSEVERITY::INFO);
 
         yorcvs::log("creating texture manager");
         assetm = std::make_unique<yorcvs::AssetManager<SDL_Texture>>(
@@ -213,70 +214,72 @@ template <> class Window<yorcvs::SDL2>
     }
 
     void draw_sprite(const std::string &path, const Rect<float> &dstRect, const Rect<size_t> &srcRect,
-                    double angle = 0.0)
-    {  
-        if (!isMinimized)
-        {
-            //NOTE: SDL_rendercopyF exists for >SDL 2.0.10 
-            SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
-                                static_cast<int>(srcRect.h)};
-            SDL_Rect dest = {static_cast<int>(dstRect.x - offset.x), static_cast<int>(dstRect.y - offset.y),static_cast<int>(dstRect.w),static_cast<int>(dstRect.h)};
-            SDL_RenderCopyEx(renderer, assetm->load_from_file(path).get(), &sourceR, &dest, angle, nullptr,
-                              SDL_FLIP_NONE);
-        }
-    }
-
-
-    void draw_sprite(const std::string &path, const yorcvs::Vec2<float>& dstRectPos , const yorcvs::Vec2<float>& dstRectSize, const yorcvs::Rect<size_t> &srcRect,
-                    double angle = 0.0)
+                     double angle = 0.0)
     {
         if (!isMinimized)
         {
-            //NOTE: SDL_rendercopyF exists for >SDL 2.0.10 
+            // NOTE: SDL_rendercopyF exists for >SDL 2.0.10
             SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
                                 static_cast<int>(srcRect.h)};
-            SDL_Rect dest = {static_cast<int>(dstRectPos.x - offset.x), static_cast<int>(dstRectPos.y - offset.y),static_cast<int>(dstRectSize.x),static_cast<int>(dstRectSize.y)};
+            SDL_Rect dest = {static_cast<int>(dstRect.x - offset.x), static_cast<int>(dstRect.y - offset.y),
+                             static_cast<int>(dstRect.w), static_cast<int>(dstRect.h)};
             SDL_RenderCopyEx(renderer, assetm->load_from_file(path).get(), &sourceR, &dest, angle, nullptr,
-                              SDL_FLIP_NONE);
+                             SDL_FLIP_NONE);
         }
     }
 
-    [[nodiscard]]Texture<yorcvs::SDL2> create_texture(const std::string &path)
+    void draw_sprite(const std::string &path, const yorcvs::Vec2<float> &dstRectPos,
+                     const yorcvs::Vec2<float> &dstRectSize, const yorcvs::Rect<size_t> &srcRect, double angle = 0.0)
+    {
+        if (!isMinimized)
+        {
+            // NOTE: SDL_rendercopyF exists for >SDL 2.0.10
+            SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
+                                static_cast<int>(srcRect.h)};
+            SDL_Rect dest = {static_cast<int>(dstRectPos.x - offset.x), static_cast<int>(dstRectPos.y - offset.y),
+                             static_cast<int>(dstRectSize.x), static_cast<int>(dstRectSize.y)};
+            SDL_RenderCopyEx(renderer, assetm->load_from_file(path).get(), &sourceR, &dest, angle, nullptr,
+                             SDL_FLIP_NONE);
+        }
+    }
+
+    [[nodiscard]] Texture<yorcvs::SDL2> create_texture(const std::string &path)
     {
         Texture<yorcvs::SDL2> tex;
         tex.SDLtex = assetm->load_from_file(path);
         return tex;
     }
-    void draw_sprite(const Texture<yorcvs::SDL2>& texture, const yorcvs::Rect<float> &dstRect, const yorcvs::Rect<size_t> &srcRect,double angle = 0.0)
-    {
-        if(!isMinimized)
-        {
-            //NOTE: SDL_rendercopyF exists for >SDL 2.0.10 
-            SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
-                                static_cast<int>(srcRect.h)};
-            SDL_Rect dest = {static_cast<int>(dstRect.x - offset.x), static_cast<int>(dstRect.y - offset.y),static_cast<int>(dstRect.w),static_cast<int>(dstRect.h)};
-            SDL_RenderCopyEx(renderer, texture.SDLtex.get(), &sourceR, &dest, angle, nullptr,
-                              SDL_FLIP_NONE);
-        }
-    }
-  
-    void draw_texture(const Texture<yorcvs::SDL2> &texture, const yorcvs::Vec2<float>& dstRectPos ,const yorcvs::Vec2<float>& dstRectSize,
+    void draw_sprite(const Texture<yorcvs::SDL2> &texture, const yorcvs::Rect<float> &dstRect,
                      const yorcvs::Rect<size_t> &srcRect, double angle = 0.0)
     {
-        if(!isMinimized)
+        if (!isMinimized)
         {
-            //NOTE: SDL_rendercopyF exists for >SDL 2.0.10 
+            // NOTE: SDL_rendercopyF exists for >SDL 2.0.10
             SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
                                 static_cast<int>(srcRect.h)};
-            SDL_Rect dest = {static_cast<int>(dstRectPos.x - offset.x), static_cast<int>(dstRectPos.y - offset.y),static_cast<int>(dstRectSize.x),static_cast<int>(dstRectSize.y)};
-            SDL_RenderCopyEx(renderer, texture.SDLtex.get(), &sourceR, &dest, angle, nullptr,
-                              SDL_FLIP_NONE);
+            SDL_Rect dest = {static_cast<int>(dstRect.x - offset.x), static_cast<int>(dstRect.y - offset.y),
+                             static_cast<int>(dstRect.w), static_cast<int>(dstRect.h)};
+            SDL_RenderCopyEx(renderer, texture.SDLtex.get(), &sourceR, &dest, angle, nullptr, SDL_FLIP_NONE);
         }
     }
 
-    [[nodiscard]]Text<yorcvs::SDL2> create_text(const std::string &path, const std::string &message, unsigned char r,
-                                          unsigned char g, unsigned char b, unsigned char a, size_t charSize,
-                                          size_t lineLength)
+    void draw_texture(const Texture<yorcvs::SDL2> &texture, const yorcvs::Vec2<float> &dstRectPos,
+                      const yorcvs::Vec2<float> &dstRectSize, const yorcvs::Rect<size_t> &srcRect, double angle = 0.0)
+    {
+        if (!isMinimized)
+        {
+            // NOTE: SDL_rendercopyF exists for >SDL 2.0.10
+            SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
+                                static_cast<int>(srcRect.h)};
+            SDL_Rect dest = {static_cast<int>(dstRectPos.x - offset.x), static_cast<int>(dstRectPos.y - offset.y),
+                             static_cast<int>(dstRectSize.x), static_cast<int>(dstRectSize.y)};
+            SDL_RenderCopyEx(renderer, texture.SDLtex.get(), &sourceR, &dest, angle, nullptr, SDL_FLIP_NONE);
+        }
+    }
+
+    [[nodiscard]] Text<yorcvs::SDL2> create_text(const std::string &path, const std::string &message, unsigned char r,
+                                                 unsigned char g, unsigned char b, unsigned char a, size_t charSize,
+                                                 size_t lineLength)
     {
         Text<yorcvs::SDL2> text;
         text.fontPath = path;
@@ -292,8 +295,9 @@ template <> class Window<yorcvs::SDL2>
     {
         if (!isMinimized)
         {
-            //NOTE: SDL_rendercopyF exists for >SDL 2.0.10 
-            SDL_Rect dest = {static_cast<int>(dstRect.x), static_cast<int>(dstRect.y),static_cast<int>(dstRect.w),static_cast<int>(dstRect.h)};
+            // NOTE: SDL_rendercopyF exists for >SDL 2.0.10
+            SDL_Rect dest = {static_cast<int>(dstRect.x), static_cast<int>(dstRect.y), static_cast<int>(dstRect.w),
+                             static_cast<int>(dstRect.h)};
             SDL_RenderCopy(renderer, text.SDLtex.get(), nullptr, &dest);
         }
     }
@@ -367,7 +371,7 @@ template <> class Window<yorcvs::SDL2>
         return keys[key.sdlScancode] ? 1 : 0; // NOLINT
     }
 
-    void set_drawing_offset(const yorcvs::Vec2<float>& newOffset)
+    void set_drawing_offset(const yorcvs::Vec2<float> &newOffset)
     {
         offset = newOffset;
     }
@@ -376,13 +380,9 @@ template <> class Window<yorcvs::SDL2>
     {
         int width = 0;
         int height = 0;
-        SDL_GetWindowSize(sdlWindow,&width,&height);
-        return yorcvs::Vec2<float>(static_cast<float>(width),static_cast<float>(height));
+        SDL_GetWindowSize(sdlWindow, &width, &height);
+        return yorcvs::Vec2<float>(static_cast<float>(width), static_cast<float>(height));
     }
-    
-
-
-
 
     bool isActive = true;
 
@@ -397,7 +397,7 @@ template <> class Window<yorcvs::SDL2>
     }
     SDL_Event event{};
     std::vector<Callback<yorcvs::SDL2>> callbacks{};
-    yorcvs::Vec2<float> offset = {0.0f,0.0f};
+    yorcvs::Vec2<float> offset = {0.0f, 0.0f};
     SDL_Window *sdlWindow = nullptr;
     SDL_Renderer *renderer = nullptr;
     std::unique_ptr<AssetManager<SDL_Texture>> assetm = nullptr;
