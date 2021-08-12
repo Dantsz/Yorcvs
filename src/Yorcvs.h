@@ -13,7 +13,7 @@
 #include "window/windowSDL2.h"
 #include <cstdlib>
 #include "Yorcvs.h"
-#include "ecs/ecs.h"
+#include "common/ecs.h"
 #include "systems.h"
 #include "systemsSDL2.h"
 #include <thread>

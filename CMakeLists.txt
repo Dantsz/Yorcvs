@@ -35,8 +35,7 @@ set(YorcvsALLFILES  "src/Yorcvs.cpp"
                     "src/common/types.h"
                     "src/common/log.h"
                     "src/common/timer.h" 
-                    
-                    "src/ecs/ecs.h"
+                    "src/common/ecs.h"
                     
                     "src/components.h"
 

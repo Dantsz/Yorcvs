@@ -10,7 +10,7 @@
  */
 #pragma once
 #include "components.h"
-#include "ecs/ecs.h"
+#include "common/ecs.h"
 #include "window/windowSDL2.h"
 #include <SDL.h>
 
