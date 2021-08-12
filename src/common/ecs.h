@@ -959,7 +959,7 @@ class ECS
      * @return size_t The number of entities with that component
      * NOTE: This is might be costly
      */
-    template <typename T> size_t get_entities_with_component() const
+    template <typename T> [[nodiscard]] size_t get_entities_with_component() const
     {
         // get component index
         size_t cIndex = componentmanager->get_component_ID<T>();

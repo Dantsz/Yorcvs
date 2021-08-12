@@ -395,18 +395,16 @@ template <> class Window<yorcvs::SDL2>
         SDL_FreeSurface(textSurf);
         TTF_CloseFont(font);
     }
-
-    SDL_Window *sdlWindow = nullptr;
-    SDL_Renderer *renderer = nullptr;
-
-    std::unique_ptr<AssetManager<SDL_Texture>> assetm = nullptr;
-    bool isMinimized = false;
     SDL_Event event{};
     std::vector<Callback<yorcvs::SDL2>> callbacks{};
+    yorcvs::Vec2<float> offset = {0.0f,0.0f};
+    SDL_Window *sdlWindow = nullptr;
+    SDL_Renderer *renderer = nullptr;
+    std::unique_ptr<AssetManager<SDL_Texture>> assetm = nullptr;
     unsigned char const *keys;
     int mouseX{};
     int mouseY{};
-    yorcvs::Vec2<float> offset = {0.0f,0.0f};
+    bool isMinimized = false;
 };
 
 } // namespace yorcvs
