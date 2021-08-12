@@ -19,11 +19,6 @@
 #include <thread>
 #include <future>
 
-int init();
-void run();
-void runMT();
-int cleanup();
-
 namespace yorcvs
 {
     class DebugInfo
@@ -86,6 +81,11 @@ namespace yorcvs
                 world.add_component<spriteComponent>(entities[3].id,{{0.0f,0.0f},{160.0f,160.0f},{0,0,200,200},r.create_texture("assets/lettuce.png")});
             counter.start();
         }
+        Application(const Application& other) = delete;
+        Application(Application&& other) = delete;
+        Application& operator=(const Application& other) = delete;
+        
+
         void run()
         {
             float elapsed = counter.get_ticks<float,std::chrono::nanoseconds>();
