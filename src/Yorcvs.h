@@ -14,7 +14,7 @@
 #include "common/timer.h"
 #include "systems.h"
 #include "systemsSDL2.h"
-#include "window/windowSDL2.h"
+#include "windowSDL2.h"
 #include <cstdlib>
 #include <future>
 #include <thread>

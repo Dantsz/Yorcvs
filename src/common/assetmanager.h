@@ -5,7 +5,7 @@
 
 #include <functional> //TODO : MAYBE REPLACE std::function
 
-#include "common/log.h"
+#include "log.h"
 
 namespace yorcvs
 {

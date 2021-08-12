@@ -1,7 +1,7 @@
 #pragma once
 #include "common/ecs.h"
 #include "components.h"
-#include "window/windowSDL2.h"
+#include "windowSDL2.h"
 #include <array>
 class CollisionSystem
 {

@@ -11,7 +11,7 @@
 #pragma once
 #include "common/ecs.h"
 #include "components.h"
-#include "window/windowSDL2.h"
+#include "windowSDL2.h"
 #include <SDL.h>
 
 class PlayerMovementControl

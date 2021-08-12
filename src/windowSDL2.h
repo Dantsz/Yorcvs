@@ -9,9 +9,9 @@
  *
  */
 #pragma once
-#include "../assetmanager.h"
-#include "../common/log.h"
-#include "window.h"
+#include "common/assetmanager.h"
+#include "common/log.h"
+#include "common/window.h"
 
 #include <vector>
 

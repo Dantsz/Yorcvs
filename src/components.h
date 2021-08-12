@@ -1,6 +1,6 @@
 #pragma once
 #include "common/types.h"
-#include "window/windowSDL2.h"
+#include "windowSDL2.h"
 namespace yorcvs{
 using graphics = yorcvs::SDL2;
 }
