@@ -20,7 +20,7 @@ int main(int argc, char **argv) // NOLINT
 #else
     while (app.is_active())
     {
-        app.runMT();
+        app.run();
     }
 #endif
 

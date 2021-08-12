@@ -43,8 +43,12 @@ class DebugInfo
     }
     yorcvs::Window<yorcvs::SDL2> *parentWindow;
     yorcvs::ECS *appECS;
+
     yorcvs::Text<yorcvs::SDL2> frameTime;
     yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
+
+    yorcvs::Text<yorcvs::SDL2> ecsEntities;
+    yorcvs::Rect<float> entitiesRect = {0,25,150,25};
 };
 /**
  * @brief Main game class
@@ -91,6 +95,33 @@ class Application
     Application &operator=(const Application &other) = delete;
     Application &operator=(Application &&other) = delete;
 
+    void update(float dt)
+    {
+        pcS.updateControls();
+        collisionS.update(dt);
+        velocityS.update(dt);
+        animS.update(dt);
+        healthS.update(dt);
+        pcS.updateAnimations();
+    }
+
+    void updateMT(float dt)
+    {
+                    pcS.updateControls();
+
+            collisionS.update(dt);
+
+            auto velAsync = std::async(&VelocitySystem::update, velocityS, dt);
+
+            auto velAnims = std::async(&AnimationSystem::update, animS, dt);
+            healthS.update(dt);
+            pcS.updateAnimations();
+            
+            velAsync.get();
+            velAnims.get();
+    }
+
+
     void run()
     {
         float elapsed = counter.get_ticks<float, std::chrono::nanoseconds>();
@@ -103,12 +134,7 @@ class Application
 
         while (lag >= msPF)
         {
-            pcS.updateControls();
-            collisionS.update(lag);
-            velocityS.update(lag);
-            animS.update(lag);
-            healthS.update(lag);
-            pcS.updateAnimations();
+            update(lag);
             lag -= msPF;
         }
 
@@ -131,18 +157,8 @@ class Application
 
         while (lag >= msPF)
         {
-            pcS.updateControls();
-
-            collisionS.update(lag);
-
-            auto velAsync = std::async(&VelocitySystem::update, velocityS, lag);
-
-            auto velAnims = std::async(&AnimationSystem::update, animS, lag);
-            healthS.update(lag);
-            pcS.updateAnimations();
+            updateMT(lag);
             lag -= msPF;
-            velAsync.get();
-            velAnims.get();
         }
 
         r.clear();
@@ -171,7 +187,7 @@ class Application
     SpriteSystem sprS;
     AnimationSystem animS;
     HealthSystem healthS;
-
+    DebugInfo dbInfo{&r, &world};
     yorcvs::Timer counter;
 
     static constexpr float msPF = 16.6f;
@@ -179,6 +195,6 @@ class Application
 
     std::vector<yorcvs::Entity> entities;
     // debug stuff
-    DebugInfo dbInfo{&r, &world};
+    
 };
 } // namespace yorcvs

@@ -806,7 +806,9 @@ class ECS
     template <typename T, typename secondT, typename... Other> bool has_components(const size_t entityID)
     {
         if (!componentmanager->get_container<T>()->has_component(entityID))
+        {
             return false;
+        }
         return has_components<secondT, Other...>(entityID);
     }
     /**

@@ -9,7 +9,7 @@
  *
  */
 #pragma once
-#include "../assetmanager/assetmanager.h"
+#include "../assetmanager.h"
 #include "../common/log.h"
 #include "window.h"
 
