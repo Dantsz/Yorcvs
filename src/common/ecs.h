@@ -159,7 +159,7 @@ class VContainer
     VContainer &operator=(VContainer &other) = delete;
     VContainer &operator=(VContainer &&other) = delete;
 
-    virtual void add_component(size_t entityID) = 0;
+    virtual void add_component(size_t entityID)  = 0;
     virtual void on_entity_destroyed(size_t entityID) noexcept = 0;
     virtual void copy_entity_component(size_t dstID, size_t srcID) = 0;
 
@@ -719,10 +719,10 @@ class ECS
         // while the vector of signature doesn't have elements until the current component add 0 to the signature
         while (e_signature.size() <= component_type)
         {
-            e_signature.push_back(0);
+            e_signature.push_back(false);
         }
         // add the new signature
-        e_signature[component_type] = 1;
+        e_signature[component_type] = true;
         entitymanager->set_signature(entityID, e_signature);
         systemmanager->on_entity_signature_change(entityID, e_signature);
     }
@@ -746,10 +746,10 @@ class ECS
         // while the vector of signature doesn't have elements until the current component add 0 to the signature
         while (e_signature.size() <= component_type)
         {
-            e_signature.emplace_back(0);
+            e_signature.push_back(false);
         }
         // add the new signature
-        e_signature[component_type] = 1;
+        e_signature[component_type] = true;
         entitymanager->set_signature(entityID, e_signature);
         systemmanager->on_entity_signature_change(entityID, e_signature);
         add_component<Other...>(entityID, other...);
@@ -765,7 +765,7 @@ class ECS
 
         std::vector<bool> &e_signature = entitymanager->get_signature(entityID);
         size_t component_type = componentmanager->get_component_ID<T>();
-        e_signature[component_type] = 0;
+        e_signature[component_type] = false;
         systemmanager->on_entity_signature_change(entityID, e_signature);
         componentmanager->remove_component<T>(entityID);
     }
@@ -782,7 +782,7 @@ class ECS
 
         std::vector<bool> &e_signature = entitymanager->get_signature(entityID);
         size_t component_type = componentmanager->get_component_ID<T>();
-        e_signature[component_type] = 0;
+        e_signature[component_type] = false;
         systemmanager->on_entity_signature_change(entityID, e_signature);
         componentmanager->remove_component<T>(entityID);
 
@@ -813,7 +813,7 @@ class ECS
     template <typename T, typename secondT, typename... Other> bool has_components(const size_t entityID)
     {
         if (!componentmanager->get_container<T>()->has_component(entityID))
-            return 0;
+            return false;
         return has_components<secondT, Other...>(entityID);
     }
     /**
@@ -841,7 +841,6 @@ class ECS
         {
             on_system_signature_change<T>();
         }
-        return;
     }
     /**
      * @brief Checks if a system is registered
@@ -907,10 +906,10 @@ class ECS
         // modify the signature to fit the new component
         while (signature.size() <= componentID)
         {
-            signature.emplace_back(0);
+            signature.push_back(false);
         }
         // mark the component as being a part of the system
-        signature[componentID] = 1;
+        signature[componentID] = true;
         // set the new signature
         set_system_signature<sys>(signature);
 
@@ -937,7 +936,7 @@ class ECS
 
         for (size_t i = 0; i < signature.size(); i++)
         {
-            signature[i] = 0;
+            signature[i] = false;
         }
 
         // get the id of the component
@@ -945,10 +944,10 @@ class ECS
         // modify the signature to fit the new component
         while (signature.size() <= componentID)
         {
-            signature.emplace_back(0);
+            signature.push_back(false);
         }
         // mark the component as being a part of the system
-        signature[componentID] = 1;
+        signature[componentID] = true;
         // set the new signature
         set_system_signature<sys>(signature);
     }
