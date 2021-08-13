@@ -1,3 +1,13 @@
+/**
+ * @file ecs.h
+ * @author Dansz
+ * @brief 
+ * @version 0.1
+ * @date 2021-08-13
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
 #pragma once
 #include "log.h"
 #include <algorithm>
@@ -158,7 +168,7 @@ class EntityManager
     // vector<bool> spooky
     std::vector<std::vector<bool>> entitySignatures;
 
-    // the lowest unallocated id that has not interacted with
+    // the lowest unallocated id that has not been interacted with
     size_t lowestUnallocatedID = 0;
 };
 
@@ -977,6 +987,15 @@ class ECS
         systemmanager->on_entity_signature_change(dstEntityID, newSignature);
     }
 
+    /**
+     * @brief Get the number of active entities
+     * 
+     * @return size_t Entities that have been created but not destroyed
+     */
+    [[nodiscard]]size_t get_active_entities_number() const
+    {
+        return entitymanager->lowestUnallocatedID - entitymanager->freedIndices.size();
+    }
   private:
     std::unique_ptr<yorcvs::ComponentManager> componentmanager;
     std::unique_ptr<yorcvs::EntityManager> entitymanager;

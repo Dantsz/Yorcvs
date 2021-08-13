@@ -1,7 +1,7 @@
 /**
  * @file Yorcvs.h
  * @author Dantsz
- * @brief
+ * @brief Simple entity component system
  * @version 0.1
  * @date 2021-07-31
  *
@@ -28,17 +28,20 @@ class DebugInfo
         parentWindow = parentW;
         appECS = pECS;
         frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", 255, 255, 255, 255, 100, 1000);
+        ecsEntities = parentWindow->create_text("assets/font.ttf", "Active Entities : ",255,255,255,255,100,1000);
     }
 
     void update(float ft)
     {
 
         parentWindow->set_text_message(frameTime, "Frame Time : " + std::to_string(ft));
+        parentWindow->set_text_message(ecsEntities,"Active Entities : " + std::to_string(appECS->get_active_entities_number()));
     }
 
     void render() const
     {
         parentWindow->draw_text(frameTime, FTRect);
+        parentWindow->draw_text(ecsEntities,entitiesRect);
     }
     yorcvs::Window<yorcvs::SDL2> *parentWindow;
     yorcvs::ECS *appECS;
@@ -68,7 +71,7 @@ class Application
         world.add_component<spriteComponent>(
             entities[0].id,
             {{0.0f, 0.0f}, {160.0f, 160.0f}, {0, 64, 32, 32}, r.create_texture("assets/test_player_sheet.png")});
-        world.add_component<animationComponent>(entities[0].id, {0, 8, 0.0f, 10.0f});
+        world.add_component<animationComponent>(entities[0].id, {0, 8, 0.0f, 60.0f});
 
         entities.emplace_back(&world);
         world.add_component<hitboxComponent>(entities[1].id, {{0, 0, 160, 160}});
@@ -167,7 +170,7 @@ class Application
     DebugInfo dbInfo{&r, &world};
     yorcvs::Timer counter;
 
-    static constexpr float msPF = 16.6f;
+    static constexpr float msPF = 0.160f;
     float lag = 0.0f;
 
     std::vector<yorcvs::Entity> entities;
