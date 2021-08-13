@@ -390,6 +390,11 @@ template <> class Window<yorcvs::SDL2>
     void setup_texture(yorcvs::Text<yorcvs::SDL2> &text)
     {
         TTF_Font *font = TTF_OpenFont(text.fontPath.c_str(), text.charSize);
+        if(font == nullptr)
+        {
+            yorcvs::log("FONT " +  text.fontPath + " could not be found",yorcvs::MSGSEVERITY::ERROR);
+            return;
+        }
         SDL_Surface *textSurf = TTF_RenderText_Blended_Wrapped(font, text.message.c_str(), text.color, text.lineLength);
         text.SDLtex = std::unique_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(renderer, textSurf));
         SDL_FreeSurface(textSurf);

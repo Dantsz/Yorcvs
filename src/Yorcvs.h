@@ -23,25 +23,47 @@ namespace yorcvs
 class DebugInfo
 {
   public:
-    DebugInfo(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS)
+    DebugInfo(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms)
     {
         parentWindow = parentW;
         appECS = pECS;
-        frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", 255, 255, 255, 255, 100, 1000);
-        ecsEntities = parentWindow->create_text("assets/font.ttf", "Active Entities : ",255,255,255,255,100,1000);
+        playerMoveSystem = pms;
+        frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", 255, 255, 255, 255, 100, 10000);
+        ecsEntities = parentWindow->create_text("assets/font.ttf", "Active Entities : ", 255, 255, 255, 255, 100, 10000);
+        playerPosition = parentWindow->create_text("assets/font.ttf", "NO PLAYER FOUND ", 255, 255, 255, 255, 100, 10000);
     }
 
     void update(float ft)
     {
 
         parentWindow->set_text_message(frameTime, "Frame Time : " + std::to_string(ft));
-        parentWindow->set_text_message(ecsEntities,"Active Entities : " + std::to_string(appECS->get_active_entities_number()));
+        parentWindow->set_text_message(ecsEntities,
+                                       "Active Entities : " + std::to_string(appECS->get_active_entities_number()));
+        // set player position text
+
+        if (playerMoveSystem->entityList->entitiesID.empty())
+        {
+             parentWindow->set_text_message(
+                playerPosition,"NO PLAYER FOUND");
+        }
+        else
+        {
+            parentWindow->set_text_message(
+                playerPosition,
+                "Player position : X = " +
+                    std::to_string(appECS->get_component<positionComponent>(playerMoveSystem->entityList->entitiesID[0]).position.x) +
+                    " Y = " + std::to_string(appECS->get_component<positionComponent>(playerMoveSystem->entityList->entitiesID[0]).position.y));
+        }
     }
 
     void render() const
     {
-        parentWindow->draw_text(frameTime, FTRect);
-        parentWindow->draw_text(ecsEntities,entitiesRect);
+        if(parentWindow->is_key_pressed({SDL_SCANCODE_E}))
+        {
+            parentWindow->draw_text(frameTime, FTRect);
+            parentWindow->draw_text(ecsEntities, entitiesRect);
+            parentWindow->draw_text(playerPosition, pPositionRect);
+        }
     }
     yorcvs::Window<yorcvs::SDL2> *parentWindow;
     yorcvs::ECS *appECS;
@@ -50,7 +72,11 @@ class DebugInfo
     yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
 
     yorcvs::Text<yorcvs::SDL2> ecsEntities;
-    yorcvs::Rect<float> entitiesRect = {0,25,150,25};
+    yorcvs::Rect<float> entitiesRect = {0, 25, 150, 25};
+
+    yorcvs::Text<yorcvs::graphics> playerPosition;
+    yorcvs::Rect<float> pPositionRect = {0, 50, 300, 25};
+    PlayerMovementControl *playerMoveSystem;
 };
 /**
  * @brief Main game class
@@ -109,20 +135,19 @@ class Application
 
     void updateMT(float dt)
     {
-                    pcS.updateControls();
+        pcS.updateControls();
 
-            collisionS.update(dt);
+        collisionS.update(dt);
 
-            auto velAsync = std::async(&VelocitySystem::update, velocityS, dt);
+        auto velAsync = std::async(&VelocitySystem::update, velocityS, dt);
 
-            auto velAnims = std::async(&AnimationSystem::update, animS, dt);
-            healthS.update(dt);
-            pcS.updateAnimations();
-            
-            velAsync.get();
-            velAnims.get();
+        auto velAnims = std::async(&AnimationSystem::update, animS, dt);
+        healthS.update(dt);
+        pcS.updateAnimations();
+
+        velAsync.get();
+        velAnims.get();
     }
-
 
     void run()
     {
@@ -147,7 +172,6 @@ class Application
         r.present();
     }
 
-
     [[nodiscard]] bool is_active() const
     {
         return r.isActive;
@@ -167,7 +191,7 @@ class Application
     SpriteSystem sprS;
     AnimationSystem animS;
     HealthSystem healthS;
-    DebugInfo dbInfo{&r, &world};
+    DebugInfo dbInfo{&r, &world, &pcS};
     yorcvs::Timer counter;
 
     static constexpr float msPF = 0.160f;
@@ -175,6 +199,5 @@ class Application
 
     std::vector<yorcvs::Entity> entities;
     // debug stuff
-    
 };
 } // namespace yorcvs
