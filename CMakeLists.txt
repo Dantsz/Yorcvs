@@ -27,7 +27,6 @@ find_package(SDL2_ttf REQUIRED)
 
 set(YorcvsALLFILES  "src/Yorcvs.cpp"
                     "src/Yorcvs.h"
-                    "src/systemsSDL2.h"
                     "src/systems.h"
                   
                     "src/common/assetmanager.h"
