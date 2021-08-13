@@ -145,28 +145,6 @@ class Application
         r.present();
     }
 
-    void runMT()
-    {
-        float elapsed = counter.get_ticks<float, std::chrono::nanoseconds>();
-        elapsed /= 1000000.0f;
-        dbInfo.update(elapsed);
-        counter.start();
-        lag += elapsed;
-
-        r.handle_events();
-
-        while (lag >= msPF)
-        {
-            updateMT(lag);
-            lag -= msPF;
-        }
-
-        r.clear();
-
-        sprS.renderSprites();
-        dbInfo.render();
-        r.present();
-    }
 
     [[nodiscard]] bool is_active() const
     {
