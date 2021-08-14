@@ -36,7 +36,11 @@ class DebugInfo
 
     void update(float ft)
     {
-
+        if(parentWindow->is_key_pressed({SDL_SCANCODE_R}))
+        {
+           reset();
+        }
+        
         parentWindow->set_text_message(frameTime, "Frame Time : " + std::to_string(ft));
 
         if(ft > maxFrameTime)
@@ -64,10 +68,12 @@ class DebugInfo
         }
     }
 
-    void render() const
+    void render(float elapsed) 
     {
+        
         if(parentWindow->is_key_pressed({SDL_SCANCODE_E}))
         {
+            update(elapsed);
             parentWindow->draw_text(frameTime, FTRect);
             parentWindow->draw_text(maxframeTimeTX,maxFTRect);
             parentWindow->draw_text(ecsEntities, entitiesRect);
@@ -110,39 +116,39 @@ class Application
     {
         r.init("TEst", 960, 480);
         entities.emplace_back(&world);
-        world.add_component<hitboxComponent>(entities[0].id, {{15, 6, 6, 11}});
+        world.add_component<hitboxComponent>(entities[0].id, {{14, 6, 6, 20}});
         world.add_component<positionComponent>(entities[0].id, {{0, 0}});
         world.add_component<velocityComponent>(entities[0].id, {{0.0f, 0.0f}, {false, false}});
         world.add_component<playerMovementControlledComponent>(entities[0].id, {});
         world.add_component<spriteComponent>(
             entities[0].id,
             {{0.0f, 0.0f}, {32.0f, 32.0f}, {0, 64, 32, 32}, r.create_texture("assets/test_player_sheet.png")});
-        world.add_component<animationComponent>(entities[0].id, {0, 8, 0.0f, 60.0f});
+        world.add_component<animationComponent>(entities[0].id, {0, 8, 0.0f, 500.0f});
 
         entities.emplace_back(&world);
-        world.add_component<hitboxComponent>(entities[1].id, {{0, 0, 160, 160}});
-        world.add_component<positionComponent>(entities[1].id, {{500, 100}});
+        world.add_component<hitboxComponent>(entities[1].id, {{0, 0, 30, 30}});
+        world.add_component<positionComponent>(entities[1].id, {{30, 30}});
         world.add_component<spriteComponent>(
-            entities[1].id, {{0.0f, 0.0f}, {160.0f, 160.0f}, {0, 0, 200, 200}, r.create_texture("assets/lettuce.png")});
+            entities[1].id, {{0.0f, 0.0f}, {30.0f, 30.0f}, {0, 0, 200, 200}, r.create_texture("assets/lettuce.png")});
 
         entities.emplace_back(&world);
-        world.add_component<hitboxComponent>(entities[2].id, {{0, 0, 160, 160}});
-        world.add_component<positionComponent>(entities[2].id, {{660, 100}});
+        world.add_component<hitboxComponent>(entities[2].id, {{0, 0, 30, 30}});
+        world.add_component<positionComponent>(entities[2].id, {{60, 30}});
         world.add_component<spriteComponent>(
-            entities[2].id, {{0.0f, 0.0f}, {160.0f, 160.0f}, {0, 0, 200, 200}, r.create_texture("assets/lettuce.png")});
+            entities[2].id, {{0.0f, 0.0f}, {30.0f, 30.0f}, {0, 0, 200, 200}, r.create_texture("assets/lettuce.png")});
 
         entities.emplace_back(&world);
-        world.add_component<hitboxComponent>(entities[3].id, {{0, 0, 160, 160}});
-        world.add_component<positionComponent>(entities[3].id, {{500, 260}});
+        world.add_component<hitboxComponent>(entities[3].id, {{0, 0, 30, 30}});
+        world.add_component<positionComponent>(entities[3].id, {{30, 60}});
         world.add_component<spriteComponent>(
-            entities[3].id, {{0.0f, 0.0f}, {160.0f, 160.0f}, {0, 0, 200, 200}, r.create_texture("assets/lettuce.png")});
+            entities[3].id, {{0.0f, 0.0f}, {30.0f, 30.0f}, {0, 0, 200, 200}, r.create_texture("assets/lettuce.png")});
         counter.start();
     }
     Application(const Application &other) = delete;
     Application(Application &&other) = delete;
     Application &operator=(const Application &other) = delete;
     Application &operator=(Application &&other) = delete;
-
+    
     void update(float dt)
     {
         
@@ -167,36 +173,32 @@ class Application
 
         velAsync.get();
         velAnims.get();
+        counter.start();
     }
 
     void run()
     {
         float elapsed = counter.get_ticks<float, std::chrono::nanoseconds>();
         elapsed /= 1000000.0f;
-        if(r.is_key_pressed({SDL_SCANCODE_R}))
-        {
-            dbInfo.reset();
-        }
-        dbInfo.update(elapsed);
+        
+        counter.stop();
         counter.start();
         lag += elapsed;
-
+     
         r.handle_events();
-
-        //don't skip more than 5 frames
        
-        pcS.updateControls(render_dimensions);
+     
         while (lag >= msPF)
-        {
-            update(lag);
+        {   
+            pcS.updateControls(render_dimensions);
+            update(msPF);
             lag -= msPF;
         }
 
         r.clear();
 
         sprS.renderSprites(render_dimensions);
-        
-        dbInfo.render();
+        dbInfo.render(elapsed);
         r.present();
     }
 
@@ -222,10 +224,10 @@ class Application
     DebugInfo dbInfo{&r, &world, &pcS};
     yorcvs::Timer counter;
 
-    static constexpr float msPF = 0.160f;
+    static constexpr float msPF = 16.6f;
     float lag = 0.0f;
     yorcvs::Vec2<float> render_dimensions = {120.0f,60.0f};// how much to render
-
+   
     std::vector<yorcvs::Entity> entities;
     // debug stuff
 };
