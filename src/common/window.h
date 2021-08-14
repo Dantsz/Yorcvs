@@ -57,8 +57,22 @@ template <typename interface> class Window
 {
   public:
     void Init(const char *name, size_t w, size_t h);
-    void set_size(size_t w, size_t h);
     void cleanup();
+
+    /**
+     * @brief Set the size 
+     * 
+     * @param w width
+     * @param h height
+     */
+    void set_size(size_t w, size_t h);
+
+    /**
+     * @brief Get the window size
+     * 
+     * @return yorcvs::Vec2<float> 
+     */
+    yorcvs::Vec2<float> get_size();
 
     /**
      * @brief Renders a sprite to the screen with the specified parameters
@@ -246,6 +260,34 @@ template <typename interface> class Window
      * @param newOffset the offset
      */
     void set_drawing_offset(const yorcvs::Vec2<float>& newOffset);
+
+    /**
+     * @brief Set the viewport 
+     * 
+     * @param viewport Area to be drawn
+     */
+    void set_viewport(const yorcvs::Rect<float>& viewport);
+
+    /**
+     * @brief Get the viewport 
+     * 
+     * @return yorcvs::Rect<float> the viewport
+     */
+    yorcvs::Rect<float> get_viewport();
+
+    /**
+     * @brief Set the render scale 
+     * 
+     * @param scale The scale x and y
+     */
+    void set_render_scale(const yorcvs::Vec2<float>& scale);
+    
+    /**
+     * @brief Get the render scale 
+     * 
+     * @return yorcvs::Vec2<float> Render scale
+     */
+    yorcvs::Vec2<float> get_render_scale();
 
 
     /**

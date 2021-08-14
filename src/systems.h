@@ -353,7 +353,7 @@ class PlayerMovementControl
                                           positionComponent, spriteComponent>();
     }
 
-    void updateControls()
+    void updateControls(const yorcvs::Vec2<float> render_size)
     {
 
         w_pressed = window->is_key_pressed({SDL_SCANCODE_W});
@@ -364,7 +364,7 @@ class PlayerMovementControl
         for (const auto &ID : entityList->entitiesID)
         {
             window->set_drawing_offset(world->get_component<positionComponent>(ID).position -
-                                       (window->get_window_size() - world->get_component<spriteComponent>(ID).size) /
+                                       (render_size - world->get_component<spriteComponent>(ID).size) /
                                            2);
             dir = yorcvs::Vec2<float>(static_cast<float>(d_pressed) + static_cast<float>(a_pressed) * -1.0f,
                                       static_cast<float>(w_pressed) * -1.0f + static_cast<float>(s_pressed));
@@ -434,8 +434,11 @@ class SpriteSystem
         world->register_system<SpriteSystem>(*this);
         world->add_criteria_for_iteration<SpriteSystem, positionComponent, spriteComponent>();
     }
-    void renderSprites() const
+    void renderSprites(const  yorcvs::Vec2<float>& render_dimensions) const
     {
+        yorcvs::Vec2<float> rs = window->get_render_scale();
+        window->set_render_scale(window->get_size()/render_dimensions);
+   
         std::sort(entityList->entitiesID.begin(), entityList->entitiesID.end(), [&](size_t ID1, size_t ID2) {
             return (world->get_component<spriteComponent>(ID1).offset.y +
                     world->get_component<positionComponent>(ID1).position.y) <
@@ -451,7 +454,9 @@ class SpriteSystem
         }
         std::sort(entityList->entitiesID.begin(), entityList->entitiesID.end(),
                   [&](size_t ID1, size_t ID2) { return ID1 < ID2; });
-    }
+        window->set_render_scale(rs);
+    }   
+    
 
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;

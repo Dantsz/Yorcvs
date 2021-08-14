@@ -171,6 +171,14 @@ template <> class Window<yorcvs::SDL2>
         SDL_SetWindowSize(sdlWindow, static_cast<int>(width), static_cast<int>(height));
     }
 
+    yorcvs::Vec2<float> get_size()
+    {
+        int x = 0;
+        int y = 0;
+        SDL_GetWindowSize(sdlWindow,&x,&y);
+        return {static_cast<float>(x),static_cast<float>(y)};
+    }
+
     void cleanup()
     {
         assetm->cleanup();
@@ -382,6 +390,34 @@ template <> class Window<yorcvs::SDL2>
         int height = 0;
         SDL_GetWindowSize(sdlWindow, &width, &height);
         return yorcvs::Vec2<float>(static_cast<float>(width), static_cast<float>(height));
+    }
+
+    void set_viewport(const yorcvs::Rect<float>& viewport)
+    {
+        SDL_Rect vp = {static_cast<int>(viewport.x), static_cast<int>(viewport.y), static_cast<int>(viewport.w),
+                             static_cast<int>(viewport.h)};
+        SDL_RenderSetViewport(renderer,&vp);
+      
+    }
+
+    yorcvs::Rect<float> get_viewport()
+    {
+        SDL_Rect vp{};
+        SDL_RenderGetViewport(renderer,&vp);
+        return {static_cast<float>(vp.x),static_cast<float>(vp.y),static_cast<float>(vp.w),static_cast<float>(vp.h)};
+
+    }
+
+    void set_render_scale(const yorcvs::Vec2<float>& scale)
+    {
+        SDL_RenderSetScale(renderer,scale.x,scale.y);
+    }
+
+    yorcvs::Vec2<float> get_render_scale()
+    {
+        yorcvs::Vec2<float> scale{};
+        SDL_RenderGetScale(renderer,&scale.x,&scale.y);
+        return scale;
     }
 
     bool isActive = true;
