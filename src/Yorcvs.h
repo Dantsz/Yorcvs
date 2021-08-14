@@ -87,7 +87,7 @@ class DebugInfo
     }
     yorcvs::Window<yorcvs::SDL2> *parentWindow;
     yorcvs::ECS *appECS;
-
+   
     yorcvs::Text<yorcvs::SDL2> frameTime;
     yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
     
@@ -102,8 +102,8 @@ class DebugInfo
     yorcvs::Rect<float> pPositionRect = {0, 75, 300, 25};
     PlayerMovementControl *playerMoveSystem;
 
-    
 };
+
 /**
  * @brief Main game class
  *
@@ -152,8 +152,8 @@ class Application
     void update(float dt)
     {
         
-        collisionS.update(dt);
-        velocityS.update(dt);
+        collisionS.update();
+        velocityS.update();
         animS.update(dt);
         healthS.update(dt);
         pcS.updateAnimations();
@@ -163,9 +163,9 @@ class Application
     {
         
 
-        collisionS.update(dt);
+        collisionS.update();
 
-        auto velAsync = std::async(&VelocitySystem::update, velocityS, dt);
+        auto velAsync = std::async(&VelocitySystem::update, velocityS);
 
         auto velAnims = std::async(&AnimationSystem::update, animS, dt);
         healthS.update(dt);
@@ -187,7 +187,7 @@ class Application
      
         r.handle_events();
        
-     
+       
         while (lag >= msPF)
         {   
             pcS.updateControls(render_dimensions);
