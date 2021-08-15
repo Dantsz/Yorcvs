@@ -29,24 +29,27 @@ class DebugInfo
         appECS = pECS;
         playerMoveSystem = pms;
         frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", 255, 255, 255, 255, 100, 10000);
-        maxframeTimeTX = parentWindow->create_text("assets/font.ttf", "Max Frame Time : ", 255, 255, 255, 255, 100, 10000);
-        ecsEntities = parentWindow->create_text("assets/font.ttf", "Active Entities : ", 255, 255, 255, 255, 100, 10000);
-        playerPosition = parentWindow->create_text("assets/font.ttf", "NO PLAYER FOUND ", 255, 255, 255, 255, 100, 10000);
+        maxframeTimeTX =
+            parentWindow->create_text("assets/font.ttf", "Max Frame Time : ", 255, 255, 255, 255, 100, 10000);
+        ecsEntities =
+            parentWindow->create_text("assets/font.ttf", "Active Entities : ", 255, 255, 255, 255, 100, 10000);
+        playerPosition =
+            parentWindow->create_text("assets/font.ttf", "NO PLAYER FOUND ", 255, 255, 255, 255, 100, 10000);
     }
 
     void update(float ft)
     {
-        if(parentWindow->is_key_pressed({SDL_SCANCODE_R}))
+        if (parentWindow->is_key_pressed({SDL_SCANCODE_R}))
         {
-           reset();
+            reset();
         }
-        
+
         parentWindow->set_text_message(frameTime, "Frame Time : " + std::to_string(ft));
 
-        if(ft > maxFrameTime)
+        if (ft > maxFrameTime)
         {
             maxFrameTime = ft;
-            parentWindow->set_text_message(maxframeTimeTX,"Max Frame Time: " + std::to_string(maxFrameTime));
+            parentWindow->set_text_message(maxframeTimeTX, "Max Frame Time: " + std::to_string(maxFrameTime));
         }
 
         parentWindow->set_text_message(ecsEntities,
@@ -55,27 +58,29 @@ class DebugInfo
 
         if (playerMoveSystem->entityList->entitiesID.empty())
         {
-             parentWindow->set_text_message(
-                playerPosition,"NO PLAYER FOUND");
+            parentWindow->set_text_message(playerPosition, "NO PLAYER FOUND");
         }
         else
         {
             parentWindow->set_text_message(
                 playerPosition,
                 "Player position : X = " +
-                    std::to_string(appECS->get_component<positionComponent>(playerMoveSystem->entityList->entitiesID[0]).position.x) +
-                    " Y = " + std::to_string(appECS->get_component<positionComponent>(playerMoveSystem->entityList->entitiesID[0]).position.y));
+                    std::to_string(appECS->get_component<positionComponent>(playerMoveSystem->entityList->entitiesID[0])
+                                       .position.x) +
+                    " Y = " +
+                    std::to_string(appECS->get_component<positionComponent>(playerMoveSystem->entityList->entitiesID[0])
+                                       .position.y));
         }
     }
 
-    void render(float elapsed) 
+    void render(float elapsed)
     {
-        
-        if(parentWindow->is_key_pressed({SDL_SCANCODE_E}))
+
+        if (parentWindow->is_key_pressed({SDL_SCANCODE_E}))
         {
             update(elapsed);
             parentWindow->draw_text(frameTime, FTRect);
-            parentWindow->draw_text(maxframeTimeTX,maxFTRect);
+            parentWindow->draw_text(maxframeTimeTX, maxFTRect);
             parentWindow->draw_text(ecsEntities, entitiesRect);
             parentWindow->draw_text(playerPosition, pPositionRect);
         }
@@ -87,10 +92,10 @@ class DebugInfo
     }
     yorcvs::Window<yorcvs::SDL2> *parentWindow;
     yorcvs::ECS *appECS;
-   
+
     yorcvs::Text<yorcvs::SDL2> frameTime;
     yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
-    
+
     float maxFrameTime = 0.0f;
     yorcvs::Text<yorcvs::SDL2> maxframeTimeTX;
     yorcvs::Rect<float> maxFTRect = {0, 25, 150, 25};
@@ -101,7 +106,6 @@ class DebugInfo
     yorcvs::Text<yorcvs::graphics> playerPosition;
     yorcvs::Rect<float> pPositionRect = {0, 75, 300, 25};
     PlayerMovementControl *playerMoveSystem;
-
 };
 
 /**
@@ -112,9 +116,10 @@ class Application
 {
   public:
     Application()
-        :r("Yorcvs",960,480), collisionS(&world), velocityS(&world), pcS(&world, &r), sprS(&world, &r), animS(&world), healthS(&world),dbInfo{&r, &world, &pcS}
+        : r("Yorcvs", 960, 480), collisionS(&world), velocityS(&world), pcS(&world, &r), sprS(&world, &r),
+          animS(&world), healthS(&world), dbInfo{&r, &world, &pcS}
     {
-        
+
         entities.emplace_back(&world);
         world.add_component<hitboxComponent>(entities[0].id, {{28, 12, 12, 40}});
         world.add_component<positionComponent>(entities[0].id, {{0, 0}});
@@ -148,10 +153,10 @@ class Application
     Application(Application &&other) = delete;
     Application &operator=(const Application &other) = delete;
     Application &operator=(Application &&other) = delete;
-    
+
     void update(float dt)
     {
-        
+
         collisionS.update();
         velocityS.update();
         animS.update(dt);
@@ -161,7 +166,6 @@ class Application
 
     void updateMT(float dt)
     {
-        
 
         collisionS.update();
 
@@ -180,16 +184,15 @@ class Application
     {
         float elapsed = counter.get_ticks<float, std::chrono::nanoseconds>();
         elapsed /= 1000000.0f;
-        
+
         counter.stop();
         counter.start();
         lag += elapsed;
-     
+
         r.handle_events();
-       
-       
+
         while (lag >= msPF)
-        {   
+        {
             pcS.updateControls(render_dimensions);
             update(msPF);
             lag -= msPF;
@@ -226,8 +229,8 @@ class Application
 
     static constexpr float msPF = 16.6f;
     float lag = 0.0f;
-    yorcvs::Vec2<float> render_dimensions = {240.0f,120.0f};// how much to render
-   
+    yorcvs::Vec2<float> render_dimensions = {240.0f, 120.0f}; // how much to render
+
     std::vector<yorcvs::Entity> entities;
     // debug stuff
 };

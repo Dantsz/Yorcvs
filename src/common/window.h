@@ -56,13 +56,13 @@ template <typename interface> class Key
 template <typename interface> class Window
 {
   public:
-    Window(const char* name , size_t width , size_t height);
+    Window(const char *name, size_t width, size_t height);
 
     void cleanup();
 
     /**
-     * @brief Set the size 
-     * 
+     * @brief Set the size
+     *
      * @param w width
      * @param h height
      */
@@ -70,8 +70,8 @@ template <typename interface> class Window
 
     /**
      * @brief Get the window size
-     * 
-     * @return yorcvs::Vec2<float> 
+     *
+     * @return yorcvs::Vec2<float>
      */
     yorcvs::Vec2<float> get_size();
 
@@ -84,29 +84,29 @@ template <typename interface> class Window
      * @param angle angle of the texture(default is 0)
      */
     void draw_sprite(const std::string &path, const yorcvs::Rect<float> &dstRect, const yorcvs::Rect<size_t> &srcRect,
-                    double angle = 0.0);
+                     double angle = 0.0);
 
     /**
      * @brief Renders a sprite to the screen with the specified parameters
-     * 
+     *
      * @param path path to the texture
      * @param dstRectPos position of the texture
      * @param dstRectSize size of the texture
      * @param srcRect  part of the texture to be drawn
      * @param angle angle of the texture(default is 0)
      */
-    void draw_sprite(const std::string &path, const yorcvs::Vec2<float>& dstRectPos , const yorcvs::Vec2<float>& dstRectSize, const yorcvs::Rect<size_t> &srcRect,
-                    double angle = 0.0);
+    void draw_sprite(const std::string &path, const yorcvs::Vec2<float> &dstRectPos,
+                     const yorcvs::Vec2<float> &dstRectSize, const yorcvs::Rect<size_t> &srcRect, double angle = 0.0);
 
     /**
      * @brief Creates a Texture object,
-     *  
+     *
      * @param path - path to the texture
      * @return Texture<interface>
      * NOTE: CREATED TEXTURE IS MANAGED BY THE WINDOW CLASS
      */
     Texture<interface> create_texture(const std::string &path);
-  
+
     /**
      * @brief Renders the texture to the screen
      *
@@ -116,19 +116,19 @@ template <typename interface> class Window
      * @param angle  angle of the sprite
      */
     void draw_texture(const Texture<interface> &texture, const yorcvs::Rect<float> &dstRect,
-                     const yorcvs::Rect<size_t> &srcRect, double angle = 0.0);
+                      const yorcvs::Rect<size_t> &srcRect, double angle = 0.0);
 
     /**
      * @brief Renders the texture to the screen
-     * 
+     *
      * @param texture the texture object
      * @param dstRectPos position of the texture
      * @param dstRectSize size of the texture
      * @param srcRect what part of the sprite to draw
      * @param angle angle of the sprite
      */
-    void draw_texture(const Texture<interface> &texture, const yorcvs::Vec2<float>& dstRectPos ,const yorcvs::Vec2<float>& dstRectSize,
-                     const yorcvs::Rect<size_t> &srcRect, double angle = 0.0);
+    void draw_texture(const Texture<interface> &texture, const yorcvs::Vec2<float> &dstRectPos,
+                      const yorcvs::Vec2<float> &dstRectSize, const yorcvs::Rect<size_t> &srcRect, double angle = 0.0);
 
     /**
      * @brief Create a Text Texture object
@@ -141,11 +141,11 @@ template <typename interface> class Window
      * @param a  alpha
      * @param charSize  the resolution of a glyph
      * @param lineLength  length of a line before a break
-     * @return std::shared_ptr<Texture<interfaceWindow>>  the texture 
+     * @return std::shared_ptr<Texture<interfaceWindow>>  the texture
      * passed to draw_texture
      */
     Text<interface> create_text(const std::string &path, const std::string &message, unsigned char r, unsigned char g,
-                               unsigned char b, unsigned char a, size_t charSize, size_t lineLength);
+                                unsigned char b, unsigned char a, size_t charSize, size_t lineLength);
 
     /**
      * @brief Draws the text to the screen, fitting it in dstRect
@@ -257,52 +257,51 @@ template <typename interface> class Window
 
     /**
      * @brief Set the  the offset at which the drawing will happen
-     * 
+     *
      * @param newOffset the offset
      */
-    void set_drawing_offset(const yorcvs::Vec2<float>& newOffset);
+    void set_drawing_offset(const yorcvs::Vec2<float> &newOffset);
 
     /**
      * @brief Get the drawing offset
-     * 
+     *
      * @return yorcvs::Vec2<float> the offset
      */
     yorcvs::Vec2<float> get_drawing_offset();
 
     /**
-     * @brief Set the viewport 
-     * 
+     * @brief Set the viewport
+     *
      * @param viewport Area to be drawn
      */
-    void set_viewport(const yorcvs::Rect<float>& viewport);
+    void set_viewport(const yorcvs::Rect<float> &viewport);
 
     /**
-     * @brief Get the viewport 
-     * 
+     * @brief Get the viewport
+     *
      * @return yorcvs::Rect<float> the viewport
      */
     yorcvs::Rect<float> get_viewport();
 
     /**
-     * @brief Set the render scale 
-     * 
+     * @brief Set the render scale
+     *
      * @param scale The scale x and y
      */
-    void set_render_scale(const yorcvs::Vec2<float>& scale);
-    
+    void set_render_scale(const yorcvs::Vec2<float> &scale);
+
     /**
-     * @brief Get the render scale 
-     * 
+     * @brief Get the render scale
+     *
      * @return yorcvs::Vec2<float> Render scale
      */
     yorcvs::Vec2<float> get_render_scale();
 
-
     /**
-    * @brief Get the window size 
-    * 
-    * @return yorcvs::Vec2<float> the size
-    */
+     * @brief Get the window size
+     *
+     * @return yorcvs::Vec2<float> the size
+     */
     yorcvs::Vec2<float> get_window_size();
     bool isActive;
 

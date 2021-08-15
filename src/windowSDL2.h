@@ -88,7 +88,7 @@ template <> class Key<yorcvs::SDL2>
 template <> class Window<yorcvs::SDL2>
 {
   public:
-    Window<yorcvs::SDL2>(const char* name , size_t width , size_t height)
+    Window<yorcvs::SDL2>(const char *name, size_t width, size_t height)
     {
         SDL_version sdlversion{};
         SDL_GetVersion(&sdlversion);
@@ -126,15 +126,15 @@ template <> class Window<yorcvs::SDL2>
             yorcvs::log("Error initializing SDL2_TTF", yorcvs::MSGSEVERITY::ERROR);
         }
 
-        sdlWindow = SDL_CreateWindow(name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                     static_cast<int>(width), static_cast<int>(height), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+        sdlWindow = SDL_CreateWindow(name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, static_cast<int>(width),
+                                     static_cast<int>(height), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
         if (sdlWindow == nullptr)
         {
             yorcvs::log("Error creating SDL2 window", yorcvs::MSGSEVERITY::ERROR);
         }
-        
+
         renderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
-        
+
         if (renderer == nullptr)
         {
             yorcvs::log("Error creating SDL2 renderer", yorcvs::MSGSEVERITY::ERROR);
@@ -168,7 +168,6 @@ template <> class Window<yorcvs::SDL2>
             },
             [](SDL_Texture *p) { SDL_DestroyTexture(p); });
     }
-   
 
     void set_size(size_t width, size_t height) const
     {
@@ -179,8 +178,8 @@ template <> class Window<yorcvs::SDL2>
     {
         int x = 0;
         int y = 0;
-        SDL_GetWindowSize(sdlWindow,&x,&y);
-        return {static_cast<float>(x),static_cast<float>(y)};
+        SDL_GetWindowSize(sdlWindow, &x, &y);
+        return {static_cast<float>(x), static_cast<float>(y)};
     }
 
     void cleanup()
@@ -284,7 +283,7 @@ template <> class Window<yorcvs::SDL2>
             SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
                                 static_cast<int>(srcRect.h)};
             SDL_FRect dest = {static_cast<float>(dstRectPos.x - offset.x), static_cast<float>(dstRectPos.y - offset.y),
-                             static_cast<float>(dstRectSize.x), static_cast<float>(dstRectSize.y)};
+                              static_cast<float>(dstRectSize.x), static_cast<float>(dstRectSize.y)};
             SDL_RenderCopyExF(renderer, texture.SDLtex.get(), &sourceR, &dest, angle, nullptr, SDL_FLIP_NONE);
         }
     }
@@ -396,31 +395,29 @@ template <> class Window<yorcvs::SDL2>
         return yorcvs::Vec2<float>(static_cast<float>(width), static_cast<float>(height));
     }
 
-    void set_viewport(const yorcvs::Rect<float>& viewport)
+    void set_viewport(const yorcvs::Rect<float> &viewport)
     {
         SDL_Rect vp = {static_cast<int>(viewport.x), static_cast<int>(viewport.y), static_cast<int>(viewport.w),
-                             static_cast<int>(viewport.h)};
-        SDL_RenderSetViewport(renderer,&vp);
-      
+                       static_cast<int>(viewport.h)};
+        SDL_RenderSetViewport(renderer, &vp);
     }
 
     yorcvs::Rect<float> get_viewport()
     {
         SDL_Rect vp{};
-        SDL_RenderGetViewport(renderer,&vp);
-        return {static_cast<float>(vp.x),static_cast<float>(vp.y),static_cast<float>(vp.w),static_cast<float>(vp.h)};
-
+        SDL_RenderGetViewport(renderer, &vp);
+        return {static_cast<float>(vp.x), static_cast<float>(vp.y), static_cast<float>(vp.w), static_cast<float>(vp.h)};
     }
 
-    void set_render_scale(const yorcvs::Vec2<float>& scale)
+    void set_render_scale(const yorcvs::Vec2<float> &scale)
     {
-        SDL_RenderSetScale(renderer,scale.x,scale.y);
+        SDL_RenderSetScale(renderer, scale.x, scale.y);
     }
 
     yorcvs::Vec2<float> get_render_scale()
     {
         yorcvs::Vec2<float> scale{};
-        SDL_RenderGetScale(renderer,&scale.x,&scale.y);
+        SDL_RenderGetScale(renderer, &scale.x, &scale.y);
         return scale;
     }
 
@@ -430,9 +427,9 @@ template <> class Window<yorcvs::SDL2>
     void setup_texture(yorcvs::Text<yorcvs::SDL2> &text)
     {
         TTF_Font *font = TTF_OpenFont(text.fontPath.c_str(), text.charSize);
-        if(font == nullptr)
+        if (font == nullptr)
         {
-            yorcvs::log("FONT " +  text.fontPath + " could not be found",yorcvs::MSGSEVERITY::ERROR);
+            yorcvs::log("FONT " + text.fontPath + " could not be found", yorcvs::MSGSEVERITY::ERROR);
             return;
         }
         SDL_Surface *textSurf = TTF_RenderText_Blended_Wrapped(font, text.message.c_str(), text.color, text.lineLength);

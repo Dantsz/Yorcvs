@@ -940,10 +940,9 @@ class ECS
         std::vector<bool> signature = get_system_signature<sys>();
 
         // reset criteria
-
-        for (size_t i = 0; i < signature.size(); i++)
+        for (auto && i : signature)
         {
-            signature[i] = false;
+            i = false;
         }
 
         // get the id of the component
