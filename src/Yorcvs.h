@@ -116,32 +116,32 @@ class Application
     {
         r.init("TEst", 960, 480);
         entities.emplace_back(&world);
-        world.add_component<hitboxComponent>(entities[0].id, {{14, 6, 6, 20}});
+        world.add_component<hitboxComponent>(entities[0].id, {{28, 12, 12, 40}});
         world.add_component<positionComponent>(entities[0].id, {{0, 0}});
         world.add_component<velocityComponent>(entities[0].id, {{0.0f, 0.0f}, {false, false}});
         world.add_component<playerMovementControlledComponent>(entities[0].id, {});
         world.add_component<spriteComponent>(
             entities[0].id,
-            {{0.0f, 0.0f}, {32.0f, 32.0f}, {0, 64, 32, 32}, r.create_texture("assets/test_player_sheet.png")});
-        world.add_component<animationComponent>(entities[0].id, {0, 8, 0.0f, 500.0f});
+            {{0.0f, 0.0f}, {64.0f, 64.0f}, {0, 128, 64, 64}, r.create_texture("assets/test_player_sheet.png")});
+        world.add_component<animationComponent>(entities[0].id, {0, 8, 0.0f, 100.0f});
 
         entities.emplace_back(&world);
-        world.add_component<hitboxComponent>(entities[1].id, {{0, 0, 30, 30}});
-        world.add_component<positionComponent>(entities[1].id, {{30, 30}});
+        world.add_component<hitboxComponent>(entities[1].id, {{0, 0, 60, 60}});
+        world.add_component<positionComponent>(entities[1].id, {{60, 60}});
         world.add_component<spriteComponent>(
-            entities[1].id, {{0.0f, 0.0f}, {30.0f, 30.0f}, {0, 0, 200, 200}, r.create_texture("assets/lettuce.png")});
+            entities[1].id, {{0.0f, 0.0f}, {60.0f, 60.0f}, {0, 0, 200, 200}, r.create_texture("assets/lettuce.png")});
 
         entities.emplace_back(&world);
-        world.add_component<hitboxComponent>(entities[2].id, {{0, 0, 30, 30}});
-        world.add_component<positionComponent>(entities[2].id, {{60, 30}});
+        world.add_component<hitboxComponent>(entities[2].id, {{0, 0, 60, 60}});
+        world.add_component<positionComponent>(entities[2].id, {{120, 60}});
         world.add_component<spriteComponent>(
-            entities[2].id, {{0.0f, 0.0f}, {30.0f, 30.0f}, {0, 0, 200, 200}, r.create_texture("assets/lettuce.png")});
+            entities[2].id, {{0.0f, 0.0f}, {60.0f, 60.0f}, {0, 0, 200, 200}, r.create_texture("assets/lettuce.png")});
 
         entities.emplace_back(&world);
-        world.add_component<hitboxComponent>(entities[3].id, {{0, 0, 30, 30}});
-        world.add_component<positionComponent>(entities[3].id, {{30, 60}});
+        world.add_component<hitboxComponent>(entities[3].id, {{0, 0, 60, 60}});
+        world.add_component<positionComponent>(entities[3].id, {{60, 120}});
         world.add_component<spriteComponent>(
-            entities[3].id, {{0.0f, 0.0f}, {30.0f, 30.0f}, {0, 0, 200, 200}, r.create_texture("assets/lettuce.png")});
+            entities[3].id, {{0.0f, 0.0f}, {60.0f, 60.0f}, {0, 0, 200, 200}, r.create_texture("assets/lettuce.png")});
         counter.start();
     }
     Application(const Application &other) = delete;
@@ -226,7 +226,7 @@ class Application
 
     static constexpr float msPF = 16.6f;
     float lag = 0.0f;
-    yorcvs::Vec2<float> render_dimensions = {120.0f,60.0f};// how much to render
+    yorcvs::Vec2<float> render_dimensions = {240.0f,120.0f};// how much to render
    
     std::vector<yorcvs::Entity> entities;
     // debug stuff

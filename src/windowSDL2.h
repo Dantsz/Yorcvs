@@ -13,6 +13,8 @@
 #include "common/log.h"
 #include "common/window.h"
 
+#include <SDL_render.h>
+#include <SDL_video.h>
 #include <vector>
 
 #include <SDL.h>
@@ -125,13 +127,14 @@ template <> class Window<yorcvs::SDL2>
         }
 
         sdlWindow = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                     static_cast<int>(width), static_cast<int>(height), SDL_WINDOW_OPENGL);
+                                     static_cast<int>(width), static_cast<int>(height), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
         if (sdlWindow == nullptr)
         {
             yorcvs::log("Error creating SDL2 window", yorcvs::MSGSEVERITY::ERROR);
         }
-
+        
         renderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
+        
         if (renderer == nullptr)
         {
             yorcvs::log("Error creating SDL2 renderer", yorcvs::MSGSEVERITY::ERROR);
@@ -279,9 +282,9 @@ template <> class Window<yorcvs::SDL2>
             // NOTE: SDL_rendercopyF exists for >SDL 2.0.10
             SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
                                 static_cast<int>(srcRect.h)};
-            SDL_Rect dest = {static_cast<int>(dstRectPos.x - offset.x), static_cast<int>(dstRectPos.y - offset.y),
-                             static_cast<int>(dstRectSize.x), static_cast<int>(dstRectSize.y)};
-            SDL_RenderCopyEx(renderer, texture.SDLtex.get(), &sourceR, &dest, angle, nullptr, SDL_FLIP_NONE);
+            SDL_FRect dest = {static_cast<float>(dstRectPos.x - offset.x), static_cast<float>(dstRectPos.y - offset.y),
+                             static_cast<float>(dstRectSize.x), static_cast<float>(dstRectSize.y)};
+            SDL_RenderCopyExF(renderer, texture.SDLtex.get(), &sourceR, &dest, angle, nullptr, SDL_FLIP_NONE);
         }
     }
 
