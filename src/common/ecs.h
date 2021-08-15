@@ -58,6 +58,27 @@ template <typename systemt> concept systemT = requires(systemt sys)
     {sys.entityList->entitiesID.size()};
 };
 
+// virtual container for polymorphism
+class VContainer
+{
+  public:
+    virtual ~VContainer() = default;
+    VContainer() = default;
+    VContainer(VContainer &other) = default;
+    VContainer(VContainer &&other) = default;
+    VContainer &operator=(VContainer &other) = delete;
+    VContainer &operator=(VContainer &&other) = delete;
+
+    virtual void add_component(size_t entityID) = 0;
+    virtual void on_entity_destroyed(size_t entityID) noexcept = 0;
+    virtual void copy_entity_component(size_t dstID, size_t srcID) = 0;
+
+    // lookup the component of a entity
+    // lookup the entity to component, it's now done through 2 vectors
+    std::vector<bool> entity_has_component{};
+    std::vector<size_t> entitytocomponent{};
+};
+
 /**
  * @brief Manages entity ids
  *
@@ -172,26 +193,7 @@ class EntityManager
     size_t lowestUnallocatedID = 0;
 };
 
-// virtual container for polymorphism
-class VContainer
-{
-  public:
-    virtual ~VContainer() = default;
-    VContainer() = default;
-    VContainer(VContainer &other) = default;
-    VContainer(VContainer &&other) = default;
-    VContainer &operator=(VContainer &other) = delete;
-    VContainer &operator=(VContainer &&other) = delete;
 
-    virtual void add_component(size_t entityID) = 0;
-    virtual void on_entity_destroyed(size_t entityID) noexcept = 0;
-    virtual void copy_entity_component(size_t dstID, size_t srcID) = 0;
-
-    // lookup the component of a entity
-    // lookup the entity to component, it's now done through 2 vectors
-    std::vector<bool> entity_has_component{};
-    std::vector<size_t> entitytocomponent{};
-};
 
 // contains..components
 template <typename T> class ComponentContainer final : public VContainer

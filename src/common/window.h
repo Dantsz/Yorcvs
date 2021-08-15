@@ -56,7 +56,8 @@ template <typename interface> class Key
 template <typename interface> class Window
 {
   public:
-    void Init(const char *name, size_t w, size_t h);
+    Window(const char* name , size_t width , size_t height);
+
     void cleanup();
 
     /**

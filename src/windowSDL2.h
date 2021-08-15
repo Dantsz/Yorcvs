@@ -88,7 +88,7 @@ template <> class Key<yorcvs::SDL2>
 template <> class Window<yorcvs::SDL2>
 {
   public:
-    void init(const std::string &name, size_t width, size_t height)
+    Window<yorcvs::SDL2>(const char* name , size_t width , size_t height)
     {
         SDL_version sdlversion{};
         SDL_GetVersion(&sdlversion);
@@ -126,7 +126,7 @@ template <> class Window<yorcvs::SDL2>
             yorcvs::log("Error initializing SDL2_TTF", yorcvs::MSGSEVERITY::ERROR);
         }
 
-        sdlWindow = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        sdlWindow = SDL_CreateWindow(name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                      static_cast<int>(width), static_cast<int>(height), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
         if (sdlWindow == nullptr)
         {
@@ -168,6 +168,7 @@ template <> class Window<yorcvs::SDL2>
             },
             [](SDL_Texture *p) { SDL_DestroyTexture(p); });
     }
+   
 
     void set_size(size_t width, size_t height) const
     {
@@ -445,7 +446,7 @@ template <> class Window<yorcvs::SDL2>
     SDL_Window *sdlWindow = nullptr;
     SDL_Renderer *renderer = nullptr;
     std::unique_ptr<AssetManager<SDL_Texture>> assetm = nullptr;
-    unsigned char const *keys;
+    unsigned char const *keys{};
     int mouseX{};
     int mouseY{};
     bool isMinimized = false;

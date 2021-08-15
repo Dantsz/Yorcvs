@@ -112,9 +112,9 @@ class Application
 {
   public:
     Application()
-        : collisionS(&world), velocityS(&world), pcS(&world, &r), sprS(&world, &r), animS(&world), healthS(&world)
+        :r("Yorcvs",960,480), collisionS(&world), velocityS(&world), pcS(&world, &r), sprS(&world, &r), animS(&world), healthS(&world),dbInfo{&r, &world, &pcS}
     {
-        r.init("TEst", 960, 480);
+        
         entities.emplace_back(&world);
         world.add_component<hitboxComponent>(entities[0].id, {{28, 12, 12, 40}});
         world.add_component<positionComponent>(entities[0].id, {{0, 0}});
@@ -221,7 +221,7 @@ class Application
     SpriteSystem sprS;
     AnimationSystem animS;
     HealthSystem healthS;
-    DebugInfo dbInfo{&r, &world, &pcS};
+    DebugInfo dbInfo;
     yorcvs::Timer counter;
 
     static constexpr float msPF = 16.6f;
