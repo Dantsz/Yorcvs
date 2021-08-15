@@ -12,6 +12,7 @@
 #include "Yorcvs.h"
 #include "common/ecs.h"
 #include "common/timer.h"
+#include "common/types.h"
 #include "systems.h"
 #include "windowSDL2.h"
 #include <cstdlib>
@@ -35,6 +36,7 @@ class DebugInfo
             parentWindow->create_text("assets/font.ttf", "Active Entities : ", 255, 255, 255, 255, 100, 10000);
         playerPosition =
             parentWindow->create_text("assets/font.ttf", "NO PLAYER FOUND ", 255, 255, 255, 255, 100, 10000);
+        playerHealth = parentWindow->create_text("assets/font.ttf", "Health : -/- ", 255, 255, 255, 255, 100, 10000);
     }
 
     void update(float ft)
@@ -59,17 +61,22 @@ class DebugInfo
         if (playerMoveSystem->entityList->entitiesID.empty())
         {
             parentWindow->set_text_message(playerPosition, "NO PLAYER FOUND");
+            parentWindow->set_text_message(playerHealth, "Health: -/-");
         }
         else
         {
+            size_t ID = playerMoveSystem->entityList->entitiesID[0];
             parentWindow->set_text_message(
                 playerPosition,
-                "Player position : X = " +
-                    std::to_string(appECS->get_component<positionComponent>(playerMoveSystem->entityList->entitiesID[0])
-                                       .position.x) +
-                    " Y = " +
-                    std::to_string(appECS->get_component<positionComponent>(playerMoveSystem->entityList->entitiesID[0])
-                                       .position.y));
+                "Player position : X = " + std::to_string(appECS->get_component<positionComponent>(ID).position.x) +
+                    " Y = " + std::to_string(appECS->get_component<positionComponent>(ID).position.y));
+
+            if (appECS->has_components<healthComponent>(ID))
+            {
+                healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
+                parentWindow->set_text_message(playerHealth, "Health: " + std::to_string(playerHealthC.HP) + " / " +
+                                                                 std::to_string(playerHealthC.maxHP));
+            }
         }
     }
 
@@ -83,6 +90,7 @@ class DebugInfo
             parentWindow->draw_text(maxframeTimeTX, maxFTRect);
             parentWindow->draw_text(ecsEntities, entitiesRect);
             parentWindow->draw_text(playerPosition, pPositionRect);
+            parentWindow->draw_text(playerHealth, playerHealthRect);
         }
     }
 
@@ -105,6 +113,10 @@ class DebugInfo
 
     yorcvs::Text<yorcvs::graphics> playerPosition;
     yorcvs::Rect<float> pPositionRect = {0, 75, 300, 25};
+
+    yorcvs::Text<yorcvs::graphics> playerHealth;
+    yorcvs::Rect<float> playerHealthRect = {0, 100, 200, 25};
+
     PlayerMovementControl *playerMoveSystem;
 };
 
@@ -129,6 +141,7 @@ class Application
             entities[0].id,
             {{0.0f, 0.0f}, {64.0f, 64.0f}, {0, 128, 64, 64}, r.create_texture("assets/test_player_sheet.png")});
         world.add_component<animationComponent>(entities[0].id, {0, 8, 0.0f, 100.0f});
+        world.add_component<healthComponent>(entities[0].id,{5,10,0.1f,false});
 
         entities.emplace_back(&world);
         world.add_component<hitboxComponent>(entities[1].id, {{0, 0, 60, 60}});
