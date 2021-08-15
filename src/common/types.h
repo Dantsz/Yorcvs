@@ -275,3 +275,9 @@ template <typename T> std::istream &operator>>(std::istream &is, yorcvs::Vec2<T>
 
     return is;
 }
+
+template <typename T> std::ostream &operator<<(std::ostream &os, const yorcvs::Rect<T> &rect) 
+{
+    os << rect.x << ' ' << rect.y << ' ' << rect.w << ' ' << rect.h;
+    return os;
+}

@@ -262,6 +262,13 @@ template <typename interface> class Window
     void set_drawing_offset(const yorcvs::Vec2<float>& newOffset);
 
     /**
+     * @brief Get the drawing offset
+     * 
+     * @return yorcvs::Vec2<float> the offset
+     */
+    yorcvs::Vec2<float> get_drawing_offset();
+
+    /**
      * @brief Set the viewport 
      * 
      * @param viewport Area to be drawn
