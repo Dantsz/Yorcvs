@@ -622,7 +622,7 @@ class ECS
     ECS &operator=(ECS &&other) = delete;
     ~ECS() noexcept
     {
-        yorcvs::log("Destroying ECS", yorcvs::MSGSEVERITY::INFO);
+        yorcvs::log("Destroying ECS...", yorcvs::MSGSEVERITY::INFO);
         if (componentmanager != nullptr)
         {
             componentmanager.reset();

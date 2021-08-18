@@ -242,7 +242,7 @@ class Application
 
     static constexpr float msPF = 16.6f;
     float lag = 0.0f;
-    yorcvs::Vec2<float> render_dimensions = {240.0f, 120.0f}; // how much to render
+    yorcvs::Vec2<float> render_dimensions = {480.0f, 240.0f}; // how much to render
 
     std::vector<yorcvs::Entity> entities;
     // debug stuff

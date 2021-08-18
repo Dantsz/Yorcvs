@@ -9,6 +9,7 @@
 class CollisionSystem
 {
   public:
+  
     CollisionSystem(yorcvs::ECS *parent)
     {
         world = parent;
