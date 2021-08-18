@@ -57,7 +57,10 @@ template <> class Text<yorcvs::SDL2>
     std::unique_ptr<SDL_Texture> SDLtex = nullptr;
     std::string message;
     std::string fontPath;
-    SDL_Color color = {255, 255, 255, 255};
+
+    static constexpr SDL_Color defaultColor = {255,255,255,255};
+
+    SDL_Color color = defaultColor;
     int charSize = 0;
     uint32_t lineLength = 0;
 };
