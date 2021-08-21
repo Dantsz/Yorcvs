@@ -1,0 +1,1 @@
+Checks: 'cert-* , modernize-* , performance-*, readability-*, portability-*, cppcoreguidelines-*'
