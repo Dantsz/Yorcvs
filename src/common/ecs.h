@@ -980,7 +980,12 @@ class ECS
         }
         return entities;
     }
-
+    /**
+     * @brief Adds all components of source to the destinations and copies their data, if the source has any components, they are destroyed before the copying
+     * 
+     * @param dstEntityID destination
+     * @param srcEntityID source
+     */
     void copy_component_to_from_entity(const size_t dstEntityID, const size_t srcEntityID)
     {
         componentmanager->copy_component_to_from_entity(dstEntityID, srcEntityID);
