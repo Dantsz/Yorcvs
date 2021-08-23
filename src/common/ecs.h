@@ -9,7 +9,7 @@
  * 
  */
 #pragma once
-#include "log.h"
+#include "utilities.h"
 #include <algorithm>
 #include <memory>
 #include <queue>

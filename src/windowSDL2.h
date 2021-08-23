@@ -10,7 +10,7 @@
  */
 #pragma once
 #include "common/assetmanager.h"
-#include "common/log.h"
+#include "common/utilities.h"
 #include "common/window.h"
 
 #include <SDL_render.h>
