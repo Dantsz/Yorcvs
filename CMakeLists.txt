@@ -6,6 +6,31 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 message(STATUS ${CMAKE_SYSTEM_NAME})
+
+
+set(YorcvsALLFILES  "src/Yorcvs.cpp"
+                    "src/Yorcvs.h"
+                    "src/systems.h"
+                  
+                    "src/common/assetmanager.h"
+
+                    "src/common/types.h"
+                    "src/common/utilities.h"
+                    "src/common/ecs.h"
+                    
+                    "src/components.h"
+
+                    "src/common/window.h"
+                    "src/windowSDL2.h"
+                    )
+
+
+add_executable(Yorcvs ${YorcvsALLFILES})
+
+if(EMSCRIPTEN)
+
+else()
+
 #set SDL for windows
 if(WIN32)
     set(SDL2MAIN_LIBRARY "C:/SDL2/lib/x64/SDL2main.lib")
@@ -25,28 +50,10 @@ find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 
-set(YorcvsALLFILES  "src/Yorcvs.cpp"
-                    "src/Yorcvs.h"
-                    "src/systems.h"
-                  
-                    "src/common/assetmanager.h"
-
-                    "src/common/types.h"
-                    "src/common/utilities.h"
-                    "src/common/ecs.h"
-                    
-                    "src/components.h"
-
-                    "src/common/window.h"
-                    "src/windowSDL2.h"
-                    )
-
-add_executable(Yorcvs ${YorcvsALLFILES})
-
-
 
 target_link_libraries(${PROJECT_NAME} SDL2::Main SDL2::Image SDL2::TTF)
 
+endif()
 
 
 target_compile_options(Yorcvs PRIVATE

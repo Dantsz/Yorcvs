@@ -2,8 +2,8 @@
 #include <cassert>
 struct Transform
 {
-    float x; 
-    float y;
+    float x{}; 
+    float y{};
     int id = 0;
 };
 

@@ -3,8 +3,8 @@
 
 struct Transform
 {
-    float x; 
-    float y;
+    float x{}; 
+    float y{};
     int id = 0;
 };
 
@@ -21,7 +21,7 @@ class TestSystem
     {
         parent = pare;
     }
-    void test()
+    void test() const
     {
         for(const auto& i : entityList->entitiesID)
         {
@@ -41,7 +41,7 @@ class SecondTestSystem
     {
         parent = pare;
     }
-    void test()
+    void test() const
     {
         for(const auto& i : entityList->entitiesID)
         {
