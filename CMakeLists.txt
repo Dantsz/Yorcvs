@@ -34,11 +34,10 @@ $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -Wmisleading-indentation -Wdup
 $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wno-c++98-compat-pedantic -Wno-c++98-compat>
 )
 
-
+#link SDL
 if(EMSCRIPTEN)
 SET(CMAKE_CXX_FLAGS "-std=c++2a -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='[\"png\"]'  -s USE_SDL_TTF=2  -s ALLOW_MEMORY_GROWTH=1 -o build/Yorcvs.html" )
 else()
-
 #set SDL for windows
 if(WIN32)
     set(SDL2MAIN_LIBRARY "C:/SDL2/lib/x64/SDL2main.lib")
@@ -51,16 +50,22 @@ if(WIN32)
 endif()
  
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
-
-
-
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
-
-
 target_link_libraries(${PROJECT_NAME} SDL2::Main SDL2::Image SDL2::TTF)
-
 endif()
 
+include(FetchContent)
 
+FetchContent_Declare(json
+  GIT_REPOSITORY https://github.com/nlohmann/json.git
+  GIT_TAG v3.7.3)
+
+FetchContent_GetProperties(json)
+if(NOT json_POPULATED)
+  FetchContent_Populate(json)
+  add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
+target_link_libraries(${PROJECT_NAME}  nlohmann_json::nlohmann_json)

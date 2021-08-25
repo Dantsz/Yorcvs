@@ -18,6 +18,7 @@
 #include <cstdlib>
 #include <future>
 #include <thread>
+#include <nlohmann/json.hpp>
 
 namespace yorcvs
 {
@@ -26,6 +27,7 @@ class DebugInfo
   public:
     DebugInfo(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms)
     {
+        
         parentWindow = parentW;
         appECS = pECS;
         playerMoveSystem = pms;
@@ -37,6 +39,22 @@ class DebugInfo
         playerPosition =
             parentWindow->create_text("assets/font.ttf", "NO PLAYER FOUND ", 255, 255, 255, 255, 100, 10000);
         playerHealth = parentWindow->create_text("assets/font.ttf", "Health : -/- ", 255, 255, 255, 255, 100, 10000);
+        //TODO: remove this test
+        nlohmann::json j2 = {
+        {"pi", 3.141},
+        {"happy", true},
+        {"name", "Niels"},
+        {"nothing", nullptr},
+        {"answer", {
+            {"everything", 42}
+        }},
+        {"list", {1, 0, 2}},
+        {"object", {
+            {"currency", "USD"},
+            {"value", 42.99}
+        }}
+        };
+        std::cout<< j2.dump(2) << '\n';
     }
 
     void update(float ft)
