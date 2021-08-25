@@ -22,11 +22,15 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       - uses: mymindstorm/setup-emsdk@v9
+      #install ninja
+      - name: install ninja
+        run: sudo apt-get install ninja
+        
         
       #Compile emscripten
       - name: configure cmake
         working-directory: ${{github.workspace}}
-        run: emcmake cmake -B build
+        run: emcmake cmake -B build -G ninja
       - name: build
         run: cmake --build ${{github.workspace}}/build
       
