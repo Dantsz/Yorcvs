@@ -24,6 +24,7 @@ jobs:
       - uses: mymindstorm/setup-emsdk@v9
         with: 
           version: tot
+      - run: emcc -v
       #install ninja
       - name: install ninja
         run: sudo apt-get install ninja-build
