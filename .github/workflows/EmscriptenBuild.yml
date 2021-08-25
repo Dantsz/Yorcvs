@@ -22,6 +22,8 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       - uses: mymindstorm/setup-emsdk@v9
+        with: 
+          version: 2.0.25
       #install ninja
       - name: install ninja
         run: sudo apt-get install ninja-build
