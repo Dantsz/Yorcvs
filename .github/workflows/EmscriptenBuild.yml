@@ -24,7 +24,9 @@ jobs:
       - uses: mymindstorm/setup-emsdk@v9
         
       #Compile emscripten
-      - name: Compile
+      - name: configure cmake
         working-directory: ${{github.workspace}}
-        run: em++ src/Yorcvs.cpp -std=c++20 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["png"]'  -s USE_SDL_TTF=2  --embed-file assets  -s ALLOW_MEMORY_GROWTH=1 -o a.html
+        run: emcmake cmake -B build
+      - name: build
+        run: cmake --build ${{github.workspace}}/build
       
