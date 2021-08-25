@@ -27,8 +27,16 @@ set(YorcvsALLFILES  "src/Yorcvs.cpp"
 
 add_executable(Yorcvs ${YorcvsALLFILES})
 
-if(EMSCRIPTEN)
 
+target_compile_options(Yorcvs PRIVATE
+$<$<CXX_COMPILER_ID:MSVC>:/W4 /fsanitize=address /Zi /DEBUG>
+$<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -std=c++2a>
+$<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wno-c++98-compat-pedantic -Wno-c++98-compat>
+)
+
+
+if(EMSCRIPTEN)
+SET(CMAKE_CXX_FLAGS "-std=c++2a -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='[\"png\"]'  -s USE_SDL_TTF=2  -s ALLOW_MEMORY_GROWTH=1 -o build/Yorcvs.html" )
 else()
 
 #set SDL for windows
@@ -56,8 +64,3 @@ target_link_libraries(${PROJECT_NAME} SDL2::Main SDL2::Image SDL2::TTF)
 endif()
 
 
-target_compile_options(Yorcvs PRIVATE
-$<$<CXX_COMPILER_ID:MSVC>:/W4 /fsanitize=address /Zi /DEBUG>
-$<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -std=c++2a>
-$<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wno-c++98-compat-pedantic -Wno-c++98-compat>
-)
