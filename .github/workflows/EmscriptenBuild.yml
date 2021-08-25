@@ -30,7 +30,7 @@ jobs:
       #Compile emscripten
       - name: configure cmake
         working-directory: ${{github.workspace}}
-        run: emcmake cmake -B build -G ninja
+        run: emcmake cmake -B build -G Ninja
       - name: build
         run: cmake --build ${{github.workspace}}/build
       
