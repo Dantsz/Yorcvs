@@ -15,7 +15,7 @@
 
 #include <SDL_render.h>
 #include <SDL_video.h>
-#include <vcruntime.h>
+
 #include <vector>
 
 #include <SDL.h>
