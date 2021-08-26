@@ -15,6 +15,7 @@
 
 #include <SDL_render.h>
 #include <SDL_video.h>
+#include <vcruntime.h>
 #include <vector>
 
 #include <SDL.h>
@@ -91,8 +92,12 @@ template <> class Key<yorcvs::SDL2>
 template <> class Window<yorcvs::SDL2>
 {
   public:
-    Window<yorcvs::SDL2>(const char *name, size_t width, size_t height)
+    Window<yorcvs::SDL2>()
     {
+        const char* name = "Yorcvs";
+        size_t width = 960;
+        size_t height = 480;
+        
         SDL_version sdlversion{};
         SDL_GetVersion(&sdlversion);
 

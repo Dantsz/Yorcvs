@@ -19,7 +19,7 @@
 #include <future>
 #include <thread>
 #include <nlohmann/json.hpp>
-
+#include <filesystem>
 namespace yorcvs
 {
 class DebugInfo
@@ -40,21 +40,7 @@ class DebugInfo
             parentWindow->create_text("assets/font.ttf", "NO PLAYER FOUND ", 255, 255, 255, 255, 100, 10000);
         playerHealth = parentWindow->create_text("assets/font.ttf", "Health : -/- ", 255, 255, 255, 255, 100, 10000);
         //TODO: remove this test
-        nlohmann::json j2 = {
-        {"pi", 3.141},
-        {"happy", true},
-        {"name", "Niels"},
-        {"nothing", nullptr},
-        {"answer", {
-            {"everything", 42}
-        }},
-        {"list", {1, 0, 2}},
-        {"object", {
-            {"currency", "USD"},
-            {"value", 42.99}
-        }}
-        };
-        std::cout<< j2.dump(2) << '\n';
+       
     }
 
     void update(float ft)
@@ -146,10 +132,10 @@ class Application
 {
   public:
     Application()
-        : r("Yorcvs", 960, 480), collisionS(&world), velocityS(&world), pcS(&world, &r), sprS(&world, &r),
+        : r(), collisionS(&world), velocityS(&world), pcS(&world, &r), sprS(&world, &r),
           animS(&world), healthS(&world), dbInfo{&r, &world, &pcS}
     {
-
+        
         entities.emplace_back(&world);
         world.add_component<hitboxComponent>(entities[0].id, {{28, 12, 12, 40}});
         world.add_component<positionComponent>(entities[0].id, {{0, 0}});
