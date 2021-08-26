@@ -19,7 +19,8 @@
 #include <future>
 #include <thread>
 #include <nlohmann/json.hpp>
-#include <filesystem>
+#include <filesystem>   
+#include <fstream>
 namespace yorcvs
 {
 class DebugInfo
@@ -135,7 +136,30 @@ class Application
         : r(), collisionS(&world), velocityS(&world), pcS(&world, &r), sprS(&world, &r),
           animS(&world), healthS(&world), dbInfo{&r, &world, &pcS}
     {
-        
+        //Load config
+        if(std::filesystem::exists(configname))
+        {
+            yorcvs::log("Loading config file...");
+            std::ifstream config_in(configname);
+            //NOTE: should read whole file in string
+            std::string confstr{(std::istreambuf_iterator<char>(config_in)),(std::istreambuf_iterator<char>())};
+            auto config = nlohmann::json::parse(confstr);
+            if(config.is_discarded())
+            {
+                yorcvs::log("Inavlid config file");
+            }
+            else {
+                r.set_size(config["window"]["width"], config["window"]["height"]);
+            }
+
+        }
+        else {
+            yorcvs::log("Config file not found, loading default settings...");
+        }
+
+
+
+
         entities.emplace_back(&world);
         world.add_component<hitboxComponent>(entities[0].id, {{28, 12, 12, 40}});
         world.add_component<positionComponent>(entities[0].id, {{0, 0}});
@@ -233,6 +257,9 @@ class Application
     }
 
   private:
+
+    static constexpr const char* configname = "yorcvsconfig.json";
+
     yorcvs::Window<yorcvs::SDL2> r;
     yorcvs::ECS world{};
     CollisionSystem collisionS;

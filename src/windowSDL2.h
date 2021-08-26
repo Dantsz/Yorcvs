@@ -95,9 +95,12 @@ template <> class Window<yorcvs::SDL2>
     Window<yorcvs::SDL2>()
     {
         const char* name = "Yorcvs";
-        size_t width = 960;
-        size_t height = 480;
+        const size_t width = 960;
+        const size_t height = 480;
         
+
+
+
         SDL_version sdlversion{};
         SDL_GetVersion(&sdlversion);
 
