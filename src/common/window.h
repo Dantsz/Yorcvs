@@ -303,6 +303,14 @@ template <typename interface> class Window
      * @return yorcvs::Vec2<float> the size
      */
     yorcvs::Vec2<float> get_window_size();
+
+    /**
+     * @brief Loads settings from yorcvsconfig.json
+     * 
+     */
+    void serialize_settings();
+
+
     bool isActive;
 
   private:

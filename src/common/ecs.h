@@ -992,7 +992,7 @@ class ECS
         std::vector<bool> newSignature = get_entity_signature(srcEntityID);
         systemmanager->on_entity_signature_change(dstEntityID, newSignature);
     }
-
+    //NOTE: DEBUG FUNCTIONS
     /**
      * @brief Get the number of active entities
      * 
@@ -1001,6 +1001,20 @@ class ECS
     [[nodiscard]]size_t get_active_entities_number() const
     {
         return entitymanager->lowestUnallocatedID - entitymanager->freedIndices.size();
+    }
+    /**
+     * @brief Get a list of names corresponding to registered components
+     * 
+     * @return std::vector<std::string> Components registered to the ECS
+     */
+    [[nodiscard]]std::vector<std::string> get_registered_components_name()
+    {
+        std::vector<std::string> names{};
+        for(const auto &i : componentmanager->component_type)
+        {
+            names.emplace_back(i.first);
+        }
+        return names;
     }
   private:
     std::unique_ptr<yorcvs::ComponentManager> componentmanager;

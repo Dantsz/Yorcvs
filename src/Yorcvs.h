@@ -148,7 +148,8 @@ class Application
             {
                 yorcvs::log("Inavlid config file");
             }
-            else {
+            else if(!config["window"]["width"].is_discarded() && !config["window"]["height"].is_discarded())
+            {
                 r.set_size(config["window"]["width"], config["window"]["height"]);
             }
 
@@ -188,6 +189,12 @@ class Application
         world.add_component<positionComponent>(entities[3].id, {{60, 120}});
         world.add_component<spriteComponent>(
             entities[3].id, {{0.0f, 0.0f}, {60.0f, 60.0f}, {0, 0, 200, 200}, r.create_texture("assets/lettuce.png")});
+
+        auto components = world.get_registered_components_name();
+        for(const auto &i : components)
+        {
+            std::cout<< i << '\n';
+        }
         counter.start();
     }
     Application(const Application &other) = delete;
