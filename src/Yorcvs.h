@@ -19,8 +19,11 @@
 #include <future>
 #include <thread>
 #include <nlohmann/json.hpp>
+namespace json = nlohmann;
 #include <filesystem>   
 #include <fstream>
+
+
 namespace yorcvs
 {
 class DebugInfo
@@ -143,7 +146,7 @@ class Application
             std::ifstream config_in(configname);
             //NOTE: should read whole file in string
             std::string confstr{(std::istreambuf_iterator<char>(config_in)),(std::istreambuf_iterator<char>())};
-            auto config = nlohmann::json::parse(confstr);
+            auto config = json::json::parse(confstr);
             if(config.is_discarded())
             {
                 yorcvs::log("Inavlid config file");
@@ -162,16 +165,24 @@ class Application
 
 
         entities.emplace_back(&world);
-        world.add_component<hitboxComponent>(entities[0].id, {{28, 12, 12, 40}});
+        std::ifstream playerIN ("assets/player.json");
+        std::string playerData{(std::istreambuf_iterator<char>(playerIN)),(std::istreambuf_iterator<char>())};
+        auto player = json::json::parse(playerData);
+
+        world.add_component<hitboxComponent>(entities[0].id, {{player["hitbox"]["x"], player["hitbox"]["y"], player["hitbox"]["w"], player["hitbox"]["h"]}});
         world.add_component<positionComponent>(entities[0].id, {{0, 0}});
         world.add_component<velocityComponent>(entities[0].id, {{0.0f, 0.0f}, {false, false}});
         world.add_component<playerMovementControlledComponent>(entities[0].id, {});
         world.add_component<spriteComponent>(
             entities[0].id,
-            {{0.0f, 0.0f}, {64.0f, 64.0f}, {0, 128, 64, 64}, r.create_texture("assets/test_player_sheet.png")});
+            {{player["sprite"]["offset"]["x"], player["sprite"]["offset"]["y"]}, {player["sprite"]["size"]["x"], player["sprite"]["size"]["y"]}, 
+            {player["sprite"]["srcRect"]["x"], player["sprite"]["srcRect"]["y"], player["sprite"]["srcRect"]["w"], player["sprite"]["srcRect"]["h"]},
+            r.create_texture(player["sprite"]["spriteName"])});
         world.add_component<animationComponent>(entities[0].id, {0, 8, 0.0f, 100.0f});
         world.add_component<healthComponent>(entities[0].id,{5,10,0.1f,false});
 
+
+        
         entities.emplace_back(&world);
         world.add_component<hitboxComponent>(entities[1].id, {{0, 0, 60, 60}});
         world.add_component<positionComponent>(entities[1].id, {{60, 60}});
@@ -190,11 +201,7 @@ class Application
         world.add_component<spriteComponent>(
             entities[3].id, {{0.0f, 0.0f}, {60.0f, 60.0f}, {0, 0, 200, 200}, r.create_texture("assets/lettuce.png")});
 
-        auto components = world.get_registered_components_name();
-        for(const auto &i : components)
-        {
-            std::cout<< i << '\n';
-        }
+    
         counter.start();
     }
     Application(const Application &other) = delete;

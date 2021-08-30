@@ -399,12 +399,12 @@ class PlayerMovementControl
             else if (world->get_component<velocityComponent>(ID).facing.x)
             {
                 world->get_component<spriteComponent>(ID).srcRect.y =
-                    0 * world->get_component<spriteComponent>(ID).srcRect.h;
+                    1 * world->get_component<spriteComponent>(ID).srcRect.h;
             }
             else
             {
                 world->get_component<spriteComponent>(ID).srcRect.y =
-                    1 * world->get_component<spriteComponent>(ID).srcRect.h;
+                    0 * world->get_component<spriteComponent>(ID).srcRect.h;
             }
         }
     }
