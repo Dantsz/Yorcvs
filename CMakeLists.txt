@@ -69,3 +69,17 @@ if(NOT json_POPULATED)
 endif()
 
 target_link_libraries(${PROJECT_NAME}  nlohmann_json::nlohmann_json)
+
+
+FetchContent_Declare(libtmxlite
+ GIT_REPOSITORY https://github.com/fallahn/tmxlite.git
+)
+FetchContent_GetProperties(libtmxlite)
+if(NOT libtmxlite_POPULATED)
+ FetchContent_Populate(libtmxlite)
+ set(libtmxlite_SOURCE_DIR  ${libtmxlite_SOURCE_DIR}/tmxlite)
+ set(TMXLITE_STATIC_LIB true)
+ add_subdirectory(${libtmxlite_SOURCE_DIR} ${libtmxlite_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+target_link_libraries(${PROJECT_NAME}  tmxlite)
+

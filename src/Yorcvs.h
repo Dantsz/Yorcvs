@@ -22,7 +22,7 @@
 namespace json = nlohmann;
 #include <filesystem>   
 #include <fstream>
-
+#include <tmxlite/Map.hpp>
 
 namespace yorcvs
 {
@@ -162,8 +162,10 @@ class Application
         }
 
 
-
-
+        tmx::Map map;
+        map.load("assets/map.tmx");
+        yorcvs::log(std::to_string(map.getVersion().upper) + ' ' + std::to_string(map.getVersion().lower));
+            
         entities.emplace_back(&world);
         std::ifstream playerIN ("assets/player.json");
         std::string playerData{(std::istreambuf_iterator<char>(playerIN)),(std::istreambuf_iterator<char>())};
