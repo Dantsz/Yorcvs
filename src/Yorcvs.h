@@ -17,7 +17,7 @@
 #include "windowSDL2.h"
 #include <cstdlib>
 #include <future>
-#include <thread>
+
 #include <nlohmann/json.hpp>
 namespace json = nlohmann;
 #include <filesystem>   
@@ -220,8 +220,7 @@ class Application
         healthS.update(dt);
         pcS.updateAnimations();
     }
-
-    void updateMT(float dt)
+        void updateMT(float dt)
     {
 
         collisionS.update();

@@ -222,11 +222,11 @@ class VelocitySystem
             world->get_component<velocityComponent>(ID).vel = {0, 0};
             if (std::abs(posOF.x) > std::numeric_limits<float>::epsilon())
             {
-                world->get_component<velocityComponent>(ID).facing.x = (posOF.x > 0.0f);
+                world->get_component<velocityComponent>(ID).facing.x = (posOF.x < 0.0f);
             }
             if (std::abs(posOF.y) > std::numeric_limits<float>::epsilon())
             {
-                world->get_component<velocityComponent>(ID).facing.y = (posOF.y > 0.0f);
+                world->get_component<velocityComponent>(ID).facing.y = (posOF.y < 0.0f);
             }
         }
     }

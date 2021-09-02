@@ -172,9 +172,18 @@ template <> class Window<yorcvs::SDL2>
         yorcvs::log("creating texture manager");
         assetm = std::make_unique<yorcvs::AssetManager<SDL_Texture>>(
             [&](const std::string &path) {
-                SDL_Surface *surf = IMG_Load(path.c_str());
+                SDL_Surface *surf;
+                SDL_RWops* rwop = SDL_RWFromFile(path.c_str(),"rb");
+         
+                surf = IMG_Load_RW(rwop,1);
+                if(surf == nullptr)
+                {
+                    yorcvs::log(IMG_GetError(),yorcvs::MSGSEVERITY::ERROR);
+                }
                 SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, surf);
+              
                 SDL_FreeSurface(surf);
+            
                 return tex;
             },
             [](SDL_Texture *p) { SDL_DestroyTexture(p); });
