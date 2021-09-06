@@ -14,11 +14,16 @@
 #include "common/utilities.h"
 #include "common/types.h"
 #include "systems.h"
+#include "tmxlite/Layer.hpp"
+#include "tmxlite/TileLayer.hpp"
+#include "tmxlite/Tileset.hpp"
 #include "windowSDL2.h"
 #include <cstdlib>
 #include <future>
 
 #include <nlohmann/json.hpp>
+#include <string>
+#include <vector>
 namespace json = nlohmann;
 #include <filesystem>   
 #include <fstream>
@@ -128,6 +133,104 @@ class DebugInfo
     PlayerMovementControl *playerMoveSystem;
 };
 
+struct Tile
+{
+    yorcvs::Vec2<float> coords;
+    yorcvs::Rect<size_t> srcRect;
+    std::string texture_path;
+};
+
+
+class Map
+{
+    public:
+    void load(const std::string& path)
+    {
+        yorcvs::log("Loading map: " + path);
+        tmx::Map map{};
+        if(!map.load(path))
+        {
+            yorcvs::log("Map loading failed", yorcvs::MSGSEVERITY::ERROR);
+        }
+        const auto& tilesets = map.getTilesets();
+        yorcvs::log("Map contains " + std::to_string(tilesets.size()) + " tile sets: ");
+        for(const auto& tileset : tilesets)
+        {
+            yorcvs::log(tileset.getImagePath());
+        }    
+        if(!map.isInfinite())
+        {
+          yorcvs::log("Cannot load non-infinte maps",yorcvs::MSGSEVERITY::ERROR);
+        }
+        tilesSize = {static_cast<float>(map.getTileSize().x),static_cast<float>(map.getTileSize().y)};
+        const auto& layers = map.getLayers();
+        for(const auto& layer : layers) //parse layers
+        {
+            if(layer->getType() == tmx::Layer::Type::Tile)
+            {
+               const auto& tileLayer = layer->getLayerAs<tmx::TileLayer>();
+               const auto& chunks = tileLayer.getChunks();
+               
+               for(const auto& chunk : chunks) // parse chunks
+               {
+                   yorcvs::Vec2<float> chunk_position = {static_cast<float>(chunk.position.x),static_cast<float>(chunk.position.y)};
+                   for(auto chunk_y = 0 ; chunk_y < chunk.size.y; chunk_y++)
+                   {
+                       for(auto chunk_x = 0 ; chunk_x < chunk.size.x;chunk_x++)
+                       {
+                           //parse tiles
+                           const size_t tileIndex = chunk_y * chunk.size.x  + chunk_x;
+                           if(chunk.tiles[tileIndex].ID == 0)
+                           {
+                             continue;
+                           } 
+                           //chunk.tiles[tileIndex].ID;
+                           //find tileset
+                           tmx::Tileset const* tile_set = nullptr;
+                           for(const auto& tileset : map.getTilesets())
+                           {
+                             if(tileset.hasTile(chunk.tiles[tileIndex].ID))
+                             {
+                                tile_set = &tileset;
+                             }   
+                           }
+                          
+                           //put the tile in the vector
+                           yorcvs::Tile tile{};
+                           tile.texture_path  = tile_set->getImagePath();
+                           tile.coords = chunk_position * tilesSize  + tilesSize * yorcvs::Vec2<float>{static_cast<float>(chunk_x),static_cast<float>(chunk_y)};
+                           tile.srcRect.x = ((chunk.tiles[tileIndex].ID - tile_set->getFirstGID()) % tile_set->getColumnCount()) * tile_set->getTileSize().x;
+                           tile.srcRect.y = ((chunk.tiles[tileIndex].ID - tile_set->getFirstGID()) % (tile_set->getTileCount()/ tile_set->getColumnCount())) * tile_set->getTileSize().x;
+                           tile.srcRect.w = tile_set->getTileSize().x;
+                           tile.srcRect.h = tile_set->getTileSize().y;
+                           tiles.push_back(tile);
+                       }    
+                   }
+                   
+               }
+
+            }
+        }
+    }
+
+    void render_tiles(yorcvs::Window<yorcvs::graphics>& window)
+    {
+      yorcvs::Vec2<float> render_dimensions = {480.0f, 240.0f};
+      yorcvs::Vec2<float> rs = window.get_render_scale();
+      window.set_render_scale(window.get_size()/render_dimensions);
+      for(const auto& tile : tiles)
+      {
+          window.draw_sprite(tile.texture_path,{tile.coords.x,tile.coords.y,tilesSize.x,tilesSize.y},tile.srcRect);
+      }
+      window.set_render_scale(rs);
+    }
+    private:
+    std::string tilesetPath; 
+    yorcvs::Vec2<float> tilesSize;
+    std::vector<yorcvs::Tile> tiles;
+
+};
+
 /**
  * @brief Main game class
  *
@@ -161,11 +264,9 @@ class Application
             yorcvs::log("Config file not found, loading default settings...");
         }
 
-
-        tmx::Map map;
+        
         map.load("assets/map.tmx");
-        yorcvs::log(std::to_string(map.getVersion().upper) + ' ' + std::to_string(map.getVersion().lower));
-            
+     
         entities.emplace_back(&world);
         std::ifstream playerIN ("assets/player.json");
         std::string playerData{(std::istreambuf_iterator<char>(playerIN)),(std::istreambuf_iterator<char>())};
@@ -220,7 +321,7 @@ class Application
         healthS.update(dt);
         pcS.updateAnimations();
     }
-        void updateMT(float dt)
+    void updateMT(float dt)
     {
 
         collisionS.update();
@@ -255,7 +356,7 @@ class Application
         }
 
         r.clear();
-
+        map.render_tiles(r);
         sprS.renderSprites(render_dimensions);
         dbInfo.render(elapsed);
         r.present();
@@ -291,6 +392,7 @@ class Application
     yorcvs::Vec2<float> render_dimensions = {480.0f, 240.0f}; // how much to render
 
     std::vector<yorcvs::Entity> entities;
+    yorcvs::Map map{};
     // debug stuff
 };
 } // namespace yorcvs
