@@ -168,8 +168,16 @@ class Map
         {
             if(layer->getType() == tmx::Layer::Type::Tile)
             {
-               const auto& tileLayer = layer->getLayerAs<tmx::TileLayer>();
-               const auto& chunks = tileLayer.getChunks();
+               auto& tileLayer = layer->getLayerAs<tmx::TileLayer>();
+               parse_tile_layer(map,tileLayer);
+
+            }
+        }
+    }
+
+    void parse_tile_layer(tmx::Map& map ,tmx::TileLayer& tileLayer)
+    {
+        const auto& chunks = tileLayer.getChunks();
                
                for(const auto& chunk : chunks) // parse chunks
                {
@@ -208,14 +216,11 @@ class Map
                    }
                    
                }
-
-            }
-        }
     }
 
-    void render_tiles(yorcvs::Window<yorcvs::graphics>& window)
+    void render_tiles(yorcvs::Window<yorcvs::graphics>& window,const yorcvs::Vec2<float>& render_dimensions)
     {
-      yorcvs::Vec2<float> render_dimensions = {480.0f, 240.0f};
+    
       yorcvs::Vec2<float> rs = window.get_render_scale();
       window.set_render_scale(window.get_size()/render_dimensions);
       for(const auto& tile : tiles)
@@ -285,25 +290,7 @@ class Application
         world.add_component<healthComponent>(entities[0].id,{5,10,0.1f,false});
 
 
-        
-        entities.emplace_back(&world);
-        world.add_component<hitboxComponent>(entities[1].id, {{0, 0, 60, 60}});
-        world.add_component<positionComponent>(entities[1].id, {{60, 60}});
-        world.add_component<spriteComponent>(
-            entities[1].id, {{0.0f, 0.0f}, {60.0f, 60.0f}, {0, 0, 200, 200}, r.create_texture("assets/lettuce.png")});
-
-        entities.emplace_back(&world);
-        world.add_component<hitboxComponent>(entities[2].id, {{0, 0, 60, 60}});
-        world.add_component<positionComponent>(entities[2].id, {{120, 60}});
-        world.add_component<spriteComponent>(
-            entities[2].id, {{0.0f, 0.0f}, {60.0f, 60.0f}, {0, 0, 200, 200}, r.create_texture("assets/lettuce.png")});
-
-        entities.emplace_back(&world);
-        world.add_component<hitboxComponent>(entities[3].id, {{0, 0, 60, 60}});
-        world.add_component<positionComponent>(entities[3].id, {{60, 120}});
-        world.add_component<spriteComponent>(
-            entities[3].id, {{0.0f, 0.0f}, {60.0f, 60.0f}, {0, 0, 200, 200}, r.create_texture("assets/lettuce.png")});
-
+ 
     
         counter.start();
     }
@@ -356,7 +343,7 @@ class Application
         }
 
         r.clear();
-        map.render_tiles(r);
+        map.render_tiles(r,render_dimensions);
         sprS.renderSprites(render_dimensions);
         dbInfo.render(elapsed);
         r.present();
