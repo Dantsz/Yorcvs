@@ -207,10 +207,18 @@ class Map
                            yorcvs::Tile tile{};
                            tile.texture_path  = tile_set->getImagePath();
                            tile.coords = chunk_position * tilesSize  + tilesSize * yorcvs::Vec2<float>{static_cast<float>(chunk_x),static_cast<float>(chunk_y)};
-                           tile.srcRect.x = ((chunk.tiles[tileIndex].ID - tile_set->getFirstGID()) % tile_set->getColumnCount()) * tile_set->getTileSize().x;
-                           tile.srcRect.y = ((chunk.tiles[tileIndex].ID - tile_set->getFirstGID()) % (tile_set->getTileCount()/ tile_set->getColumnCount())) * tile_set->getTileSize().x;
+                           tile.srcRect.x = ((chunk.tiles[tileIndex].ID - tile_set->getFirstGID()) % tile_set->getColumnCount() ) * tile_set->getTileSize().x;
+                           tile.srcRect.y = 0;
+                           size_t y_index = 0;
+                           while(y_index + tile_set->getColumnCount() < chunk.tiles[tileIndex].ID  )
+                           {
+                               y_index += tile_set->getColumnCount();
+                               tile.srcRect.y += tile_set->getTileSize().y;
+
+                           }
                            tile.srcRect.w = tile_set->getTileSize().x;
                            tile.srcRect.h = tile_set->getTileSize().y;
+
                            tiles.push_back(tile);
                        }    
                    }
