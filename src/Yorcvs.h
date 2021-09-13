@@ -11,8 +11,8 @@
 #pragma once
 #include "Yorcvs.h"
 #include "common/ecs.h"
-#include "common/utilities.h"
 #include "common/types.h"
+#include "common/utilities.h"
 #include "systems.h"
 #include "tmxlite/Layer.hpp"
 #include "tmxlite/TileLayer.hpp"
@@ -21,11 +21,12 @@
 #include <cstdlib>
 #include <future>
 
+
 #include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
 namespace json = nlohmann;
-#include <filesystem>   
+#include <filesystem>
 #include <fstream>
 #include <tmxlite/Map.hpp>
 
@@ -36,7 +37,7 @@ class DebugInfo
   public:
     DebugInfo(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms)
     {
-        
+
         parentWindow = parentW;
         appECS = pECS;
         playerMoveSystem = pms;
@@ -48,8 +49,7 @@ class DebugInfo
         playerPosition =
             parentWindow->create_text("assets/font.ttf", "NO PLAYER FOUND ", 255, 255, 255, 255, 100, 10000);
         playerHealth = parentWindow->create_text("assets/font.ttf", "Health : -/- ", 255, 255, 255, 255, 100, 10000);
-        //TODO: remove this test
-       
+        // TODO: remove this test
     }
 
     void update(float ft)
@@ -140,108 +140,130 @@ struct Tile
     std::string texture_path;
 };
 
-
 class Map
 {
-    public:
-    void load(const std::string& path)
+  public:
+    void load(const std::string &path)
     {
         yorcvs::log("Loading map: " + path);
         tmx::Map map{};
-        if(!map.load(path))
+        if (!map.load(path))
         {
             yorcvs::log("Map loading failed", yorcvs::MSGSEVERITY::ERROR);
         }
-        const auto& tilesets = map.getTilesets();
+        const auto &tilesets = map.getTilesets();
         yorcvs::log("Map contains " + std::to_string(tilesets.size()) + " tile sets: ");
-        for(const auto& tileset : tilesets)
+        for (const auto &tileset : tilesets)
         {
             yorcvs::log(tileset.getImagePath());
-        }    
-        if(!map.isInfinite())
-        {
-          yorcvs::log("Cannot load non-infinte maps",yorcvs::MSGSEVERITY::ERROR);
         }
-        tilesSize = {static_cast<float>(map.getTileSize().x),static_cast<float>(map.getTileSize().y)};
-        const auto& layers = map.getLayers();
-        for(const auto& layer : layers) //parse layers
+        if (!map.isInfinite())
         {
-            if(layer->getType() == tmx::Layer::Type::Tile)
+            yorcvs::log("Cannot load non-infinte maps", yorcvs::MSGSEVERITY::ERROR);
+        }
+        tilesSize = {static_cast<float>(map.getTileSize().x), static_cast<float>(map.getTileSize().y)};
+        const auto &layers = map.getLayers();
+        for (const auto &layer : layers) // parse layers
+        {
+            if (layer->getType() == tmx::Layer::Type::Tile)
             {
-               auto& tileLayer = layer->getLayerAs<tmx::TileLayer>();
-               parse_tile_layer(map,tileLayer);
-
+                auto &tileLayer = layer->getLayerAs<tmx::TileLayer>();
+                parse_tile_layer(map, tileLayer);
             }
         }
     }
 
-    void parse_tile_layer(tmx::Map& map ,tmx::TileLayer& tileLayer)
+    void parse_tile_layer(tmx::Map &map, tmx::TileLayer &tileLayer)
     {
-        const auto& chunks = tileLayer.getChunks();
-               
-               for(const auto& chunk : chunks) // parse chunks
-               {
-                   yorcvs::Vec2<float> chunk_position = {static_cast<float>(chunk.position.x),static_cast<float>(chunk.position.y)};
-                   for(auto chunk_y = 0 ; chunk_y < chunk.size.y; chunk_y++)
-                   {
-                       for(auto chunk_x = 0 ; chunk_x < chunk.size.x;chunk_x++)
-                       {
-                           //parse tiles
-                           const size_t tileIndex = chunk_y * chunk.size.x  + chunk_x;
-                           if(chunk.tiles[tileIndex].ID == 0)
-                           {
-                             continue;
-                           } 
-                           //chunk.tiles[tileIndex].ID;
-                           //find tileset
-                           tmx::Tileset const* tile_set = nullptr;
-                           for(const auto& tileset : map.getTilesets())
-                           {
-                             if(tileset.hasTile(chunk.tiles[tileIndex].ID))
-                             {
-                                tile_set = &tileset;
-                             }   
-                           }
-                          
-                           //put the tile in the vector
-                           yorcvs::Tile tile{};
-                           tile.texture_path  = tile_set->getImagePath();
-                           tile.coords = chunk_position * tilesSize  + tilesSize * yorcvs::Vec2<float>{static_cast<float>(chunk_x),static_cast<float>(chunk_y)};
-                           tile.srcRect.x = ((chunk.tiles[tileIndex].ID - tile_set->getFirstGID()) % tile_set->getColumnCount() ) * tile_set->getTileSize().x;
-                           tile.srcRect.y = 0;
-                           size_t y_index = 0;
-                           while(y_index + tile_set->getColumnCount() < chunk.tiles[tileIndex].ID  )
-                           {
-                               y_index += tile_set->getColumnCount();
-                               tile.srcRect.y += tile_set->getTileSize().y;
+        const auto &chunks = tileLayer.getChunks();
 
-                           }
-                           tile.srcRect.w = tile_set->getTileSize().x;
-                           tile.srcRect.h = tile_set->getTileSize().y;
+        for (const auto &chunk : chunks) // parse chunks
+        {
+            yorcvs::Vec2<float> chunk_position = {static_cast<float>(chunk.position.x),
+                                                  static_cast<float>(chunk.position.y)};
+            for (auto chunk_y = 0; chunk_y < chunk.size.y; chunk_y++)
+            {
+                for (auto chunk_x = 0; chunk_x < chunk.size.x; chunk_x++)
+                {
+                    // parse tiles
+                    const size_t tileIndex = chunk_y * chunk.size.x + chunk_x;
+                    if (chunk.tiles[tileIndex].ID == 0)
+                    {
+                        continue;
+                    }
+                    // chunk.tiles[tileIndex].ID;
+                    // find tileset
+                    tmx::Tileset const *tile_set = nullptr;
+                    for (const auto &tileset : map.getTilesets())
+                    {
+                        if (tileset.hasTile(chunk.tiles[tileIndex].ID))
+                        {
+                            tile_set = &tileset;
+                        }
+                    }
 
-                           tiles.push_back(tile);
-                       }    
-                   }
-                   
-               }
+                    // put the tile in the vector
+                    yorcvs::Tile tile{};
+                    tile.texture_path = tile_set->getImagePath();
+                    tile.coords =
+                        chunk_position * tilesSize +
+                        tilesSize * yorcvs::Vec2<float>{static_cast<float>(chunk_x), static_cast<float>(chunk_y)};
+                    tile.srcRect = get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID);
+
+                    tiles.push_back(tile);
+                }
+            }
+        }
     }
 
-    void render_tiles(yorcvs::Window<yorcvs::graphics>& window,const yorcvs::Vec2<float>& render_dimensions)
+    void render_tiles(yorcvs::Window<yorcvs::graphics> &window, const yorcvs::Vec2<float> &render_dimensions)
     {
-    
-      yorcvs::Vec2<float> rs = window.get_render_scale();
-      window.set_render_scale(window.get_size()/render_dimensions);
-      for(const auto& tile : tiles)
-      {
-          window.draw_sprite(tile.texture_path,{tile.coords.x,tile.coords.y,tilesSize.x,tilesSize.y},tile.srcRect);
-      }
-      window.set_render_scale(rs);
+
+        yorcvs::Vec2<float> rs = window.get_render_scale();
+        window.set_render_scale(window.get_size() / render_dimensions);
+        for (const auto &tile : tiles)
+        {
+            window.draw_sprite(tile.texture_path, {tile.coords.x, tile.coords.y, tilesSize.x, tilesSize.y},
+                               tile.srcRect);
+        }
+        window.set_render_scale(rs);
     }
-    private:
-    std::string tilesetPath; 
+
+    // NOTE: this can be a free function
+    static yorcvs::Rect<size_t> get_src_rect_from_uid(const tmx::Map &map, const size_t UID)
+    {
+        tmx::Tileset const *tile_set = nullptr;
+        for (const auto &tileset : map.getTilesets())
+        {
+            if (tileset.hasTile(UID))
+            {
+                tile_set = &tileset;
+            }
+        }
+        if (tile_set == nullptr)
+        {
+            yorcvs::log(std::string("failed to find a tileset matching the uid: ") + std::to_string(UID),
+                        yorcvs::MSGSEVERITY::ERROR);
+            return {0, 0, 0, 0};
+        }
+        yorcvs::Rect<size_t> srcRect{};
+        srcRect.x = ((UID - tile_set->getFirstGID()) % tile_set->getColumnCount()) * tile_set->getTileSize().x;
+        srcRect.y = 0;
+        size_t y_index = 0;
+        while (y_index + tile_set->getColumnCount() < UID)
+        {
+            y_index += tile_set->getColumnCount();
+            srcRect.y += tile_set->getTileSize().y;
+        }
+        srcRect.w = tile_set->getTileSize().x;
+        srcRect.h = tile_set->getTileSize().y;
+        return srcRect;
+    }
+
+  private:
+    std::string tilesetPath;
     yorcvs::Vec2<float> tilesSize;
     std::vector<yorcvs::Tile> tiles;
-
 };
 
 /**
@@ -252,54 +274,52 @@ class Application
 {
   public:
     Application()
-        : r(), collisionS(&world), velocityS(&world), pcS(&world, &r), sprS(&world, &r),
-          animS(&world), healthS(&world), dbInfo{&r, &world, &pcS}
+        : r(), collisionS(&world), velocityS(&world), pcS(&world, &r), sprS(&world, &r), animS(&world),
+          healthS(&world), dbInfo{&r, &world, &pcS}
     {
-        //Load config
-        if(std::filesystem::exists(configname))
+        // Load config
+        if (std::filesystem::exists(configname))
         {
             yorcvs::log("Loading config file...");
             std::ifstream config_in(configname);
-            //NOTE: should read whole file in string
-            std::string confstr{(std::istreambuf_iterator<char>(config_in)),(std::istreambuf_iterator<char>())};
+            // NOTE: should read whole file in string
+            std::string confstr{(std::istreambuf_iterator<char>(config_in)), (std::istreambuf_iterator<char>())};
             auto config = json::json::parse(confstr);
-            if(config.is_discarded())
+            if (config.is_discarded())
             {
                 yorcvs::log("Inavlid config file");
             }
-            else if(!config["window"]["width"].is_discarded() && !config["window"]["height"].is_discarded())
+            else if (!config["window"]["width"].is_discarded() && !config["window"]["height"].is_discarded())
             {
                 r.set_size(config["window"]["width"], config["window"]["height"]);
             }
-
         }
-        else {
+        else
+        {
             yorcvs::log("Config file not found, loading default settings...");
         }
 
-        
         map.load("assets/map.tmx");
-     
+
         entities.emplace_back(&world);
-        std::ifstream playerIN ("assets/player.json");
-        std::string playerData{(std::istreambuf_iterator<char>(playerIN)),(std::istreambuf_iterator<char>())};
+        std::ifstream playerIN("assets/player.json");
+        std::string playerData{(std::istreambuf_iterator<char>(playerIN)), (std::istreambuf_iterator<char>())};
         auto player = json::json::parse(playerData);
 
-        world.add_component<hitboxComponent>(entities[0].id, {{player["hitbox"]["x"], player["hitbox"]["y"], player["hitbox"]["w"], player["hitbox"]["h"]}});
+        world.add_component<hitboxComponent>(entities[0].id, {{player["hitbox"]["x"], player["hitbox"]["y"],
+                                                               player["hitbox"]["w"], player["hitbox"]["h"]}});
         world.add_component<positionComponent>(entities[0].id, {{0, 0}});
         world.add_component<velocityComponent>(entities[0].id, {{0.0f, 0.0f}, {false, false}});
         world.add_component<playerMovementControlledComponent>(entities[0].id, {});
-        world.add_component<spriteComponent>(
-            entities[0].id,
-            {{player["sprite"]["offset"]["x"], player["sprite"]["offset"]["y"]}, {player["sprite"]["size"]["x"], player["sprite"]["size"]["y"]}, 
-            {player["sprite"]["srcRect"]["x"], player["sprite"]["srcRect"]["y"], player["sprite"]["srcRect"]["w"], player["sprite"]["srcRect"]["h"]},
-            r.create_texture(player["sprite"]["spriteName"])});
+        world.add_component<spriteComponent>(entities[0].id,
+                                             {{player["sprite"]["offset"]["x"], player["sprite"]["offset"]["y"]},
+                                              {player["sprite"]["size"]["x"], player["sprite"]["size"]["y"]},
+                                              {player["sprite"]["srcRect"]["x"], player["sprite"]["srcRect"]["y"],
+                                               player["sprite"]["srcRect"]["w"], player["sprite"]["srcRect"]["h"]},
+                                              r.create_texture(player["sprite"]["spriteName"])});
         world.add_component<animationComponent>(entities[0].id, {0, 8, 0.0f, 100.0f});
-        world.add_component<healthComponent>(entities[0].id,{5,10,0.1f,false});
+        world.add_component<healthComponent>(entities[0].id, {5, 10, 0.1f, false});
 
-
- 
-    
         counter.start();
     }
     Application(const Application &other) = delete;
@@ -351,7 +371,7 @@ class Application
         }
 
         r.clear();
-        map.render_tiles(r,render_dimensions);
+        map.render_tiles(r, render_dimensions);
         sprS.renderSprites(render_dimensions);
         dbInfo.render(elapsed);
         r.present();
@@ -368,8 +388,7 @@ class Application
     }
 
   private:
-
-    static constexpr const char* configname = "yorcvsconfig.json";
+    static constexpr const char *configname = "yorcvsconfig.json";
 
     yorcvs::Window<yorcvs::SDL2> r;
     yorcvs::ECS world{};
