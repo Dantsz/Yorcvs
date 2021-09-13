@@ -7,3 +7,4 @@ C++ game project
 |[SDL2_image](https://www.libsdl.org/projects/SDL_image/)|
 |[SDL2_ttf](https://www.libsdl.org/projects/SDL_ttf/)|
 |[nlohmann/json](https://github.com/nlohmann/json)|
+|[tmxlite](https://github.com/fallahn/tmxlite)|
