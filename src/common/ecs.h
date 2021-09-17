@@ -334,7 +334,7 @@ class ComponentManager
         if (component_type.find(componentid) == component_type.end())
         {
             // if the type of the container is not registered ,register it
-            component_type.insert({componentid, topComponentType++});
+            component_type.insert({componentid, nrComponents++});
 
             componentContainers.insert({componentid, std::make_shared<ComponentContainer<T>>()});
         }
@@ -415,7 +415,7 @@ class ComponentManager
         if (component_type.find(componentid) == component_type.end())
         {
             // if the type of the container is not registered ,register it
-            component_type.insert({componentid, topComponentType++});
+            component_type.insert({componentid, nrComponents++});
 
             componentContainers.insert({componentid, std::make_shared<ComponentContainer<T>>()});
         }
@@ -449,8 +449,8 @@ class ComponentManager
         }
     }
 
-    // the largest id
-    size_t topComponentType = 0;
+    // number of components
+    size_t nrComponents = 0;
     // type -> id
     std::unordered_map<const char *, size_t> component_type{};
 
@@ -558,7 +558,7 @@ class SystemManager
         return true;
     }
     /**
-     * @brief compares the signature of an entity to a specific system and if they are compatible
+     * @brief compares the signature of an entity to a specific system
      *
      * @param entity_s The entity
      * @param system_s The system

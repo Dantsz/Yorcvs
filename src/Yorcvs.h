@@ -15,12 +15,12 @@
 #include "common/utilities.h"
 #include "systems.h"
 #include "tmxlite/Layer.hpp"
+#include "tmxlite/ObjectGroup.hpp"
 #include "tmxlite/TileLayer.hpp"
 #include "tmxlite/Tileset.hpp"
 #include "windowSDL2.h"
 #include <cstdlib>
 #include <future>
-
 
 #include <nlohmann/json.hpp>
 #include <string>
@@ -143,8 +143,10 @@ struct Tile
 class Map
 {
   public:
-    void load(const std::string &path)
+    void load(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *window, const std::string &path)
     {
+        ecs = parent;
+        parentWindow = window;
         yorcvs::log("Loading map: " + path);
         tmx::Map map{};
         if (!map.load(path))
@@ -165,10 +167,20 @@ class Map
         const auto &layers = map.getLayers();
         for (const auto &layer : layers) // parse layers
         {
-            if (layer->getType() == tmx::Layer::Type::Tile)
+            switch (layer->getType())
             {
-                auto &tileLayer = layer->getLayerAs<tmx::TileLayer>();
-                parse_tile_layer(map, tileLayer);
+            case tmx::Layer::Type::Tile:
+                parse_tile_layer(map, layer->getLayerAs<tmx::TileLayer>());
+                break;
+            case tmx::Layer::Type::Object:
+                parse_object_layer(map, layer->getLayerAs<tmx::ObjectGroup>());
+                break;
+            case tmx::Layer::Type::Image:
+
+                break;
+            case tmx::Layer::Type::Group:
+
+                break;
             }
         }
     }
@@ -212,6 +224,27 @@ class Map
 
                     tiles.push_back(tile);
                 }
+            }
+        }
+    }
+
+    void parse_object_layer(tmx::Map &map, tmx::ObjectGroup &objectLayer)
+    {
+        const auto &objects = objectLayer.getObjects();
+        for (const auto &object : objects)
+        {
+            // create entity
+            size_t entity = ecs->create_entity_ID();
+              ecs->add_component<positionComponent>(entity,{{object.getPosition().x,object.getPosition().y}});
+            if (object.getTileID() != 0)
+            {
+                const auto *tileSet = get_tileset_containing(map,object.getTileID());
+                // add sprite component
+              
+                ecs->add_component<spriteComponent>(entity, {{0, 0},
+                                                             {object.getAABB().width, object.getAABB().height},
+                                                             get_src_rect_from_uid(map, object.getTileID()),
+                                                             parentWindow->create_texture(tileSet->getImagePath())});
             }
         }
     }
@@ -260,10 +293,29 @@ class Map
         return srcRect;
     }
 
+    static tmx::Tileset const* get_tileset_containing(tmx::Map& map,const size_t tile_UID)
+    {
+        tmx::Tileset const *tile_set = nullptr;
+        for (const auto &tileset : map.getTilesets())
+        {
+            if (tileset.hasTile(tile_UID))
+            {
+                tile_set = &tileset;
+            }
+        }
+        if(tile_set != nullptr)
+        {
+          return tile_set;
+        }
+    }
+
   private:
     std::string tilesetPath;
     yorcvs::Vec2<float> tilesSize;
     std::vector<yorcvs::Tile> tiles;
+
+    yorcvs::ECS *ecs{};
+    yorcvs::Window<yorcvs::graphics> *parentWindow{};
 };
 
 /**
@@ -299,7 +351,7 @@ class Application
             yorcvs::log("Config file not found, loading default settings...");
         }
 
-        map.load("assets/map.tmx");
+        map.load(&world, &r, "assets/map.tmx");
 
         entities.emplace_back(&world);
         std::ifstream playerIN("assets/player.json");
