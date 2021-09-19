@@ -80,7 +80,11 @@
   </data>
  </layer>
  <objectgroup id="2" name="Object Layer 1">
-  <object id="4" name="Wall" type="Wall" gid="31" x="128" y="125.333" width="64" height="64"/>
+  <object id="4" name="Wall" type="Wall" gid="31" x="128" y="125.333" width="64" height="64">
+   <properties>
+    <property name="collision" type="bool" value="true"/>
+   </properties>
+  </object>
   <object id="5" x="-98.6667" y="77.3333" width="33.4493" height="15.6957"/>
  </objectgroup>
 </map>

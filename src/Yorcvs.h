@@ -246,6 +246,14 @@ class Map
                                                              get_src_rect_from_uid(map, object.getTileID()),
                                                              parentWindow->create_texture(tileSet->getImagePath())});
             }
+            for(const auto& property : object.getProperties())
+            {
+                if(property.getName() == "collision" && property.getBoolValue())
+                {
+                    //add collision
+                    ecs->add_component<hitboxComponent>(entity,{{0,0,object.getAABB().width,object.getAABB().height}});
+                }
+            }
         }
     }
 
