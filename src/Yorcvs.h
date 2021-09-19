@@ -235,7 +235,7 @@ class Map
         {
             // create entity
             size_t entity = ecs->create_entity_ID();
-              ecs->add_component<positionComponent>(entity,{{object.getPosition().x,object.getPosition().y}});
+              ecs->add_component<positionComponent>(entity,{{object.getPosition().x - object.getAABB().width/2,object.getPosition().y - object.getAABB().height}});
             if (object.getTileID() != 0)
             {
                 const auto *tileSet = get_tileset_containing(map,object.getTileID());
