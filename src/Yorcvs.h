@@ -235,7 +235,7 @@ class Map
         {
             // create entity
             size_t entity = ecs->create_entity_ID();
-              ecs->add_component<positionComponent>(entity,{{object.getPosition().x - object.getAABB().width/2,object.getPosition().y - object.getAABB().height}});
+              ecs->add_component<positionComponent>(entity,{{object.getPosition().x ,object.getPosition().y - object.getAABB().height}});
             if (object.getTileID() != 0)
             {
                 const auto *tileSet = get_tileset_containing(map,object.getTileID());
@@ -311,10 +311,11 @@ class Map
                 tile_set = &tileset;
             }
         }
-        if(tile_set != nullptr)
+        if(tile_set == nullptr)
         {
-          return tile_set;
+         yorcvs::log("no tileset contains tile ID : " + std::to_string(tile_UID));
         }
+        return tile_set;    
     }
 
   private:
