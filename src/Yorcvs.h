@@ -165,12 +165,31 @@ class Map
         }
         tilesSize = {static_cast<float>(map.getTileSize().x), static_cast<float>(map.getTileSize().y)};
         const auto &layers = map.getLayers();
+
         for (const auto &layer : layers) // parse layers
         {
+            const auto &properties = layer->getProperties();
+            bool tiles_ysorted = false;
             switch (layer->getType())
             {
             case tmx::Layer::Type::Tile:
-                parse_tile_layer(map, layer->getLayerAs<tmx::TileLayer>());
+
+                for (const auto &property : properties)
+                {
+                    if (property.getName() == "Ysorted")
+                    {
+                        tiles_ysorted = true;
+                    }
+                }
+                if (tiles_ysorted)
+                {
+                    parse_tile_layer_ysorted(map, layer->getLayerAs<tmx::TileLayer>());
+                }
+                else
+                {
+                    parse_tile_layer(map, layer->getLayerAs<tmx::TileLayer>());
+                }
+
                 break;
             case tmx::Layer::Type::Object:
                 parse_object_layer(map, layer->getLayerAs<tmx::ObjectGroup>());
@@ -227,7 +246,48 @@ class Map
             }
         }
     }
+    void parse_tile_layer_ysorted(tmx::Map &map, tmx::TileLayer &tileLayer)
+    {
+        const auto &chunks = tileLayer.getChunks();
 
+        for (const auto &chunk : chunks) // parse chunks
+        {
+            yorcvs::Vec2<float> chunk_position = {static_cast<float>(chunk.position.x),
+                                                  static_cast<float>(chunk.position.y)};
+            for (auto chunk_y = 0; chunk_y < chunk.size.y; chunk_y++)
+            {
+                for (auto chunk_x = 0; chunk_x < chunk.size.x; chunk_x++)
+                {
+                    // parse tiles
+                    const size_t tileIndex = chunk_y * chunk.size.x + chunk_x;
+                    if (chunk.tiles[tileIndex].ID == 0)
+                    {
+                        continue;
+                    }
+                    // chunk.tiles[tileIndex].ID;
+                    // find tileset
+                    tmx::Tileset const *tile_set = nullptr;
+                    for (const auto &tileset : map.getTilesets())
+                    {
+                        if (tileset.hasTile(chunk.tiles[tileIndex].ID))
+                        {
+                            tile_set = &tileset;
+                        }
+                    }
+
+                
+                    ///add object
+                    size_t entity = ecs->create_entity_ID();  
+                    ecs->add_component<positionComponent>(
+                     entity, {chunk_position * tilesSize + tilesSize * yorcvs::Vec2<float>{static_cast<float>(chunk_x), static_cast<float>(chunk_y)}});
+                    ecs->add_component<spriteComponent>(entity, {{0, 0},
+                                                             {static_cast<float>(tile_set->getTileSize().x),static_cast<float>(tile_set->getTileSize().y)},
+                                                             get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID),
+                                                             parentWindow->create_texture(tile_set->getImagePath())});
+                }
+            }
+        }
+    }
     void parse_object_layer(tmx::Map &map, tmx::ObjectGroup &objectLayer)
     {
         const auto &objects = objectLayer.getObjects();
@@ -235,23 +295,25 @@ class Map
         {
             // create entity
             size_t entity = ecs->create_entity_ID();
-              ecs->add_component<positionComponent>(entity,{{object.getPosition().x ,object.getPosition().y - object.getAABB().height}});
+            ecs->add_component<positionComponent>(
+                entity, {{object.getPosition().x, object.getPosition().y - object.getAABB().height}});
             if (object.getTileID() != 0)
             {
-                const auto *tileSet = get_tileset_containing(map,object.getTileID());
+                const auto *tileSet = get_tileset_containing(map, object.getTileID());
                 // add sprite component
-              
+
                 ecs->add_component<spriteComponent>(entity, {{0, 0},
                                                              {object.getAABB().width, object.getAABB().height},
                                                              get_src_rect_from_uid(map, object.getTileID()),
                                                              parentWindow->create_texture(tileSet->getImagePath())});
             }
-            for(const auto& property : object.getProperties())
+            for (const auto &property : object.getProperties())
             {
-                if(property.getName() == "collision" && property.getBoolValue())
+                if (property.getName() == "collision" && property.getBoolValue())
                 {
-                    //add collision
-                    ecs->add_component<hitboxComponent>(entity,{{0,0,object.getAABB().width,object.getAABB().height}});
+                    // add collision
+                    ecs->add_component<hitboxComponent>(entity,
+                                                        {{0, 0, object.getAABB().width, object.getAABB().height}});
                 }
             }
         }
@@ -301,7 +363,7 @@ class Map
         return srcRect;
     }
 
-    static tmx::Tileset const* get_tileset_containing(tmx::Map& map,const size_t tile_UID)
+    static tmx::Tileset const *get_tileset_containing(tmx::Map &map, const size_t tile_UID)
     {
         tmx::Tileset const *tile_set = nullptr;
         for (const auto &tileset : map.getTilesets())
@@ -311,11 +373,11 @@ class Map
                 tile_set = &tileset;
             }
         }
-        if(tile_set == nullptr)
+        if (tile_set == nullptr)
         {
-         yorcvs::log("no tileset contains tile ID : " + std::to_string(tile_UID));
+            yorcvs::log("no tileset contains tile ID : " + std::to_string(tile_UID));
         }
-        return tile_set;    
+        return tile_set;
     }
 
   private:
