@@ -307,18 +307,32 @@ class Map
                                                              get_src_rect_from_uid(map, object.getTileID()),
                                                              parentWindow->create_texture(tileSet->getImagePath())});
             }
+            /*  
+            Object properties
+            1. collision - object has collision
+            2. playerSpawn - objects' coordinates are where the player can spawn
+
+            */
             for (const auto &property : object.getProperties())
             {
                 if (property.getName() == "collision" && property.getBoolValue())
                 {
-                    // add collision
+                    //Note: handles hitbox to object
                     ecs->add_component<hitboxComponent>(entity,
                                                         {{0, 0, object.getAABB().width, object.getAABB().height}});
+                }
+                if(property.getName() == "playerSpawn" && property.getBoolValue())
+                {
+                    //NOTE: handles player spawn area
+                    spawn_coord = {object.getPosition().x,object.getPosition().y};
                 }
             }
         }
     }
-
+    yorcvs::Vec2<float> get_spawn_position()
+    {
+        return spawn_coord;
+    }
     void render_tiles(yorcvs::Window<yorcvs::graphics> &window, const yorcvs::Vec2<float> &render_dimensions)
     {
 
@@ -387,6 +401,7 @@ class Map
 
     yorcvs::ECS *ecs{};
     yorcvs::Window<yorcvs::graphics> *parentWindow{};
+    yorcvs::Vec2<float> spawn_coord;
 };
 
 /**
@@ -431,7 +446,7 @@ class Application
 
         world.add_component<hitboxComponent>(entities[0].id, {{player["hitbox"]["x"], player["hitbox"]["y"],
                                                                player["hitbox"]["w"], player["hitbox"]["h"]}});
-        world.add_component<positionComponent>(entities[0].id, {{0, 0}});
+        world.add_component<positionComponent>(entities[0].id, {map.get_spawn_position()});
         world.add_component<velocityComponent>(entities[0].id, {{0.0f, 0.0f}, {false, false}});
         world.add_component<playerMovementControlledComponent>(entities[0].id, {});
         world.add_component<spriteComponent>(entities[0].id,

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="left-up" width="100" height="100" tilewidth="32" tileheight="32" infinite="1" nextlayerid="4" nextobjectid="8">
+<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="left-up" width="100" height="100" tilewidth="32" tileheight="32" infinite="1" nextlayerid="4" nextobjectid="9">
  <properties>
   <property name="Ysorted" type="bool" value="false"/>
  </properties>
@@ -91,6 +91,11 @@
   <object id="7" name="Wall" type="Wall" gid="31" x="48.0233" y="78.622" width="32" height="32">
    <properties>
     <property name="collision" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="8" x="-138" y="49.3333">
+   <properties>
+    <property name="playerSpawn" type="bool" value="true"/>
    </properties>
   </object>
  </objectgroup>
