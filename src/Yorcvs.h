@@ -311,20 +311,44 @@ class Map
             Object properties
             1. collision - object has collision
             2. playerSpawn - objects' coordinates are where the player can spawn
-
             */
             for (const auto &property : object.getProperties())
             {
+                //Note: handles hitbox to object
                 if (property.getName() == "collision" && property.getBoolValue())
                 {
-                    //Note: handles hitbox to object
                     ecs->add_component<hitboxComponent>(entity,
                                                         {{0, 0, object.getAABB().width, object.getAABB().height}});
                 }
+                //NOTE: handles player spawn area
                 if(property.getName() == "playerSpawn" && property.getBoolValue())
                 {
-                    //NOTE: handles player spawn area
                     spawn_coord = {object.getPosition().x,object.getPosition().y};
+                }
+                //NOTE HANDLES HP 
+                if(property.getName() == "HP")
+                {
+                    if(!ecs->has_components<healthComponent>(entity))
+                    {
+                        ecs->add_component<healthComponent>(entity,{});
+                    }
+                    ecs->get_component<healthComponent>(entity).HP = property.getFloatValue();
+                }
+                if(property.getName() == "HP_max")
+                {
+                    if(!ecs->has_components<healthComponent>(entity))
+                    {
+                        ecs->add_component<healthComponent>(entity,{});
+                    }
+                    ecs->get_component<healthComponent>(entity).maxHP = property.getFloatValue();
+                }
+                if(property.getName() == "HP_regen")
+                {
+                    if(!ecs->has_components<healthComponent>(entity))
+                    {
+                        ecs->add_component<healthComponent>(entity,{});
+                    }
+                    ecs->get_component<healthComponent>(entity).health_regen = property.getFloatValue();
                 }
             }
         }

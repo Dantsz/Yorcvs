@@ -88,8 +88,11 @@
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="7" name="Wall" type="Wall" gid="31" x="48.0233" y="78.622" width="32" height="32">
+  <object id="7" name="Wall" type="Wall" gid="31" x="-83.4767" y="102.372" width="32" height="32">
    <properties>
+    <property name="HP" type="float" value="1"/>
+    <property name="HP_max" type="float" value="1"/>
+    <property name="HP_regen" type="float" value="1"/>
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
