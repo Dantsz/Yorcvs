@@ -88,7 +88,7 @@
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="7" name="Wall" type="Wall" gid="31" x="-83.4767" y="102.372" width="32" height="32">
+  <object id="7" name="Wall" type="Wall" gid="1073741855" x="-51.4767" y="70.372" width="32" height="32" rotation="180">
    <properties>
     <property name="HP" type="float" value="1"/>
     <property name="HP_max" type="float" value="1"/>

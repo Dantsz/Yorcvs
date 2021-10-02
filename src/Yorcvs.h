@@ -297,7 +297,7 @@ class Map
             size_t entity = ecs->create_entity_ID();
             ecs->add_component<positionComponent>(
                 entity, {{object.getPosition().x, object.getPosition().y - object.getAABB().height}});
-            if (object.getTileID() != 0)
+            if (object.getTileID() != 0 && object.visible())
             {
                 const auto *tileSet = get_tileset_containing(map, object.getTileID());
                 // add sprite component
@@ -309,9 +309,13 @@ class Map
             }
             /*  
             Object properties
-            1. collision - object has collision
-            2. playerSpawn - objects' coordinates are where the player can spawn
+            * collision - object has collision
+            * playerSpawn - objects' coordinates are where the player can spawn
+            * HP - health
+            * HP_max - maximum hp
+            * HP_Regen - health regeneration 
             */
+            
             for (const auto &property : object.getProperties())
             {
                 //Note: handles hitbox to object
@@ -565,7 +569,7 @@ class Application
 
     static constexpr float msPF = 16.6f;
     float lag = 0.0f;
-    yorcvs::Vec2<float> render_dimensions = {480.0f, 240.0f}; // how much to render
+    yorcvs::Vec2<float> render_dimensions = {240.0f, 120.0f}; // how much to render
 
     std::vector<yorcvs::Entity> entities;
     yorcvs::Map map{};
