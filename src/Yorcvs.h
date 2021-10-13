@@ -329,7 +329,7 @@ class Map
                 {
                     spawn_coord = {object.getPosition().x,object.getPosition().y};
                 }
-                //NOTE HANDLES HP 
+                //NOTE HANDLES HP             
                 if(property.getName() == "HP")
                 {
                     if(!ecs->has_components<healthComponent>(entity))
@@ -432,6 +432,19 @@ class Map
     yorcvs::Vec2<float> spawn_coord;
 };
 
+//TODO: MAKE SOME SYSTEMS MAP-DEPENDENT AND REMOVE THIS
+struct ecs_Initializer
+{
+    ecs_Initializer(yorcvs::ECS& world)
+    {
+        //register components
+        world.register_component<hitboxComponent,positionComponent,velocityComponent,healthComponent>();
+        world.register_component<playerMovementControlledComponent>();
+        world.register_component<spriteComponent,animationComponent>();
+    }
+};
+
+
 /**
  * @brief Main game class
  *
@@ -440,9 +453,11 @@ class Application
 {
   public:
     Application()
-        : r(), collisionS(&world), velocityS(&world), pcS(&world, &r), sprS(&world, &r), animS(&world),
+        : r(),temp(world), collisionS(&world), velocityS(&world), pcS(&world, &r), sprS(&world, &r), animS(&world),
           healthS(&world), dbInfo{&r, &world, &pcS}
     {
+       
+        std :: cout << world.is_component_registered<healthComponent>() << '\n';
         // Load config
         if (std::filesystem::exists(configname))
         {
@@ -558,6 +573,9 @@ class Application
 
     yorcvs::Window<yorcvs::SDL2> r;
     yorcvs::ECS world{};
+
+    ecs_Initializer temp;
+
     CollisionSystem collisionS;
     VelocitySystem velocityS;
     PlayerMovementControl pcS;

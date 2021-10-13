@@ -14,14 +14,7 @@ class CollisionSystem
     {
         world = parent;
         // is this legal? yee
-        if (!world->is_component_registered<hitboxComponent>())
-        {
-            world->register_component<hitboxComponent>();
-        }
-        if (!world->is_component_registered<positionComponent>())
-        {
-            world->register_component<positionComponent>();
-        }
+       
 
         world->register_system<CollisionSystem>(*this);
 
@@ -201,14 +194,7 @@ class VelocitySystem
     VelocitySystem(yorcvs::ECS *parent)
     {
         world = parent;
-        if (!world->is_component_registered<positionComponent>())
-        {
-            world->register_component<positionComponent>();
-        }
-        if (!world->is_component_registered<velocityComponent>())
-        {
-            world->register_component<velocityComponent>();
-        }
+       
         world->register_system<VelocitySystem>(*this);
         world->add_criteria_for_iteration<VelocitySystem, positionComponent, velocityComponent>();
     }
@@ -241,14 +227,7 @@ class AnimationSystem
     AnimationSystem(yorcvs::ECS *parent)
     {
         world = parent;
-        if (!world->is_component_registered<animationComponent>())
-        {
-            world->register_component<animationComponent>();
-        }
-        if (!world->is_component_registered<spriteComponent>())
-        {
-            world->register_component<spriteComponent>();
-        }
+
         world->register_system<AnimationSystem>(*this);
         world->add_criteria_for_iteration<AnimationSystem, animationComponent, spriteComponent>();
     }
@@ -291,10 +270,7 @@ class HealthSystem
     HealthSystem(yorcvs::ECS *parent)
     {
         world = parent;
-        if (!world->is_component_registered<healthComponent>())
-        {
-            world->register_component<healthComponent>();
-        }
+
         world->register_system<HealthSystem>(*this);
         world->add_criteria_for_iteration<HealthSystem, healthComponent>();
     }
@@ -332,22 +308,7 @@ class PlayerMovementControl
     {
         window = parent_window;
         world = parent;
-        if (!world->is_component_registered<playerMovementControlledComponent>())
-        {
-            world->register_component<playerMovementControlledComponent>();
-        }
-        if (!world->is_component_registered<velocityComponent>())
-        {
-            world->register_component<velocityComponent>();
-        }
-        if (!world->is_component_registered<positionComponent>())
-        {
-            world->register_component<positionComponent>();
-        }
-        if (!world->is_component_registered<spriteComponent>())
-        {
-            world->register_component<spriteComponent>();
-        }
+
         world->register_system<PlayerMovementControl>(*this);
         world->add_criteria_for_iteration<PlayerMovementControl, playerMovementControlledComponent, velocityComponent,
                                           positionComponent, spriteComponent>();
@@ -425,14 +386,7 @@ class SpriteSystem
     {
         world = parent;
         window = parentWindow;
-        if (!world->is_component_registered<positionComponent>())
-        {
-            world->register_component<positionComponent>();
-        }
-        if (!world->is_component_registered<spriteComponent>())
-        {
-            world->register_component<spriteComponent>();
-        }
+
         world->register_system<SpriteSystem>(*this);
         world->add_criteria_for_iteration<SpriteSystem, positionComponent, spriteComponent>();
     }
