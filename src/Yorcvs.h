@@ -143,6 +143,33 @@ struct Tile
 class Map
 {
   public:
+
+    Map( const std::string& path , yorcvs::ECS* world,yorcvs::Window<yorcvs::SDL2>& r) :  collisionS(world), velocityS(world), pcS(world, &r), sprS(world, &r), animS(world),
+          healthS(world), dbInfo{&r, world, &pcS}
+    {
+
+        load(world,&r,path);
+        entities.emplace_back(world);
+        std::ifstream playerIN("assets/player.json");
+        std::string playerData{(std::istreambuf_iterator<char>(playerIN)), (std::istreambuf_iterator<char>())};
+        auto player = json::json::parse(playerData);
+
+        world->add_component<hitboxComponent>(entities[0].id, {{player["hitbox"]["x"], player["hitbox"]["y"],
+                                                               player["hitbox"]["w"], player["hitbox"]["h"]}});
+        world->add_component<positionComponent>(entities[0].id, {get_spawn_position()});
+        world->add_component<velocityComponent>(entities[0].id, {{0.0f, 0.0f}, {false, false}});
+        world->add_component<playerMovementControlledComponent>(entities[0].id, {});
+        world->add_component<spriteComponent>(entities[0].id,
+                                             {{player["sprite"]["offset"]["x"], player["sprite"]["offset"]["y"]},
+                                              {player["sprite"]["size"]["x"], player["sprite"]["size"]["y"]},
+                                              {player["sprite"]["srcRect"]["x"], player["sprite"]["srcRect"]["y"],
+                                               player["sprite"]["srcRect"]["w"], player["sprite"]["srcRect"]["h"]},
+                                              r.create_texture(player["sprite"]["spriteName"])});
+        world->add_component<animationComponent>(entities[0].id, {0, 8, 0.0f, 100.0f});
+        world->add_component<healthComponent>(entities[0].id, {5, 10, 0.1f, false});
+
+    }
+    
     void load(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *window, const std::string &path)
     {
         ecs = parent;
@@ -161,7 +188,7 @@ class Map
         }
         if (!map.isInfinite())
         {
-            yorcvs::log("Cannot load non-infinte maps", yorcvs::MSGSEVERITY::ERROR);
+            yorcvs::log("Cannot load finite  maps", yorcvs::MSGSEVERITY::ERROR);
         }
         tilesSize = {static_cast<float>(map.getTileSize().x), static_cast<float>(map.getTileSize().y)};
         const auto &layers = map.getLayers();
@@ -422,6 +449,24 @@ class Map
         return tile_set;
     }
 
+    void update(float dt, const yorcvs::Vec2<float>& render_dimensions)
+    {
+        collisionS.update();
+        velocityS.update();
+        animS.update(dt);
+        healthS.update(dt);
+        pcS.updateAnimations();
+        pcS.updateControls(render_dimensions);
+    }
+
+
+    void render(const yorcvs::Vec2<float>& render_dimensions , yorcvs::Window<SDL2>& r , float elapsed)
+    {
+        render_tiles(r, render_dimensions);
+        sprS.renderSprites(render_dimensions);
+        dbInfo.render(elapsed);
+    }
+
   private:
     std::string tilesetPath;
     yorcvs::Vec2<float> tilesSize;
@@ -430,6 +475,17 @@ class Map
     yorcvs::ECS *ecs{};
     yorcvs::Window<yorcvs::graphics> *parentWindow{};
     yorcvs::Vec2<float> spawn_coord;
+
+    CollisionSystem collisionS;
+    VelocitySystem velocityS;
+    PlayerMovementControl pcS;
+    SpriteSystem sprS;
+    AnimationSystem animS;
+    HealthSystem healthS;
+    DebugInfo dbInfo;
+
+    std::vector<yorcvs::Entity> entities;
+  
 };
 
 //TODO: MAKE SOME SYSTEMS MAP-DEPENDENT AND REMOVE THIS
@@ -453,11 +509,10 @@ class Application
 {
   public:
     Application()
-        : r(),temp(world), collisionS(&world), velocityS(&world), pcS(&world, &r), sprS(&world, &r), animS(&world),
-          healthS(&world), dbInfo{&r, &world, &pcS}
+        : r(),temp(world)
     {
        
-        std :: cout << world.is_component_registered<healthComponent>() << '\n';
+    
         // Load config
         if (std::filesystem::exists(configname))
         {
@@ -480,27 +535,9 @@ class Application
             yorcvs::log("Config file not found, loading default settings...");
         }
 
-        map.load(&world, &r, "assets/map.tmx");
+     
 
-        entities.emplace_back(&world);
-        std::ifstream playerIN("assets/player.json");
-        std::string playerData{(std::istreambuf_iterator<char>(playerIN)), (std::istreambuf_iterator<char>())};
-        auto player = json::json::parse(playerData);
-
-        world.add_component<hitboxComponent>(entities[0].id, {{player["hitbox"]["x"], player["hitbox"]["y"],
-                                                               player["hitbox"]["w"], player["hitbox"]["h"]}});
-        world.add_component<positionComponent>(entities[0].id, {map.get_spawn_position()});
-        world.add_component<velocityComponent>(entities[0].id, {{0.0f, 0.0f}, {false, false}});
-        world.add_component<playerMovementControlledComponent>(entities[0].id, {});
-        world.add_component<spriteComponent>(entities[0].id,
-                                             {{player["sprite"]["offset"]["x"], player["sprite"]["offset"]["y"]},
-                                              {player["sprite"]["size"]["x"], player["sprite"]["size"]["y"]},
-                                              {player["sprite"]["srcRect"]["x"], player["sprite"]["srcRect"]["y"],
-                                               player["sprite"]["srcRect"]["w"], player["sprite"]["srcRect"]["h"]},
-                                              r.create_texture(player["sprite"]["spriteName"])});
-        world.add_component<animationComponent>(entities[0].id, {0, 8, 0.0f, 100.0f});
-        world.add_component<healthComponent>(entities[0].id, {5, 10, 0.1f, false});
-
+        
         counter.start();
     }
     Application(const Application &other) = delete;
@@ -511,27 +548,9 @@ class Application
     void update(float dt)
     {
 
-        collisionS.update();
-        velocityS.update();
-        animS.update(dt);
-        healthS.update(dt);
-        pcS.updateAnimations();
+        map.update(dt,render_dimensions);
     }
-    void updateMT(float dt)
-    {
-
-        collisionS.update();
-
-        auto velAsync = std::async(&VelocitySystem::update, velocityS);
-
-        auto velAnims = std::async(&AnimationSystem::update, animS, dt);
-        healthS.update(dt);
-        pcS.updateAnimations();
-
-        velAsync.get();
-        velAnims.get();
-        counter.start();
-    }
+ 
 
     void run()
     {
@@ -546,15 +565,13 @@ class Application
 
         while (lag >= msPF)
         {
-            pcS.updateControls(render_dimensions);
+            
             update(msPF);
             lag -= msPF;
         }
 
         r.clear();
-        map.render_tiles(r, render_dimensions);
-        sprS.renderSprites(render_dimensions);
-        dbInfo.render(elapsed);
+        map.render(render_dimensions,r,elapsed);
         r.present();
     }
 
@@ -576,21 +593,15 @@ class Application
 
     ecs_Initializer temp;
 
-    CollisionSystem collisionS;
-    VelocitySystem velocityS;
-    PlayerMovementControl pcS;
-    SpriteSystem sprS;
-    AnimationSystem animS;
-    HealthSystem healthS;
-    DebugInfo dbInfo;
+   
     yorcvs::Timer counter;
 
     static constexpr float msPF = 16.6f;
     float lag = 0.0f;
     yorcvs::Vec2<float> render_dimensions = {240.0f, 120.0f}; // how much to render
 
-    std::vector<yorcvs::Entity> entities;
-    yorcvs::Map map{};
+  
+    yorcvs::Map map{"assets/map.tmx",&world,r};
     // debug stuff
 };
 } // namespace yorcvs
