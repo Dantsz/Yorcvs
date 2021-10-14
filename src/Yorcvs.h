@@ -145,28 +145,12 @@ class Map
   public:
 
     Map( const std::string& path , yorcvs::ECS* world,yorcvs::Window<yorcvs::SDL2>& r) :  collisionS(world), velocityS(world), pcS(world, &r), sprS(world, &r), animS(world),
-          healthS(world), dbInfo{&r, world, &pcS}
+          healthS(world), dbInfo{&r, world, &pcS},ecs(world),parentWindow(&r)
     {
 
         load(world,&r,path);
         entities.emplace_back(world);
-        std::ifstream playerIN("assets/player.json");
-        std::string playerData{(std::istreambuf_iterator<char>(playerIN)), (std::istreambuf_iterator<char>())};
-        auto player = json::json::parse(playerData);
-
-        world->add_component<hitboxComponent>(entities[0].id, {{player["hitbox"]["x"], player["hitbox"]["y"],
-                                                               player["hitbox"]["w"], player["hitbox"]["h"]}});
-        world->add_component<positionComponent>(entities[0].id, {get_spawn_position()});
-        world->add_component<velocityComponent>(entities[0].id, {{0.0f, 0.0f}, {false, false}});
-        world->add_component<playerMovementControlledComponent>(entities[0].id, {});
-        world->add_component<spriteComponent>(entities[0].id,
-                                             {{player["sprite"]["offset"]["x"], player["sprite"]["offset"]["y"]},
-                                              {player["sprite"]["size"]["x"], player["sprite"]["size"]["y"]},
-                                              {player["sprite"]["srcRect"]["x"], player["sprite"]["srcRect"]["y"],
-                                               player["sprite"]["srcRect"]["w"], player["sprite"]["srcRect"]["h"]},
-                                              r.create_texture(player["sprite"]["spriteName"])});
-        world->add_component<animationComponent>(entities[0].id, {0, 8, 0.0f, 100.0f});
-        world->add_component<healthComponent>(entities[0].id, {5, 10, 0.1f, false});
+        load_character_from_path(entities[0].id, "assets/player.json");
 
     }
     
@@ -465,6 +449,28 @@ class Map
         render_tiles(r, render_dimensions);
         sprS.renderSprites(render_dimensions);
         dbInfo.render(elapsed);
+    }
+
+
+    void load_character_from_path(size_t entity_id , const std::string& path)
+    {
+         std::ifstream playerIN(path);
+        std::string playerData{(std::istreambuf_iterator<char>(playerIN)), (std::istreambuf_iterator<char>())};
+        auto player = json::json::parse(playerData);
+
+        ecs->add_component<hitboxComponent>(entity_id, {{player["hitbox"]["x"], player["hitbox"]["y"],
+                                                               player["hitbox"]["w"], player["hitbox"]["h"]}});
+        ecs->add_component<positionComponent>(entity_id, {get_spawn_position()});
+        ecs->add_component<velocityComponent>(entity_id, {{0.0f, 0.0f}, {false, false}});
+        ecs->add_component<playerMovementControlledComponent>(entity_id, {});
+        ecs->add_component<spriteComponent>(entity_id,
+                                             {{player["sprite"]["offset"]["x"], player["sprite"]["offset"]["y"]},
+                                              {player["sprite"]["size"]["x"], player["sprite"]["size"]["y"]},
+                                              {player["sprite"]["srcRect"]["x"], player["sprite"]["srcRect"]["y"],
+                                               player["sprite"]["srcRect"]["w"], player["sprite"]["srcRect"]["h"]},
+                                              parentWindow->create_texture(player["sprite"]["spriteName"])});
+        ecs->add_component<animationComponent>(entity_id, {0, 8, 0.0f, 100.0f});
+        ecs->add_component<healthComponent>(entity_id, {5, 10, 0.1f, false});
     }
 
   private:
