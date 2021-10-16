@@ -406,7 +406,7 @@ class Map
         srcRect.x = ((UID - tile_set->getFirstGID()) % tile_set->getColumnCount()) * tile_set->getTileSize().x;
         srcRect.y = 0;
         size_t y_index = 0;
-        while (y_index + tile_set->getColumnCount() < UID)
+        while (y_index + tile_set->getColumnCount() <= UID - tile_set->getFirstGID())
         {
             y_index += tile_set->getColumnCount();
             srcRect.y += tile_set->getTileSize().y;

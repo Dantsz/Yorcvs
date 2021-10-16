@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="left-up" width="100" height="100" tilewidth="32" tileheight="32" infinite="1" nextlayerid="4" nextobjectid="9">
+<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="left-up" width="100" height="100" tilewidth="32" tileheight="32" infinite="1" nextlayerid="4" nextobjectid="15">
  <properties>
   <property name="Ysorted" type="bool" value="false"/>
  </properties>
  <tileset firstgid="1" name="tiles" tilewidth="32" tileheight="32" tilecount="80" columns="10">
   <image source="map_tiles.png" width="320" height="256"/>
+ </tileset>
+ <tileset firstgid="81" name="map_static_objects" tilewidth="32" tileheight="32" tilecount="8" columns="4">
+  <image source="map_static_objects.png" width="128" height="64"/>
  </tileset>
  <layer id="1" name="Tile Layer 1" width="100" height="100">
   <data encoding="csv">
@@ -101,14 +104,37 @@
     <property name="playerSpawn" type="bool" value="true"/>
    </properties>
   </object>
+  <object id="13" x="-154.554" y="18.2374" width="182.212" height="10.5758">
+   <properties>
+    <property name="collision" type="bool" value="true"/>
+   </properties>
+  </object>
  </objectgroup>
  <layer id="3" name="sortedLayer" width="100" height="100">
   <properties>
    <property name="Ysorted" type="bool" value="true"/>
   </properties>
   <data encoding="csv">
-   <chunk x="0" y="0" width="16" height="16">
+   <chunk x="-16" y="0" width="16" height="16">
+0,0,0,0,0,0,0,0,0,0,0,81,81,81,81,81,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</chunk>
+   <chunk x="0" y="0" width="16" height="16">
+81,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,31,0,0,0,0,0,0,0,0,0,0,0,0,
