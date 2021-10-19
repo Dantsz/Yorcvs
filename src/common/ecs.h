@@ -16,7 +16,7 @@
 #include <unordered_map>
 #include <vector>
 
-/*The ECS is heaviley isnpired by AUSTIN MORLAN's implementation , but it has a bit more functionality and ease of use.
+/*The ECS is heaviley inspired by AUSTIN MORLAN's implementation , but it has a bit more functionality and ease of use.
   It's a bit more 'loose'. It's minimal and doesn't have very specific function so it may be interchangeable with other
   ECS.
 */
@@ -321,6 +321,43 @@ class ComponentManager
 {
 
   public:
+
+    ComponentManager() = default;
+    ComponentManager(const ComponentManager& other)
+     {
+        this->nrComponents = other.nrComponents;
+        this->componentContainers = other.componentContainers;
+        this->component_type = other.component_type;
+    }
+    ComponentManager(ComponentManager&& other)  noexcept : nrComponents(other.nrComponents),component_type(std::move(other.component_type)),componentContainers(std::move(other.componentContainers))
+    {
+
+    }
+    ~ComponentManager() = default;
+
+
+    ComponentManager& operator=(const ComponentManager& other)
+    {
+        if(this == &other)
+        {
+            return *this;
+        }
+        this->nrComponents = other.nrComponents;
+        this->componentContainers = other.componentContainers;
+        this->component_type = other.component_type;
+        return *this;
+    }
+
+    ComponentManager& operator=(ComponentManager&& other) noexcept   
+    {
+       nrComponents = other.nrComponents;
+       component_type = std::move(other.component_type);
+       componentContainers = std::move(other.componentContainers);
+       return *this;
+
+    }
+
+
     // register a component
     // Note: add_component already registers a component that has not been use before
     // this function is not really useful at this point

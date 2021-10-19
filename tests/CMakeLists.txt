@@ -11,5 +11,8 @@ add_test(ECSTestEntitiesAndComponents ECSTestEntitiesAndComponents)
 add_executable(ECSComponentCreationDeletion ECSComponentCreationDeletion.cpp)
 add_test(ECSComponentCreationDeletion ECSComponentCreationDeletion)
 
+add_executable(ECSTestComponentManagerCopyConstructor ECSTestComponentManagerCopyConstructor.cpp)
+add_test(ECSTestComponentManagerCopyConstructor ECSTestComponentManagerCopyConstructor)
+
 add_executable(ECSsystems ECSsystems.cpp)
 add_test(ECSsystems ECSsystems)
