@@ -1,12 +1,12 @@
 /**
  * @file ecs.h
  * @author Dansz
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2021-08-13
- * 
+ *
  * @copyright Copyright (c) 2021
- * 
+ *
  */
 #pragma once
 #include "utilities.h"
@@ -86,6 +86,39 @@ class VContainer
 class EntityManager
 {
   public:
+    EntityManager() = default;
+    ;
+    EntityManager(const EntityManager &other)
+    {
+        this->entitySignatures = other.entitySignatures;
+        this->freedIndices = other.freedIndices;
+        this->lowestUnallocatedID = other.lowestUnallocatedID;
+    };
+    EntityManager(EntityManager &&other) noexcept
+    {
+        this->entitySignatures = std::move(other.entitySignatures);
+        this->freedIndices = std::move(other.freedIndices);
+        this->lowestUnallocatedID = other.lowestUnallocatedID;
+    };
+    EntityManager &operator=(const EntityManager &other)
+    {
+        if(this == &other)
+        {
+            return *this;
+        }
+        this->entitySignatures = other.entitySignatures;
+        this->freedIndices   = other.freedIndices;
+        this->lowestUnallocatedID = other.lowestUnallocatedID;
+        return *this;
+    };
+    EntityManager &operator=(EntityManager &&other)
+ noexcept     {
+        this->entitySignatures = std::move(other.entitySignatures);
+        this->freedIndices = std::move(other.freedIndices);
+        this->lowestUnallocatedID = other.lowestUnallocatedID;
+        return *this;
+    }
+
     /**
      * @brief  takes a freed or makes a new one if there's no id
      *
@@ -192,8 +225,6 @@ class EntityManager
     // the lowest unallocated id that has not been interacted with
     size_t lowestUnallocatedID = 0;
 };
-
-
 
 // contains..components
 template <typename T> class ComponentContainer final : public VContainer
@@ -321,24 +352,23 @@ class ComponentManager
 {
 
   public:
-
     ComponentManager() = default;
-    ComponentManager(const ComponentManager& other)
-     {
+    ComponentManager(const ComponentManager &other)
+    {
         this->nrComponents = other.nrComponents;
         this->componentContainers = other.componentContainers;
         this->component_type = other.component_type;
     }
-    ComponentManager(ComponentManager&& other)  noexcept : nrComponents(other.nrComponents),component_type(std::move(other.component_type)),componentContainers(std::move(other.componentContainers))
+    ComponentManager(ComponentManager &&other) noexcept
+        : nrComponents(other.nrComponents), component_type(std::move(other.component_type)),
+          componentContainers(std::move(other.componentContainers))
     {
-
     }
     ~ComponentManager() = default;
 
-
-    ComponentManager& operator=(const ComponentManager& other)
+    ComponentManager &operator=(const ComponentManager &other)
     {
-        if(this == &other)
+        if (this == &other)
         {
             return *this;
         }
@@ -348,15 +378,13 @@ class ComponentManager
         return *this;
     }
 
-    ComponentManager& operator=(ComponentManager&& other) noexcept   
+    ComponentManager &operator=(ComponentManager &&other) noexcept
     {
-       nrComponents = other.nrComponents;
-       component_type = std::move(other.component_type);
-       componentContainers = std::move(other.componentContainers);
-       return *this;
-
+        nrComponents = other.nrComponents;
+        component_type = std::move(other.component_type);
+        componentContainers = std::move(other.componentContainers);
+        return *this;
     }
-
 
     // register a component
     // Note: add_component already registers a component that has not been use before
@@ -413,7 +441,7 @@ class ComponentManager
     }
 
     // gets the id of a component in the manager
-    template <typename T>[[nodiscard]] size_t get_component_ID()
+    template <typename T> [[nodiscard]] size_t get_component_ID()
     {
         const char *component_name = typeid(T).name();
 
@@ -530,7 +558,7 @@ class SystemManager
     }
 
     // gets signature of a system
-    template <systemT T>[[nodiscard]] std::vector<bool> get_system_signature()
+    template <systemT T> [[nodiscard]] std::vector<bool> get_system_signature()
     {
 
         const char *systemType = typeid(T).name();
@@ -739,7 +767,7 @@ class ECS
      * @return true the component is registered
      * @return false it's not registered
      */
-    template <typename T>[[nodiscard]] bool is_component_registered() const
+    template <typename T> [[nodiscard]] bool is_component_registered() const
     {
         const char *component_name = typeid(T).name();
         return (componentmanager->component_type.find(component_name) != componentmanager->component_type.end());
@@ -778,7 +806,7 @@ class ECS
      * @param other Other components
      */
     template <typename T, typename... Other>
-    void add_component(const size_t entityID, T component, const Other &... other)
+    void add_component(const size_t entityID, T component, const Other &...other)
     {
         // add the component
         componentmanager->add_component<T>(entityID, component);
@@ -893,7 +921,7 @@ class ECS
      * @return true It is
      * @return false It is not
      */
-    template <typename T>[[nodiscard]] bool is_system_registered() const
+    template <typename T> [[nodiscard]] bool is_system_registered() const
     {
         const char *systemType = typeid(T).name();
 
@@ -917,7 +945,7 @@ class ECS
      * @tparam T The system
      * @return std::vector<bool> Value of the systems signature
      */
-    template <typename T>[[nodiscard]] std::vector<bool> get_system_signature() const
+    template <typename T> [[nodiscard]] std::vector<bool> get_system_signature() const
     {
         return systemmanager->get_system_signature<T>();
     }
@@ -977,7 +1005,7 @@ class ECS
         std::vector<bool> signature = get_system_signature<sys>();
 
         // reset criteria
-        for (auto && i : signature)
+        for (auto &&i : signature)
         {
             i = false;
         }
@@ -1002,7 +1030,7 @@ class ECS
      * @return size_t The number of entities with that component
      * NOTE: This is might be costly
      */
-    template <typename T>[[nodiscard]] size_t get_entities_with_component() const
+    template <typename T> [[nodiscard]] size_t get_entities_with_component() const
     {
         // get component index
         size_t cIndex = componentmanager->get_component_ID<T>();
@@ -1018,8 +1046,9 @@ class ECS
         return entities;
     }
     /**
-     * @brief Adds all components of source to the destinations and copies their data, if the source has any components, they are destroyed before the copying
-     * 
+     * @brief Adds all components of source to the destinations and copies their data, if the source has any components,
+     * they are destroyed before the copying
+     *
      * @param dstEntityID destination
      * @param srcEntityID source
      */
@@ -1029,30 +1058,31 @@ class ECS
         std::vector<bool> newSignature = get_entity_signature(srcEntityID);
         systemmanager->on_entity_signature_change(dstEntityID, newSignature);
     }
-    //NOTE: DEBUG FUNCTIONS
+    // NOTE: DEBUG FUNCTIONS
     /**
      * @brief Get the number of active entities
-     * 
+     *
      * @return size_t Entities that have been created but not destroyed
      */
-    [[nodiscard]]size_t get_active_entities_number() const
+    [[nodiscard]] size_t get_active_entities_number() const
     {
         return entitymanager->lowestUnallocatedID - entitymanager->freedIndices.size();
     }
     /**
      * @brief Get a list of names corresponding to registered components
-     * 
+     *
      * @return std::vector<std::string> Components registered to the ECS
      */
-    [[nodiscard]]std::vector<std::string> get_registered_components_name()
+    [[nodiscard]] std::vector<std::string> get_registered_components_name()
     {
         std::vector<std::string> names{};
-        for(const auto &i : componentmanager->component_type)
+        for (const auto &i : componentmanager->component_type)
         {
             names.emplace_back(i.first);
         }
         return names;
     }
+
   private:
     std::unique_ptr<yorcvs::ComponentManager> componentmanager;
     std::unique_ptr<yorcvs::EntityManager> entitymanager;
