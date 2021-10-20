@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <memory>
 #include <queue>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -87,18 +88,13 @@ class EntityManager
 {
   public:
     EntityManager() = default;
-    ;
-    EntityManager(const EntityManager &other)
+    ~EntityManager() = default;
+    EntityManager(const EntityManager &other) = default;
+    EntityManager(EntityManager &&other) noexcept : freedIndices(std::move(other.freedIndices)), entitySignatures(std::move(other.entitySignatures)), lowestUnallocatedID(other.lowestUnallocatedID)
     {
-        this->entitySignatures = other.entitySignatures;
-        this->freedIndices = other.freedIndices;
-        this->lowestUnallocatedID = other.lowestUnallocatedID;
-    };
-    EntityManager(EntityManager &&other) noexcept
-    {
-        this->entitySignatures = std::move(other.entitySignatures);
-        this->freedIndices = std::move(other.freedIndices);
-        this->lowestUnallocatedID = other.lowestUnallocatedID;
+        
+        
+        
     };
     EntityManager &operator=(const EntityManager &other)
     {
@@ -353,12 +349,7 @@ class ComponentManager
 
   public:
     ComponentManager() = default;
-    ComponentManager(const ComponentManager &other)
-    {
-        this->nrComponents = other.nrComponents;
-        this->componentContainers = other.componentContainers;
-        this->component_type = other.component_type;
-    }
+    ComponentManager(const ComponentManager &other) = default;
     ComponentManager(ComponentManager &&other) noexcept
         : nrComponents(other.nrComponents), component_type(std::move(other.component_type)),
           componentContainers(std::move(other.componentContainers))
@@ -557,6 +548,25 @@ class SystemManager
         typetosignature[systemType] = signature;
     }
 
+    /**
+     * @brief Returns the list of entities the system has acces to
+     *  
+     * @tparam system - the system  
+     * @return std::shared_ptr<yorcvs::EntitySystemList> - pointer too the list of entities 
+     */
+    template<systemT system>
+    std::shared_ptr<yorcvs::EntitySystemList> get_system_entity_list()
+    {
+        const char* systemType = typeid(system).name();
+        if (typetosystem.find(systemType) == typetosystem.end())
+        {
+            yorcvs::log("Unable to get list of system " + std::string(systemType) + " system does not exist", yorcvs::MSGSEVERITY::ERROR);
+            return nullptr;
+        }
+        return typetosystem[systemType];
+
+    }
+
     // gets signature of a system
     template <systemT T> [[nodiscard]] std::vector<bool> get_system_signature()
     {
@@ -675,11 +685,11 @@ class ECS
         entitymanager = std::make_unique<yorcvs::EntityManager>();
         systemmanager = std::make_unique<yorcvs::SystemManager>();
     }
-    ECS(ECS &&other) noexcept
+    ECS(ECS &&other) noexcept : componentmanager(std::move(other.componentmanager)), entitymanager(std::move(other.entitymanager)), systemmanager(std::move(other.systemmanager))
     {
-        this->componentmanager = std::move(other.componentmanager);
-        this->entitymanager = std::move(other.entitymanager);
-        this->systemmanager = std::move(other.systemmanager);
+        
+        
+        
     }
     ECS(const ECS &other) =
         delete; // copy would be so expensive  the copy constructor will probably be called by accident
@@ -927,7 +937,17 @@ class ECS
 
         return (systemmanager->typetosystem.find(systemType) != systemmanager->typetosystem.end());
     }
-
+    /**
+    * @brief Returns the list of entities the system has acces to
+    *  
+    * @tparam system - the system  
+    * @return std::shared_ptr<yorcvs::EntitySystemList> - pointer too the list of entities 
+    */
+    template<systemT system>
+    std::shared_ptr<yorcvs::EntitySystemList> get_system_entity_list()
+    {
+        return systemmanager->get_system_entity_list<system>();
+    }
     /**
      * @brief Sets the signature of a system
      *
@@ -1111,14 +1131,13 @@ class ECS
             if (systemmanager->compare_entity_to_system(entitymanager->entitySignatures[entity],
                                                         systemmanager->get_system_signature<T>()))
             {
-                // TODO : MAKE A METHOD TO SYSTEM , method needs to be virtual /Onewntitierase/insert
+                // TODO : MAKE A METHOD TO SYSTEM , method needs to be virtual /Onwntitierase/insert
                 insert_sorted(systemmanager->typetosystem.at(systemType)->entitiesID, entity);
             }
             else
             {
                 // not looking good
-                systemmanager->typetosystem.at(systemType)
-                    ->entitiesID.erase(std::remove(systemmanager->typetosystem.at(systemType)->entitiesID.begin(),
+                systemmanager->typetosystem.at(systemType)->entitiesID.erase(std::remove(systemmanager->typetosystem.at(systemType)->entitiesID.begin(),
                                                    systemmanager->typetosystem.at(systemType)->entitiesID.end(),
                                                    entity),
                                        systemmanager->typetosystem.at(systemType)->entitiesID.end());
@@ -1135,26 +1154,26 @@ class ECS
 class Entity
 {
   public:
-    Entity(ECS *ecs)
+    Entity(ECS *ecs) : parent(ecs)
     {
-        parent = ecs;
+        
         id = parent->create_entity_ID();
         yorcvs::log("Created entity with id: " + std::to_string(id), yorcvs::MSGSEVERITY::INFO);
     }
 
-    Entity(const Entity &other)
+    Entity(const Entity &other) : parent(other.parent)
     {
-        parent = other.parent;
+        
         id = parent->create_entity_ID();
         parent->copy_component_to_from_entity(id, other.id);
         yorcvs::log("The copy constructor for an Entity " + std::to_string(id) +
                         " has been called: this might be an unecesary expensive option",
                     yorcvs::MSGSEVERITY::WARNING);
     }
-    Entity(Entity &&other) noexcept
+    Entity(Entity &&other) noexcept : id(other.id), parent(other.parent)
     {
-        parent = other.parent;
-        id = other.id;
+        
+        
         other.parent = nullptr;
     }
     Entity &operator=(const Entity &other)

@@ -35,12 +35,12 @@ namespace yorcvs
 class DebugInfo
 {
   public:
-    DebugInfo(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms)
+    DebugInfo(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms) : parentWindow(parentW), appECS(pECS), playerMoveSystem(pms)
     {
 
-        parentWindow = parentW;
-        appECS = pECS;
-        playerMoveSystem = pms;
+        
+        
+        
         frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", 255, 255, 255, 255, 100, 10000);
         maxframeTimeTX =
             parentWindow->create_text("assets/font.ttf", "Max Frame Time : ", 255, 255, 255, 255, 100, 10000);
@@ -144,8 +144,8 @@ class Map
 {
   public:
 
-    Map( const std::string& path , yorcvs::ECS* world,yorcvs::Window<yorcvs::SDL2>& r) :  collisionS(world), velocityS(world), pcS(world, &r), sprS(world, &r), animS(world),
-          healthS(world), dbInfo{&r, world, &pcS},ecs(world),parentWindow(&r)
+    Map( const std::string& path , yorcvs::ECS* world,yorcvs::Window<yorcvs::SDL2>& r) :  ecs(world), parentWindow(&r), collisionS(world), velocityS(world), pcS(world, &r),
+          sprS(world, &r), animS(world),healthS(world),dbInfo{&r, world, &pcS}
     {
 
         load(world,&r,path);
@@ -515,7 +515,7 @@ class Application
 {
   public:
     Application()
-        : r(),temp(world)
+        :temp(world)
     {
        
     

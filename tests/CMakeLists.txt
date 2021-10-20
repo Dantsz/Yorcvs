@@ -17,5 +17,8 @@ add_test(ECSTestComponentManagerCopyConstructor ECSTestComponentManagerCopyConst
 add_executable(ECSEntityManagerCopyMove ECSEntityManagerCopyMove.cpp)
 add_test(ECSEntityManagerCopyMove ECSEntityManagerCopyMove)
 
+add_executable(ECSSystemManagerCopyMove ECSSystemManagerCopyMove.cpp)
+add_test(ECSSystemManagerCopyMove ECSSystemManagerCopyMove)
+
 add_executable(ECSsystems ECSsystems.cpp)
 add_test(ECSsystems ECSsystems)
