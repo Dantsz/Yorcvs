@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+include(FetchContent)
+
 message(STATUS ${CMAKE_SYSTEM_NAME})
 
 
@@ -27,7 +29,7 @@ set(YorcvsALLFILES  "src/Yorcvs.cpp"
 
 add_executable(Yorcvs ${YorcvsALLFILES})
 
-
+#COMPILE FLAGS
 target_compile_options(Yorcvs PRIVATE
 $<$<CXX_COMPILER_ID:MSVC>:/W4 /fsanitize=address /Zi /DEBUG>
 $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -std=c++2a>
@@ -37,11 +39,12 @@ $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wno-c++
 #link SDL
 if(EMSCRIPTEN)
 set(CMAKE_EXECUTABLE_SUFFIX ".html")
-SET(CMAKE_CXX_FLAGS "-std=c++2a -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=\"[\"\"png\"\"]\"  -s USE_SDL_TTF=2  -s ALLOW_MEMORY_GROWTH=1 -o build/Yorcvs.html") #--preload-file ./assets" )
+SET(CMAKE_CXX_FLAGS "-std=c++2a -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=\"[\"\"png\"\"]\"  -s USE_SDL_TTF=2  -s ALLOW_MEMORY_GROWTH=1 -o build/Yorcvs.html") #--preload-file ./assets" ) #commented because emscriptem requires the assets folder to be in special place and it's not necesary for compilation for CI
 else()
 
-#set SDL for windows
+
 if(WIN32)
+  #set SDL for windows
   find_package(SDL2 CONFIG REQUIRED)
   find_package(SDL2-image CONFIG REQUIRED)
   find_package(SDL2-ttf CONFIG REQUIRED)
@@ -56,8 +59,6 @@ endif()
 
   
 endif()
-
-include(FetchContent)
 
 FetchContent_Declare(json
   GIT_REPOSITORY https://github.com/nlohmann/json.git

@@ -473,17 +473,6 @@ class Map
         ecs->add_component<animationComponent>(entity_id, {0, 8, 0.0f, 100.0f});
         ecs->add_component<healthComponent>(entity_id, {5, 10, 0.1f, false});
 
-        try{
-            std::vector<size_t> anims = player["sprite"]["animations"];
-            for(const auto& i : anims)
-            {
-                std::cout <<  i << ' ';
-            }
-        }
-        catch(std::exception & e)
-        {
-            std::cout<< e.what();
-        }
 
     }
 

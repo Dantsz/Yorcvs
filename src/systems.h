@@ -10,9 +10,9 @@ class CollisionSystem
 {
   public:
   
-    CollisionSystem(yorcvs::ECS *parent)
+    CollisionSystem(yorcvs::ECS *parent) : world(parent)
     {
-        world = parent;
+        
         // is this legal? yee
        
 
@@ -191,9 +191,9 @@ class CollisionSystem
 class VelocitySystem
 {
   public:
-    VelocitySystem(yorcvs::ECS *parent)
+    VelocitySystem(yorcvs::ECS *parent) : world(parent)
     {
-        world = parent;
+        
        
         world->register_system<VelocitySystem>(*this);
         world->add_criteria_for_iteration<VelocitySystem, positionComponent, velocityComponent>();
@@ -224,9 +224,9 @@ class VelocitySystem
 class AnimationSystem
 {
   public:
-    AnimationSystem(yorcvs::ECS *parent)
+    AnimationSystem(yorcvs::ECS *parent) : world(parent)
     {
-        world = parent;
+        
 
         world->register_system<AnimationSystem>(*this);
         world->add_criteria_for_iteration<AnimationSystem, animationComponent, spriteComponent>();
@@ -267,9 +267,9 @@ class AnimationSystem
 class HealthSystem
 {
   public:
-    HealthSystem(yorcvs::ECS *parent)
+    HealthSystem(yorcvs::ECS *parent) : world(parent)
     {
-        world = parent;
+        
 
         world->register_system<HealthSystem>(*this);
         world->add_criteria_for_iteration<HealthSystem, healthComponent>();
@@ -304,11 +304,9 @@ class HealthSystem
 class PlayerMovementControl
 {
   public:
-    PlayerMovementControl(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *parent_window)
+    PlayerMovementControl(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *parent_window) : world(parent), window(parent_window)
     {
-        window = parent_window;
-        world = parent;
-
+        
         world->register_system<PlayerMovementControl>(*this);
         world->add_criteria_for_iteration<PlayerMovementControl, playerMovementControlledComponent, velocityComponent,
                                           positionComponent, spriteComponent>();
@@ -382,10 +380,10 @@ class PlayerMovementControl
 class SpriteSystem
 {
   public:
-    SpriteSystem(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *parentWindow)
+    SpriteSystem(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *parentWindow) : world(parent), window(parentWindow)
     {
-        world = parent;
-        window = parentWindow;
+        
+        
 
         world->register_system<SpriteSystem>(*this);
         world->add_criteria_for_iteration<SpriteSystem, positionComponent, spriteComponent>();

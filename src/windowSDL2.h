@@ -76,9 +76,9 @@ template <> class Key<yorcvs::SDL2>
 {
   public:
     Key<yorcvs::SDL2>() = default;
-    Key<yorcvs::SDL2>(SDL_Scancode scancode)
+    Key<yorcvs::SDL2>(SDL_Scancode scancode) : sdlScancode(scancode)
     {
-        sdlScancode = scancode;
+        
     }
 
     SDL_Scancode sdlScancode;
@@ -380,7 +380,7 @@ template <> class Window<yorcvs::SDL2>
     yorcvs::Vec2<float> get_cursor_position()
     {
         SDL_GetMouseState(&mouseX, &mouseY);
-        return Vec2<float>(static_cast<float>(mouseX), static_cast<float>(mouseY));
+        return {static_cast<float>(mouseX), static_cast<float>(mouseY)};
     }
 
     size_t register_callback(const Callback<yorcvs::SDL2> &callback)
@@ -412,7 +412,7 @@ template <> class Window<yorcvs::SDL2>
         int width = 0;
         int height = 0;
         SDL_GetWindowSize(sdlWindow, &width, &height);
-        return yorcvs::Vec2<float>(static_cast<float>(width), static_cast<float>(height));
+        return {static_cast<float>(width), static_cast<float>(height)};
     }
 
     void set_viewport(const yorcvs::Rect<float> &viewport)
