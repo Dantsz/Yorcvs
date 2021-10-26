@@ -39,22 +39,22 @@ if(EMSCRIPTEN)
 set(CMAKE_EXECUTABLE_SUFFIX ".html")
 SET(CMAKE_CXX_FLAGS "-std=c++2a -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=\"[\"\"png\"\"]\"  -s USE_SDL_TTF=2  -s ALLOW_MEMORY_GROWTH=1 -o build/Yorcvs.html") #--preload-file ./assets" )
 else()
+
 #set SDL for windows
 if(WIN32)
-    set(SDL2MAIN_LIBRARY "C:/Libs/SDL2/lib/x64/SDL2main.lib")
-    set(SDL2_INCLUDE_DIR "C:/Libs/SDL2/include")
-    set(SDL2_LIBRARY "C:/Libs/SDL2/lib/x64/SDL2.lib")
-    set(SDL2_IMAGE_INCLUDE_DIR "C:/Libs/SDL2_image/include")
-    set(SDL2_IMAGE_LIBRARY "C:/Libs/SDL2_image/lib/x64/SDL2_image.lib")
-    set(SDL2_TTF_INCLUDE_DIR "C:/Libs/SDL2_ttf/include")
-    set(SDL2_TTF_LIBRARY "C:/Libs/SDL2_ttf/lib/x64/SDL2_ttf.lib")
+  find_package(SDL2 CONFIG REQUIRED)
+  find_package(SDL2-image CONFIG REQUIRED)
+  find_package(SDL2-ttf CONFIG REQUIRED)
+  target_link_libraries(${PROJECT_NAME} SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf)
+else()
+  list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
+  find_package(SDL2 REQUIRED)
+  find_package(SDL2_image REQUIRED)
+  find_package(SDL2_ttf REQUIRED)
+  target_link_libraries(${PROJECT_NAME} SDL2::Main SDL2::Image SDL2::TTF)
 endif()
- 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
-find_package(SDL2 REQUIRED)
-find_package(SDL2_image REQUIRED)
-find_package(SDL2_ttf REQUIRED)
-target_link_libraries(${PROJECT_NAME} SDL2::Main SDL2::Image SDL2::TTF)
+
+  
 endif()
 
 include(FetchContent)
@@ -76,6 +76,7 @@ FetchContent_Declare(libtmxlite
  GIT_REPOSITORY https://github.com/fallahn/tmxlite.git
 )
 FetchContent_GetProperties(libtmxlite)
+
 if(NOT libtmxlite_POPULATED)
  FetchContent_Populate(libtmxlite)
  set(libtmxlite_SOURCE_DIR  ${libtmxlite_SOURCE_DIR}/tmxlite)

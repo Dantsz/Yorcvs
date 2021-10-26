@@ -20,6 +20,7 @@
 #include "tmxlite/Tileset.hpp"
 #include "windowSDL2.h"
 #include <cstdlib>
+#include <exception>
 #include <future>
 
 #include <nlohmann/json.hpp>
@@ -454,7 +455,7 @@ class Map
 
     void load_character_from_path(size_t entity_id , const std::string& path)
     {
-         std::ifstream playerIN(path);
+        std::ifstream playerIN(path);
         std::string playerData{(std::istreambuf_iterator<char>(playerIN)), (std::istreambuf_iterator<char>())};
         auto player = json::json::parse(playerData);
 
@@ -471,6 +472,19 @@ class Map
                                               parentWindow->create_texture(player["sprite"]["spriteName"])});
         ecs->add_component<animationComponent>(entity_id, {0, 8, 0.0f, 100.0f});
         ecs->add_component<healthComponent>(entity_id, {5, 10, 0.1f, false});
+
+        try{
+            std::vector<size_t> anims = player["sprite"]["animations"];
+            for(const auto& i : anims)
+            {
+                std::cout <<  i << ' ';
+            }
+        }
+        catch(std::exception & e)
+        {
+            std::cout<< e.what();
+        }
+
     }
 
   private:

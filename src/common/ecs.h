@@ -517,6 +517,14 @@ class ComponentManager
 class SystemManager
 {
   public:
+    SystemManager() = default;
+    SystemManager(const SystemManager& other)  = default;
+    SystemManager(SystemManager&& other) noexcept = default;
+
+    SystemManager& operator=(const SystemManager& other) = default;
+    SystemManager& operator=(SystemManager&& other) = default;
+
+    ~SystemManager() = default;
     // creates a system of type T and puts it in the map
     template <systemT T> bool register_system(T &system)
     {

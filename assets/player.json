@@ -29,7 +29,8 @@
             "w" : 64,
             "h" : 64
         },
-        "spriteName" : "assets/test_player_sheet.png"
+        "spriteName" : "assets/test_player_sheet.png",
+        "animations" : [1,2,3,4,5]
     }
 
 
