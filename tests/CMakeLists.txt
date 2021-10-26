@@ -22,3 +22,6 @@ add_test(ECSSystemManagerCopyMove ECSSystemManagerCopyMove)
 
 add_executable(ECSsystems ECSsystems.cpp)
 add_test(ECSsystems ECSsystems)
+
+add_executable(ECSmainclassCopyMove ECSmainclassCopyMove.cpp)
+add_test(ECSmainclassCopyMove ECSmainclassCopyMove)

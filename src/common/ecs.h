@@ -701,7 +701,18 @@ class ECS
     }
     ECS(const ECS &other) =
         delete; // copy would be so expensive  the copy constructor will probably be called by accident
-    ECS &operator=(const ECS &other) = delete;
+    ECS &operator=(const ECS &other)
+    {
+        if(this == &other)
+        {
+            return *this;
+        }
+        yorcvs::log("Initializing ECS with copy assignment operator", yorcvs::MSGSEVERITY::INFO);
+        componentmanager = std::make_unique<yorcvs::ComponentManager>(*other.componentmanager);
+        entitymanager = std::make_unique<yorcvs::EntityManager>(*other.entitymanager);
+        systemmanager = std::make_unique<yorcvs::SystemManager>(*other.systemmanager);
+        return *this;
+    }
     ECS &operator=(ECS &&other) = delete;
     ~ECS() noexcept
     {
@@ -1180,8 +1191,6 @@ class Entity
     }
     Entity(Entity &&other) noexcept : id(other.id), parent(other.parent)
     {
-        
-        
         other.parent = nullptr;
     }
     Entity &operator=(const Entity &other)
