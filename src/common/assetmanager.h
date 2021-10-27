@@ -78,8 +78,8 @@ template <typename assetType> class AssetManager
         for (auto it : assetMap)
         {
             yorcvs::log(std::string("Unloading asset") + it.first);
-            it.second.reset();
         }
+        assetMap.clear();
     }
 
   private:

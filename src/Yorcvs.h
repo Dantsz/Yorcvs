@@ -14,7 +14,7 @@
 #include "common/types.h"
 #include "common/utilities.h"
 #include "systems.h"
-#include "tmxlite/Layer.hpp"
+
 #include "tmxlite/ObjectGroup.hpp"
 #include "tmxlite/TileLayer.hpp"
 #include "tmxlite/Tileset.hpp"
@@ -29,6 +29,7 @@
 namespace json = nlohmann;
 #include <filesystem>
 #include <fstream>
+#include "tmxlite/Layer.hpp"
 #include <tmxlite/Map.hpp>
 
 namespace yorcvs
@@ -38,10 +39,6 @@ class DebugInfo
   public:
     DebugInfo(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms) : parentWindow(parentW), appECS(pECS), playerMoveSystem(pms)
     {
-
-        
-        
-        
         frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", 255, 255, 255, 255, 100, 10000);
         maxframeTimeTX =
             parentWindow->create_text("assets/font.ttf", "Max Frame Time : ", 255, 255, 255, 255, 100, 10000);
@@ -51,6 +48,16 @@ class DebugInfo
             parentWindow->create_text("assets/font.ttf", "NO PLAYER FOUND ", 255, 255, 255, 255, 100, 10000);
         playerHealth = parentWindow->create_text("assets/font.ttf", "Health : -/- ", 255, 255, 255, 255, 100, 10000);
         // TODO: remove this test
+    }
+
+    ~DebugInfo()
+    {
+        std::cout << frameTime.SDLtex.get() <<'\n';
+        std::cout << maxframeTimeTX.SDLtex.get() << '\n';
+        std::cout << ecsEntities.SDLtex.get() << '\n';
+        std::cout << playerHealth.SDLtex.get() << '\n';
+        std::cout << playerPosition.SDLtex.get() << '\n';
+        
     }
 
     void update(float ft)
@@ -145,10 +152,10 @@ class Map
 {
   public:
 
-    Map( const std::string& path , yorcvs::ECS* world,yorcvs::Window<yorcvs::SDL2>& r) :  ecs(world), parentWindow(&r), collisionS(world), velocityS(world), pcS(world, &r),
-          sprS(world, &r), animS(world),healthS(world),dbInfo{&r, world, &pcS}
+    Map( const std::string& path , yorcvs::ECS* world,yorcvs::Window<yorcvs::SDL2>& r) :  ecs(world),init_ecs(*world), parentWindow(&r), collisionS(world), velocityS(world), pcS(world, &r),
+          sprS(world, &r), animS(world),healthS(world)//,dbInfo{&r, world, &pcS}
     {
-
+        
         load(world,&r,path);
         entities.emplace_back(world);
         load_character_from_path(entities[0].id, "assets/player.json");
@@ -449,7 +456,7 @@ class Map
     {
         render_tiles(r, render_dimensions);
         sprS.renderSprites(render_dimensions);
-        dbInfo.render(elapsed);
+        //dbInfo.render(elapsed);
     }
 
 
@@ -477,11 +484,26 @@ class Map
     }
 
   private:
+    //class to initialize the ecs before systems are constructed
+    struct ecs_Initializer
+    {
+        ecs_Initializer(yorcvs::ECS& world)
+        {
+            //register components
+            world.register_component<hitboxComponent,positionComponent,velocityComponent,healthComponent>();
+            world.register_component<playerMovementControlledComponent>();
+            world.register_component<spriteComponent,animationComponent>();
+        }
+    };
+
+
     std::string tilesetPath;
     yorcvs::Vec2<float> tilesSize;
     std::vector<yorcvs::Tile> tiles;
 
     yorcvs::ECS *ecs{};
+    ecs_Initializer init_ecs;
+
     yorcvs::Window<yorcvs::graphics> *parentWindow{};
     yorcvs::Vec2<float> spawn_coord;
 
@@ -491,24 +513,13 @@ class Map
     SpriteSystem sprS;
     AnimationSystem animS;
     HealthSystem healthS;
-    DebugInfo dbInfo;
+   // DebugInfo dbInfo;
 
     std::vector<yorcvs::Entity> entities;
   
 };
 
 //TODO: MAKE SOME SYSTEMS MAP-DEPENDENT AND REMOVE THIS
-struct ecs_Initializer
-{
-    ecs_Initializer(yorcvs::ECS& world)
-    {
-        //register components
-        world.register_component<hitboxComponent,positionComponent,velocityComponent,healthComponent>();
-        world.register_component<playerMovementControlledComponent>();
-        world.register_component<spriteComponent,animationComponent>();
-    }
-};
-
 
 /**
  * @brief Main game class
@@ -518,7 +529,6 @@ class Application
 {
   public:
     Application()
-        :temp(world)
     {
        
     
@@ -597,20 +607,18 @@ class Application
   private:
     static constexpr const char *configname = "yorcvsconfig.json";
 
+  
+
     yorcvs::Window<yorcvs::SDL2> r;
-    yorcvs::ECS world{};
-
-    ecs_Initializer temp;
-
-   
     yorcvs::Timer counter;
 
     static constexpr float msPF = 16.6f;
     float lag = 0.0f;
     yorcvs::Vec2<float> render_dimensions = {240.0f, 120.0f}; // how much to render
 
-  
+    yorcvs::ECS world{};
     yorcvs::Map map{"assets/map.tmx",&world,r};
     // debug stuff
+    
 };
 } // namespace yorcvs

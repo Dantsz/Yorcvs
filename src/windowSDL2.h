@@ -188,7 +188,10 @@ template <> class Window<yorcvs::SDL2>
             },
             [](SDL_Texture *p) { SDL_DestroyTexture(p); });
     }
-
+    ~Window<yorcvs::SDL2>()
+    {
+        cleanup();
+    }
     void set_size(size_t width, size_t height) const
     {
         SDL_SetWindowSize(sdlWindow, static_cast<int>(width), static_cast<int>(height));
@@ -204,12 +207,12 @@ template <> class Window<yorcvs::SDL2>
 
     void cleanup()
     {
-        assetm->cleanup();
-        SDL_DestroyRenderer(renderer);
+    
         SDL_DestroyWindow(sdlWindow);
         IMG_Quit();
-        SDL_Quit();
         TTF_Quit();
+        SDL_Quit();
+        
     }
     void handle_events()
     {
@@ -460,9 +463,10 @@ template <> class Window<yorcvs::SDL2>
     SDL_Event event{};
     std::vector<Callback<yorcvs::SDL2>> callbacks{};
     yorcvs::Vec2<float> offset = {0.0f, 0.0f};
+    std::unique_ptr<AssetManager<SDL_Texture>> assetm = nullptr;
     SDL_Window *sdlWindow = nullptr;
     SDL_Renderer *renderer = nullptr;
-    std::unique_ptr<AssetManager<SDL_Texture>> assetm = nullptr;
+    
     unsigned char const *keys{};
     int mouseX{};
     int mouseY{};

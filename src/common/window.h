@@ -58,6 +58,8 @@ template <typename interface> class Window
   public:
     Window();
 
+    ~Window();
+    
     void cleanup();
 
     /**

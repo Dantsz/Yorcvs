@@ -74,7 +74,8 @@ target_link_libraries(${PROJECT_NAME}  nlohmann_json::nlohmann_json)
 
 
 FetchContent_Declare(libtmxlite
- GIT_REPOSITORY https://github.com/fallahn/tmxlite.git
+ GIT_REPOSITORY https://github.com/Dantsz/tmxlite.git
+ GIT_TAG "main" 
 )
 FetchContent_GetProperties(libtmxlite)
 
