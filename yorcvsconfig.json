@@ -3,5 +3,10 @@
     {
         "width" : 960,
         "height" : 480
-    }
+    },
+    "engine_settings":
+    {
+        "render_width" : 0,
+        "render_height" : 0
+    }   
 }

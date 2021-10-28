@@ -22,10 +22,10 @@ template <typename assetType> class AssetManager
     AssetManager() = default;
     AssetManager(const AssetManager& other) = delete;
     AssetManager(AssetManager&& other) = delete;
-    AssetManager(std::function<assetType *(const std::string &path)> pCtor, std::function<void(assetType *)> pDtor)
+    AssetManager(std::function<assetType *(const std::string &path)> pCtor, std::function<void(assetType *)> pDtor) : ctor(pCtor), dtor(pDtor)
     {
-        ctor = pCtor;
-        dtor = pDtor;
+        
+        
     }
     AssetManager& operator=(const AssetManager& other) = delete;
     AssetManager& operator=(AssetManager&& other) = delete;

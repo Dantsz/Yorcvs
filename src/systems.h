@@ -4,17 +4,13 @@
 #include "windowSDL2.h"
 #include <array>
 
-
-
 class CollisionSystem
 {
   public:
-  
     CollisionSystem(yorcvs::ECS *parent) : world(parent)
     {
-        
+
         // is this legal? yee
-       
 
         world->register_system<CollisionSystem>(*this);
 
@@ -72,14 +68,32 @@ class CollisionSystem
             }
         }
     }
+    template <typename render_backend>
+    void render_hitboxes(yorcvs::Window<render_backend> &window , const yorcvs::Vec2<float> &render_dimensions, float r, float g, float b,float a)
+    {
+          yorcvs::Vec2<float> old_rs = window.get_render_scale();
+        window.set_render_scale(window.get_size() / render_dimensions);
 
+        yorcvs::Rect<float> rect{};
+        for (const auto &ID : entityList->entitiesID)
+        {
+            rect.x = world->get_component<positionComponent>(ID).position.x + world->get_component<hitboxComponent>(ID).hitbox.x;
+            rect.y = world->get_component<positionComponent>(ID).position.y + world->get_component<hitboxComponent>(ID).hitbox.y;
+            rect.w = world->get_component<hitboxComponent>(ID).hitbox.w;
+            rect.h =  world->get_component<hitboxComponent>(ID).hitbox.h;
+            window.draw_rect(rect,r,g,b,a);
+        }
+        window.set_render_scale(old_rs);
+    }
+
+  private:
     static bool check_collision_left_right(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                            yorcvs::Vec2<float> &rectAvel)
     {
-        if (rectA.x + rectA.w <= rectB.x && rectA.x + rectA.w + (rectAvel.x ) > rectB.x &&
-            rectA.y + rectA.h > rectB.y && rectA.y - rectB.y < rectB.h)
+        if (rectA.x + rectA.w <= rectB.x && rectA.x + rectA.w + (rectAvel.x) > rectB.x && rectA.y + rectA.h > rectB.y &&
+            rectA.y - rectB.y < rectB.h)
         {
-            rectAvel.x = (rectB.x - rectA.x - rectA.w) ;
+            rectAvel.x = (rectB.x - rectA.x - rectA.w);
             return true;
         }
         return false;
@@ -87,10 +101,10 @@ class CollisionSystem
     static bool check_collision_right_left(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                            yorcvs::Vec2<float> &rectAvel)
     {
-        if (rectA.x >= rectB.x + rectB.w && rectA.x + (rectAvel.x ) < rectB.x + rectB.w &&
-            rectA.y + rectA.h > rectB.y && rectA.y - rectB.y < rectB.h)
+        if (rectA.x >= rectB.x + rectB.w && rectA.x + (rectAvel.x) < rectB.x + rectB.w && rectA.y + rectA.h > rectB.y &&
+            rectA.y - rectB.y < rectB.h)
         {
-            rectAvel.x = (rectB.x + rectB.w - rectA.x) ;
+            rectAvel.x = (rectB.x + rectB.w - rectA.x);
             return true;
         }
         return false;
@@ -98,10 +112,10 @@ class CollisionSystem
     static bool check_collision_up_down(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                         yorcvs::Vec2<float> &rectAvel)
     {
-        if (rectA.y + rectA.h <= rectB.y && rectA.y + rectA.h + (rectAvel.y ) > rectB.y &&
-            rectA.x - rectB.x < rectB.w && rectA.x + rectA.w > rectB.x)
+        if (rectA.y + rectA.h <= rectB.y && rectA.y + rectA.h + (rectAvel.y) > rectB.y && rectA.x - rectB.x < rectB.w &&
+            rectA.x + rectA.w > rectB.x)
         {
-            rectAvel.y = (rectB.y - rectA.y - rectA.h) ;
+            rectAvel.y = (rectB.y - rectA.y - rectA.h);
             return true;
         }
         return false;
@@ -109,10 +123,10 @@ class CollisionSystem
     static bool check_collision_down_up(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                         yorcvs::Vec2<float> &rectAvel)
     {
-        if (rectA.y >= rectB.y + rectB.h && rectA.y + (rectAvel.y ) < rectB.y + rectB.h &&
-            rectA.x - rectB.x < rectB.w && rectA.x + rectA.w > rectB.x)
+        if (rectA.y >= rectB.y + rectB.h && rectA.y + (rectAvel.y) < rectB.y + rectB.h && rectA.x - rectB.x < rectB.w &&
+            rectA.x + rectA.w > rectB.x)
         {
-            rectAvel.y = (rectB.y + rectB.h - rectA.y) ;
+            rectAvel.y = (rectB.y + rectB.h - rectA.y);
             return true;
         }
         return false;
@@ -121,15 +135,13 @@ class CollisionSystem
     static bool check_collision_corner_top_right(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                                  yorcvs::Vec2<float> &rectAvel)
     {
-        if (rectA.x + (rectAvel.x ) + rectA.w > rectB.x &&
-            rectA.x + (rectAvel.x ) + rectA.w < (rectB.x + rectB.w) &&
-            rectA.y + rectA.h + (rectAvel.y ) > rectB.y &&
-            rectA.y + rectA.h + (rectAvel.y ) < rectB.y + rectB.h && rectA.x < rectB.x &&
-            rectA.y < rectB.y)
+        if (rectA.x + (rectAvel.x) + rectA.w > rectB.x && rectA.x + (rectAvel.x) + rectA.w < (rectB.x + rectB.w) &&
+            rectA.y + rectA.h + (rectAvel.y) > rectB.y && rectA.y + rectA.h + (rectAvel.y) < rectB.y + rectB.h &&
+            rectA.x < rectB.x && rectA.y < rectB.y)
         {
 
-            rectAvel.x = (rectB.x - (rectA.x + rectA.w)) ;
-            rectAvel.y = ((rectA.y + rectA.h) - rectB.y) ;
+            rectAvel.x = (rectB.x - (rectA.x + rectA.w));
+            rectAvel.y = ((rectA.y + rectA.h) - rectB.y);
             return true;
         }
         return false;
@@ -137,15 +149,13 @@ class CollisionSystem
     static bool check_collision_corner_top_left(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                                 yorcvs::Vec2<float> &rectAvel)
     {
-        if (rectA.x + (rectAvel.x ) > rectB.x &&
-            rectA.x + (rectAvel.x ) < rectB.x + rectB.w &&
-            rectA.y + rectA.h + (rectAvel.y ) > rectB.y &&
-            rectA.y + rectA.h + (rectAvel.y ) < rectB.y + rectB.h && rectA.x >= rectB.x &&
-            rectA.x + (rectAvel.x ) + rectA.w > rectB.x + rectB.w && rectA.y < rectB.y)
+        if (rectA.x + (rectAvel.x) > rectB.x && rectA.x + (rectAvel.x) < rectB.x + rectB.w &&
+            rectA.y + rectA.h + (rectAvel.y) > rectB.y && rectA.y + rectA.h + (rectAvel.y) < rectB.y + rectB.h &&
+            rectA.x >= rectB.x && rectA.x + (rectAvel.x) + rectA.w > rectB.x + rectB.w && rectA.y < rectB.y)
         {
 
-            rectAvel.x = ((rectB.x + rectB.w) - rectA.x) ;
-            rectAvel.y = ((rectA.y + rectA.h) - rectB.y) ;
+            rectAvel.x = ((rectB.x + rectB.w) - rectA.x);
+            rectAvel.y = ((rectA.y + rectA.h) - rectB.y);
             return true;
         }
         return false;
@@ -153,16 +163,14 @@ class CollisionSystem
     static bool check_collision_corner_bottom_right(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                                     yorcvs::Vec2<float> &rectAvel)
     {
-        if (rectA.x + (rectAvel.x ) < rectB.x &&
-            rectA.x + (rectAvel.x ) + rectA.w > rectB.x &&
-            rectA.x + (rectAvel.x ) + rectA.w < rectB.x + rectB.w && rectA.x < rectB.x &&
-            rectA.y + (rectAvel.y ) > rectB.y &&
-            rectA.y + (rectAvel.y ) < rectB.y + rectB.h &&
-            rectA.y + rectA.h + (rectAvel.y ) > rectB.y + rectB.h)
+        if (rectA.x + (rectAvel.x) < rectB.x && rectA.x + (rectAvel.x) + rectA.w > rectB.x &&
+            rectA.x + (rectAvel.x) + rectA.w < rectB.x + rectB.w && rectA.x < rectB.x &&
+            rectA.y + (rectAvel.y) > rectB.y && rectA.y + (rectAvel.y) < rectB.y + rectB.h &&
+            rectA.y + rectA.h + (rectAvel.y) > rectB.y + rectB.h)
 
         {
-            rectAvel.x = (rectB.x - (rectA.x + rectA.w)) ;
-            rectAvel.y = ((rectB.y + rectB.h) - rectA.y) ;
+            rectAvel.x = (rectB.x - (rectA.x + rectA.w));
+            rectAvel.y = ((rectB.y + rectB.h) - rectA.y);
             return true;
         }
         return false;
@@ -170,20 +178,17 @@ class CollisionSystem
     static bool check_collision_corner_bottom_left(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                                    yorcvs::Vec2<float> &rectAvel)
     {
-        if (rectA.x + (rectAvel.x ) > rectB.x &&
-            rectA.x + (rectAvel.x ) < rectB.x + rectB.w &&
-            rectA.x + (rectAvel.x ) + rectA.w > rectB.x + rectB.w &&
-            rectA.y + (rectAvel.y ) > rectB.y &&
-            rectA.y + (rectAvel.y ) < rectB.y + rectB.h &&
-            rectA.y + (rectAvel.y ) + rectA.h > rectB.y + rectB.h)
+        if (rectA.x + (rectAvel.x) > rectB.x && rectA.x + (rectAvel.x) < rectB.x + rectB.w &&
+            rectA.x + (rectAvel.x) + rectA.w > rectB.x + rectB.w && rectA.y + (rectAvel.y) > rectB.y &&
+            rectA.y + (rectAvel.y) < rectB.y + rectB.h && rectA.y + (rectAvel.y) + rectA.h > rectB.y + rectB.h)
         {
-            rectAvel.x = ((rectB.x + rectB.w) - rectA.x) ;
-            rectAvel.y = ((rectB.y + rectB.h) - rectA.y) ;
+            rectAvel.x = ((rectB.x + rectB.w) - rectA.x);
+            rectAvel.y = ((rectB.y + rectB.h) - rectA.y);
             return true;
         }
         return false;
     }
-
+    public:
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;
 };
@@ -193,8 +198,7 @@ class VelocitySystem
   public:
     VelocitySystem(yorcvs::ECS *parent) : world(parent)
     {
-        
-       
+
         world->register_system<VelocitySystem>(*this);
         world->add_criteria_for_iteration<VelocitySystem, positionComponent, velocityComponent>();
     }
@@ -216,7 +220,7 @@ class VelocitySystem
             }
         }
     }
-    
+
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;
 };
@@ -226,7 +230,6 @@ class AnimationSystem
   public:
     AnimationSystem(yorcvs::ECS *parent) : world(parent)
     {
-        
 
         world->register_system<AnimationSystem>(*this);
         world->add_criteria_for_iteration<AnimationSystem, animationComponent, spriteComponent>();
@@ -269,7 +272,6 @@ class HealthSystem
   public:
     HealthSystem(yorcvs::ECS *parent) : world(parent)
     {
-        
 
         world->register_system<HealthSystem>(*this);
         world->add_criteria_for_iteration<HealthSystem, healthComponent>();
@@ -304,15 +306,16 @@ class HealthSystem
 class PlayerMovementControl
 {
   public:
-    PlayerMovementControl(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *parent_window) : world(parent), window(parent_window)
+    PlayerMovementControl(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *parent_window)
+        : world(parent), window(parent_window)
     {
-        
+
         world->register_system<PlayerMovementControl>(*this);
         world->add_criteria_for_iteration<PlayerMovementControl, playerMovementControlledComponent, velocityComponent,
                                           positionComponent, spriteComponent>();
     }
 
-    void updateControls(const yorcvs::Vec2<float>& render_size)
+    void updateControls(const yorcvs::Vec2<float> &render_size)
     {
 
         w_pressed = window->is_key_pressed({SDL_SCANCODE_W});
@@ -322,7 +325,7 @@ class PlayerMovementControl
 
         for (const auto &ID : entityList->entitiesID)
         {
-            
+
             dir = yorcvs::Vec2<float>(static_cast<float>(d_pressed) + static_cast<float>(a_pressed) * -1.0f,
                                       static_cast<float>(w_pressed) * -1.0f + static_cast<float>(s_pressed));
             dir.normalize();
@@ -330,8 +333,7 @@ class PlayerMovementControl
             world->get_component<velocityComponent>(ID).vel = dir;
 
             window->set_drawing_offset(world->get_component<positionComponent>(ID).position + dir -
-                                       (render_size - world->get_component<spriteComponent>(ID).size) /
-                                           2);
+                                       (render_size - world->get_component<spriteComponent>(ID).size) / 2);
         }
     }
     void updateAnimations() const
@@ -380,19 +382,18 @@ class PlayerMovementControl
 class SpriteSystem
 {
   public:
-    SpriteSystem(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *parentWindow) : world(parent), window(parentWindow)
+    SpriteSystem(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *parentWindow)
+        : world(parent), window(parentWindow)
     {
-        
-        
 
         world->register_system<SpriteSystem>(*this);
         world->add_criteria_for_iteration<SpriteSystem, positionComponent, spriteComponent>();
     }
-    void renderSprites(const  yorcvs::Vec2<float>& render_dimensions) const
+    void renderSprites(const yorcvs::Vec2<float> &render_dimensions) const
     {
         yorcvs::Vec2<float> rs = window->get_render_scale();
-        window->set_render_scale(window->get_size()/render_dimensions);
-   
+        window->set_render_scale(window->get_size() / render_dimensions);
+
         std::sort(entityList->entitiesID.begin(), entityList->entitiesID.end(), [&](size_t ID1, size_t ID2) {
             return (world->get_component<spriteComponent>(ID1).offset.y +
                     world->get_component<positionComponent>(ID1).position.y) <
@@ -409,8 +410,7 @@ class SpriteSystem
         std::sort(entityList->entitiesID.begin(), entityList->entitiesID.end(),
                   [&](size_t ID1, size_t ID2) { return ID1 < ID2; });
         window->set_render_scale(rs);
-    }   
-    
+    }
 
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;

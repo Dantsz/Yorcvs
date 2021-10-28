@@ -59,7 +59,7 @@ template <typename interface> class Window
     Window();
 
     ~Window();
-    
+
     void cleanup();
 
     /**
@@ -131,6 +131,18 @@ template <typename interface> class Window
      */
     void draw_texture(const Texture<interface> &texture, const yorcvs::Vec2<float> &dstRectPos,
                       const yorcvs::Vec2<float> &dstRectSize, const yorcvs::Rect<size_t> &srcRect, double angle = 0.0);
+
+
+    /**
+     * @brief Draws a rectangle to the screen
+     * 
+     * @param rect - the position and dimesnions of the rectangle
+     * @param r - red color component
+     * @param g - green
+     * @param b - blue
+     * @param a - alpha
+     */
+    void draw_rect(const yorcvs::Rect<float>& rect, uint8_t r , uint8_t g , uint8_t b , uint8_t a);
 
     /**
      * @brief Create a Text Texture object

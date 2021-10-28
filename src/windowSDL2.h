@@ -13,6 +13,7 @@
 #include "common/utilities.h"
 #include "common/window.h"
 
+#include <SDL_rect.h>
 #include <SDL_render.h>
 #include <SDL_video.h>
 
@@ -21,6 +22,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+#include <math.h>
 #include <functional> // callbacks need to be stored in a vector
 // SDL TEXTURE MANAGER
 // default_delete needs to be specialized for SDL_Texture to be used with STL
@@ -311,6 +313,21 @@ template <> class Window<yorcvs::SDL2>
         }
     }
 
+
+      
+    void draw_rect(const yorcvs::Rect<float>& rect, uint8_t r , uint8_t g , uint8_t b , uint8_t a)
+    {
+       SDL_FRect dest = {static_cast<float>(rect.x - offset.x ), static_cast<float>(rect.y - offset.y),
+                              static_cast<float>(rect.w), static_cast<float>(rect.h)};
+        uint8_t r_old = 0 ;
+        uint8_t g_old = 0;
+        uint8_t b_old = 0;
+        uint8_t a_old = 0;
+        SDL_GetRenderDrawColor(renderer,&r_old,&g_old,&b_old,&a_old);
+        SDL_SetRenderDrawColor(renderer,r,g,b,a);
+        SDL_RenderDrawRectF(renderer,&dest);
+        SDL_SetRenderDrawColor(renderer,r_old,g_old,b_old,a_old);
+    }
     [[nodiscard]] Text<yorcvs::SDL2> create_text(const std::string &path, const std::string &message, unsigned char r,
                                                  unsigned char g, unsigned char b, unsigned char a, size_t charSize,
                                                  size_t lineLength)

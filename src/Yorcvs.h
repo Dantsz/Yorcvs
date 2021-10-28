@@ -153,7 +153,7 @@ class Map
   public:
 
     Map( const std::string& path , yorcvs::ECS* world,yorcvs::Window<yorcvs::SDL2>& r) :  ecs(world),init_ecs(*world), parentWindow(&r), collisionS(world), velocityS(world), pcS(world, &r),
-          sprS(world, &r), animS(world),healthS(world)//,dbInfo{&r, world, &pcS}
+          sprS(world, &r), animS(world),healthS(world),dbInfo{&r, world, &pcS}
     {
         
         load(world,&r,path);
@@ -342,6 +342,12 @@ class Map
                 {
                     ecs->add_component<hitboxComponent>(entity,
                                                         {{0, 0, object.getAABB().width, object.getAABB().height}});
+
+                    //TILED HAS A WEIRD BEHAVIOUR THAT IF AN TILE IS INSERTED AS A OBJECT IT'S Y POSITION IS DIFFERENT FROM AN RECTANGLE OBJECT AND DOESN'T LOOK LIKE IN THE EDITOR
+                    if(!ecs->has_components<spriteComponent>(entity))
+                    {
+                        ecs->get_component<hitboxComponent>(entity).hitbox.y += object.getAABB().height;
+                    }
                 }
                 //NOTE: handles player spawn area
                 if(property.getName() == "playerSpawn" && property.getBoolValue())
@@ -456,7 +462,8 @@ class Map
     {
         render_tiles(r, render_dimensions);
         sprS.renderSprites(render_dimensions);
-        //dbInfo.render(elapsed);
+        collisionS.render_hitboxes(*parentWindow,render_dimensions,255, 0, 0,150);
+        dbInfo.render(elapsed);
     }
 
 
@@ -513,7 +520,7 @@ class Map
     SpriteSystem sprS;
     AnimationSystem animS;
     HealthSystem healthS;
-   // DebugInfo dbInfo;
+    DebugInfo dbInfo;
 
     std::vector<yorcvs::Entity> entities;
   
