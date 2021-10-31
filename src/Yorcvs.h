@@ -38,8 +38,8 @@ namespace yorcvs
 class DebugInfo
 {
   public:
-    DebugInfo(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms)
-        : parentWindow(parentW), appECS(pECS), playerMoveSystem(pms)
+    DebugInfo(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms,CollisionSystem* cols)
+        : parentWindow(parentW), appECS(pECS), playerMoveSystem(pms),colSystem(cols)
     {
         frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", 255, 255, 255, 255, 100, 10000);
         maxframeTimeTX =
@@ -102,7 +102,7 @@ class DebugInfo
         }
     }
 
-    void render(float elapsed)
+    void render(float elapsed,const yorcvs::Vec2<float>& render_dimensions)
     {
 
         if (parentWindow->is_key_pressed({SDL_SCANCODE_E}))
@@ -113,6 +113,7 @@ class DebugInfo
             parentWindow->draw_text(ecsEntities, entitiesRect);
             parentWindow->draw_text(playerPosition, pPositionRect);
             parentWindow->draw_text(playerHealth, playerHealthRect);
+            colSystem->render_hitboxes(*parentWindow,render_dimensions,255,0,0,255);
         }
     }
 
@@ -140,6 +141,9 @@ class DebugInfo
     yorcvs::Rect<float> playerHealthRect = {0, 100, 200, 25};
 
     PlayerMovementControl *playerMoveSystem;
+
+    CollisionSystem* colSystem;
+    
 };
 
 struct Tile
@@ -154,7 +158,7 @@ class Map
   public:
     Map(const std::string &path, yorcvs::ECS *world, yorcvs::Window<yorcvs::SDL2> &r)
         : ecs(world), init_ecs(*world), parentWindow(&r), collisionS(world), velocityS(world), pcS(world, &r),
-          sprS(world, &r), animS(world), healthS(world), dbInfo{&r, world, &pcS}
+          sprS(world, &r), animS(world), healthS(world), dbInfo{&r, world, &pcS,&collisionS}
     {
 
         load(world, &r, path);
@@ -465,8 +469,8 @@ class Map
     {
         render_tiles(r, render_dimensions);
         sprS.renderSprites(render_dimensions);
-        collisionS.render_hitboxes(*parentWindow, render_dimensions, 255, 0, 0, 150);
-        dbInfo.render(elapsed);
+        
+        dbInfo.render(elapsed,render_dimensions);
     }
 
     void load_character_from_path(size_t entity_id, const std::string &path)

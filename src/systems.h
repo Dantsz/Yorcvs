@@ -72,7 +72,7 @@ class CollisionSystem
     template <typename render_backend>
     void render_hitboxes(yorcvs::Window<render_backend> &window , const yorcvs::Vec2<float> &render_dimensions, float r, float g, float b,float a)
     {
-          yorcvs::Vec2<float> old_rs = window.get_render_scale();
+        yorcvs::Vec2<float> old_rs = window.get_render_scale();
         window.set_render_scale(window.get_size() / render_dimensions);
 
         yorcvs::Rect<float> rect{};
