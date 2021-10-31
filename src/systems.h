@@ -37,12 +37,13 @@ class CollisionSystem
                 for (const auto &IDB : entityList->entitiesID)
                 {
 
-                    rectB.x = world->get_component<positionComponent>(IDB).position.x;
-                    rectB.y = world->get_component<positionComponent>(IDB).position.y;
-                    rectB.w = world->get_component<hitboxComponent>(IDB).hitbox.w +
-                              world->get_component<hitboxComponent>(IDB).hitbox.x;
-                    rectB.h = world->get_component<hitboxComponent>(IDB).hitbox.h +
-                              world->get_component<hitboxComponent>(IDB).hitbox.y;
+                    rectB.x = world->get_component<positionComponent>(IDB).position.x +  world->get_component<hitboxComponent>(IDB).hitbox.x;
+                    rectB.y = world->get_component<positionComponent>(IDB).position.y +
+                              world->get_component<hitboxComponent>(IDB).hitbox.y;;
+
+                    rectB.w = world->get_component<hitboxComponent>(IDB).hitbox.w;
+                              
+                    rectB.h = world->get_component<hitboxComponent>(IDB).hitbox.h;
                     if (IDA != IDB)
                     {
 

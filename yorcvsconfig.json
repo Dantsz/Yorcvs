@@ -6,7 +6,7 @@
     },
     "engine_settings":
     {
-        "render_width" : 0,
-        "render_height" : 0
+        "render_width" : 240,
+        "render_height" : 120
     }   
 }

@@ -27,17 +27,19 @@
 #include <string>
 #include <vector>
 namespace json = nlohmann;
+#include "tmxlite/Layer.hpp"
 #include <filesystem>
 #include <fstream>
-#include "tmxlite/Layer.hpp"
 #include <tmxlite/Map.hpp>
+
 
 namespace yorcvs
 {
 class DebugInfo
 {
   public:
-    DebugInfo(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms) : parentWindow(parentW), appECS(pECS), playerMoveSystem(pms)
+    DebugInfo(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms)
+        : parentWindow(parentW), appECS(pECS), playerMoveSystem(pms)
     {
         frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", 255, 255, 255, 255, 100, 10000);
         maxframeTimeTX =
@@ -52,12 +54,11 @@ class DebugInfo
 
     ~DebugInfo()
     {
-        std::cout << frameTime.SDLtex.get() <<'\n';
+        std::cout << frameTime.SDLtex.get() << '\n';
         std::cout << maxframeTimeTX.SDLtex.get() << '\n';
         std::cout << ecsEntities.SDLtex.get() << '\n';
         std::cout << playerHealth.SDLtex.get() << '\n';
         std::cout << playerPosition.SDLtex.get() << '\n';
-        
     }
 
     void update(float ft)
@@ -151,17 +152,16 @@ struct Tile
 class Map
 {
   public:
-
-    Map( const std::string& path , yorcvs::ECS* world,yorcvs::Window<yorcvs::SDL2>& r) :  ecs(world),init_ecs(*world), parentWindow(&r), collisionS(world), velocityS(world), pcS(world, &r),
-          sprS(world, &r), animS(world),healthS(world),dbInfo{&r, world, &pcS}
+    Map(const std::string &path, yorcvs::ECS *world, yorcvs::Window<yorcvs::SDL2> &r)
+        : ecs(world), init_ecs(*world), parentWindow(&r), collisionS(world), velocityS(world), pcS(world, &r),
+          sprS(world, &r), animS(world), healthS(world), dbInfo{&r, world, &pcS}
     {
-        
-        load(world,&r,path);
+
+        load(world, &r, path);
         entities.emplace_back(world);
         load_character_from_path(entities[0].id, "assets/player.json");
-
     }
-    
+
     void load(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *window, const std::string &path)
     {
         ecs = parent;
@@ -294,15 +294,18 @@ class Map
                         }
                     }
 
-                
-                    ///add object
-                    size_t entity = ecs->create_entity_ID();  
+                    /// add object
+                    size_t entity = ecs->create_entity_ID();
                     ecs->add_component<positionComponent>(
-                     entity, {chunk_position * tilesSize + tilesSize * yorcvs::Vec2<float>{static_cast<float>(chunk_x), static_cast<float>(chunk_y)}});
-                    ecs->add_component<spriteComponent>(entity, {{0, 0},
-                                                             {static_cast<float>(tile_set->getTileSize().x),static_cast<float>(tile_set->getTileSize().y)},
-                                                             get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID),
-                                                             parentWindow->create_texture(tile_set->getImagePath())});
+                        entity,
+                        {chunk_position * tilesSize +
+                         tilesSize * yorcvs::Vec2<float>{static_cast<float>(chunk_x), static_cast<float>(chunk_y)}});
+                    ecs->add_component<spriteComponent>(
+                        entity,
+                        {{0, 0},
+                         {static_cast<float>(tile_set->getTileSize().x), static_cast<float>(tile_set->getTileSize().y)},
+                         get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID),
+                         parentWindow->create_texture(tile_set->getImagePath())});
                 }
             }
         }
@@ -326,56 +329,57 @@ class Map
                                                              get_src_rect_from_uid(map, object.getTileID()),
                                                              parentWindow->create_texture(tileSet->getImagePath())});
             }
-            /*  
+            /*
             Object properties
             * collision - object has collision
             * playerSpawn - objects' coordinates are where the player can spawn
             * HP - health
             * HP_max - maximum hp
-            * HP_Regen - health regeneration 
+            * HP_Regen - health regeneration
             */
-            
+
             for (const auto &property : object.getProperties())
             {
-                //Note: handles hitbox to object
+                // Note: handles hitbox to object
                 if (property.getName() == "collision" && property.getBoolValue())
                 {
                     ecs->add_component<hitboxComponent>(entity,
                                                         {{0, 0, object.getAABB().width, object.getAABB().height}});
 
-                    //TILED HAS A WEIRD BEHAVIOUR THAT IF AN TILE IS INSERTED AS A OBJECT IT'S Y POSITION IS DIFFERENT FROM AN RECTANGLE OBJECT AND DOESN'T LOOK LIKE IN THE EDITOR
-                    if(!ecs->has_components<spriteComponent>(entity))
+                    // TILED HAS A WEIRD BEHAVIOUR THAT IF AN TILE IS INSERTED AS A OBJECT IT'S Y POSITION IS DIFFERENT
+                    // FROM AN RECTANGLE OBJECT AND DOESN'T LOOK LIKE IN THE EDITOR
+                    if (!ecs->has_components<spriteComponent>(entity))
                     {
                         ecs->get_component<hitboxComponent>(entity).hitbox.y += object.getAABB().height;
                     }
                 }
-                //NOTE: handles player spawn area
-                if(property.getName() == "playerSpawn" && property.getBoolValue())
+                // NOTE: handles player spawn area
+                if (property.getName() == "playerSpawn" && property.getBoolValue())
                 {
-                    spawn_coord = {object.getPosition().x,object.getPosition().y};
+                    spawn_coord = {object.getPosition().x, object.getPosition().y};
                 }
-                //NOTE HANDLES HP             
-                if(property.getName() == "HP")
+                // NOTE HANDLES HP
+                if (property.getName() == "HP")
                 {
-                    if(!ecs->has_components<healthComponent>(entity))
+                    if (!ecs->has_components<healthComponent>(entity))
                     {
-                        ecs->add_component<healthComponent>(entity,{});
+                        ecs->add_component<healthComponent>(entity, {});
                     }
                     ecs->get_component<healthComponent>(entity).HP = property.getFloatValue();
                 }
-                if(property.getName() == "HP_max")
+                if (property.getName() == "HP_max")
                 {
-                    if(!ecs->has_components<healthComponent>(entity))
+                    if (!ecs->has_components<healthComponent>(entity))
                     {
-                        ecs->add_component<healthComponent>(entity,{});
+                        ecs->add_component<healthComponent>(entity, {});
                     }
                     ecs->get_component<healthComponent>(entity).maxHP = property.getFloatValue();
                 }
-                if(property.getName() == "HP_regen")
+                if (property.getName() == "HP_regen")
                 {
-                    if(!ecs->has_components<healthComponent>(entity))
+                    if (!ecs->has_components<healthComponent>(entity))
                     {
-                        ecs->add_component<healthComponent>(entity,{});
+                        ecs->add_component<healthComponent>(entity, {});
                     }
                     ecs->get_component<healthComponent>(entity).health_regen = property.getFloatValue();
                 }
@@ -447,7 +451,7 @@ class Map
         return tile_set;
     }
 
-    void update(float dt, const yorcvs::Vec2<float>& render_dimensions)
+    void update(float dt, const yorcvs::Vec2<float> &render_dimensions)
     {
         collisionS.update();
         velocityS.update();
@@ -457,52 +461,47 @@ class Map
         pcS.updateControls(render_dimensions);
     }
 
-
-    void render(const yorcvs::Vec2<float>& render_dimensions , yorcvs::Window<SDL2>& r , float elapsed)
+    void render(const yorcvs::Vec2<float> &render_dimensions, yorcvs::Window<SDL2> &r, float elapsed)
     {
         render_tiles(r, render_dimensions);
         sprS.renderSprites(render_dimensions);
-        collisionS.render_hitboxes(*parentWindow,render_dimensions,255, 0, 0,150);
+        collisionS.render_hitboxes(*parentWindow, render_dimensions, 255, 0, 0, 150);
         dbInfo.render(elapsed);
     }
 
-
-    void load_character_from_path(size_t entity_id , const std::string& path)
+    void load_character_from_path(size_t entity_id, const std::string &path)
     {
         std::ifstream playerIN(path);
         std::string playerData{(std::istreambuf_iterator<char>(playerIN)), (std::istreambuf_iterator<char>())};
         auto player = json::json::parse(playerData);
 
-        ecs->add_component<hitboxComponent>(entity_id, {{player["hitbox"]["x"], player["hitbox"]["y"],
-                                                               player["hitbox"]["w"], player["hitbox"]["h"]}});
+        ecs->add_component<hitboxComponent>(
+            entity_id, {{player["hitbox"]["x"], player["hitbox"]["y"], player["hitbox"]["w"], player["hitbox"]["h"]}});
         ecs->add_component<positionComponent>(entity_id, {get_spawn_position()});
         ecs->add_component<velocityComponent>(entity_id, {{0.0f, 0.0f}, {false, false}});
         ecs->add_component<playerMovementControlledComponent>(entity_id, {});
         ecs->add_component<spriteComponent>(entity_id,
-                                             {{player["sprite"]["offset"]["x"], player["sprite"]["offset"]["y"]},
-                                              {player["sprite"]["size"]["x"], player["sprite"]["size"]["y"]},
-                                              {player["sprite"]["srcRect"]["x"], player["sprite"]["srcRect"]["y"],
-                                               player["sprite"]["srcRect"]["w"], player["sprite"]["srcRect"]["h"]},
-                                              parentWindow->create_texture(player["sprite"]["spriteName"])});
+                                            {{player["sprite"]["offset"]["x"], player["sprite"]["offset"]["y"]},
+                                             {player["sprite"]["size"]["x"], player["sprite"]["size"]["y"]},
+                                             {player["sprite"]["srcRect"]["x"], player["sprite"]["srcRect"]["y"],
+                                              player["sprite"]["srcRect"]["w"], player["sprite"]["srcRect"]["h"]},
+                                             parentWindow->create_texture(player["sprite"]["spriteName"])});
         ecs->add_component<animationComponent>(entity_id, {0, 8, 0.0f, 100.0f});
         ecs->add_component<healthComponent>(entity_id, {5, 10, 0.1f, false});
-
-
     }
 
   private:
-    //class to initialize the ecs before systems are constructed
+    // class to initialize the ecs before systems are constructed
     struct ecs_Initializer
     {
-        ecs_Initializer(yorcvs::ECS& world)
+        ecs_Initializer(yorcvs::ECS &world)
         {
-            //register components
-            world.register_component<hitboxComponent,positionComponent,velocityComponent,healthComponent>();
+            // register components
+            world.register_component<hitboxComponent, positionComponent, velocityComponent, healthComponent>();
             world.register_component<playerMovementControlledComponent>();
-            world.register_component<spriteComponent,animationComponent>();
+            world.register_component<spriteComponent, animationComponent>();
         }
     };
-
 
     std::string tilesetPath;
     yorcvs::Vec2<float> tilesSize;
@@ -523,10 +522,9 @@ class Map
     DebugInfo dbInfo;
 
     std::vector<yorcvs::Entity> entities;
-  
 };
 
-//TODO: MAKE SOME SYSTEMS MAP-DEPENDENT AND REMOVE THIS
+// TODO: MAKE SOME SYSTEMS MAP-DEPENDENT AND REMOVE THIS
 
 /**
  * @brief Main game class
@@ -537,8 +535,7 @@ class Application
   public:
     Application()
     {
-       
-    
+
         // Load config
         if (std::filesystem::exists(configname))
         {
@@ -551,9 +548,23 @@ class Application
             {
                 yorcvs::log("Inavlid config file");
             }
-            else if (!config["window"]["width"].is_discarded() && !config["window"]["height"].is_discarded())
+            else
             {
-                r.set_size(config["window"]["width"], config["window"]["height"]);
+                if (!config["window"]["width"].is_discarded() && !config["window"]["height"].is_discarded())
+                {
+                    r.set_size(config["window"]["width"], config["window"]["height"]);
+                }
+                if(!config["engine_settings"].is_discarded())
+                {
+                    if(!config["engine_settings"]["render_width"].is_discarded())
+                    {
+                        render_dimensions.x = config["engine_settings"]["render_width"];
+                    }
+                    if(!config["engine_settings"]["render_height"].is_discarded())
+                    {
+                        render_dimensions.y = config["engine_settings"]["render_height"];
+                    }
+                }
             }
         }
         else
@@ -561,9 +572,6 @@ class Application
             yorcvs::log("Config file not found, loading default settings...");
         }
 
-     
-
-        
         counter.start();
     }
     Application(const Application &other) = delete;
@@ -574,9 +582,8 @@ class Application
     void update(float dt)
     {
 
-        map.update(dt,render_dimensions);
+        map.update(dt, render_dimensions);
     }
- 
 
     void run()
     {
@@ -591,13 +598,13 @@ class Application
 
         while (lag >= msPF)
         {
-            
+
             update(msPF);
             lag -= msPF;
         }
 
         r.clear();
-        map.render(render_dimensions,r,elapsed);
+        map.render(render_dimensions, r, elapsed);
         r.present();
     }
 
@@ -614,8 +621,6 @@ class Application
   private:
     static constexpr const char *configname = "yorcvsconfig.json";
 
-  
-
     yorcvs::Window<yorcvs::SDL2> r;
     yorcvs::Timer counter;
 
@@ -624,8 +629,7 @@ class Application
     yorcvs::Vec2<float> render_dimensions = {240.0f, 120.0f}; // how much to render
 
     yorcvs::ECS world{};
-    yorcvs::Map map{"assets/map.tmx",&world,r};
+    yorcvs::Map map{"assets/map.tmx", &world, r};
     // debug stuff
-    
 };
 } // namespace yorcvs
