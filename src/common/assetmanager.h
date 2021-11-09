@@ -32,7 +32,7 @@ template <typename assetType> class AssetManager
     ~AssetManager() = default;
 
     /**
-     * @brief Loads the resource from the diosk and returns a pointer to it.
+     * @brief Loads the resource from the disk and returns a pointer to it.
      * Returns nullptr if the file is not found
      *
      * @param path path to resource

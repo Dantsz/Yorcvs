@@ -1225,8 +1225,6 @@ class Entity
     }
 
     size_t id = 0;
-
-  private:
     ECS *parent = nullptr; // non-owning pointer to parent
 };
 

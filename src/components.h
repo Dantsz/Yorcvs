@@ -1,7 +1,7 @@
 #pragma once
 #include "common/types.h"
 #include "windowSDL2.h"
-
+#include <unordered_map>
 namespace yorcvs{
 using graphics = yorcvs::SDL2;
 }
@@ -45,10 +45,21 @@ struct spriteComponent
 
 struct animationComponent
 {
+    struct AnimationFrame
+    {
+        yorcvs::Rect<size_t> srcRect;
+    };
+    struct Animation
+    {
+        std::vector<AnimationFrame> frames;// not ideal
+        float speed;// in milliseconds
+    };
+    std::unordered_map<std::string, Animation> animations;//ugly
+    Animation* cur_animation; // non-owning pointer to an animation in the map
     size_t cur_frame;
     size_t frames;
     float cur_elapsed;
-    float speed;// in milliseconds
+   
 };
 
 struct defensiveStatsComponent;

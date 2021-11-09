@@ -52,14 +52,7 @@ class DebugInfo
         // TODO: remove this test
     }
 
-    ~DebugInfo()
-    {
-        std::cout << frameTime.SDLtex.get() << '\n';
-        std::cout << maxframeTimeTX.SDLtex.get() << '\n';
-        std::cout << ecsEntities.SDLtex.get() << '\n';
-        std::cout << playerHealth.SDLtex.get() << '\n';
-        std::cout << playerPosition.SDLtex.get() << '\n';
-    }
+    ~DebugInfo() = default;
 
     void update(float ft)
     {
@@ -163,7 +156,7 @@ class Map
 
         load(world, &r, path);
         entities.emplace_back(world);
-        load_character_from_path(entities[0].id, "assets/player.json");
+        load_character_from_path(entities[0], "assets/player.json");
     }
 
     void load(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *window, const std::string &path)
@@ -473,25 +466,36 @@ class Map
         dbInfo.render(elapsed,render_dimensions);
     }
 
-    void load_character_from_path(size_t entity_id, const std::string &path)
-    {
+    void load_character_from_path(yorcvs::Entity& entity, const std::string &path)
+    {   
         std::ifstream playerIN(path);
         std::string playerData{(std::istreambuf_iterator<char>(playerIN)), (std::istreambuf_iterator<char>())};
         auto player = json::json::parse(playerData);
 
         ecs->add_component<hitboxComponent>(
-            entity_id, {{player["hitbox"]["x"], player["hitbox"]["y"], player["hitbox"]["w"], player["hitbox"]["h"]}});
-        ecs->add_component<positionComponent>(entity_id, {get_spawn_position()});
-        ecs->add_component<velocityComponent>(entity_id, {{0.0f, 0.0f}, {false, false}});
-        ecs->add_component<playerMovementControlledComponent>(entity_id, {});
-        ecs->add_component<spriteComponent>(entity_id,
+            entity.id, {{player["hitbox"]["x"], player["hitbox"]["y"], player["hitbox"]["w"], player["hitbox"]["h"]}});
+        ecs->add_component<positionComponent>(entity.id, {get_spawn_position()});
+        ecs->add_component<velocityComponent>(entity.id, {{0.0f, 0.0f}, {false, false}});
+        ecs->add_component<playerMovementControlledComponent>(entity.id, {});
+        ecs->add_component<spriteComponent>(entity.id,
                                             {{player["sprite"]["offset"]["x"], player["sprite"]["offset"]["y"]},
                                              {player["sprite"]["size"]["x"], player["sprite"]["size"]["y"]},
                                              {player["sprite"]["srcRect"]["x"], player["sprite"]["srcRect"]["y"],
                                               player["sprite"]["srcRect"]["w"], player["sprite"]["srcRect"]["h"]},
                                              parentWindow->create_texture(player["sprite"]["spriteName"])});
-        ecs->add_component<animationComponent>(entity_id, {0, 8, 0.0f, 100.0f});
-        ecs->add_component<healthComponent>(entity_id, {5, 10, 0.1f, false});
+        ecs->add_component<healthComponent>(entity.id, {5, 10, 0.1f, false});
+        ecs->add_component<animationComponent>(entity.id,{});
+        for(const auto &animation : player["sprite"]["animations"])
+        {
+            
+            bool animation_fail = animS.add_animation(entity.id, animation["name"],animation["speed"]);
+            for(const auto& frame : animation["frames"])
+            {
+                bool frame_fail = animS.add_animation_frame(entity.id, animation["name"], {frame["x"],frame["y"],frame["w"],frame["h"]});
+            }
+        }
+        animS.set_animation(entity, "idleL");
+
     }
 
   private:

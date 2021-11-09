@@ -37,12 +37,14 @@ class CollisionSystem
                 for (const auto &IDB : entityList->entitiesID)
                 {
 
-                    rectB.x = world->get_component<positionComponent>(IDB).position.x +  world->get_component<hitboxComponent>(IDB).hitbox.x;
+                    rectB.x = world->get_component<positionComponent>(IDB).position.x +
+                              world->get_component<hitboxComponent>(IDB).hitbox.x;
                     rectB.y = world->get_component<positionComponent>(IDB).position.y +
-                              world->get_component<hitboxComponent>(IDB).hitbox.y;;
+                              world->get_component<hitboxComponent>(IDB).hitbox.y;
+                    ;
 
                     rectB.w = world->get_component<hitboxComponent>(IDB).hitbox.w;
-                              
+
                     rectB.h = world->get_component<hitboxComponent>(IDB).hitbox.h;
                     if (IDA != IDB)
                     {
@@ -70,7 +72,8 @@ class CollisionSystem
         }
     }
     template <typename render_backend>
-    void render_hitboxes(yorcvs::Window<render_backend> &window , const yorcvs::Vec2<float> &render_dimensions, float r, float g, float b,float a)
+    void render_hitboxes(yorcvs::Window<render_backend> &window, const yorcvs::Vec2<float> &render_dimensions, float r,
+                         float g, float b, float a)
     {
         yorcvs::Vec2<float> old_rs = window.get_render_scale();
         window.set_render_scale(window.get_size() / render_dimensions);
@@ -78,11 +81,13 @@ class CollisionSystem
         yorcvs::Rect<float> rect{};
         for (const auto &ID : entityList->entitiesID)
         {
-            rect.x = world->get_component<positionComponent>(ID).position.x + world->get_component<hitboxComponent>(ID).hitbox.x;
-            rect.y = world->get_component<positionComponent>(ID).position.y + world->get_component<hitboxComponent>(ID).hitbox.y;
+            rect.x = world->get_component<positionComponent>(ID).position.x +
+                     world->get_component<hitboxComponent>(ID).hitbox.x;
+            rect.y = world->get_component<positionComponent>(ID).position.y +
+                     world->get_component<hitboxComponent>(ID).hitbox.y;
             rect.w = world->get_component<hitboxComponent>(ID).hitbox.w;
-            rect.h =  world->get_component<hitboxComponent>(ID).hitbox.h;
-            window.draw_rect(rect,r,g,b,a);
+            rect.h = world->get_component<hitboxComponent>(ID).hitbox.h;
+            window.draw_rect(rect, r, g, b, a);
         }
         window.set_render_scale(old_rs);
     }
@@ -189,7 +194,8 @@ class CollisionSystem
         }
         return false;
     }
-    public:
+
+  public:
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;
 };
@@ -235,31 +241,145 @@ class AnimationSystem
         world->register_system<AnimationSystem>(*this);
         world->add_criteria_for_iteration<AnimationSystem, animationComponent, spriteComponent>();
     }
+    /**
+     * @brief Adds an animation with that name to the component
+     *
+     * @param entity
+     * @param name - name of the animation
+     * @return bool - false if failed
+     */
+    [[nodiscard]] bool add_animation(const size_t entityID, const std::string &name, const float speed) const
+    {
+        if (!world->has_components<animationComponent>(entityID))
+        {
+            yorcvs::log("Entity doesn't have  an animation component", yorcvs::MSGSEVERITY::WARNING);
+            return false;
+        }
+        std::unordered_map<std::string, animationComponent::Animation> *entity_anims =
+            &world->get_component<animationComponent>(entityID).animations;
+        const auto &anim = entity_anims->find(name);
+        if (anim == entity_anims->end())
+        {
+            entity_anims->insert({name, {{},speed}});
+            return true;
+        }
+
+        yorcvs::log("Animation " + name + " already exists", yorcvs::MSGSEVERITY::WARNING);
+        return false;
+    }
+
+    /**
+     * @brief adds a frame to the animation with name animation_name to the entity with ID entityID
+     *
+     * @param entityID
+     * @param animation_name
+     * @param frame
+     * @param frame_pass_time amount of time to pass until next frame
+     * @return bool - false if failed
+     */
+    [[nodiscard]] bool add_animation_frame(const size_t entityID, const std::string &animation_name,
+                                           const yorcvs::Rect<size_t> &frame) const
+    {
+        if (!world->has_components<animationComponent>(entityID))
+        {
+            yorcvs::log("Entity doesn't have  an animation component", yorcvs::MSGSEVERITY::WARNING);
+            return false;
+        }
+        std::unordered_map<std::string, animationComponent::Animation> *entity_anims =
+            &world->get_component<animationComponent>(entityID).animations;
+        const auto &anim = entity_anims->find(animation_name);
+        if (anim == entity_anims->end())
+        {
+            yorcvs::log("Entity " + std::to_string(entityID) + " doesn't have an animation with the name " +
+                            animation_name,
+                        yorcvs::MSGSEVERITY::ERROR);
+            return false;
+        }
+        anim->second.frames.push_back({frame});
+        return true;
+    }
+
+    void remove_animation(yorcvs::Entity, size_t index);
+
+    void remove_animation_frame(yorcvs::Entity, size_t index);
+
+    /**
+     * @brief Set which animation to be used
+     *
+     * @param entity
+     * @param animation_name
+     */
+    static void set_animation(const yorcvs::Entity &entity, const std::string &animation_name)
+    {
+        if (!entity.parent->has_components<animationComponent>(entity.id))
+        {
+            yorcvs::log("Entity doesn't have  an animation component", yorcvs::MSGSEVERITY::WARNING);
+            return;
+        }
+        std::unordered_map<std::string, animationComponent::Animation> *entity_anims =
+            &entity.parent->get_component<animationComponent>(entity.id).animations;
+        const auto &anim = entity_anims->find(animation_name);
+        if (anim == entity_anims->end())
+        {
+            yorcvs::log("Entity " + std::to_string(entity.id) + " doesn't have an animation with the name " +
+                            animation_name,
+                        yorcvs::MSGSEVERITY::ERROR);
+            return;
+        }
+        entity.parent->get_component<animationComponent>(entity.id).cur_animation = &anim->second;
+    }
+
+    /**
+     * @brief Set the animation object
+     *
+     * @param world
+     * @param entityID
+     * @param animation_name
+     */
+    static void set_animation(yorcvs::ECS *world, const size_t &entityID, const std::string &animation_name)
+    {
+        if (!world->has_components<animationComponent>(entityID))
+        {
+            yorcvs::log("Entity doesn't have  an animation component", yorcvs::MSGSEVERITY::WARNING);
+            return;
+        }
+        std::unordered_map<std::string, animationComponent::Animation> *entity_anims =
+            &world->get_component<animationComponent>(entityID).animations;
+        const auto &anim = entity_anims->find(animation_name);
+        if (anim == entity_anims->end())
+        {
+            yorcvs::log("Entity " + std::to_string(entityID) + " doesn't have an animation with the name " +
+                            animation_name,
+                        yorcvs::MSGSEVERITY::ERROR);
+            return;
+        }
+        world->get_component<animationComponent>(entityID).cur_animation = &anim->second;
+    }
 
     void update(float elapsed) const
     {
         for (const auto &ID : entityList->entitiesID)
         {
+            if (world->get_component<animationComponent>(ID).cur_animation == nullptr)
+            {
+                continue;
+            }
             world->get_component<animationComponent>(ID).cur_elapsed += elapsed;
             if (world->get_component<animationComponent>(ID).cur_elapsed >
-                world->get_component<animationComponent>(ID).speed)
+                world->get_component<animationComponent>(ID).cur_animation->speed)
             {
+               
+                world->get_component<animationComponent>(ID).cur_elapsed =  0;
                 world->get_component<animationComponent>(ID).cur_frame++;
-                world->get_component<animationComponent>(ID).cur_elapsed = 0.0f;
-                if (world->get_component<animationComponent>(ID).cur_frame <
-                    world->get_component<animationComponent>(ID).frames)
+                if (world->get_component<animationComponent>(ID).cur_frame >=
+                    world->get_component<animationComponent>(ID).cur_animation->frames.size())
                 {
-                    world->get_component<spriteComponent>(ID).srcRect.x =
-                        world->get_component<spriteComponent>(ID).srcRect.x +
-                        world->get_component<spriteComponent>(ID).srcRect.w;
-                }
-                else
-                {
-                    world->get_component<spriteComponent>(ID).srcRect.x -=
-                        world->get_component<spriteComponent>(ID).srcRect.w *
-                        (world->get_component<animationComponent>(ID).frames - 1);
                     world->get_component<animationComponent>(ID).cur_frame = 0;
                 }
+                world->get_component<spriteComponent>(ID).srcRect =
+                    world->get_component<animationComponent>(ID)
+                        .cur_animation->frames[world->get_component<animationComponent>(ID).cur_frame]
+                        .srcRect;
             }
         }
     }
@@ -344,29 +464,23 @@ class PlayerMovementControl
 
             if (d_pressed)
             {
-                world->get_component<spriteComponent>(ID).srcRect.y =
-                    2 * world->get_component<spriteComponent>(ID).srcRect.h;
+                AnimationSystem::set_animation(world, ID, "walkingR");
             }
             else if (a_pressed)
             {
-                world->get_component<spriteComponent>(ID).srcRect.y =
-                    3 * world->get_component<spriteComponent>(ID).srcRect.h;
+                AnimationSystem::set_animation(world, ID, "walkingL");
             }
             else if (s_pressed || w_pressed)
             {
-                world->get_component<spriteComponent>(ID).srcRect.y =
-                    (static_cast<size_t>(!world->get_component<velocityComponent>(ID).facing.x) + 2) *
-                    world->get_component<spriteComponent>(ID).srcRect.h;
+                AnimationSystem::set_animation(world, ID, "walkingR");
             }
             else if (world->get_component<velocityComponent>(ID).facing.x)
             {
-                world->get_component<spriteComponent>(ID).srcRect.y =
-                    1 * world->get_component<spriteComponent>(ID).srcRect.h;
+                AnimationSystem::set_animation(world, ID, "idleR");
             }
             else
             {
-                world->get_component<spriteComponent>(ID).srcRect.y =
-                    0 * world->get_component<spriteComponent>(ID).srcRect.h;
+                AnimationSystem::set_animation(world, ID, "idleR");
             }
         }
     }
