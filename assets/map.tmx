@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="left-up" width="100" height="100" tilewidth="32" tileheight="32" infinite="1" nextlayerid="4" nextobjectid="36">
+<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="left-up" width="100" height="100" tilewidth="32" tileheight="32" infinite="1" nextlayerid="4" nextobjectid="38">
  <properties>
   <property name="Ysorted" type="bool" value="false"/>
  </properties>
@@ -147,7 +147,7 @@
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="30" x="-403.711" y="-64.125" width="870.408" height="6.542">
+  <object id="30" x="-403.711" y="-70.125" width="870.408" height="6.292">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
@@ -157,12 +157,12 @@
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="32" x="96.5005" y="-43.7937" width="95.7262" height="11.792">
+  <object id="32" x="96.5005" y="-49.7937" width="95.7262" height="17.792">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="33" x="-0.1131" y="-42.771" width="62.4762" height="10.792">
+  <object id="33" x="-0.1131" y="-46.521" width="62.4762" height="14.542">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>

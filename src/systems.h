@@ -41,7 +41,6 @@ class CollisionSystem
                               world->get_component<hitboxComponent>(IDB).hitbox.x;
                     rectB.y = world->get_component<positionComponent>(IDB).position.y +
                               world->get_component<hitboxComponent>(IDB).hitbox.y;
-                    ;
 
                     rectB.w = world->get_component<hitboxComponent>(IDB).hitbox.w;
 
@@ -66,6 +65,7 @@ class CollisionSystem
                         check_collision_corner_bottom_right(rectA, rectB, rectAvel);
                         // bottom left corner
                         check_collision_corner_bottom_left(rectA, rectB, rectAvel);
+                  
                     }
                 }
             }
@@ -118,10 +118,13 @@ class CollisionSystem
     static bool check_collision_up_down(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                         yorcvs::Vec2<float> &rectAvel)
     {
-        if (rectA.y + rectA.h <= rectB.y && rectA.y + rectA.h + (rectAvel.y) > rectB.y && rectA.x - rectB.x < rectB.w &&
+        if (rectA.y  <= rectB.y && rectA.y + rectA.h + (rectAvel.y) > rectB.y && rectA.x - rectB.x < rectB.w &&
             rectA.x + rectA.w > rectB.x)
         {
-            rectAvel.y = (rectB.y - rectA.y - rectA.h);
+           
+            rectAvel.y = (rectB.y - rectA.y - rectA.h );
+           // rectAvel.y *= -1.0f;
+            
             return true;
         }
         return false;
