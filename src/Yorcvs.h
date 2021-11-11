@@ -15,7 +15,9 @@
 #include "common/utilities.h"
 #include "systems.h"
 
+#include "tmxlite/Object.hpp"
 #include "tmxlite/ObjectGroup.hpp"
+#include "tmxlite/Property.hpp"
 #include "tmxlite/TileLayer.hpp"
 #include "tmxlite/Tileset.hpp"
 #include "windowSDL2.h"
@@ -32,14 +34,14 @@ namespace json = nlohmann;
 #include <fstream>
 #include <tmxlite/Map.hpp>
 
-
 namespace yorcvs
 {
 class DebugInfo
 {
   public:
-    DebugInfo(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms,CollisionSystem* cols)
-        : parentWindow(parentW), appECS(pECS), playerMoveSystem(pms),colSystem(cols)
+    DebugInfo(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms,
+              CollisionSystem *cols)
+        : parentWindow(parentW), appECS(pECS), playerMoveSystem(pms), colSystem(cols)
     {
         frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", 255, 255, 255, 255, 100, 10000);
         maxframeTimeTX =
@@ -95,7 +97,7 @@ class DebugInfo
         }
     }
 
-    void render(float elapsed,const yorcvs::Vec2<float>& render_dimensions)
+    void render(float elapsed, const yorcvs::Vec2<float> &render_dimensions)
     {
 
         if (parentWindow->is_key_pressed({SDL_SCANCODE_E}))
@@ -106,7 +108,7 @@ class DebugInfo
             parentWindow->draw_text(ecsEntities, entitiesRect);
             parentWindow->draw_text(playerPosition, pPositionRect);
             parentWindow->draw_text(playerHealth, playerHealthRect);
-            colSystem->render_hitboxes(*parentWindow,render_dimensions,255,0,0,255);
+            colSystem->render_hitboxes(*parentWindow, render_dimensions, 255, 0, 0, 255);
         }
     }
 
@@ -135,8 +137,7 @@ class DebugInfo
 
     PlayerMovementControl *playerMoveSystem;
 
-    CollisionSystem* colSystem;
-    
+    CollisionSystem *colSystem;
 };
 
 struct Tile
@@ -151,7 +152,7 @@ class Map
   public:
     Map(const std::string &path, yorcvs::ECS *world, yorcvs::Window<yorcvs::SDL2> &r)
         : ecs(world), init_ecs(*world), parentWindow(&r), collisionS(world), velocityS(world), pcS(world, &r),
-          sprS(world, &r), animS(world), healthS(world), dbInfo{&r, world, &pcS,&collisionS}
+          sprS(world, &r), animS(world), healthS(world), dbInfo{&r, world, &pcS, &collisionS}
     {
 
         load(world, &r, path);
@@ -307,6 +308,56 @@ class Map
             }
         }
     }
+
+    void object_handle_property_int(size_t entity, const tmx::Property &property)
+    {
+        // NOTE HANDLES HP
+        if (property.getName() == "HP")
+        {
+            if (!ecs->has_components<healthComponent>(entity))
+            {
+                ecs->add_component<healthComponent>(entity, {});
+            }
+            ecs->get_component<healthComponent>(entity).HP = property.getFloatValue();
+        }
+        if (property.getName() == "HP_max")
+        {
+            if (!ecs->has_components<healthComponent>(entity))
+            {
+                ecs->add_component<healthComponent>(entity, {});
+            }
+            ecs->get_component<healthComponent>(entity).maxHP = property.getFloatValue();
+        }
+        if (property.getName() == "HP_regen")
+        {
+            if (!ecs->has_components<healthComponent>(entity))
+            {
+                ecs->add_component<healthComponent>(entity, {});
+            }
+            ecs->get_component<healthComponent>(entity).health_regen = property.getFloatValue();
+        }
+    }
+    void object_handle_property_bool(size_t entity, const tmx::Property &property,const tmx::Object& object)
+    {
+        // Note: handles hitbox to object
+                if (property.getName() == "collision" && property.getBoolValue())
+                {
+                    ecs->add_component<hitboxComponent>(entity,
+                                                        {{0, 0, object.getAABB().width, object.getAABB().height}});
+
+                    // TILED HAS A WEIRD BEHAVIOUR THAT IF AN TILE IS INSERTED AS A OBJECT IT'S Y POSITION IS DIFFERENT
+                    // FROM AN RECTANGLE OBJECT AND DOESN'T LOOK LIKE IN THE EDITOR
+                    if (!ecs->has_components<spriteComponent>(entity))
+                    {
+                        ecs->get_component<hitboxComponent>(entity).hitbox.y += object.getAABB().height;
+                    }
+                }
+                // NOTE: handles player spawn area
+                if (property.getName() == "playerSpawn" && property.getBoolValue())
+                {
+                    spawn_coord = {object.getPosition().x, object.getPosition().y};
+                }
+    }
     void parse_object_layer(tmx::Map &map, tmx::ObjectGroup &objectLayer)
     {
         const auto &objects = objectLayer.getObjects();
@@ -337,49 +388,17 @@ class Map
 
             for (const auto &property : object.getProperties())
             {
-                // Note: handles hitbox to object
-                if (property.getName() == "collision" && property.getBoolValue())
-                {
-                    ecs->add_component<hitboxComponent>(entity,
-                                                        {{0, 0, object.getAABB().width, object.getAABB().height}});
 
-                    // TILED HAS A WEIRD BEHAVIOUR THAT IF AN TILE IS INSERTED AS A OBJECT IT'S Y POSITION IS DIFFERENT
-                    // FROM AN RECTANGLE OBJECT AND DOESN'T LOOK LIKE IN THE EDITOR
-                    if (!ecs->has_components<spriteComponent>(entity))
-                    {
-                        ecs->get_component<hitboxComponent>(entity).hitbox.y += object.getAABB().height;
-                    }
-                }
-                // NOTE: handles player spawn area
-                if (property.getName() == "playerSpawn" && property.getBoolValue())
+                switch (property.getType())
                 {
-                    spawn_coord = {object.getPosition().x, object.getPosition().y};
+                    case tmx::Property::Type::Int: 
+                      object_handle_property_int(entity, property);
+                    break;
+                    case tmx::Property::Type::Boolean:
+                      object_handle_property_bool(entity, property,object);
+                    break;
                 }
-                // NOTE HANDLES HP
-                if (property.getName() == "HP")
-                {
-                    if (!ecs->has_components<healthComponent>(entity))
-                    {
-                        ecs->add_component<healthComponent>(entity, {});
-                    }
-                    ecs->get_component<healthComponent>(entity).HP = property.getFloatValue();
-                }
-                if (property.getName() == "HP_max")
-                {
-                    if (!ecs->has_components<healthComponent>(entity))
-                    {
-                        ecs->add_component<healthComponent>(entity, {});
-                    }
-                    ecs->get_component<healthComponent>(entity).maxHP = property.getFloatValue();
-                }
-                if (property.getName() == "HP_regen")
-                {
-                    if (!ecs->has_components<healthComponent>(entity))
-                    {
-                        ecs->add_component<healthComponent>(entity, {});
-                    }
-                    ecs->get_component<healthComponent>(entity).health_regen = property.getFloatValue();
-                }
+                
             }
         }
     }
@@ -462,12 +481,12 @@ class Map
     {
         render_tiles(r, render_dimensions);
         sprS.renderSprites(render_dimensions);
-        
-        dbInfo.render(elapsed,render_dimensions);
+
+        dbInfo.render(elapsed, render_dimensions);
     }
 
-    void load_character_from_path(yorcvs::Entity& entity, const std::string &path)
-    {   
+    void load_character_from_path(yorcvs::Entity &entity, const std::string &path)
+    {
         std::ifstream playerIN(path);
         std::string playerData{(std::istreambuf_iterator<char>(playerIN)), (std::istreambuf_iterator<char>())};
         auto player = json::json::parse(playerData);
@@ -484,18 +503,18 @@ class Map
                                               player["sprite"]["srcRect"]["w"], player["sprite"]["srcRect"]["h"]},
                                              parentWindow->create_texture(player["sprite"]["spriteName"])});
         ecs->add_component<healthComponent>(entity.id, {5, 10, 0.1f, false});
-        ecs->add_component<animationComponent>(entity.id,{});
-        for(const auto &animation : player["sprite"]["animations"])
+        ecs->add_component<animationComponent>(entity.id, {});
+        for (const auto &animation : player["sprite"]["animations"])
         {
-            
-            bool animation_fail = animS.add_animation(entity.id, animation["name"],animation["speed"]);
-            for(const auto& frame : animation["frames"])
+
+            bool animation_fail = animS.add_animation(entity.id, animation["name"], animation["speed"]);
+            for (const auto &frame : animation["frames"])
             {
-                bool frame_fail = animS.add_animation_frame(entity.id, animation["name"], {frame["x"],frame["y"],frame["w"],frame["h"]});
+                bool frame_fail = animS.add_animation_frame(entity.id, animation["name"],
+                                                            {frame["x"], frame["y"], frame["w"], frame["h"]});
             }
         }
         animS.set_animation(entity, "idleL");
-
     }
 
   private:
@@ -562,13 +581,13 @@ class Application
                 {
                     r.set_size(config["window"]["width"], config["window"]["height"]);
                 }
-                if(!config["engine_settings"].is_discarded())
+                if (!config["engine_settings"].is_discarded())
                 {
-                    if(!config["engine_settings"]["render_width"].is_discarded())
+                    if (!config["engine_settings"]["render_width"].is_discarded())
                     {
                         render_dimensions.x = config["engine_settings"]["render_width"];
                     }
-                    if(!config["engine_settings"]["render_height"].is_discarded())
+                    if (!config["engine_settings"]["render_height"].is_discarded())
                     {
                         render_dimensions.y = config["engine_settings"]["render_height"];
                     }
