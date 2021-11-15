@@ -65,6 +65,12 @@
     {
       "name": "default",
       "configurePreset": "default"
+    },
+    {
+      "name": "ninja-multi-vcpkg",
+      "configurePreset": "ninja-multi-vcpkg",
+      "displayName": "Build ninja-multi-vcpkg",
+      "description": "Build ninja-multi-vcpkg Configurations"
     }
   ],
   "testPresets": [
@@ -73,6 +79,10 @@
       "configurePreset": "default",
       "output": {"outputOnFailure": true},
       "execution": {"noTestsAction": "error", "stopOnFailure": true}
+    },
+    {
+      "name": "ninja-multi-vcpkg",
+      "configurePreset": "ninja-multi-vcpkg"
     }
   ],
   "vendor": {
