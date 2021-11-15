@@ -16,11 +16,11 @@
 #include <SDL_rect.h>
 #include <SDL_render.h>
 #include <SDL_video.h>
-
+#include <SDL_vulkan.h>
 #include <vector>
 
 #include <SDL.h>
-#include <SDL_image.h>
+#include "SDL_image.h"
 #include <SDL_ttf.h>
 #include <math.h>
 #include <functional> // callbacks need to be stored in a vector
@@ -145,7 +145,7 @@ template <> class Window<yorcvs::SDL2>
         {
             yorcvs::log("Error creating SDL2 window", yorcvs::MSGSEVERITY::ERROR);
         }
-
+     
         renderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
 
         if (renderer == nullptr)

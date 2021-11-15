@@ -309,35 +309,13 @@ class Map
         }
     }
 
-    void object_handle_property_int(size_t entity, const tmx::Property &property)
-    {
-        // NOTE HANDLES HP
-        if (property.getName() == "HP")
-        {
-            if (!ecs->has_components<healthComponent>(entity))
-            {
-                ecs->add_component<healthComponent>(entity, {});
-            }
-            ecs->get_component<healthComponent>(entity).HP = property.getFloatValue();
-        }
-        if (property.getName() == "HP_max")
-        {
-            if (!ecs->has_components<healthComponent>(entity))
-            {
-                ecs->add_component<healthComponent>(entity, {});
-            }
-            ecs->get_component<healthComponent>(entity).maxHP = property.getFloatValue();
-        }
-        if (property.getName() == "HP_regen")
-        {
-            if (!ecs->has_components<healthComponent>(entity))
-            {
-                ecs->add_component<healthComponent>(entity, {});
-            }
-            ecs->get_component<healthComponent>(entity).health_regen = property.getFloatValue();
-        }
-    }
-    void object_handle_property_bool(size_t entity, const tmx::Property &property,const tmx::Object& object)
+  
+    /**
+     * THESE FUNCTION ALL BEHAVE THE SAME 
+     *  RETURN TRUE IF THE PROPERTY EXISTS
+     *  RETURN FALSE IF IT'S UNKNOWN
+     */
+    bool object_handle_property_bool(size_t entity, const tmx::Property &property,const tmx::Object& object)
     {
         // Note: handles hitbox to object
                 if (property.getName() == "collision" && property.getBoolValue())
@@ -351,13 +329,53 @@ class Map
                     {
                         ecs->get_component<hitboxComponent>(entity).hitbox.y += object.getAABB().height;
                     }
+                    return true;
                 }
                 // NOTE: handles player spawn area
                 if (property.getName() == "playerSpawn" && property.getBoolValue())
                 {
                     spawn_coord = {object.getPosition().x, object.getPosition().y};
+                    return true;
                 }
+                return false;
     }
+    bool object_handle_property_color(size_t entity, const tmx::Property &property);
+    bool object_handle_property_float(size_t entity, const tmx::Property &property);
+    bool object_handle_property_file(size_t entity, const tmx::Property &property);
+    bool object_handle_property_int(size_t entity, const tmx::Property &property)
+    {
+        // NOTE HANDLES HP
+        if (property.getName() == "HP")
+        {
+            if (!ecs->has_components<healthComponent>(entity))
+            {
+                ecs->add_component<healthComponent>(entity, {});
+            }
+            ecs->get_component<healthComponent>(entity).HP = property.getFloatValue();
+            return true;
+        }
+        if (property.getName() == "HP_max")
+        {
+            if (!ecs->has_components<healthComponent>(entity))
+            {
+                ecs->add_component<healthComponent>(entity, {});
+            }
+            ecs->get_component<healthComponent>(entity).maxHP = property.getFloatValue();
+            return true;
+        }
+        if (property.getName() == "HP_regen")
+        {
+            if (!ecs->has_components<healthComponent>(entity))
+            {
+                ecs->add_component<healthComponent>(entity, {});
+            }
+            ecs->get_component<healthComponent>(entity).health_regen = property.getFloatValue();
+            return true;
+        }
+    }
+    bool object_handle_property_object(size_t entity, const tmx::Property &property);
+    bool object_handle_property_string(size_t entity, const tmx::Property &property);
+
     void parse_object_layer(tmx::Map &map, tmx::ObjectGroup &objectLayer)
     {
         const auto &objects = objectLayer.getObjects();
@@ -388,17 +406,24 @@ class Map
 
             for (const auto &property : object.getProperties())
             {
-
+                bool known = false;
                 switch (property.getType())
                 {
                     case tmx::Property::Type::Int: 
-                      object_handle_property_int(entity, property);
+                    known =  object_handle_property_int(entity, property);
                     break;
                     case tmx::Property::Type::Boolean:
-                      object_handle_property_bool(entity, property,object);
+                    known =  object_handle_property_bool(entity, property,object);
+                    break;
+
+                    default:
                     break;
                 }
-                
+                if(!known)
+                {
+                    yorcvs::log("UNKNOWN PROPERTY " + property.getName() + " of object " + std::to_string(object.getUID()), yorcvs::MSGSEVERITY::WARNING);
+                }
+
             }
         }
     }
@@ -562,7 +587,7 @@ class Application
   public:
     Application()
     {
-
+        
         // Load config
         if (std::filesystem::exists(configname))
         {
@@ -598,7 +623,7 @@ class Application
         {
             yorcvs::log("Config file not found, loading default settings...");
         }
-
+        
         counter.start();
     }
     Application(const Application &other) = delete;
