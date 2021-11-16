@@ -61,9 +61,12 @@ jobs:
     - name: build
       uses: lukka/run-cmake@v10
       with:
+          cmakeListsTxtPath: '${{ github.workspace }}/tests/CMakeLists.txt'
           configurePreset: 'ninja-multi-vcpkg'
           buildPreset: 'ninja-multi-vcpkg'
-          cmakeListsTxtPath: '${{ github.workspace }}/tests/CMakeLists.txt'
+    - name: run tests
+      run: ctest --test-dir tests/build
+          
   
     
     
