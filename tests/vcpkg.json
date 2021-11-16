@@ -1,9 +1,0 @@
-{
-    "name": "yorcvs",
-    "version-string": "0.1",
-    "dependencies": [
-        "sdl2",
-        "sdl2-image",
-        "sdl2-ttf"
-    ]
-}
