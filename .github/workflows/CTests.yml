@@ -58,12 +58,12 @@ jobs:
     - uses: lukka/run-vcpkg@v10
       with:
         vcpkgGitCommitId: '5568f110b509a9fd90711978a7cb76bae75bb092'
-        cmakeListsTxtPath: '${{ github.workspace }}/tests/CMakeLists.txt'
     - name: build
       uses: lukka/run-cmake@v10
       with:
           configurePreset: 'ninja-multi-vcpkg-clang'
           buildPreset: 'ninja-multi-vcpkg-clang'
+          cmakeListsTxtPath: '${{ github.workspace }}/tests/CMakeLists.txt'
   
     
     
