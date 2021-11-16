@@ -65,7 +65,7 @@ jobs:
           configurePreset: 'ninja-multi-vcpkg'
           buildPreset: 'ninja-multi-vcpkg'
     - name: run tests
-      run: ctest --test-dir tests/build
+      run: ctest --test-dir tests/build/ninja-multi-vcpkg
           
   
     
