@@ -47,3 +47,23 @@ jobs:
       run: cmake --build ${{github.workspace}}/tests/build 
     - name: Test
       run: ctest --test-dir tests/build
+  job:
+    name: ${{matrix.os}}-vcpkg
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest,windows-latest]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: lukka/run-vcpkg@v10
+      with:
+        vcpkgGitCommitId: '5568f110b509a9fd90711978a7cb76bae75bb092'
+        cmakeListsTxtPath: '${{ github.workspace }}/tests/CMakeLists.txt'
+    - name: build
+      uses: lukka/run-cmake@v10
+      with:
+          configurePreset: 'ninja-multi-vcpkg-clang'
+          buildPreset: 'ninja-multi-vcpkg-clang'
+  
+    
+    
