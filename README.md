@@ -1,4 +1,7 @@
-# Yorcvs [![Linux Build](https://github.com/Dantsz/Yorcvs/actions/workflows/cmake.yml/badge.svg)](https://github.com/Dantsz/Yorcvs/actions/workflows/cmake.yml) [![Emscripten Build](https://github.com/Dantsz/Yorcvs/actions/workflows/EmscriptenBuild.yml/badge.svg)](https://github.com/Dantsz/Yorcvs/actions/workflows/EmscriptenBuild.yml)[![Ctests](https://github.com/Dantsz/Yorcvs/actions/workflows/CTests.yml/badge.svg)](https://github.com/Dantsz/Yorcvs/actions/workflows/CTests.yml)[![Windows Build](https://github.com/Dantsz/Yorcvs/actions/workflows/windows.yml/badge.svg)](https://github.com/Dantsz/Yorcvs/actions/workflows/windows.yml)
+# Yorcvs [![Linux Build](https://github.com/Dantsz/Yorcvs/actions/workflows/cmake.yml/badge.svg)](https://github.com/Dantsz/Yorcvs/actions/workflows/cmake.yml)
+[![Emscripten Build](https://github.com/Dantsz/Yorcvs/actions/workflows/EmscriptenBuild.yml/badge.svg)](https://github.com/Dantsz/Yorcvs/actions/workflows/EmscriptenBuild.yml)
+[![Windows Build](https://github.com/Dantsz/Yorcvs/actions/workflows/windows.yml/badge.svg)](https://github.com/Dantsz/Yorcvs/actions/workflows/windows.yml)
+[![Ctests](https://github.com/Dantsz/Yorcvs/actions/workflows/CTests.yml/badge.svg)](https://github.com/Dantsz/Yorcvs/actions/workflows/CTests.yml)
 C++ game project
 ## Dependencies
 |Dependency|Minimum Version|
