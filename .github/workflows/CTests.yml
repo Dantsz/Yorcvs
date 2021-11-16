@@ -61,8 +61,8 @@ jobs:
     - name: build
       uses: lukka/run-cmake@v10
       with:
-          configurePreset: 'ninja-multi-vcpkg-clang'
-          buildPreset: 'ninja-multi-vcpkg-clang'
+          configurePreset: 'ninja-multi-vcpkg'
+          buildPreset: 'ninja-multi-vcpkg'
           cmakeListsTxtPath: '${{ github.workspace }}/tests/CMakeLists.txt'
   
     
