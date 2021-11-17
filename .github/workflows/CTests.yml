@@ -52,7 +52,7 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        os: [ubuntu-latest,windows-latest]
+        os: [windows-latest]
     steps:
     - uses: actions/checkout@v2
     - uses: lukka/run-vcpkg@v10
@@ -65,7 +65,7 @@ jobs:
           configurePreset: 'ninja-multi-vcpkg'
           buildPreset: 'ninja-multi-vcpkg'
     - name: run tests
-      run: ctest --test-dir tests/build/ninja-multi-vcpkg
+      run: ctest --test-dir tests/build/Debug
           
   
     
