@@ -68,4 +68,4 @@ jobs:
           configurePreset: ${{matrix.config}}
           buildPreset:  ${{matrix.config}}
     - name: run tests
-      run: ctest --test-dir tests/builds/ninja-multi-vcpkg
+      run: ctest --test-dir tests/builds/${{matrix.config}}
