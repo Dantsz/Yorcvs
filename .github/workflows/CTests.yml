@@ -15,12 +15,12 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  job:
+  windows:
     name: ${{matrix.os}}-vcpkg
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        os: [ubuntu-latest,windows-latest]
+        os: [windows-latest]
     steps:
     - uses: actions/checkout@v2
     - uses: seanmiddleditch/gha-setup-ninja@master
@@ -35,7 +35,30 @@ jobs:
           buildPreset: 'ninja-multi-vcpkg'
     - name: run tests
       run: ctest --test-dir tests/builds/ninja-multi-vcpkg
-          
-  
-    
-    
+  ubuntu:
+    name: ${{matrix.os}}-vcpkg
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: seanmiddleditch/gha-setup-ninja@master
+    - name: reps
+      run : sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu `lsb_release -sc` main universe restricted multiverse"
+    - name: update
+      run: sudo apt-get update -y -qq
+    - name: install gcc10
+      run: sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
+
+    - uses: lukka/run-vcpkg@v10
+      with:
+        vcpkgGitCommitId: '5568f110b509a9fd90711978a7cb76bae75bb092'
+    - name: build
+      uses: lukka/run-cmake@v10
+      with:
+          cmakeListsTxtPath: '${{ github.workspace }}/tests/CMakeLists.txt'
+          configurePreset: 'ninja-multi-vcpkg'
+          buildPreset: 'ninja-multi-vcpkg'
+    - name: run tests
+      run: ctest --test-dir tests/builds/ninja-multi-vcpkg
