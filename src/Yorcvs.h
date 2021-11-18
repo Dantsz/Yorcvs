@@ -39,9 +39,7 @@ namespace yorcvs
 class DebugInfo
 {
   public:
-    DebugInfo()
-    {
-    }
+    DebugInfo() = default;
 
     DebugInfo(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms,
               CollisionSystem *cols)
@@ -130,8 +128,8 @@ class DebugInfo
     {
         maxFrameTime = 0.0f;
     }
-    yorcvs::Window<yorcvs::SDL2> *parentWindow;
-    yorcvs::ECS *appECS;
+    yorcvs::Window<yorcvs::SDL2> *parentWindow{};
+    yorcvs::ECS *appECS{};
 
     yorcvs::Text<yorcvs::SDL2> frameTime;
     yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
@@ -149,9 +147,9 @@ class DebugInfo
     yorcvs::Text<yorcvs::graphics> playerHealth;
     yorcvs::Rect<float> playerHealthRect = {0, 100, 200, 25};
 
-    PlayerMovementControl *playerMoveSystem;
+    PlayerMovementControl *playerMoveSystem{};
 
-    CollisionSystem *colSystem;
+    CollisionSystem *colSystem{};
 };
 
 struct Tile
@@ -166,7 +164,7 @@ class Map
   public:
     Map(const std::string &path, yorcvs::ECS *world, yorcvs::Window<yorcvs::SDL2> &r)
         : ecs(world), init_ecs(*world), parentWindow(&r), collisionS(world), velocityS(world), pcS(world, &r),
-          sprS(world, &r), animS(world), healthS(world)
+          animS(world), healthS(world)
     {
 
         load(world, &r, path);
@@ -277,7 +275,7 @@ class Map
             }
         }
     }
-    void parse_tile_layer_ysorted(tmx::Map &map, tmx::TileLayer &tileLayer)
+    void parse_tile_layer_ysorted(tmx::Map &map, tmx::TileLayer &tileLayer) const
     {
         const auto &chunks = tileLayer.getChunks();
 
@@ -354,7 +352,7 @@ class Map
     bool object_handle_property_color(size_t entity, const tmx::Property &property);
     bool object_handle_property_float(size_t entity, const tmx::Property &property);
     bool object_handle_property_file(size_t entity, const tmx::Property &property);
-    bool object_handle_property_int(size_t entity, const tmx::Property &property)
+    bool object_handle_property_int(size_t entity, const tmx::Property &property) const
     {
         // NOTE HANDLES HP
         if (property.getName() == "HP")
@@ -518,7 +516,6 @@ class Map
     void render(const yorcvs::Vec2<float> &render_dimensions, yorcvs::Window<SDL2> &r, float elapsed)
     {
         render_tiles(r, render_dimensions);
-        sprS.renderSprites(render_dimensions);
     }
 
     void load_character_from_path(yorcvs::Entity &entity, const std::string &path)
@@ -567,6 +564,7 @@ class Map
             world.register_component<spriteComponent, animationComponent>();
         }
     };
+    // class to initialize the ecs before systems are constructed
     ecs_Initializer init_ecs;
 
   public:
@@ -574,21 +572,17 @@ class Map
     PlayerMovementControl pcS;
     CollisionSystem collisionS;
 
-  private:
-    // class to initialize the ecs before systems are constructed
 
-    std::string tilesetPath;
+
     yorcvs::Vec2<float> tilesSize;
     std::vector<yorcvs::Tile> tiles;
-
+  private:
+    
+    std::string tilesetPath;
     yorcvs::Vec2<float> spawn_coord;
-
     VelocitySystem velocityS;
-
-    SpriteSystem sprS;
     AnimationSystem animS;
     HealthSystem healthS;
-
     std::vector<yorcvs::Entity> entities;
 };
 
@@ -639,6 +633,7 @@ class Application
         {
             yorcvs::log("Config file not found, loading default settings...");
         }
+       
         dbInfo.attach(&r, map.ecs, &map.pcS, &map.collisionS);
         counter.start();
     }
@@ -652,7 +647,18 @@ class Application
 
         map.update(dt, render_dimensions);
     }
+    void render_map_tiles(yorcvs::Map& map)
+    {
 
+        yorcvs::Vec2<float> rs = r.get_render_scale();
+        r.set_render_scale(r.get_size() / render_dimensions);
+        for (const auto &tile : map.tiles)
+        {
+            r.draw_sprite(tile.texture_path, {tile.coords.x, tile.coords.y, map.tilesSize.x, map.tilesSize.y},
+                               tile.srcRect);
+        }
+        r.set_render_scale(rs);
+    }
     void run()
     {
         float elapsed = counter.get_ticks<float, std::chrono::nanoseconds>();
@@ -673,6 +679,8 @@ class Application
 
         r.clear();
         map.render(render_dimensions, r, elapsed);
+        render_map_tiles(map);
+        sprS.renderSprites(render_dimensions);
         dbInfo.render(elapsed, render_dimensions);
         r.present();
     }
@@ -699,6 +707,7 @@ class Application
 
     yorcvs::ECS world{};
     yorcvs::Map map{"assets/map.tmx", &world, r};
+    SpriteSystem sprS{map.ecs,&r}; 
     // debug stuff
     DebugInfo dbInfo;
 };
