@@ -16,7 +16,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   windows:
-    name: ${{matrix.os}}-vcpkg
+    name: ${{matrix.os}}
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
@@ -36,7 +36,7 @@ jobs:
     - name: run tests
       run: ctest --test-dir tests/builds/ninja-multi-vcpkg
   ubuntu:
-    name: ${{matrix.os}}-vcpkg
+    name: ${{matrix.os}}-${{matrix.compiler}}
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
