@@ -41,6 +41,12 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
+        compiler: [gcc, clang]
+        include:
+          - compiler: gcc
+            config: 'ninja-multi-vcpkg-gcc'
+          - compiler: clang
+            config: 'ninja-multi-vcpkg-clang'
     steps:
     - uses: actions/checkout@v2
     - uses: seanmiddleditch/gha-setup-ninja@master
@@ -50,7 +56,8 @@ jobs:
       run: sudo apt-get update -y -qq
     - name: install gcc10
       run: sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
-
+    - name: install clang
+      run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
     - uses: lukka/run-vcpkg@v10
       with:
         vcpkgGitCommitId: '5568f110b509a9fd90711978a7cb76bae75bb092'
@@ -58,7 +65,7 @@ jobs:
       uses: lukka/run-cmake@v10
       with:
           cmakeListsTxtPath: '${{ github.workspace }}/tests/CMakeLists.txt'
-          configurePreset: 'ninja-multi-vcpkg'
-          buildPreset: 'ninja-multi-vcpkg'
+          configurePreset: ${{matrix.config}}
+          buildPreset:  ${{matrix.config}}
     - name: run tests
       run: ctest --test-dir tests/builds/ninja-multi-vcpkg
