@@ -1,7 +1,7 @@
 /**
  * @file Yorcvs.h
  * @author Dantsz
- * @brief Simple entity component system
+ * @brief
  * @version 0.1
  * @date 2021-07-31
  *
@@ -39,18 +39,15 @@ namespace yorcvs
 class DebugInfo
 {
   public:
+    DebugInfo()
+    {
+    }
+
     DebugInfo(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms,
               CollisionSystem *cols)
         : parentWindow(parentW), appECS(pECS), playerMoveSystem(pms), colSystem(cols)
     {
-        frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", 255, 255, 255, 255, 100, 10000);
-        maxframeTimeTX =
-            parentWindow->create_text("assets/font.ttf", "Max Frame Time : ", 255, 255, 255, 255, 100, 10000);
-        ecsEntities =
-            parentWindow->create_text("assets/font.ttf", "Active Entities : ", 255, 255, 255, 255, 100, 10000);
-        playerPosition =
-            parentWindow->create_text("assets/font.ttf", "NO PLAYER FOUND ", 255, 255, 255, 255, 100, 10000);
-        playerHealth = parentWindow->create_text("assets/font.ttf", "Health : -/- ", 255, 255, 255, 255, 100, 10000);
+        attach(parentW, pECS, pms, cols);
         // TODO: remove this test
     }
 
@@ -112,6 +109,23 @@ class DebugInfo
         }
     }
 
+    void attach(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms,
+                CollisionSystem *cols)
+    {
+        parentWindow = parentW;
+        appECS = pECS;
+        playerMoveSystem = pms;
+        colSystem = cols;
+        frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", 255, 255, 255, 255, 100, 10000);
+        maxframeTimeTX =
+            parentWindow->create_text("assets/font.ttf", "Max Frame Time : ", 255, 255, 255, 255, 100, 10000);
+        ecsEntities =
+            parentWindow->create_text("assets/font.ttf", "Active Entities : ", 255, 255, 255, 255, 100, 10000);
+        playerPosition =
+            parentWindow->create_text("assets/font.ttf", "NO PLAYER FOUND ", 255, 255, 255, 255, 100, 10000);
+        playerHealth = parentWindow->create_text("assets/font.ttf", "Health : -/- ", 255, 255, 255, 255, 100, 10000);
+    }
+
     void reset()
     {
         maxFrameTime = 0.0f;
@@ -152,7 +166,7 @@ class Map
   public:
     Map(const std::string &path, yorcvs::ECS *world, yorcvs::Window<yorcvs::SDL2> &r)
         : ecs(world), init_ecs(*world), parentWindow(&r), collisionS(world), velocityS(world), pcS(world, &r),
-          sprS(world, &r), animS(world), healthS(world), dbInfo{&r, world, &pcS, &collisionS}
+          sprS(world, &r), animS(world), healthS(world)
     {
 
         load(world, &r, path);
@@ -309,35 +323,33 @@ class Map
         }
     }
 
-  
     /**
-     * THESE FUNCTION ALL BEHAVE THE SAME 
+     * THESE FUNCTION ALL BEHAVE THE SAME
      *  RETURN TRUE IF THE PROPERTY EXISTS
      *  RETURN FALSE IF IT'S UNKNOWN
      */
-    bool object_handle_property_bool(size_t entity, const tmx::Property &property,const tmx::Object& object)
+    bool object_handle_property_bool(size_t entity, const tmx::Property &property, const tmx::Object &object)
     {
         // Note: handles hitbox to object
-                if (property.getName() == "collision" && property.getBoolValue())
-                {
-                    ecs->add_component<hitboxComponent>(entity,
-                                                        {{0, 0, object.getAABB().width, object.getAABB().height}});
+        if (property.getName() == "collision" && property.getBoolValue())
+        {
+            ecs->add_component<hitboxComponent>(entity, {{0, 0, object.getAABB().width, object.getAABB().height}});
 
-                    // TILED HAS A WEIRD BEHAVIOUR THAT IF AN TILE IS INSERTED AS A OBJECT IT'S Y POSITION IS DIFFERENT
-                    // FROM AN RECTANGLE OBJECT AND DOESN'T LOOK LIKE IN THE EDITOR
-                    if (!ecs->has_components<spriteComponent>(entity))
-                    {
-                        ecs->get_component<hitboxComponent>(entity).hitbox.y += object.getAABB().height;
-                    }
-                    return true;
-                }
-                // NOTE: handles player spawn area
-                if (property.getName() == "playerSpawn" && property.getBoolValue())
-                {
-                    spawn_coord = {object.getPosition().x, object.getPosition().y};
-                    return true;
-                }
-                return false;
+            // TILED HAS A WEIRD BEHAVIOUR THAT IF AN TILE IS INSERTED AS A OBJECT IT'S Y POSITION IS DIFFERENT
+            // FROM AN RECTANGLE OBJECT AND DOESN'T LOOK LIKE IN THE EDITOR
+            if (!ecs->has_components<spriteComponent>(entity))
+            {
+                ecs->get_component<hitboxComponent>(entity).hitbox.y += object.getAABB().height;
+            }
+            return true;
+        }
+        // NOTE: handles player spawn area
+        if (property.getName() == "playerSpawn" && property.getBoolValue())
+        {
+            spawn_coord = {object.getPosition().x, object.getPosition().y};
+            return true;
+        }
+        return false;
     }
     bool object_handle_property_color(size_t entity, const tmx::Property &property);
     bool object_handle_property_float(size_t entity, const tmx::Property &property);
@@ -409,21 +421,22 @@ class Map
                 bool known = false;
                 switch (property.getType())
                 {
-                    case tmx::Property::Type::Int: 
-                    known =  object_handle_property_int(entity, property);
+                case tmx::Property::Type::Int:
+                    known = object_handle_property_int(entity, property);
                     break;
-                    case tmx::Property::Type::Boolean:
-                    known =  object_handle_property_bool(entity, property,object);
+                case tmx::Property::Type::Boolean:
+                    known = object_handle_property_bool(entity, property, object);
                     break;
 
-                    default:
+                default:
                     break;
                 }
-                if(!known)
+                if (!known)
                 {
-                    yorcvs::log("UNKNOWN PROPERTY " + property.getName() + " of object " + std::to_string(object.getUID()), yorcvs::MSGSEVERITY::WARNING);
+                    yorcvs::log("UNKNOWN PROPERTY " + property.getName() + " of object " +
+                                    std::to_string(object.getUID()),
+                                yorcvs::MSGSEVERITY::WARNING);
                 }
-
             }
         }
     }
@@ -506,8 +519,6 @@ class Map
     {
         render_tiles(r, render_dimensions);
         sprS.renderSprites(render_dimensions);
-
-        dbInfo.render(elapsed, render_dimensions);
     }
 
     void load_character_from_path(yorcvs::Entity &entity, const std::string &path)
@@ -542,8 +553,10 @@ class Map
         animS.set_animation(entity, "idleL");
     }
 
+  public:
+    yorcvs::ECS *ecs{};
+
   private:
-    // class to initialize the ecs before systems are constructed
     struct ecs_Initializer
     {
         ecs_Initializer(yorcvs::ECS &world)
@@ -554,24 +567,27 @@ class Map
             world.register_component<spriteComponent, animationComponent>();
         }
     };
+    ecs_Initializer init_ecs;
+
+  public:
+    yorcvs::Window<yorcvs::graphics> *parentWindow{};
+    PlayerMovementControl pcS;
+    CollisionSystem collisionS;
+
+  private:
+    // class to initialize the ecs before systems are constructed
 
     std::string tilesetPath;
     yorcvs::Vec2<float> tilesSize;
     std::vector<yorcvs::Tile> tiles;
 
-    yorcvs::ECS *ecs{};
-    ecs_Initializer init_ecs;
-
-    yorcvs::Window<yorcvs::graphics> *parentWindow{};
     yorcvs::Vec2<float> spawn_coord;
 
-    CollisionSystem collisionS;
     VelocitySystem velocityS;
-    PlayerMovementControl pcS;
+
     SpriteSystem sprS;
     AnimationSystem animS;
     HealthSystem healthS;
-    DebugInfo dbInfo;
 
     std::vector<yorcvs::Entity> entities;
 };
@@ -587,7 +603,7 @@ class Application
   public:
     Application()
     {
-        
+
         // Load config
         if (std::filesystem::exists(configname))
         {
@@ -623,7 +639,7 @@ class Application
         {
             yorcvs::log("Config file not found, loading default settings...");
         }
-        
+        dbInfo.attach(&r, map.ecs, &map.pcS, &map.collisionS);
         counter.start();
     }
     Application(const Application &other) = delete;
@@ -657,6 +673,7 @@ class Application
 
         r.clear();
         map.render(render_dimensions, r, elapsed);
+        dbInfo.render(elapsed, render_dimensions);
         r.present();
     }
 
@@ -683,5 +700,6 @@ class Application
     yorcvs::ECS world{};
     yorcvs::Map map{"assets/map.tmx", &world, r};
     // debug stuff
+    DebugInfo dbInfo;
 };
 } // namespace yorcvs
