@@ -163,7 +163,7 @@ class Map
 {
   public:
     Map(const std::string &path, yorcvs::ECS *world, yorcvs::Window<yorcvs::SDL2> &r)
-        : ecs(world), init_ecs(*world), parentWindow(&r), collisionS(world), velocityS(world), pcS(world, &r),
+        : ecs(world), init_ecs(*world), parentWindow(&r), collisionS(world), velocityS(world),
           animS(world), healthS(world)
     {
 
@@ -382,6 +382,7 @@ class Map
             ecs->get_component<healthComponent>(entity).health_regen = property.getFloatValue();
             return true;
         }
+        return false;
     }
     bool object_handle_property_object(size_t entity, const tmx::Property &property);
     bool object_handle_property_string(size_t entity, const tmx::Property &property);
@@ -509,11 +510,10 @@ class Map
         velocityS.update();
         animS.update(dt);
         healthS.update(dt);
-        pcS.updateAnimations();
-        pcS.updateControls(render_dimensions);
+       
     }
 
-    void render(const yorcvs::Vec2<float> &render_dimensions, yorcvs::Window<SDL2> &r, float elapsed)
+    void render(const yorcvs::Vec2<float> &render_dimensions, yorcvs::Window<SDL2> &r, float  /*elapsed*/)
     {
         render_tiles(r, render_dimensions);
     }
@@ -569,10 +569,8 @@ class Map
 
   public:
     yorcvs::Window<yorcvs::graphics> *parentWindow{};
-    PlayerMovementControl pcS;
+  
     CollisionSystem collisionS;
-
-
 
     yorcvs::Vec2<float> tilesSize;
     std::vector<yorcvs::Tile> tiles;
@@ -634,7 +632,7 @@ class Application
             yorcvs::log("Config file not found, loading default settings...");
         }
        
-        dbInfo.attach(&r, map.ecs, &map.pcS, &map.collisionS);
+        dbInfo.attach(&r, map.ecs, &pcS, &map.collisionS);
         counter.start();
     }
     Application(const Application &other) = delete;
@@ -674,6 +672,8 @@ class Application
         {
 
             update(msPF);
+            pcS.updateAnimations();
+            pcS.updateControls(render_dimensions);
             lag -= msPF;
         }
 
@@ -708,6 +708,7 @@ class Application
     yorcvs::ECS world{};
     yorcvs::Map map{"assets/map.tmx", &world, r};
     SpriteSystem sprS{map.ecs,&r}; 
+    PlayerMovementControl pcS{map.ecs,&r};
     // debug stuff
     DebugInfo dbInfo;
 };
