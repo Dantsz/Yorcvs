@@ -30,11 +30,11 @@ jobs:
     - name: build
       uses: lukka/run-cmake@v10
       with:
-          cmakeListsTxtPath: '${{ github.workspace }}/tests/CMakeLists.txt'
+          cmakeListsTxtPath: '${{ github.workspace }}/tests/CTest/CMakeLists.txt'
           configurePreset: 'ninja-multi-vcpkg'
           buildPreset: 'ninja-multi-vcpkg'
     - name: run tests
-      run: ctest --test-dir tests/builds/ninja-multi-vcpkg
+      run: ctest --test-dir tests/CTest/builds/ninja-multi-vcpkg
   ubuntu:
     name: ${{matrix.os}}-${{matrix.compiler}}
     runs-on: ${{matrix.os}}
@@ -64,8 +64,8 @@ jobs:
     - name: build
       uses: lukka/run-cmake@v10
       with:
-          cmakeListsTxtPath: '${{ github.workspace }}/tests/CMakeLists.txt'
+          cmakeListsTxtPath: '${{ github.workspace }}/tests/CTest/CMakeLists.txt'
           configurePreset: ${{matrix.config}}
           buildPreset:  ${{matrix.config}}
     - name: run tests
-      run: ctest --test-dir tests/builds/${{matrix.config}}
+      run: ctest --test-dir tests/CTest/builds/${{matrix.config}}
