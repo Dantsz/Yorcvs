@@ -46,10 +46,12 @@ class DebugInfo
         : parentWindow(parentW), appECS(pECS), playerMoveSystem(pms), colSystem(cols)
     {
         attach(parentW, pECS, pms, cols);
-        // TODO: remove this test
     }
-
     ~DebugInfo() = default;
+    DebugInfo(const DebugInfo &other) = delete;
+    DebugInfo(DebugInfo &&other) = delete;
+    DebugInfo operator=(const DebugInfo &other) = delete;
+    DebugInfo operator=(DebugInfo &&other) = delete;
 
     void update(float ft)
     {
@@ -163,13 +165,13 @@ class Map
 {
   public:
     Map(const std::string &path, yorcvs::ECS *world, yorcvs::Window<yorcvs::SDL2> &r)
-        : ecs(world), init_ecs(*world), parentWindow(&r), collisionS(world), velocityS(world),
-          animS(world), healthS(world)
+        : ecs(world), init_ecs(*world), parentWindow(&r), collisionS(world), velocityS(world), animS(world),
+          healthS(world)
     {
 
         load(world, &r, path);
         entities.emplace_back(world);
-        load_character_from_path(entities[0], "assets/player.json");
+        load_character_from_path(entities[entities.size() - 1], "assets/player.json");
     }
 
     void load(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *window, const std::string &path)
@@ -352,7 +354,7 @@ class Map
     bool object_handle_property_color(size_t entity, const tmx::Property &property);
     bool object_handle_property_float(size_t entity, const tmx::Property &property);
     bool object_handle_property_file(size_t entity, const tmx::Property &property);
-    bool object_handle_property_int(size_t entity, const tmx::Property &property) const
+    [[nodiscard]] bool object_handle_property_int(size_t entity, const tmx::Property &property) const
     {
         // NOTE HANDLES HP
         if (property.getName() == "HP")
@@ -504,16 +506,15 @@ class Map
         return tile_set;
     }
 
-    void update(float dt, const yorcvs::Vec2<float> &render_dimensions)
+    void update(float dt, const yorcvs::Vec2<float> & /*render_dimensions*/)
     {
         collisionS.update();
         velocityS.update();
         animS.update(dt);
         healthS.update(dt);
-       
     }
 
-    void render(const yorcvs::Vec2<float> &render_dimensions, yorcvs::Window<SDL2> &r, float  /*elapsed*/)
+    void render(const yorcvs::Vec2<float> &render_dimensions, yorcvs::Window<SDL2> &r, float /*elapsed*/)
     {
         render_tiles(r, render_dimensions);
     }
@@ -547,13 +548,13 @@ class Map
                                                             {frame["x"], frame["y"], frame["w"], frame["h"]});
             }
         }
-        animS.set_animation(entity, "idleL");
+        AnimationSystem::set_animation(entity, "idleL");
     }
 
-  public:
     yorcvs::ECS *ecs{};
 
   private:
+    // TODO: MAKE THIS UNNECESSARY
     struct ecs_Initializer
     {
         ecs_Initializer(yorcvs::ECS &world)
@@ -569,13 +570,13 @@ class Map
 
   public:
     yorcvs::Window<yorcvs::graphics> *parentWindow{};
-  
+
     CollisionSystem collisionS;
 
     yorcvs::Vec2<float> tilesSize;
     std::vector<yorcvs::Tile> tiles;
+
   private:
-    
     std::string tilesetPath;
     yorcvs::Vec2<float> spawn_coord;
     VelocitySystem velocityS;
@@ -631,7 +632,7 @@ class Application
         {
             yorcvs::log("Config file not found, loading default settings...");
         }
-       
+
         dbInfo.attach(&r, map.ecs, &pcS, &map.collisionS);
         counter.start();
     }
@@ -642,18 +643,17 @@ class Application
 
     void update(float dt)
     {
-
         map.update(dt, render_dimensions);
     }
-    void render_map_tiles(yorcvs::Map& map)
+    void render_map_tiles(yorcvs::Map &p_map)
     {
 
         yorcvs::Vec2<float> rs = r.get_render_scale();
         r.set_render_scale(r.get_size() / render_dimensions);
-        for (const auto &tile : map.tiles)
+        for (const auto &tile : p_map.tiles)
         {
-            r.draw_sprite(tile.texture_path, {tile.coords.x, tile.coords.y, map.tilesSize.x, map.tilesSize.y},
-                               tile.srcRect);
+            r.draw_sprite(tile.texture_path, {tile.coords.x, tile.coords.y, p_map.tilesSize.x, p_map.tilesSize.y},
+                          tile.srcRect);
         }
         r.set_render_scale(rs);
     }
@@ -707,8 +707,8 @@ class Application
 
     yorcvs::ECS world{};
     yorcvs::Map map{"assets/map.tmx", &world, r};
-    SpriteSystem sprS{map.ecs,&r}; 
-    PlayerMovementControl pcS{map.ecs,&r};
+    SpriteSystem sprS{map.ecs, &r};
+    PlayerMovementControl pcS{map.ecs, &r};
     // debug stuff
     DebugInfo dbInfo;
 };

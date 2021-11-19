@@ -13,17 +13,17 @@
 #include "common/utilities.h"
 #include "common/window.h"
 
-#include <SDL_rect.h>
 #include <SDL_render.h>
 #include <SDL_video.h>
 #include <SDL_vulkan.h>
 #include <vector>
 
-#include <SDL.h>
 #include "SDL_image.h"
+#include <SDL.h>
 #include <SDL_ttf.h>
-#include <math.h>
 #include <functional> // callbacks need to be stored in a vector
+#include <math.h>
+
 // SDL TEXTURE MANAGER
 // default_delete needs to be specialized for SDL_Texture to be used with STL
 
@@ -61,7 +61,7 @@ template <> class Text<yorcvs::SDL2>
     std::string message;
     std::string fontPath;
 
-    static constexpr SDL_Color defaultColor = {255,255,255,255};
+    static constexpr SDL_Color defaultColor = {255, 255, 255, 255};
 
     SDL_Color color = defaultColor;
     int charSize = 0;
@@ -80,7 +80,6 @@ template <> class Key<yorcvs::SDL2>
     Key<yorcvs::SDL2>() = default;
     Key<yorcvs::SDL2>(SDL_Scancode scancode) : sdlScancode(scancode)
     {
-        
     }
 
     SDL_Scancode sdlScancode;
@@ -96,12 +95,9 @@ template <> class Window<yorcvs::SDL2>
   public:
     Window<yorcvs::SDL2>()
     {
-        const char* name = "Yorcvs";
+        const char *name = "Yorcvs";
         const size_t width = 960;
         const size_t height = 480;
-        
-
-
 
         SDL_version sdlversion{};
         SDL_GetVersion(&sdlversion);
@@ -145,7 +141,7 @@ template <> class Window<yorcvs::SDL2>
         {
             yorcvs::log("Error creating SDL2 window", yorcvs::MSGSEVERITY::ERROR);
         }
-     
+
         renderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
 
         if (renderer == nullptr)
@@ -175,17 +171,17 @@ template <> class Window<yorcvs::SDL2>
         assetm = std::make_unique<yorcvs::AssetManager<SDL_Texture>>(
             [&](const std::string &path) {
                 SDL_Surface *surf = nullptr;
-                SDL_RWops* rwop = SDL_RWFromFile(path.c_str(),"rb");
-         
-                surf = IMG_Load_RW(rwop,1);
-                if(surf == nullptr)
+                SDL_RWops *rwop = SDL_RWFromFile(path.c_str(), "rb");
+
+                surf = IMG_Load_RW(rwop, 1);
+                if (surf == nullptr)
                 {
-                    yorcvs::log(IMG_GetError(),yorcvs::MSGSEVERITY::ERROR);
+                    yorcvs::log(IMG_GetError(), yorcvs::MSGSEVERITY::ERROR);
                 }
                 SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, surf);
-              
+
                 SDL_FreeSurface(surf);
-            
+
                 return tex;
             },
             [](SDL_Texture *p) { SDL_DestroyTexture(p); });
@@ -209,12 +205,11 @@ template <> class Window<yorcvs::SDL2>
 
     void cleanup()
     {
-    
+
         SDL_DestroyWindow(sdlWindow);
         IMG_Quit();
         TTF_Quit();
         SDL_Quit();
-        
     }
     void handle_events()
     {
@@ -313,20 +308,18 @@ template <> class Window<yorcvs::SDL2>
         }
     }
 
-
-      
-    void draw_rect(const yorcvs::Rect<float>& rect, uint8_t r , uint8_t g , uint8_t b , uint8_t a)
+    void draw_rect(const yorcvs::Rect<float> &rect, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
     {
-       SDL_FRect dest = {static_cast<float>(rect.x - offset.x ), static_cast<float>(rect.y - offset.y),
-                              static_cast<float>(rect.w), static_cast<float>(rect.h)};
-        uint8_t r_old = 0 ;
+        SDL_FRect dest = {static_cast<float>(rect.x - offset.x), static_cast<float>(rect.y - offset.y),
+                          static_cast<float>(rect.w), static_cast<float>(rect.h)};
+        uint8_t r_old = 0;
         uint8_t g_old = 0;
         uint8_t b_old = 0;
         uint8_t a_old = 0;
-        SDL_GetRenderDrawColor(renderer,&r_old,&g_old,&b_old,&a_old);
-        SDL_SetRenderDrawColor(renderer,r,g,b,a);
-        SDL_RenderDrawRectF(renderer,&dest);
-        SDL_SetRenderDrawColor(renderer,r_old,g_old,b_old,a_old);
+        SDL_GetRenderDrawColor(renderer, &r_old, &g_old, &b_old, &a_old);
+        SDL_SetRenderDrawColor(renderer, r, g, b, a);
+        SDL_RenderDrawRectF(renderer, &dest);
+        SDL_SetRenderDrawColor(renderer, r_old, g_old, b_old, a_old);
     }
     [[nodiscard]] Text<yorcvs::SDL2> create_text(const std::string &path, const std::string &message, unsigned char r,
                                                  unsigned char g, unsigned char b, unsigned char a, size_t charSize,
@@ -483,7 +476,7 @@ template <> class Window<yorcvs::SDL2>
     std::unique_ptr<AssetManager<SDL_Texture>> assetm = nullptr;
     SDL_Window *sdlWindow = nullptr;
     SDL_Renderer *renderer = nullptr;
-    
+
     unsigned char const *keys{};
     int mouseX{};
     int mouseY{};
