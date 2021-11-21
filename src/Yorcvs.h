@@ -166,20 +166,19 @@ struct Tile
 class Map
 {
   public:
-    Map(const std::string &path, yorcvs::ECS *world, yorcvs::Window<yorcvs::graphics> &r)
-        : ecs(world), init_ecs(*world), collisionS(world), velocityS(world), animS(world),
-          healthS(world)
+    Map(const std::string &path, yorcvs::ECS *world)
+        : ecs(world), init_ecs(*world), collisionS(world), velocityS(world), animS(world), healthS(world)
     {
 
-        load(world, &r, path);
+        load(world, path);
         entities.emplace_back(world);
         load_character_from_path(entities[entities.size() - 1], "assets/player.json");
     }
 
-    void load(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *window, const std::string &path)
+    void load(yorcvs::ECS *parent, const std::string &path)
     {
         ecs = parent;
-     
+
         yorcvs::log("Loading map: " + path);
         tmx::Map map{};
         if (!map.load(path))
@@ -279,7 +278,7 @@ class Map
             }
         }
     }
-    void parse_tile_layer_ysorted(tmx::Map &map, tmx::TileLayer &tileLayer) const
+    void parse_tile_layer_ysorted(tmx::Map &map, tmx::TileLayer &tileLayer) 
     {
         const auto &chunks = tileLayer.getChunks();
 
@@ -309,17 +308,17 @@ class Map
                     }
 
                     /// add object
-                    size_t entity = ecs->create_entity_ID();
+                    ysorted_tiles.emplace_back(ecs);
+                    size_t entity = ysorted_tiles[ysorted_tiles.size() - 1].id;
                     ecs->add_component<positionComponent>(
                         entity,
                         {chunk_position * tilesSize +
                          tilesSize * yorcvs::Vec2<float>{static_cast<float>(chunk_x), static_cast<float>(chunk_y)}});
-                    ecs->add_component<spriteComponent>(
-                        entity,
-                        {{0, 0},
-                         {static_cast<float>(tile_set->getTileSize().x), static_cast<float>(tile_set->getTileSize().y)},
-                         get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID),
-                         tile_set->getImagePath()});
+                    ecs->add_component<spriteComponent>(entity, {{0, 0},
+                                                                 {static_cast<float>(tile_set->getTileSize().x),
+                                                                  static_cast<float>(tile_set->getTileSize().y)},
+                                                                 get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID),
+                                                                 tile_set->getImagePath()});
                 }
             }
         }
@@ -397,7 +396,8 @@ class Map
         for (const auto &object : objects)
         {
             // create entity
-            size_t entity = ecs->create_entity_ID();
+            entities.emplace_back(ecs);
+            size_t entity = entities[entities.size() - 1].id;
             ecs->add_component<positionComponent>(
                 entity, {{object.getPosition().x, object.getPosition().y - object.getAABB().height}});
             if (object.getTileID() != 0 && object.visible())
@@ -537,7 +537,7 @@ class Map
                                              {player["sprite"]["size"]["x"], player["sprite"]["size"]["y"]},
                                              {player["sprite"]["srcRect"]["x"], player["sprite"]["srcRect"]["y"],
                                               player["sprite"]["srcRect"]["w"], player["sprite"]["srcRect"]["h"]},
-                                              player["sprite"]["spriteName"]});
+                                             player["sprite"]["spriteName"]});
         ecs->add_component<healthComponent>(entity.id, {5, 10, 0.1f, false});
         ecs->add_component<animationComponent>(entity.id, {});
         for (const auto &animation : player["sprite"]["animations"])
@@ -548,8 +548,8 @@ class Map
             {
                 for (const auto &frame : animation["frames"])
                 {
-                    bool frame_fail = animS.add_animation_frame(entity.id, animation["name"],
-                                                                {frame["x"], frame["y"], frame["w"], frame["h"]});
+                    animS.add_animation_frame(entity.id, animation["name"],
+                                              {frame["x"], frame["y"], frame["w"], frame["h"]});
                 }
             }
         }
@@ -574,19 +574,16 @@ class Map
     ecs_Initializer init_ecs;
 
   public:
-   
     CollisionSystem collisionS;
-
     yorcvs::Vec2<float> tilesSize;
     std::vector<yorcvs::Tile> tiles;
-
   private:
-   
     yorcvs::Vec2<float> spawn_coord;
     VelocitySystem velocityS;
     AnimationSystem animS;
     HealthSystem healthS;
     std::vector<yorcvs::Entity> entities;
+    std::vector<yorcvs::Entity> ysorted_tiles;
 };
 
 // TODO: MAKE SOME SYSTEMS MAP-DEPENDENT AND REMOVE THIS
@@ -710,7 +707,7 @@ class Application
     yorcvs::Vec2<float> render_dimensions = {240.0f, 120.0f}; // how much to render
 
     yorcvs::ECS world{};
-    yorcvs::Map map{"assets/map.tmx", &world, r};
+    yorcvs::Map map{"assets/map.tmx", &world};
     SpriteSystem sprS{map.ecs, &r};
     PlayerMovementControl pcS{map.ecs, &r};
     // debug stuff

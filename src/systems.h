@@ -280,13 +280,13 @@ class AnimationSystem
      * @param frame_pass_time amount of time to pass until next frame
      * @return bool - false if failed
      */
-    [[nodiscard]] bool add_animation_frame(const size_t entityID, const std::string &animation_name,
+    void add_animation_frame(const size_t entityID, const std::string &animation_name,
                                            const yorcvs::Rect<size_t> &frame) const
     {
         if (!world->has_components<animationComponent>(entityID))
         {
             yorcvs::log("Entity doesn't have  an animation component", yorcvs::MSGSEVERITY::WARNING);
-            return false;
+            return;
         }
         std::unordered_map<std::string, animationComponent::Animation> *entity_anims =
             &world->get_component<animationComponent>(entityID).animations;
@@ -296,10 +296,9 @@ class AnimationSystem
             yorcvs::log("Entity " + std::to_string(entityID) + " doesn't have an animation with the name " +
                             animation_name,
                         yorcvs::MSGSEVERITY::ERROR);
-            return false;
+            return;
         }
         anim->second.frames.push_back({frame});
-        return true;
     }
 
     void remove_animation(yorcvs::Entity, size_t index);
