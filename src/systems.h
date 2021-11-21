@@ -529,7 +529,7 @@ class SpriteSystem
                   [&](size_t ID1, size_t ID2) { return ID1 < ID2; });
         window->set_render_scale(rs);
     }
-
+    
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;
     yorcvs::Window<yorcvs::graphics> *window;

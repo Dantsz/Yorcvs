@@ -24,6 +24,15 @@
 #include <functional> // callbacks need to be stored in a vector
 #include <math.h>
 
+#pragma once
+namespace yorcvs
+{
+class SDL2
+{
+  public:
+    const char *name = "SDL2";
+};
+} // namespace yorcvs
 // SDL TEXTURE MANAGER
 // default_delete needs to be specialized for SDL_Texture to be used with STL
 
@@ -42,11 +51,7 @@ namespace yorcvs
  * @brief Interface concept for defining rendering objects that are implemented using SDL2
  *
  */
-class SDL2
-{
-  public:
-    const char *name = "SDL2";
-};
+
 
 template <> class Texture<yorcvs::SDL2>
 {
@@ -252,9 +257,9 @@ template <> class Window<yorcvs::SDL2>
             // NOTE: SDL_rendercopyF exists for >SDL 2.0.10
             SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
                                 static_cast<int>(srcRect.h)};
-            SDL_Rect dest = {static_cast<int>(dstRect.x - offset.x), static_cast<int>(dstRect.y - offset.y),
-                             static_cast<int>(dstRect.w), static_cast<int>(dstRect.h)};
-            SDL_RenderCopyEx(renderer, assetm->load_from_file(path).get(), &sourceR, &dest, angle, nullptr,
+            SDL_FRect dest = {static_cast<float>(dstRect.x - offset.x), static_cast<float>(dstRect.y - offset.y),
+                             static_cast<float>(dstRect.w), static_cast<float>(dstRect.h)};
+            SDL_RenderCopyExF(renderer, assetm->load_from_file(path).get(), &sourceR, &dest, angle, nullptr,
                              SDL_FLIP_NONE);
         }
     }
@@ -267,9 +272,9 @@ template <> class Window<yorcvs::SDL2>
             // NOTE: SDL_rendercopyF exists for >SDL 2.0.10
             SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
                                 static_cast<int>(srcRect.h)};
-            SDL_Rect dest = {static_cast<int>(dstRectPos.x - offset.x), static_cast<int>(dstRectPos.y - offset.y),
-                             static_cast<int>(dstRectSize.x), static_cast<int>(dstRectSize.y)};
-            SDL_RenderCopyEx(renderer, assetm->load_from_file(path).get(), &sourceR, &dest, angle, nullptr,
+            SDL_FRect dest = {static_cast<float>(dstRectPos.x - offset.x), static_cast<float>(dstRectPos.y - offset.y),
+                             static_cast<float>(dstRectSize.x), static_cast<float>(dstRectSize.y)};
+            SDL_RenderCopyExF(renderer, assetm->load_from_file(path).get(), &sourceR, &dest, angle, nullptr,
                              SDL_FLIP_NONE);
         }
     }
@@ -280,7 +285,7 @@ template <> class Window<yorcvs::SDL2>
         tex.SDLtex = assetm->load_from_file(path);
         return tex;
     }
-    void draw_sprite(const Texture<yorcvs::SDL2> &texture, const yorcvs::Rect<float> &dstRect,
+    void draw_texture(const Texture<yorcvs::SDL2> &texture, const yorcvs::Rect<float> &dstRect,
                      const yorcvs::Rect<size_t> &srcRect, double angle = 0.0)
     {
         if (!isMinimized)

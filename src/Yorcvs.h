@@ -9,6 +9,7 @@
  *
  */
 #pragma once
+
 #include "Yorcvs.h"
 #include "common/ecs.h"
 #include "common/types.h"
@@ -36,12 +37,13 @@ namespace json = nlohmann;
 
 namespace yorcvs
 {
+
 class DebugInfo
 {
   public:
     DebugInfo() = default;
 
-    DebugInfo(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms,
+    DebugInfo(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms,
               CollisionSystem *cols)
         : parentWindow(parentW), appECS(pECS), playerMoveSystem(pms), colSystem(cols)
     {
@@ -109,7 +111,7 @@ class DebugInfo
         }
     }
 
-    void attach(yorcvs::Window<yorcvs::SDL2> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms,
+    void attach(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms,
                 CollisionSystem *cols)
     {
         parentWindow = parentW;
@@ -130,17 +132,17 @@ class DebugInfo
     {
         maxFrameTime = 0.0f;
     }
-    yorcvs::Window<yorcvs::SDL2> *parentWindow{};
+    yorcvs::Window<yorcvs::graphics> *parentWindow{};
     yorcvs::ECS *appECS{};
 
-    yorcvs::Text<yorcvs::SDL2> frameTime;
+    yorcvs::Text<yorcvs::graphics> frameTime;
     yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
 
     float maxFrameTime = 0.0f;
-    yorcvs::Text<yorcvs::SDL2> maxframeTimeTX;
+    yorcvs::Text<yorcvs::graphics> maxframeTimeTX;
     yorcvs::Rect<float> maxFTRect = {0, 25, 150, 25};
 
-    yorcvs::Text<yorcvs::SDL2> ecsEntities;
+    yorcvs::Text<yorcvs::graphics> ecsEntities;
     yorcvs::Rect<float> entitiesRect = {0, 50, 150, 25};
 
     yorcvs::Text<yorcvs::graphics> playerPosition;
@@ -164,7 +166,7 @@ struct Tile
 class Map
 {
   public:
-    Map(const std::string &path, yorcvs::ECS *world, yorcvs::Window<yorcvs::SDL2> &r)
+    Map(const std::string &path, yorcvs::ECS *world, yorcvs::Window<yorcvs::graphics> &r)
         : ecs(world), init_ecs(*world), parentWindow(&r), collisionS(world), velocityS(world), animS(world),
           healthS(world)
     {
@@ -317,7 +319,7 @@ class Map
                         {{0, 0},
                          {static_cast<float>(tile_set->getTileSize().x), static_cast<float>(tile_set->getTileSize().y)},
                          get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID),
-                         parentWindow->create_texture(tile_set->getImagePath())});
+                         parentWindow->create_texture(tile_set->getImagePath()),tile_set->getImagePath()});
                 }
             }
         }
@@ -406,7 +408,7 @@ class Map
                 ecs->add_component<spriteComponent>(entity, {{0, 0},
                                                              {object.getAABB().width, object.getAABB().height},
                                                              get_src_rect_from_uid(map, object.getTileID()),
-                                                             parentWindow->create_texture(tileSet->getImagePath())});
+                                                             parentWindow->create_texture(tileSet->getImagePath()),tileSet->getImagePath()});
             }
             /*
             Object properties
@@ -535,17 +537,20 @@ class Map
                                              {player["sprite"]["size"]["x"], player["sprite"]["size"]["y"]},
                                              {player["sprite"]["srcRect"]["x"], player["sprite"]["srcRect"]["y"],
                                               player["sprite"]["srcRect"]["w"], player["sprite"]["srcRect"]["h"]},
-                                             parentWindow->create_texture(player["sprite"]["spriteName"])});
+                                             parentWindow->create_texture(player["sprite"]["spriteName"]),player["sprite"]["spriteName"]});
         ecs->add_component<healthComponent>(entity.id, {5, 10, 0.1f, false});
         ecs->add_component<animationComponent>(entity.id, {});
         for (const auto &animation : player["sprite"]["animations"])
         {
 
-            bool animation_fail = animS.add_animation(entity.id, animation["name"], animation["speed"]);
-            for (const auto &frame : animation["frames"])
+            bool animation_succes = animS.add_animation(entity.id, animation["name"], animation["speed"]);
+            if (animation_succes)
             {
-                bool frame_fail = animS.add_animation_frame(entity.id, animation["name"],
-                                                            {frame["x"], frame["y"], frame["w"], frame["h"]});
+                for (const auto &frame : animation["frames"])
+                {
+                    bool frame_fail = animS.add_animation_frame(entity.id, animation["name"],
+                                                                {frame["x"], frame["y"], frame["w"], frame["h"]});
+                }
             }
         }
         AnimationSystem::set_animation(entity, "idleL");
@@ -577,7 +582,7 @@ class Map
     std::vector<yorcvs::Tile> tiles;
 
   private:
-    std::string tilesetPath;
+   
     yorcvs::Vec2<float> spawn_coord;
     VelocitySystem velocityS;
     AnimationSystem animS;
@@ -698,7 +703,7 @@ class Application
   private:
     static constexpr const char *configname = "yorcvsconfig.json";
 
-    yorcvs::Window<yorcvs::SDL2> r;
+    yorcvs::Window<yorcvs::graphics> r;
     yorcvs::Timer counter;
 
     static constexpr float msPF = 16.6f;
