@@ -7,6 +7,8 @@ configure_file(${CMAKE_SOURCE_DIR}/CTestCustom.cmake ${CMAKE_BINARY_DIR} @ONLY)
 enable_testing()
 
 project(ECSTest)
+
+set(test_dir ${CMAKE_SOURCE_DIR})
 include(FetchContent)
 
 FetchContent_Declare(libtmxlite
@@ -27,8 +29,8 @@ find_package(SDL2 CONFIG REQUIRED)
 find_package(SDL2-image CONFIG REQUIRED)
 find_package(SDL2-ttf CONFIG REQUIRED)
 
-add_executable(ECSTestEntitiesAndComponents ECSTestEntitiesAndComponents.cpp)
-add_test(ECSTestEntitiesAndComponents ECSTestEntitiesAndComponents)
+add_executable(ECSTestEntitiesAndComponents ECSTestEntitiesAndComponents.cpp )
+add_test(ECSTestEntitiesAndComponents ECSTestEntitiesAndComponents )
 
 add_executable(ECSComponentCreationDeletion ECSComponentCreationDeletion.cpp)
 add_test(ECSComponentCreationDeletion ECSComponentCreationDeletion)
@@ -49,6 +51,7 @@ add_executable(ECSmainclassCopyMove ECSmainclassCopyMove.cpp)
 add_test(ECSmainclassCopyMove ECSmainclassCopyMove)
 
 add_executable(YorcvsLoadMap YorcvsLoadMap.cpp)
-add_test(YorcvsLoadMap YorcvsLoadMap)
+add_test(NAME YorcvsLoadMap  COMMAND YorcvsLoadMap WORKING_DIRECTORY ${test_dir})
+
 target_link_libraries(YorcvsLoadMap PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main  SDL2::SDL2_image SDL2::SDL2_ttf)
 
