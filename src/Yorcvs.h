@@ -167,7 +167,7 @@ class Map
 {
   public:
     Map(const std::string &path, yorcvs::ECS *world, yorcvs::Window<yorcvs::graphics> &r)
-        : ecs(world), init_ecs(*world), parentWindow(&r), collisionS(world), velocityS(world), animS(world),
+        : ecs(world), init_ecs(*world), collisionS(world), velocityS(world), animS(world),
           healthS(world)
     {
 
@@ -179,7 +179,7 @@ class Map
     void load(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *window, const std::string &path)
     {
         ecs = parent;
-        parentWindow = window;
+     
         yorcvs::log("Loading map: " + path);
         tmx::Map map{};
         if (!map.load(path))
@@ -319,7 +319,7 @@ class Map
                         {{0, 0},
                          {static_cast<float>(tile_set->getTileSize().x), static_cast<float>(tile_set->getTileSize().y)},
                          get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID),
-                         parentWindow->create_texture(tile_set->getImagePath()),tile_set->getImagePath()});
+                         tile_set->getImagePath()});
                 }
             }
         }
@@ -408,7 +408,7 @@ class Map
                 ecs->add_component<spriteComponent>(entity, {{0, 0},
                                                              {object.getAABB().width, object.getAABB().height},
                                                              get_src_rect_from_uid(map, object.getTileID()),
-                                                             parentWindow->create_texture(tileSet->getImagePath()),tileSet->getImagePath()});
+                                                             tileSet->getImagePath()});
             }
             /*
             Object properties
@@ -537,7 +537,7 @@ class Map
                                              {player["sprite"]["size"]["x"], player["sprite"]["size"]["y"]},
                                              {player["sprite"]["srcRect"]["x"], player["sprite"]["srcRect"]["y"],
                                               player["sprite"]["srcRect"]["w"], player["sprite"]["srcRect"]["h"]},
-                                             parentWindow->create_texture(player["sprite"]["spriteName"]),player["sprite"]["spriteName"]});
+                                              player["sprite"]["spriteName"]});
         ecs->add_component<healthComponent>(entity.id, {5, 10, 0.1f, false});
         ecs->add_component<animationComponent>(entity.id, {});
         for (const auto &animation : player["sprite"]["animations"])
@@ -574,8 +574,7 @@ class Map
     ecs_Initializer init_ecs;
 
   public:
-    yorcvs::Window<yorcvs::graphics> *parentWindow{};
-
+   
     CollisionSystem collisionS;
 
     yorcvs::Vec2<float> tilesSize;

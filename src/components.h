@@ -40,7 +40,6 @@ struct spriteComponent
     yorcvs::Vec2<float> offset;//position offset
     yorcvs::Vec2<float> size;// size of sprite
     yorcvs::Rect<size_t> srcRect;//part of texture to render
-    yorcvs::Texture<yorcvs::graphics> texture;
     std::string texture_path;
 };
 

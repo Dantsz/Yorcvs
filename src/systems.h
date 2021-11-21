@@ -520,8 +520,8 @@ class SpriteSystem
         });
         for (const auto &ID : entityList->entitiesID)
         {
-            window->draw_texture(
-                world->get_component<spriteComponent>(ID).texture,
+            window->draw_sprite(
+                world->get_component<spriteComponent>(ID).texture_path,
                 world->get_component<spriteComponent>(ID).offset + world->get_component<positionComponent>(ID).position,
                 world->get_component<spriteComponent>(ID).size, world->get_component<spriteComponent>(ID).srcRect, 0.0);
         }
@@ -529,7 +529,7 @@ class SpriteSystem
                   [&](size_t ID1, size_t ID2) { return ID1 < ID2; });
         window->set_render_scale(rs);
     }
-    
+
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;
     yorcvs::Window<yorcvs::graphics> *window;
