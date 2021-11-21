@@ -34,7 +34,7 @@ jobs:
           configurePreset: 'ninja-multi-vcpkg'
           buildPreset: 'ninja-multi-vcpkg'
     - name: run tests
-      run: ctest --test-dir tests/CTest/builds/ninja-multi-vcpkg
+      run: ctest --test-dir tests/CTest/builds/ninja-multi-vcpkg -C Debug
   ubuntu:
     name: ${{matrix.os}}-${{matrix.compiler}}
     runs-on: ${{matrix.os}}
@@ -68,4 +68,4 @@ jobs:
           configurePreset: ${{matrix.config}}
           buildPreset:  ${{matrix.config}}
     - name: run tests
-      run: ctest --test-dir tests/CTest/builds/${{matrix.config}}
+      run: ctest --test-dir tests/CTest/builds/${{matrix.config}} -C Debug
