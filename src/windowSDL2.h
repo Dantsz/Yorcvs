@@ -323,7 +323,7 @@ template <> class Window<yorcvs::SDL2>
         uint8_t a_old = 0;
         SDL_GetRenderDrawColor(renderer, &r_old, &g_old, &b_old, &a_old);
         SDL_SetRenderDrawColor(renderer, r, g, b, a);
-        SDL_RenderDrawRectF(renderer, &dest);
+        SDL_RenderFillRectF(renderer, &dest);
         SDL_SetRenderDrawColor(renderer, r_old, g_old, b_old, a_old);
     }
     [[nodiscard]] Text<yorcvs::SDL2> create_text(const std::string &path, const std::string &message, unsigned char r,
