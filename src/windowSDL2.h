@@ -153,6 +153,7 @@ template <> class Window<yorcvs::SDL2>
         {
             yorcvs::log("Error creating SDL2 renderer", yorcvs::MSGSEVERITY::ERROR);
         }
+        SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);
         SDL_RendererInfo renderInfo{};
         SDL_GetRendererInfo(renderer, &renderInfo);
         const std::string softwareRenderer =
