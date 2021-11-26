@@ -44,10 +44,10 @@ class DebugInfo
     DebugInfo() = default;
 
     DebugInfo(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms,
-              CollisionSystem *cols)
+              CollisionSystem *cols, HealthSystem *healthS)
         : parentWindow(parentW), appECS(pECS), playerMoveSystem(pms), colSystem(cols)
     {
-        attach(parentW, pECS, pms, cols);
+        attach(parentW, pECS, pms, cols,healthS);
     }
     ~DebugInfo() = default;
     DebugInfo(const DebugInfo &other) = delete;
@@ -107,17 +107,19 @@ class DebugInfo
             parentWindow->draw_text(ecsEntities, entitiesRect);
             parentWindow->draw_text(playerPosition, pPositionRect);
             parentWindow->draw_text(playerHealth, playerHealthRect);
-            colSystem->render_hitboxes(*parentWindow, render_dimensions, 255, 0, 0, 255);
+            colSystem->render_hitboxes(*parentWindow, render_dimensions, 255, 0, 0, 100);
         }
     }
 
     void attach(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms,
-                CollisionSystem *cols)
+                CollisionSystem *cols, HealthSystem *healthS)
     {
         parentWindow = parentW;
         appECS = pECS;
         playerMoveSystem = pms;
         colSystem = cols;
+        healthSys = healthS;
+
         frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", 255, 255, 255, 255, 100, 10000);
         maxframeTimeTX =
             parentWindow->create_text("assets/font.ttf", "Max Frame Time : ", 255, 255, 255, 255, 100, 10000);
@@ -153,7 +155,9 @@ class DebugInfo
 
     PlayerMovementControl *playerMoveSystem{};
 
+    
     CollisionSystem *colSystem{};
+    HealthSystem *healthSys{};
 };
 
 struct Tile
@@ -167,7 +171,7 @@ class Map
 {
   public:
     Map(const std::string &path, yorcvs::ECS *world)
-        : ecs(world), init_ecs(*world), collisionS(world), velocityS(world), animS(world), healthS(world)
+        : ecs(world), init_ecs(*world), collisionS(world), healthS(world), velocityS(world), animS(world)
     {
 
         load(world, path);
@@ -278,7 +282,7 @@ class Map
             }
         }
     }
-    void parse_tile_layer_ysorted(tmx::Map &map, tmx::TileLayer &tileLayer) 
+    void parse_tile_layer_ysorted(tmx::Map &map, tmx::TileLayer &tileLayer)
     {
         const auto &chunks = tileLayer.getChunks();
 
@@ -577,11 +581,13 @@ class Map
     CollisionSystem collisionS;
     yorcvs::Vec2<float> tilesSize;
     std::vector<yorcvs::Tile> tiles;
+    HealthSystem healthS;
+
   private:
     yorcvs::Vec2<float> spawn_coord;
     VelocitySystem velocityS;
     AnimationSystem animS;
-    HealthSystem healthS;
+
     std::vector<yorcvs::Entity> entities;
     std::vector<yorcvs::Entity> ysorted_tiles;
 };
@@ -634,7 +640,7 @@ class Application
             yorcvs::log("Config file not found, loading default settings...");
         }
 
-        dbInfo.attach(&r, map.ecs, &pcS, &map.collisionS);
+        dbInfo.attach(&r, map.ecs, &pcS, &map.collisionS, &map.healthS);
         counter.start();
     }
     Application(const Application &other) = delete;
@@ -648,7 +654,6 @@ class Application
     }
     void render_map_tiles(yorcvs::Map &p_map)
     {
-
         yorcvs::Vec2<float> rs = r.get_render_scale();
         r.set_render_scale(r.get_size() / render_dimensions);
         for (const auto &tile : p_map.tiles)

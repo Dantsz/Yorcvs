@@ -75,6 +75,9 @@ class CollisionSystem
     void render_hitboxes(yorcvs::Window<render_backend> &window, const yorcvs::Vec2<float> &render_dimensions, float r,
                          float g, float b, float a)
     {
+
+    
+
         yorcvs::Vec2<float> old_rs = window.get_render_scale();
         window.set_render_scale(window.get_size() / render_dimensions);
 
@@ -88,6 +91,18 @@ class CollisionSystem
             rect.w = world->get_component<hitboxComponent>(ID).hitbox.w;
             rect.h = world->get_component<hitboxComponent>(ID).hitbox.h;
             window.draw_rect(rect, r, g, b, a);
+            if(world->has_components<healthComponent>(ID))
+            {
+                ///draw health bar
+                yorcvs::Rect<float> healthBarRect{};
+                healthBarRect.x = rect.x - 16.0f + rect.w/2;
+                healthBarRect.y = rect.y - rect.h;
+                healthBarRect.w = 32.0f;
+                healthBarRect.h = 8.0f;
+                window.draw_rect(healthBarRect, 100, 0, 0, 255);
+                healthBarRect.w = (world->get_component<healthComponent>(ID).HP / world->get_component<healthComponent>(ID).maxHP) * 32.0f;
+                window.draw_rect(healthBarRect, 255, 0, 0, 255);
+            }
         }
         window.set_render_scale(old_rs);
     }
@@ -122,9 +137,7 @@ class CollisionSystem
             rectA.x + rectA.w > rectB.x)
         {
            
-            rectAvel.y = (rectB.y - rectA.y - rectA.h );
-           // rectAvel.y *= -1.0f;
-            
+            rectAvel.y = (rectB.y - rectA.y - rectA.h );         
             return true;
         }
         return false;
