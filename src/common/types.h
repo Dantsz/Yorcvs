@@ -21,25 +21,25 @@ namespace yorcvs
 template <typename T> class Vec2
 {
   public:
-    constexpr Vec2()
+    constexpr Vec2() : x(static_cast<T>(0)), y(static_cast<T>(0))
     {
-        x = static_cast<T>(0);
-        y = static_cast<T>(0);
+        
+        
     }
-    constexpr Vec2(T px, T py)
+    constexpr Vec2(T px, T py) : x(px), y(py)
     {
-        x = px;
-        y = py;
+        
+        
     }
-    constexpr Vec2(const Vec2 &other)
+    constexpr Vec2(const Vec2 &other) : x(other.x), y(other.y)
     {
-        x = other.x;
-        y = other.y;
+        
+        
     }
-    constexpr Vec2(Vec2 &&other) noexcept
+    constexpr Vec2(Vec2 &&other) noexcept : x(other.x), y(other.y)
     {
-        x = other.x;
-        y = other.y;
+        
+        
     }
     ~Vec2() = default; // trivially destructuted
     constexpr Vec2 &operator=(const Vec2 &other) = default;
@@ -181,47 +181,47 @@ template <typename T> class Vec2
 template <typename T> class Rect
 {
   public:
-    constexpr Rect()
+    constexpr Rect() : x(static_cast<T>(0)), y(static_cast<T>(0)), w(static_cast<T>(0)), h(static_cast<T>(0))
     {
-        x = static_cast<T>(0);
-        y = static_cast<T>(0);
-        w = static_cast<T>(0);
-        h = static_cast<T>(0);
+        
+        
+        
+        
     }
-    constexpr Rect(T px, T py, T pw, T ph)
+    constexpr Rect(T px, T py, T pw, T ph) : x(px), y(py), w(pw), h(ph)
     {
-        x = px;
-        y = py;
-        w = pw;
-        h = ph;
+        
+        
+        
+        
     }
-    constexpr Rect(const Rect &other)
+    constexpr Rect(const Rect &other) : x(other.x), y(other.y), w(other.w), h(other.h)
     {
-        x = other.x;
-        y = other.y;
-        w = other.w;
-        h = other.h;
+        
+        
+        
+        
     }
-    constexpr Rect(Rect &&other) noexcept
+    constexpr Rect(Rect &&other) noexcept : x(other.x), y(other.y), w(other.w), h(other.h)
     {
-        x = other.x;
-        y = other.y;
-        w = other.w;
-        h = other.h;
+        
+        
+        
+        
     }
-    constexpr Rect(const Vec2<T> position, const Vec2<T> dimension)
+    constexpr Rect(const Vec2<T> position, const Vec2<T> dimension) : x(position.x), y(position.y), w(dimension.x), h(dimension.y)
     {
-        x = position.x;
-        y = position.y;
-        w = dimension.x;
-        h = dimension.y;
+        
+        
+        
+        
     }
-    constexpr Rect(const Vec2<T> &position, const Vec2<T>& dimension)
+    constexpr Rect(const Vec2<T> &position, const Vec2<T>& dimension) : x(position.x), y(position.y), w(dimension.x), h(dimension.y)
     {
-        x = position.x;
-        y = position.y;
-        w = dimension.x;
-        h = dimension.y;
+        
+        
+        
+        
     }
     ~Rect() = default;
     constexpr Rect &operator=(const Rect &other) = default;
