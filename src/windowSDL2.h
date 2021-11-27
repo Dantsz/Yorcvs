@@ -22,7 +22,7 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <functional> // callbacks need to be stored in a vector
-#include <math.h>
+#include <cmath>
 
 #pragma once
 namespace yorcvs

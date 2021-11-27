@@ -3,6 +3,7 @@
     "HP": 5.0,
     "maxHP" : 5.0,
     "HPregen" : 0.1,
+    
     "hitbox" :
     {
         "x" : 14,
@@ -26,10 +27,10 @@
         {
             "x" : 0,
             "y" : 0,
-            "w" : 64,
+            "w" : 64,  
             "h" : 64
         },
-        "spriteName" : "assets/test_player_sheet.png",
+        "spriteName" : "test_player_sheet.png",
         "animations" : [
             {
                 "name" : "idleR",

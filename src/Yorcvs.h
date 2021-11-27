@@ -527,9 +527,14 @@ class Map
 
     void load_character_from_path(yorcvs::Entity &entity, const std::string &path)
     {
+        std::filesystem::path file = path;
+       
+
         std::ifstream playerIN(path);
         std::string playerData{(std::istreambuf_iterator<char>(playerIN)), (std::istreambuf_iterator<char>())};
         auto player = json::json::parse(playerData);
+        const std::string sprite_path = file.remove_filename().generic_string() + std::string(player["sprite"]["spriteName"]); 
+        
 
         ecs->add_component<hitboxComponent>(
             entity.id, {{player["hitbox"]["x"], player["hitbox"]["y"], player["hitbox"]["w"], player["hitbox"]["h"]}});
@@ -541,7 +546,9 @@ class Map
                                              {player["sprite"]["size"]["x"], player["sprite"]["size"]["y"]},
                                              {player["sprite"]["srcRect"]["x"], player["sprite"]["srcRect"]["y"],
                                               player["sprite"]["srcRect"]["w"], player["sprite"]["srcRect"]["h"]},
-                                             player["sprite"]["spriteName"]});
+                                              sprite_path});
+
+                                           
         ecs->add_component<healthComponent>(entity.id, {5, 10, 0.1f, false});
         ecs->add_component<animationComponent>(entity.id, {});
         for (const auto &animation : player["sprite"]["animations"])
