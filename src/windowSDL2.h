@@ -21,8 +21,9 @@
 #include "SDL_image.h"
 #include <SDL.h>
 #include <SDL_ttf.h>
-#include <functional> // callbacks need to be stored in a vector
 #include <cmath>
+#include <functional> // callbacks need to be stored in a vector
+
 
 #pragma once
 namespace yorcvs
@@ -51,7 +52,6 @@ namespace yorcvs
  * @brief Interface concept for defining rendering objects that are implemented using SDL2
  *
  */
-
 
 template <> class Texture<yorcvs::SDL2>
 {
@@ -153,7 +153,7 @@ template <> class Window<yorcvs::SDL2>
         {
             yorcvs::log("Error creating SDL2 renderer", yorcvs::MSGSEVERITY::ERROR);
         }
-        SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
         SDL_RendererInfo renderInfo{};
         SDL_GetRendererInfo(renderer, &renderInfo);
         const std::string softwareRenderer =
@@ -259,9 +259,9 @@ template <> class Window<yorcvs::SDL2>
             SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
                                 static_cast<int>(srcRect.h)};
             SDL_FRect dest = {static_cast<float>(dstRect.x - offset.x), static_cast<float>(dstRect.y - offset.y),
-                             static_cast<float>(dstRect.w), static_cast<float>(dstRect.h)};
+                              static_cast<float>(dstRect.w), static_cast<float>(dstRect.h)};
             SDL_RenderCopyExF(renderer, assetm->load_from_file(path).get(), &sourceR, &dest, angle, nullptr,
-                             SDL_FLIP_NONE);
+                              SDL_FLIP_NONE);
         }
     }
 
@@ -274,9 +274,9 @@ template <> class Window<yorcvs::SDL2>
             SDL_Rect sourceR = {static_cast<int>(srcRect.x), static_cast<int>(srcRect.y), static_cast<int>(srcRect.w),
                                 static_cast<int>(srcRect.h)};
             SDL_FRect dest = {static_cast<float>(dstRectPos.x - offset.x), static_cast<float>(dstRectPos.y - offset.y),
-                             static_cast<float>(dstRectSize.x), static_cast<float>(dstRectSize.y)};
+                              static_cast<float>(dstRectSize.x), static_cast<float>(dstRectSize.y)};
             SDL_RenderCopyExF(renderer, assetm->load_from_file(path).get(), &sourceR, &dest, angle, nullptr,
-                             SDL_FLIP_NONE);
+                              SDL_FLIP_NONE);
         }
     }
 
@@ -287,7 +287,7 @@ template <> class Window<yorcvs::SDL2>
         return tex;
     }
     void draw_texture(const Texture<yorcvs::SDL2> &texture, const yorcvs::Rect<float> &dstRect,
-                     const yorcvs::Rect<size_t> &srcRect, double angle = 0.0)
+                      const yorcvs::Rect<size_t> &srcRect, double angle = 0.0)
     {
         if (!isMinimized)
         {

@@ -92,9 +92,7 @@ class EntityManager
     EntityManager(const EntityManager &other) = default;
     EntityManager(EntityManager &&other) noexcept
         : freedIndices(std::move(other.freedIndices)), entitySignatures(std::move(other.entitySignatures)),
-          lowestUnallocatedID(other.lowestUnallocatedID){
-
-          };
+          lowestUnallocatedID(other.lowestUnallocatedID){};
     EntityManager &operator=(const EntityManager &other)
     {
         if (this == &other)
@@ -246,7 +244,6 @@ template <typename T> class ComponentContainer final : public VContainer
         }
         else // just take an unused component
         {
-
             components[freeIndex.front()] = component;
 
             while (entitytocomponent.size() < entityID)
@@ -340,7 +337,6 @@ template <typename T> class ComponentContainer final : public VContainer
 // handles all components
 class ComponentManager
 {
-
   public:
     ComponentManager() = default;
     ComponentManager(const ComponentManager &other) = default;
@@ -1126,7 +1122,6 @@ class ECS
 
         for (size_t entity = 0; entity < entitymanager->lowestUnallocatedID; entity++)
         {
-
             if (systemmanager->compare_entity_to_system(entitymanager->entitySignatures[entity],
                                                         systemmanager->get_system_signature<T>()))
             {

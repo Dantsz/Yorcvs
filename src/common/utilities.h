@@ -1,16 +1,17 @@
 #pragma once
+#include <chrono>
 #include <iostream>
 #include <string>
-#include <chrono>
 
-namespace yorcvs{
 
+namespace yorcvs
+{
 namespace MSGSEVERITY
 {
-    constexpr size_t INFO = 0;
-    constexpr size_t WARNING = 1;
-    constexpr size_t ERROR = 2;
-}
+constexpr size_t INFO = 0;
+constexpr size_t WARNING = 1;
+constexpr size_t ERROR = 2;
+} // namespace MSGSEVERITY
 
 /**
  * @brief Simple function to print a message
@@ -82,9 +83,10 @@ class Timer
 
     /**
      * @brief Returns the time passed since timer was started
-     * 
+     *
      * @tparam return_type - what type should be returned
-     * @tparam cast_format - what unit of measure should be used(nanosecond,milisecond,second) , by default it's millisecond
+     * @tparam cast_format - what unit of measure should be used(nanosecond,milisecond,second) , by default it's
+     * millisecond
      */
     template <typename return_type = size_t, typename cast_format = std::chrono::milliseconds>
     [[nodiscard]] return_type get_ticks() const
@@ -103,4 +105,4 @@ class Timer
     bool mStopped = false;
     bool mStarted = false;
 };
-}
+} // namespace yorcvs

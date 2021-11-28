@@ -3,7 +3,6 @@
 #include <emscripten.h>
 #endif
 
-
 #include "Yorcvs.h"
 
 static yorcvs::Application *m_app;

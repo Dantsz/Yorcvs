@@ -166,7 +166,6 @@ class Map
     Map(const std::string &path, yorcvs::ECS *world)
         : ecs(world), init_ecs(*world), collisionS(world), healthS(world), velocityS(world), animS(world)
     {
-
         load(world, path);
         entities.emplace_back(world);
         load_character_from_path(entities[entities.size() - 1], "assets/player.json");
@@ -539,7 +538,6 @@ class Map
         ecs->add_component<animationComponent>(entity.id, {});
         for (const auto &animation : player["sprite"]["animations"])
         {
-
             bool animation_succes = animS.add_animation(entity.id, animation["name"], animation["speed"]);
             if (animation_succes)
             {
@@ -553,6 +551,7 @@ class Map
         AnimationSystem::set_animation(entity, "idleL");
     }
     yorcvs::ECS *ecs{};
+
   private:
     // TODO: MAKE THIS UNNECESSARY
     struct ecs_Initializer
@@ -594,7 +593,6 @@ class Application
   public:
     Application()
     {
-
         // Load config
         if (std::filesystem::exists(configname))
         {
@@ -667,7 +665,6 @@ class Application
 
         while (lag >= msPF)
         {
-
             update(msPF);
             pcS.updateAnimations();
             pcS.updateControls(render_dimensions);
