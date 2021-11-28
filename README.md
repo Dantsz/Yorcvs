@@ -3,7 +3,7 @@
 [![Emscripten Build](https://github.com/Dantsz/Yorcvs/actions/workflows/EmscriptenBuild.yml/badge.svg)](https://github.com/Dantsz/Yorcvs/actions/workflows/EmscriptenBuild.yml)
 [![Windows Build](https://github.com/Dantsz/Yorcvs/actions/workflows/windows.yml/badge.svg)](https://github.com/Dantsz/Yorcvs/actions/workflows/windows.yml)
 [![Ctests](https://github.com/Dantsz/Yorcvs/actions/workflows/CTests.yml/badge.svg)](https://github.com/Dantsz/Yorcvs/actions/workflows/CTests.yml)
-[![CodeFactor](https://www.codefactor.io/repository/github/dantsz/yorcvs/badge?s=c9aff80c39c79e9d970cb65e1572ff8096881f19(https://www.codefactor.io/repository/github/dantsz/yorcvs)
+[![CodeFactor](https://www.codefactor.io/repository/github/dantsz/yorcvs/badge?s=c9aff80c39c79e9d970cb65e1572ff8096881f19)](https://www.codefactor.io/repository/github/dantsz/yorcvs)
 
 C++ game project
 ## Dependencies
