@@ -37,7 +37,6 @@ namespace json = nlohmann;
 
 namespace yorcvs
 {
-
 class DebugInfo
 {
   public:
@@ -47,7 +46,7 @@ class DebugInfo
               CollisionSystem *cols, HealthSystem *healthS)
         : parentWindow(parentW), appECS(pECS), playerMoveSystem(pms), colSystem(cols)
     {
-        attach(parentW, pECS, pms, cols,healthS);
+        attach(parentW, pECS, pms, cols, healthS);
     }
     ~DebugInfo() = default;
     DebugInfo(const DebugInfo &other) = delete;
@@ -61,7 +60,6 @@ class DebugInfo
         {
             reset();
         }
-
         parentWindow->set_text_message(frameTime, "Frame Time : " + std::to_string(ft));
 
         if (ft > maxFrameTime)
@@ -69,11 +67,9 @@ class DebugInfo
             maxFrameTime = ft;
             parentWindow->set_text_message(maxframeTimeTX, "Max Frame Time: " + std::to_string(maxFrameTime));
         }
-
         parentWindow->set_text_message(ecsEntities,
                                        "Active Entities : " + std::to_string(appECS->get_active_entities_number()));
         // set player position text
-
         if (playerMoveSystem->entityList->entitiesID.empty())
         {
             parentWindow->set_text_message(playerPosition, "NO PLAYER FOUND");
@@ -95,10 +91,8 @@ class DebugInfo
             }
         }
     }
-
     void render(float elapsed, const yorcvs::Vec2<float> &render_dimensions)
     {
-
         if (parentWindow->is_key_pressed({SDL_SCANCODE_E}))
         {
             update(elapsed);
@@ -155,7 +149,6 @@ class DebugInfo
 
     PlayerMovementControl *playerMoveSystem{};
 
-    
     CollisionSystem *colSystem{};
     HealthSystem *healthSys{};
 };
@@ -239,11 +232,9 @@ class Map
             }
         }
     }
-
     void parse_tile_layer(tmx::Map &map, tmx::TileLayer &tileLayer)
     {
         const auto &chunks = tileLayer.getChunks();
-
         for (const auto &chunk : chunks) // parse chunks
         {
             yorcvs::Vec2<float> chunk_position = {static_cast<float>(chunk.position.x),
@@ -268,7 +259,6 @@ class Map
                             tile_set = &tileset;
                         }
                     }
-
                     // put the tile in the vector
                     yorcvs::Tile tile{};
                     tile.texture_path = tile_set->getImagePath();
@@ -285,7 +275,6 @@ class Map
     void parse_tile_layer_ysorted(tmx::Map &map, tmx::TileLayer &tileLayer)
     {
         const auto &chunks = tileLayer.getChunks();
-
         for (const auto &chunk : chunks) // parse chunks
         {
             yorcvs::Vec2<float> chunk_position = {static_cast<float>(chunk.position.x),
@@ -422,7 +411,6 @@ class Map
             * HP_max - maximum hp
             * HP_Regen - health regeneration
             */
-
             for (const auto &property : object.getProperties())
             {
                 bool known = false;
@@ -453,7 +441,6 @@ class Map
     }
     void render_tiles(yorcvs::Window<yorcvs::graphics> &window, const yorcvs::Vec2<float> &render_dimensions)
     {
-
         yorcvs::Vec2<float> rs = window.get_render_scale();
         window.set_render_scale(window.get_size() / render_dimensions);
         for (const auto &tile : tiles)
@@ -528,13 +515,13 @@ class Map
     void load_character_from_path(yorcvs::Entity &entity, const std::string &path)
     {
         std::filesystem::path file = path;
-       
+        const std::string directory_path = file.remove_filename().generic_string();
 
         std::ifstream playerIN(path);
         std::string playerData{(std::istreambuf_iterator<char>(playerIN)), (std::istreambuf_iterator<char>())};
         auto player = json::json::parse(playerData);
-        const std::string sprite_path = file.remove_filename().generic_string() + std::string(player["sprite"]["spriteName"]); 
-        
+
+        const std::string sprite_path = directory_path + std::string(player["sprite"]["spriteName"]);
 
         ecs->add_component<hitboxComponent>(
             entity.id, {{player["hitbox"]["x"], player["hitbox"]["y"], player["hitbox"]["w"], player["hitbox"]["h"]}});
@@ -546,9 +533,8 @@ class Map
                                              {player["sprite"]["size"]["x"], player["sprite"]["size"]["y"]},
                                              {player["sprite"]["srcRect"]["x"], player["sprite"]["srcRect"]["y"],
                                               player["sprite"]["srcRect"]["w"], player["sprite"]["srcRect"]["h"]},
-                                              sprite_path});
+                                             sprite_path});
 
-                                           
         ecs->add_component<healthComponent>(entity.id, {5, 10, 0.1f, false});
         ecs->add_component<animationComponent>(entity.id, {});
         for (const auto &animation : player["sprite"]["animations"])
@@ -566,9 +552,7 @@ class Map
         }
         AnimationSystem::set_animation(entity, "idleL");
     }
-
     yorcvs::ECS *ecs{};
-
   private:
     // TODO: MAKE THIS UNNECESSARY
     struct ecs_Initializer
@@ -689,7 +673,6 @@ class Application
             pcS.updateControls(render_dimensions);
             lag -= msPF;
         }
-
         r.clear();
         map.render(render_dimensions, r, elapsed);
         render_map_tiles(map);

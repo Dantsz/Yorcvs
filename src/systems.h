@@ -9,9 +9,7 @@ class CollisionSystem
   public:
     CollisionSystem(yorcvs::ECS *parent) : world(parent)
     {
-
         // is this legal? yee
-
         world->register_system<CollisionSystem>(*this);
 
         world->add_criteria_for_iteration<CollisionSystem, positionComponent, hitboxComponent>();
@@ -75,9 +73,6 @@ class CollisionSystem
     void render_hitboxes(yorcvs::Window<render_backend> &window, const yorcvs::Vec2<float> &render_dimensions, float r,
                          float g, float b, float a)
     {
-
-    
-
         yorcvs::Vec2<float> old_rs = window.get_render_scale();
         window.set_render_scale(window.get_size() / render_dimensions);
 

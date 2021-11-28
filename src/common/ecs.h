@@ -90,25 +90,24 @@ class EntityManager
     EntityManager() = default;
     ~EntityManager() = default;
     EntityManager(const EntityManager &other) = default;
-    EntityManager(EntityManager &&other) noexcept : freedIndices(std::move(other.freedIndices)), entitySignatures(std::move(other.entitySignatures)), lowestUnallocatedID(other.lowestUnallocatedID)
-    {
-        
-        
-        
-    };
+    EntityManager(EntityManager &&other) noexcept
+        : freedIndices(std::move(other.freedIndices)), entitySignatures(std::move(other.entitySignatures)),
+          lowestUnallocatedID(other.lowestUnallocatedID){
+
+          };
     EntityManager &operator=(const EntityManager &other)
     {
-        if(this == &other)
+        if (this == &other)
         {
             return *this;
         }
         this->entitySignatures = other.entitySignatures;
-        this->freedIndices   = other.freedIndices;
+        this->freedIndices = other.freedIndices;
         this->lowestUnallocatedID = other.lowestUnallocatedID;
         return *this;
     };
-    EntityManager &operator=(EntityManager &&other)
- noexcept     {
+    EntityManager &operator=(EntityManager &&other) noexcept
+    {
         this->entitySignatures = std::move(other.entitySignatures);
         this->freedIndices = std::move(other.freedIndices);
         this->lowestUnallocatedID = other.lowestUnallocatedID;
@@ -144,7 +143,6 @@ class EntityManager
      */
     void delete_entity(const size_t id)
     {
-
         if (id > lowestUnallocatedID)
         {
             yorcvs::log("Invalid id for deletion : id doesn't exist", yorcvs::MSGSEVERITY::ERROR);
@@ -172,7 +170,6 @@ class EntityManager
      */
     void set_signature(const size_t id, const std::vector<bool> &signature)
     {
-
         if (id > lowestUnallocatedID)
         {
             yorcvs::log("Cannot set id signature  : id doesn't exist", yorcvs::MSGSEVERITY::ERROR);
@@ -229,7 +226,6 @@ template <typename T> class ComponentContainer final : public VContainer
     // update a specific component
     void add_component(const size_t entityID, const T &component)
     {
-
         // if the entity does have this type of component throw exception
         if (entity_has_component.size() > entityID && entity_has_component[entityID] == 1)
         {
@@ -276,7 +272,6 @@ template <typename T> class ComponentContainer final : public VContainer
 
     T &get_component(const size_t entityID)
     {
-
         if (entity_has_component.size() <= entityID || entity_has_component[entityID] != 1)
         {
             yorcvs::log("Cannot get component : entity " + std::to_string(entityID) +
@@ -289,7 +284,6 @@ template <typename T> class ComponentContainer final : public VContainer
 
     void remove_component(const size_t entityID)
     {
-
         // if the entity doesn't have this type of component throw exception
         if (entity_has_component.size() <= entityID || entity_has_component[entityID] != 1)
         {
@@ -382,7 +376,6 @@ class ComponentManager
     // this function is not really useful at this point
     template <typename T> void register_component()
     {
-
         const char *componentid = typeid(T).name();
         // and it does what it looks it should do
 
@@ -435,7 +428,6 @@ class ComponentManager
     template <typename T> [[nodiscard]] size_t get_component_ID()
     {
         const char *component_name = typeid(T).name();
-
         if (component_type.find(component_name) == component_type.end())
         {
             yorcvs::log("Cannot fetch component id" + std::string(component_name) + " : invalid component",
@@ -518,18 +510,17 @@ class SystemManager
 {
   public:
     SystemManager() = default;
-    SystemManager(const SystemManager& other)  = default;
-    SystemManager(SystemManager&& other) noexcept = default;
+    SystemManager(const SystemManager &other) = default;
+    SystemManager(SystemManager &&other) noexcept = default;
 
-    SystemManager& operator=(const SystemManager& other) = default;
-    SystemManager& operator=(SystemManager&& other) = default;
+    SystemManager &operator=(const SystemManager &other) = default;
+    SystemManager &operator=(SystemManager &&other) = default;
 
     ~SystemManager() = default;
     // creates a system of type T and puts it in the map
     template <systemT T> bool register_system(T &system)
     {
         const char *systemType = typeid(T).name();
-
         // if the system is already present
         if (typetosystem.find(systemType) != typetosystem.end())
         {
@@ -546,41 +537,36 @@ class SystemManager
     template <systemT T> void set_signature(const std::vector<bool> &signature)
     {
         const char *systemType = typeid(T).name();
-
         // if the system is not found  //throw
         if (typetosystem.find(systemType) == typetosystem.end())
         {
             yorcvs::log("Unable to set the signature: system does not exist.", yorcvs::MSGSEVERITY::ERROR);
         }
-
         typetosignature[systemType] = signature;
     }
 
     /**
      * @brief Returns the list of entities the system has acces to
-     *  
-     * @tparam system - the system  
-     * @return std::shared_ptr<yorcvs::EntitySystemList> - pointer too the list of entities 
+     *
+     * @tparam system - the system
+     * @return std::shared_ptr<yorcvs::EntitySystemList> - pointer too the list of entities
      */
-    template<systemT system>
-    std::shared_ptr<yorcvs::EntitySystemList> get_system_entity_list()
+    template <systemT system> std::shared_ptr<yorcvs::EntitySystemList> get_system_entity_list()
     {
-        const char* systemType = typeid(system).name();
+        const char *systemType = typeid(system).name();
         if (typetosystem.find(systemType) == typetosystem.end())
         {
-            yorcvs::log("Unable to get list of system " + std::string(systemType) + " system does not exist", yorcvs::MSGSEVERITY::ERROR);
+            yorcvs::log("Unable to get list of system " + std::string(systemType) + " system does not exist",
+                        yorcvs::MSGSEVERITY::ERROR);
             return nullptr;
         }
         return typetosystem[systemType];
-
     }
 
     // gets signature of a system
     template <systemT T> [[nodiscard]] std::vector<bool> get_system_signature()
     {
-
         const char *systemType = typeid(T).name();
-
         // if the system is not found  //throw
         if (typetosystem.find(systemType) == typetosystem.end())
         {
@@ -651,7 +637,6 @@ class SystemManager
      */
     static bool compare_entity_to_system(const std::vector<bool> &entity_s, const std::vector<bool> &system_s)
     {
-
         /// if the system signature doesn't match the entity
         if (system_s.size() > entity_s.size())
         {
@@ -693,17 +678,17 @@ class ECS
         entitymanager = std::make_unique<yorcvs::EntityManager>();
         systemmanager = std::make_unique<yorcvs::SystemManager>();
     }
-    ECS(ECS &&other) noexcept : componentmanager(std::move(other.componentmanager)), entitymanager(std::move(other.entitymanager)), systemmanager(std::move(other.systemmanager))
+    ECS(ECS &&other)
+    noexcept
+        : componentmanager(std::move(other.componentmanager)), entitymanager(std::move(other.entitymanager)),
+          systemmanager(std::move(other.systemmanager))
     {
-        
-        
-        
     }
     ECS(const ECS &other) =
         delete; // copy would be so expensive  the copy constructor will probably be called by accident
     ECS &operator=(const ECS &other)
     {
-        if(this == &other)
+        if (this == &other)
         {
             return *this;
         }
@@ -742,7 +727,6 @@ class ECS
     {
         size_t ID = entitymanager->addEntity();
         systemmanager->on_entity_signature_change(ID, entitymanager->get_signature(ID));
-
         return ID;
     }
     /**
@@ -861,7 +845,6 @@ class ECS
      */
     template <typename T> void remove_component(const size_t entityID)
     {
-
         std::vector<bool> &e_signature = entitymanager->get_signature(entityID);
         size_t component_type = componentmanager->get_component_ID<T>();
         e_signature[component_type] = false;
@@ -878,13 +861,11 @@ class ECS
      */
     template <typename T, typename secondT, typename... Other> void remove_component(const size_t entityID)
     {
-
         std::vector<bool> &e_signature = entitymanager->get_signature(entityID);
         size_t component_type = componentmanager->get_component_ID<T>();
         e_signature[component_type] = false;
         systemmanager->on_entity_signature_change(entityID, e_signature);
         componentmanager->remove_component<T>(entityID);
-
         remove_component<secondT, Other...>(entityID);
     }
     /**
@@ -957,13 +938,12 @@ class ECS
         return (systemmanager->typetosystem.find(systemType) != systemmanager->typetosystem.end());
     }
     /**
-    * @brief Returns the list of entities the system has acces to
-    *  
-    * @tparam system - the system  
-    * @return std::shared_ptr<yorcvs::EntitySystemList> - pointer too the list of entities 
-    */
-    template<systemT system>
-    std::shared_ptr<yorcvs::EntitySystemList> get_system_entity_list()
+     * @brief Returns the list of entities the system has acces to
+     *
+     * @tparam system - the system
+     * @return std::shared_ptr<yorcvs::EntitySystemList> - pointer too the list of entities
+     */
+    template <systemT system> std::shared_ptr<yorcvs::EntitySystemList> get_system_entity_list()
     {
         return systemmanager->get_system_entity_list<system>();
     }
@@ -1156,7 +1136,8 @@ class ECS
             else
             {
                 // not looking good
-                systemmanager->typetosystem.at(systemType)->entitiesID.erase(std::remove(systemmanager->typetosystem.at(systemType)->entitiesID.begin(),
+                systemmanager->typetosystem.at(systemType)
+                    ->entitiesID.erase(std::remove(systemmanager->typetosystem.at(systemType)->entitiesID.begin(),
                                                    systemmanager->typetosystem.at(systemType)->entitiesID.end(),
                                                    entity),
                                        systemmanager->typetosystem.at(systemType)->entitiesID.end());
@@ -1175,14 +1156,12 @@ class Entity
   public:
     Entity(ECS *ecs) : parent(ecs)
     {
-        
         id = parent->create_entity_ID();
         yorcvs::log("Created entity with id: " + std::to_string(id), yorcvs::MSGSEVERITY::INFO);
     }
 
     Entity(const Entity &other) : parent(other.parent)
     {
-        
         id = parent->create_entity_ID();
         parent->copy_component_to_from_entity(id, other.id);
         yorcvs::log("The copy constructor for an Entity " + std::to_string(id) +
