@@ -192,6 +192,10 @@ template <> class Window<yorcvs::SDL2>
             },
             [](SDL_Texture *p) { SDL_DestroyTexture(p); });
     }
+    Window<yorcvs::SDL2>(const Window<yorcvs::SDL2>&)  = delete;
+    Window<yorcvs::SDL2>(Window<yorcvs::SDL2>&& ) = delete;
+    Window<yorcvs::SDL2>& operator=(const Window<yorcvs::SDL2>& ) = delete;
+    Window<yorcvs::SDL2>& operator=(Window<yorcvs::SDL2>&&) = delete;
     ~Window<yorcvs::SDL2>()
     {
         cleanup();
@@ -211,7 +215,6 @@ template <> class Window<yorcvs::SDL2>
 
     void cleanup()
     {
-
         SDL_DestroyWindow(sdlWindow);
         IMG_Quit();
         TTF_Quit();
