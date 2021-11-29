@@ -453,21 +453,21 @@ class PlayerMovementControl
     {
         for (const auto &ID : entityList->entitiesID)
         {
-            if (d_pressed)
-            {
-                AnimationSystem::set_animation(world, ID, "walkingR");
-            }
-            else if (a_pressed)
+            if (a_pressed)
             {
                 AnimationSystem::set_animation(world, ID, "walkingL");
             }
+            else if (d_pressed)
+            {
+                AnimationSystem::set_animation(world, ID, "walkingR");
+            } 
             else if (s_pressed || w_pressed)
             {
                 AnimationSystem::set_animation(world, ID, "walkingR");
             }
             else if (world->get_component<velocityComponent>(ID).facing.x)
             {
-                AnimationSystem::set_animation(world, ID, "idleR");
+                AnimationSystem::set_animation(world, ID, "idleL");
             }
             else
             {
