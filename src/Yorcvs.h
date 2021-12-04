@@ -553,6 +553,14 @@ class Map
         }
         AnimationSystem::set_animation(entity, "idleL");
     }
+
+    void clear()
+    {
+       entities.clear();
+       ysorted_tiles.clear();
+       tiles.clear();
+    }
+
     yorcvs::ECS *ecs{};
 
   private:
@@ -574,6 +582,7 @@ class Map
     CollisionSystem collisionS;
     yorcvs::Vec2<float> tilesSize;
     std::vector<yorcvs::Tile> tiles;
+    std::vector<yorcvs::Entity> entities;
     HealthSystem healthS;
 
   private:
@@ -581,7 +590,7 @@ class Map
     VelocitySystem velocityS;
     AnimationSystem animS;
 
-    std::vector<yorcvs::Entity> entities;
+    
     std::vector<yorcvs::Entity> ysorted_tiles;
 };
 
@@ -665,7 +674,14 @@ class Application
         lag += elapsed;
 
         r.handle_events();
-
+        if(r.is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_W) && r.is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_S))
+        {
+            map.clear();
+            map.load(&world, "assets/map.tmx");
+            map.entities.emplace_back(&world);
+            map.load_character_from_path(map.entities[map.entities.size() - 1], "assets/player.json");
+            world.add_component<playerMovementControlledComponent>(map.entities[map.entities.size() - 1].id, {});
+        }
         while (lag >= msPF)
         {
             update(msPF);
