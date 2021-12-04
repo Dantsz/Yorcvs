@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="left-up" width="100" height="100" tilewidth="32" tileheight="32" infinite="1" nextlayerid="4" nextobjectid="39">
+<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="left-up" width="100" height="100" tilewidth="32" tileheight="32" infinite="1" nextlayerid="4" nextobjectid="41">
  <properties>
   <property name="Ysorted" type="bool" value="false"/>
  </properties>
@@ -180,6 +180,11 @@
   <object id="38" x="-125.25" y="81.25">
    <properties>
     <property name="testObject" type="file" value="lettuce.png"/>
+   </properties>
+  </object>
+  <object id="40" name="ChickenTest" x="-115.75" y="30.75">
+   <properties>
+    <property name="entityPath" type="file" value="duck.json"/>
    </properties>
   </object>
  </objectgroup>

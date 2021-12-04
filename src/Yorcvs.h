@@ -175,7 +175,7 @@ class Map
     void load(yorcvs::ECS *parent, const std::string &path)
     {
         ecs = parent;
-
+        map_file_path = path;
         yorcvs::log("Loading map: " + path);
         tmx::Map map{};
         if (!map.load(path))
@@ -347,7 +347,19 @@ class Map
     }
     bool object_handle_property_color(size_t entity, const tmx::Property &property);
     bool object_handle_property_float(size_t entity, const tmx::Property &property);
-    bool object_handle_property_file(size_t entity, const tmx::Property &property);
+    bool object_handle_property_file(size_t entity, const tmx::Property &property)
+    {
+        const std::string& filePath = property.getFileValue();
+        std::filesystem::path map_file = map_file_path;
+        const std::string directory_path = map_file.remove_filename().generic_string();
+
+        if(property.getName() == "entityPath")
+        {
+            load_character_from_path(entity,directory_path + filePath);
+          
+        }
+        return true;
+    }
     [[nodiscard]] bool object_handle_property_int(size_t entity, const tmx::Property &property) const
     {
         // NOTE HANDLES HP
@@ -422,7 +434,9 @@ class Map
                 case tmx::Property::Type::Boolean:
                     known = object_handle_property_bool(entity, property, object);
                     break;
-
+                case tmx::Property::Type::File:
+                    known = object_handle_property_file(entity, property);
+                    break;
                 default:
                     break;
                 }
@@ -512,7 +526,8 @@ class Map
         render_tiles(r, render_dimensions);
     }
 
-    void load_character_from_path(yorcvs::Entity &entity, const std::string &path)
+   
+    void load_character_from_path(const size_t entity_id, const std::string &path)
     {
         std::filesystem::path file = path;
         const std::string directory_path = file.remove_filename().generic_string();
@@ -522,38 +537,68 @@ class Map
         auto entityJSON = json::json::parse(entityDATA);
 
         const std::string sprite_path = directory_path + std::string(entityJSON["sprite"]["spriteName"]);
-
-        ecs->add_component<hitboxComponent>(
-            entity.id, {{entityJSON["hitbox"]["x"], entityJSON["hitbox"]["y"], entityJSON["hitbox"]["w"], entityJSON["hitbox"]["h"]}});
-        ecs->add_component<positionComponent>(entity.id, {get_spawn_position()});
-        ecs->add_component<velocityComponent>(entity.id, {{0.0f, 0.0f}, {false, false}});
+        if(!ecs->has_components<hitboxComponent>(entity_id))
+        {
+            ecs->add_component<hitboxComponent>(entity_id,{});   
+        }
+        ecs->get_component<hitboxComponent>(
+            entity_id) =  {{entityJSON["hitbox"]["x"], entityJSON["hitbox"]["y"], entityJSON["hitbox"]["w"], entityJSON["hitbox"]["h"]}};
+        if(!ecs->has_components<positionComponent>(entity_id))
+        {    
+            ecs->add_component<positionComponent>(entity_id,{});
+            //TODO: move this elsewhere
+            ecs->get_component<positionComponent>(entity_id) =  {get_spawn_position()};
+        }
+        
+        if(!ecs->has_components<velocityComponent>(entity_id))
+        {
+            ecs->add_component<velocityComponent>(entity_id,{});
+        }
+        ecs->get_component<velocityComponent>(entity_id) =  {{0.0f, 0.0f}, {false, false}};
        
 
-        
-        ecs->add_component<spriteComponent>(entity.id,
+        if(!ecs->has_components<spriteComponent>(entity_id))
+        {
+            ecs->add_component<spriteComponent>(entity_id,{});
+        }
+        ecs->get_component<spriteComponent>(entity_id) =
                                             {{entityJSON["sprite"]["offset"]["x"], entityJSON["sprite"]["offset"]["y"]},
                                              {entityJSON["sprite"]["size"]["x"], entityJSON["sprite"]["size"]["y"]},
                                              {entityJSON["sprite"]["srcRect"]["x"], entityJSON["sprite"]["srcRect"]["y"],
                                               entityJSON["sprite"]["srcRect"]["w"], entityJSON["sprite"]["srcRect"]["h"]},
-                                             sprite_path});
-
-        ecs->add_component<healthComponent>(entity.id, {5, 10, 0.1f, false});
-        ecs->add_component<animationComponent>(entity.id, {});
+                                             sprite_path};
+        if(!ecs->has_components<healthComponent>(entity_id))
+        {
+            ecs->add_component<healthComponent>(entity_id,{});
+        }
+        ecs->get_component<healthComponent>(entity_id) = {entityJSON["HP"], entityJSON["maxHP"], entityJSON["HPregen"], false};
+        if(!ecs->has_components<animationComponent>(entity_id))
+        {
+            ecs->add_component<animationComponent>(entity_id,{});
+        }
+        ecs->get_component<animationComponent>(entity_id).animations.clear();
+        ecs->get_component<animationComponent>(entity_id) = {};
         for (const auto &animation : entityJSON["sprite"]["animations"])
         {
-            bool animation_succes = animS.add_animation(entity.id, animation["name"], animation["speed"]);
+            bool animation_succes = animS.add_animation(entity_id, animation["name"], animation["speed"]);
             if (animation_succes)
             {
                 for (const auto &frame : animation["frames"])
                 {
-                    animS.add_animation_frame(entity.id, animation["name"],
+                  animS.add_animation_frame(entity_id, animation["name"],
                                               {frame["x"], frame["y"], frame["w"], frame["h"]});
                 }
             }
         }
-        AnimationSystem::set_animation(entity, "idleL");
+ 
+        AnimationSystem::set_animation(ecs,entity_id, "idleL");
+     
+     
     }
-
+    void load_character_from_path(yorcvs::Entity &entity, const std::string &path)
+    {
+        load_character_from_path(entity.id, path);
+    }
     void clear()
     {
        entities.clear();
@@ -584,7 +629,7 @@ class Map
     std::vector<yorcvs::Tile> tiles;
     std::vector<yorcvs::Entity> entities;
     HealthSystem healthS;
-
+    std::string map_file_path;
   private:
     yorcvs::Vec2<float> spawn_coord;
     VelocitySystem velocityS;

@@ -55,9 +55,8 @@ struct animationComponent
         float speed;// in milliseconds
     };
     std::unordered_map<std::string, Animation> animations;//ugly
-    Animation* cur_animation; // non-owning pointer to an animation in the map
+    std::string cur_animation; // non-owning pointer to an animation in the map
     size_t cur_frame;
-    size_t frames;
     float cur_elapsed;
    
 };

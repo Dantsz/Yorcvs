@@ -324,7 +324,7 @@ class AnimationSystem
                         yorcvs::MSGSEVERITY::ERROR);
             return;
         }
-        entity.parent->get_component<animationComponent>(entity.id).cur_animation = &anim->second;
+        entity.parent->get_component<animationComponent>(entity.id).cur_animation = animation_name;
     }
 
     /**
@@ -351,31 +351,30 @@ class AnimationSystem
                         yorcvs::MSGSEVERITY::ERROR);
             return;
         }
-        world->get_component<animationComponent>(entityID).cur_animation = &anim->second;
+        world->get_component<animationComponent>(entityID).cur_animation = animation_name;
     }
 
     void update(float elapsed) const
     {
         for (const auto &ID : entityList->entitiesID)
         {
-            if (world->get_component<animationComponent>(ID).cur_animation == nullptr)
-            {
-                continue;
-            }
+            const animationComponent::Animation* cur_animation = &world->get_component<animationComponent>(ID).animations[world->get_component<animationComponent>(ID).cur_animation];
             world->get_component<animationComponent>(ID).cur_elapsed += elapsed;
             if (world->get_component<animationComponent>(ID).cur_elapsed >
-                world->get_component<animationComponent>(ID).cur_animation->speed)
+                cur_animation->speed)
             {
                 world->get_component<animationComponent>(ID).cur_elapsed = 0;
                 world->get_component<animationComponent>(ID).cur_frame++;
+
                 if (world->get_component<animationComponent>(ID).cur_frame >=
-                    world->get_component<animationComponent>(ID).cur_animation->frames.size())
+                    cur_animation->frames.size()) 
                 {
                     world->get_component<animationComponent>(ID).cur_frame = 0;
                 }
+
+             
                 world->get_component<spriteComponent>(ID).srcRect =
-                    world->get_component<animationComponent>(ID)
-                        .cur_animation->frames[world->get_component<animationComponent>(ID).cur_frame]
+                        cur_animation->frames[world->get_component<animationComponent>(ID).cur_frame]
                         .srcRect;
             }
         }

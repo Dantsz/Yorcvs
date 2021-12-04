@@ -1,0 +1,60 @@
+{
+    "name" : "Duck",
+    "HP": 5.0,
+    "maxHP" : 5.0,
+    "HPregen" : 0.1,
+    
+    "hitbox" :
+    {
+        "x" : 6,
+        "y" : 6,
+        "w" : 4,
+        "h" : 4
+    },
+    "sprite" :
+    {
+        "offset":
+        {
+            "x" : 0.0,
+            "y" : 0.0
+        },
+        "size":
+        {
+            "x" : 16.0,
+            "y" : 16.0
+        },
+        "srcRect":
+        {
+            "x" : 0,
+            "y" : 0,
+            "w" : 8,  
+            "h" : 8
+        },
+        "spriteName" : "duck_sheet.png",
+        "animations" : [
+            {
+                "name" : "idleR",
+                "speed" : 50,
+                "frames":[{"x" : 0, "y" : 0, "w":8,"h":8}]
+            },
+            {
+                "name" : "idleL",
+                "speed" : 50,
+                "frames" : [{"x" : 0, "y" : 8, "w":8,"h":8}]
+            },
+            {
+                "name": "walkingR",
+                "speed" : 50,
+                "frames":[{"x" : 0, "y" : 8, "w":8,"h":8}]
+            },
+            {
+                "name": "walkingL",
+                "speed" : 50,
+                "frames":[{"x" : 0, "y" : 8, "w":8,"h":8}]
+            }
+
+        ]
+    }
+
+
+}
