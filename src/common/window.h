@@ -40,13 +40,7 @@ template <typename interface> class Callback
 {
 };
 
-/**
- * @brief Class for specifying which key should be check as being pressed
- * @note Is currently no api-independent
- */
-template <typename interface> class Key
-{
-};
+
 
 /**
  * @brief Windows that can render sprites and text to the screen
@@ -64,6 +58,12 @@ template <typename interface> class Window
     ~Window();
 
     void cleanup();
+    
+    enum Key
+    {
+      
+    };
+  
 
     /**
      * @brief Set the size
@@ -250,7 +250,7 @@ template <typename interface> class Window
      * @note  Currently has no api-independent way of specifying which key to be checked
      */
 
-    bool is_key_pressed(yorcvs::Key<interface> key);
+    bool is_key_pressed(Key key);
 
     /**
      * @brief Adds the callback to the event loop and will execute each time handleEvent is being called

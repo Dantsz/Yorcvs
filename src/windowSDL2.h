@@ -79,16 +79,7 @@ template <> class Callback<yorcvs::SDL2>
     std::function<void(const SDL_Event &)> func;
 };
 
-template <> class Key<yorcvs::SDL2>
-{
-  public:
-    Key<yorcvs::SDL2>() = default;
-    Key<yorcvs::SDL2>(SDL_Scancode scancode) : sdlScancode(scancode)
-    {
-    }
 
-    SDL_Scancode sdlScancode;
-};
 
 /**
  * @brief interfaceWindow that uses SDL2 api
@@ -196,6 +187,17 @@ template <> class Window<yorcvs::SDL2>
     Window<yorcvs::SDL2>(Window<yorcvs::SDL2>&& ) = delete;
     Window<yorcvs::SDL2>& operator=(const Window<yorcvs::SDL2>& ) = delete;
     Window<yorcvs::SDL2>& operator=(Window<yorcvs::SDL2>&&) = delete;
+
+    enum Key
+    {
+        YORCVS_KEY_W  = SDL_SCANCODE_W,
+        YORCVS_KEY_A = SDL_SCANCODE_A,
+        YORCVS_KEY_S = SDL_SCANCODE_S,
+        YORCVS_KEY_D = SDL_SCANCODE_D,
+        YORCVS_KEY_R = SDL_SCANCODE_R,
+        YORCVS_KEY_E = SDL_SCANCODE_E
+    };
+
     ~Window<yorcvs::SDL2>()
     {
         cleanup();
@@ -417,11 +419,11 @@ template <> class Window<yorcvs::SDL2>
     }
     // this can take a SDL_scancode directly
     //
-    [[nodiscard]] bool is_key_pressed(yorcvs::Key<yorcvs::SDL2> key)
+    [[nodiscard]] bool is_key_pressed(Key key)
     {
         keys = SDL_GetKeyboardState(nullptr);
         // TODO: REPLACE WITH SPAN?
-        return keys[key.sdlScancode] ? 1 : 0; // NOLINT
+        return keys[key] ? 1 : 0; // NOLINT
     }
 
     void set_drawing_offset(const yorcvs::Vec2<float> &newOffset)

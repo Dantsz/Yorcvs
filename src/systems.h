@@ -434,10 +434,10 @@ class PlayerMovementControl
 
     void updateControls(const yorcvs::Vec2<float> &render_size)
     {
-        w_pressed = window->is_key_pressed({SDL_SCANCODE_W});
-        a_pressed = window->is_key_pressed({SDL_SCANCODE_A});
-        s_pressed = window->is_key_pressed({SDL_SCANCODE_S});
-        d_pressed = window->is_key_pressed({SDL_SCANCODE_D});
+        w_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_W);
+        a_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_A);
+        s_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_S);
+        d_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_D);
 
         for (const auto &ID : entityList->entitiesID)
         {

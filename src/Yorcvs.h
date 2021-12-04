@@ -56,7 +56,7 @@ class DebugInfo
 
     void update(float ft)
     {
-        if (parentWindow->is_key_pressed({SDL_SCANCODE_R}))
+        if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_R))
         {
             reset();
         }
@@ -93,7 +93,7 @@ class DebugInfo
     }
     void render(float elapsed, const yorcvs::Vec2<float> &render_dimensions)
     {
-        if (parentWindow->is_key_pressed({SDL_SCANCODE_E}))
+        if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_E))
         {
             update(elapsed);
             parentWindow->draw_text(frameTime, FTRect);
@@ -169,6 +169,7 @@ class Map
         load(world, path);
         entities.emplace_back(world);
         load_character_from_path(entities[entities.size() - 1], "assets/player.json");
+        ecs->add_component<playerMovementControlledComponent>(entities[entities.size() - 1].id, {});
     }
 
     void load(yorcvs::ECS *parent, const std::string &path)
@@ -516,27 +517,29 @@ class Map
         std::filesystem::path file = path;
         const std::string directory_path = file.remove_filename().generic_string();
 
-        std::ifstream playerIN(path);
-        std::string playerData{(std::istreambuf_iterator<char>(playerIN)), (std::istreambuf_iterator<char>())};
-        auto player = json::json::parse(playerData);
+        std::ifstream entityIN(path);
+        std::string entityDATA{(std::istreambuf_iterator<char>(entityIN)), (std::istreambuf_iterator<char>())};
+        auto entityJSON = json::json::parse(entityDATA);
 
-        const std::string sprite_path = directory_path + std::string(player["sprite"]["spriteName"]);
+        const std::string sprite_path = directory_path + std::string(entityJSON["sprite"]["spriteName"]);
 
         ecs->add_component<hitboxComponent>(
-            entity.id, {{player["hitbox"]["x"], player["hitbox"]["y"], player["hitbox"]["w"], player["hitbox"]["h"]}});
+            entity.id, {{entityJSON["hitbox"]["x"], entityJSON["hitbox"]["y"], entityJSON["hitbox"]["w"], entityJSON["hitbox"]["h"]}});
         ecs->add_component<positionComponent>(entity.id, {get_spawn_position()});
         ecs->add_component<velocityComponent>(entity.id, {{0.0f, 0.0f}, {false, false}});
-        ecs->add_component<playerMovementControlledComponent>(entity.id, {});
+       
+
+        
         ecs->add_component<spriteComponent>(entity.id,
-                                            {{player["sprite"]["offset"]["x"], player["sprite"]["offset"]["y"]},
-                                             {player["sprite"]["size"]["x"], player["sprite"]["size"]["y"]},
-                                             {player["sprite"]["srcRect"]["x"], player["sprite"]["srcRect"]["y"],
-                                              player["sprite"]["srcRect"]["w"], player["sprite"]["srcRect"]["h"]},
+                                            {{entityJSON["sprite"]["offset"]["x"], entityJSON["sprite"]["offset"]["y"]},
+                                             {entityJSON["sprite"]["size"]["x"], entityJSON["sprite"]["size"]["y"]},
+                                             {entityJSON["sprite"]["srcRect"]["x"], entityJSON["sprite"]["srcRect"]["y"],
+                                              entityJSON["sprite"]["srcRect"]["w"], entityJSON["sprite"]["srcRect"]["h"]},
                                              sprite_path});
 
         ecs->add_component<healthComponent>(entity.id, {5, 10, 0.1f, false});
         ecs->add_component<animationComponent>(entity.id, {});
-        for (const auto &animation : player["sprite"]["animations"])
+        for (const auto &animation : entityJSON["sprite"]["animations"])
         {
             bool animation_succes = animS.add_animation(entity.id, animation["name"], animation["speed"]);
             if (animation_succes)
