@@ -61,5 +61,9 @@ struct animationComponent
    
 };
 
+struct behaviourComponent
+{
+    
+};
 struct defensiveStatsComponent;
 struct offensiveStatsComponent;

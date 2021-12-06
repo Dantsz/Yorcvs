@@ -3,6 +3,7 @@
 #include "components.h"
 #include "windowSDL2.h"
 #include <array>
+#include <random>
 
 class CollisionSystem
 {
@@ -84,11 +85,20 @@ class CollisionSystem
             if (world->has_components<healthComponent>(ID))
             {
                 /// draw health bar
+
                 yorcvs::Rect<float> healthBarRect{};
+                if(world->has_components<spriteComponent>(ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
+                {
+                    healthBarRect.y = rect.y - world->get_component<spriteComponent>(ID).size.y/2;
+                
+                }
+                else
+                {
+                    healthBarRect.y = rect.y - rect.h;
+                }
                 healthBarRect.x = rect.x - 16.0f + rect.w / 2;
-                healthBarRect.y = rect.y - rect.h;
                 healthBarRect.w = 32.0f;
-                healthBarRect.h = 8.0f;
+                healthBarRect.h = 4.0f;
                 window.draw_rect(healthBarRect, 100, 0, 0, 255);
                 healthBarRect.w =
                     (world->get_component<healthComponent>(ID).HP / world->get_component<healthComponent>(ID).maxHP) *
@@ -518,4 +528,32 @@ class SpriteSystem
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;
     yorcvs::Window<yorcvs::graphics> *window;
+};
+
+
+class BehaviourSystem
+{
+    public:
+    BehaviourSystem(yorcvs::ECS *parent) : world(parent)
+    {
+        world->register_system<BehaviourSystem>(*this);
+        world->add_criteria_for_iteration<BehaviourSystem,behaviourComponent,velocityComponent>();
+
+    }
+    void update(const float dt)
+    {
+        for(const auto ID : entityList->entitiesID)
+        {   
+            const float velx = static_cast<float>(generator()%3) - 1.0f;
+            const float vely = static_cast<float>(generator()%3) - 1.0f;
+            world->get_component<velocityComponent>(ID).vel = {velx,vely};
+            
+        }
+    }
+    std::shared_ptr<yorcvs::EntitySystemList> entityList = nullptr;
+
+    std::random_device dev{};
+    std::mt19937 generator{dev()};
+
+    yorcvs::ECS *world =  nullptr;
 };

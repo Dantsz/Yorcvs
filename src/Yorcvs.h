@@ -356,9 +356,14 @@ class Map
         if(property.getName() == "entityPath")
         {
             load_character_from_path(entity,directory_path + filePath);
-          
+            return true; 
         }
-        return true;
+        if(property.getName() == "behaviour")
+        {
+            ecs->add_component<behaviourComponent>(entity,{});
+            return true;
+        }
+        return false;
     }
     [[nodiscard]] bool object_handle_property_int(size_t entity, const tmx::Property &property) const
     {
@@ -571,6 +576,7 @@ class Map
         {
             ecs->add_component<healthComponent>(entity_id,{});
         }
+
         ecs->get_component<healthComponent>(entity_id) = {entityJSON["HP"], entityJSON["maxHP"], entityJSON["HPregen"], false};
         if(!ecs->has_components<animationComponent>(entity_id))
         {
@@ -730,6 +736,7 @@ class Application
         while (lag >= msPF)
         {
             update(msPF);
+            bhvS.update(msPF);
             pcS.updateAnimations();
             pcS.updateControls(render_dimensions);
             lag -= msPF;
@@ -766,6 +773,7 @@ class Application
     yorcvs::Map map{"assets/map.tmx", &world};
     SpriteSystem sprS{map.ecs, &r};
     PlayerMovementControl pcS{map.ecs, &r};
+    BehaviourSystem bhvS{map.ecs};
     // debug stuff
     DebugInfo dbInfo;
 };
