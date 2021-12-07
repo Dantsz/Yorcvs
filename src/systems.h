@@ -87,10 +87,10 @@ class CollisionSystem
                 /// draw health bar
 
                 yorcvs::Rect<float> healthBarRect{};
-                if(world->has_components<spriteComponent>(ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
+                if (world->has_components<spriteComponent>(
+                        ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
                 {
-                    healthBarRect.y = rect.y - world->get_component<spriteComponent>(ID).size.y/2;
-                
+                    healthBarRect.y = rect.y - world->get_component<spriteComponent>(ID).size.y / 2;
                 }
                 else
                 {
@@ -368,24 +368,22 @@ class AnimationSystem
     {
         for (const auto &ID : entityList->entitiesID)
         {
-            const animationComponent::Animation* cur_animation = &world->get_component<animationComponent>(ID).animations[world->get_component<animationComponent>(ID).cur_animation];
+            const animationComponent::Animation *cur_animation =
+                &world->get_component<animationComponent>(ID)
+                     .animations[world->get_component<animationComponent>(ID).cur_animation];
             world->get_component<animationComponent>(ID).cur_elapsed += elapsed;
-            if (world->get_component<animationComponent>(ID).cur_elapsed >
-                cur_animation->speed)
+            if (world->get_component<animationComponent>(ID).cur_elapsed > cur_animation->speed)
             {
                 world->get_component<animationComponent>(ID).cur_elapsed = 0;
                 world->get_component<animationComponent>(ID).cur_frame++;
 
-                if (world->get_component<animationComponent>(ID).cur_frame >=
-                    cur_animation->frames.size()) 
+                if (world->get_component<animationComponent>(ID).cur_frame >= cur_animation->frames.size())
                 {
                     world->get_component<animationComponent>(ID).cur_frame = 0;
                 }
 
-             
                 world->get_component<spriteComponent>(ID).srcRect =
-                        cur_animation->frames[world->get_component<animationComponent>(ID).cur_frame]
-                        .srcRect;
+                    cur_animation->frames[world->get_component<animationComponent>(ID).cur_frame].srcRect;
             }
         }
     }
@@ -469,7 +467,7 @@ class PlayerMovementControl
             else if (d_pressed)
             {
                 AnimationSystem::set_animation(world, ID, "walkingR");
-            } 
+            }
             else if (s_pressed || w_pressed)
             {
                 AnimationSystem::set_animation(world, ID, "walkingR");
@@ -530,24 +528,44 @@ class SpriteSystem
     yorcvs::Window<yorcvs::graphics> *window;
 };
 
-
 class BehaviourSystem
 {
-    public:
+  public:
     BehaviourSystem(yorcvs::ECS *parent) : world(parent)
     {
         world->register_system<BehaviourSystem>(*this);
-        world->add_criteria_for_iteration<BehaviourSystem,behaviourComponent,velocityComponent>();
-
+        world->add_criteria_for_iteration<BehaviourSystem, behaviourComponent, velocityComponent>();
     }
     void update(const float dt)
     {
-        for(const auto ID : entityList->entitiesID)
-        {   
-            const float velx = static_cast<float>(generator()%3) - 1.0f;
-            const float vely = static_cast<float>(generator()%3) - 1.0f;
-            world->get_component<velocityComponent>(ID).vel = {velx,vely};
-            
+        for (const auto ID : entityList->entitiesID)
+        {
+            world->get_component<behaviourComponent>(ID).accumulated += dt;
+
+            if (world->get_component<behaviourComponent>(ID).accumulated >
+                world->get_component<behaviourComponent>(ID).dt)
+            {
+                const float velx = static_cast<float>(generator() % 3) - 1.0f;
+                const float vely = static_cast<float>(generator() % 3) - 1.0f;
+                world->get_component<velocityComponent>(ID).vel = {velx, vely};
+                world->get_component<behaviourComponent>(ID).accumulated = 0.0f;
+            }
+            if (world->get_component<velocityComponent>(ID).vel.x > 0.1f)
+            {
+                AnimationSystem::set_animation(world, ID, "walkingL");
+            }
+            else if (world->get_component<velocityComponent>(ID).vel.x < 0.1f)
+            {
+                AnimationSystem::set_animation(world, ID, "walkingR");
+            }
+            else if (world->get_component<velocityComponent>(ID).facing.x)
+            {
+                AnimationSystem::set_animation(world, ID, "idleL");
+            }
+            else
+            {
+                AnimationSystem::set_animation(world, ID, "idleR");
+            }
         }
     }
     std::shared_ptr<yorcvs::EntitySystemList> entityList = nullptr;
@@ -555,5 +573,5 @@ class BehaviourSystem
     std::random_device dev{};
     std::mt19937 generator{dev()};
 
-    yorcvs::ECS *world =  nullptr;
+    yorcvs::ECS *world = nullptr;
 };

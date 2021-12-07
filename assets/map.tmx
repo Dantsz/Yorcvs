@@ -184,6 +184,8 @@
   </object>
   <object id="40" name="ChickenTest" x="-115.75" y="30.75">
    <properties>
+    <property name="behaviour" type="file" value=""/>
+    <property name="behaviourDT" type="float" value="1000"/>
     <property name="entityPath" type="file" value="duck.json"/>
    </properties>
   </object>

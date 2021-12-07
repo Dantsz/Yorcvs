@@ -63,7 +63,8 @@ struct animationComponent
 
 struct behaviourComponent
 {
-    
+    float dt;
+    float accumulated;
 };
 struct defensiveStatsComponent;
 struct offensiveStatsComponent;
