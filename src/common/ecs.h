@@ -246,7 +246,7 @@ template <typename T> class ComponentContainer final : public VContainer
         {
             components[freeIndex.front()] = component;
 
-            while (entitytocomponent.size() < entityID)
+            while (entitytocomponent.size() <= entityID)
             {
                 entitytocomponent.push_back(0);
                 entity_has_component.push_back(0);
