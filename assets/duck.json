@@ -1,6 +1,6 @@
 {
     "name": "Duck",
-    "HP": 5.0,
+    "HP": 1.0,
     "maxHP": 5.0,
     "HPregen": 0.1,
     "hitbox": {
