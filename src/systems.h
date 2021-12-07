@@ -228,7 +228,7 @@ class VelocitySystem
         {
             yorcvs::Vec2<float> posOF = world->get_component<velocityComponent>(ID).vel;
             world->get_component<positionComponent>(ID).position += posOF;
-            world->get_component<velocityComponent>(ID).vel = {0, 0};
+            //world->get_component<velocityComponent>(ID).vel = {0, 0};
             if (std::abs(posOF.x) > std::numeric_limits<float>::epsilon())
             {
                 world->get_component<velocityComponent>(ID).facing.x = (posOF.x < 0.0f);
