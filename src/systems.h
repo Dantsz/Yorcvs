@@ -4,7 +4,7 @@
 #include "windowSDL2.h"
 #include <array>
 #include <random>
-
+#include <stack>
 class CollisionSystem
 {
   public:
@@ -406,23 +406,29 @@ class HealthSystem
         cur_time += dt;
         if (cur_time >= update_time)
         {
-            for (const auto &ID : entityList->entitiesID)
+            for (size_t ID =  0 ; ID  < entityList->entitiesID.size() ; ID++)
             {
-                if (world->get_component<healthComponent>(ID).HP < 0.0f)
+                if (world->get_component<healthComponent>(entityList->entitiesID[ID]).HP < 0.0f)
                 {
-                    world->get_component<healthComponent>(ID).is_dead = true;
+                    world->get_component<healthComponent>(entityList->entitiesID[ID]).is_dead = true;
                     continue;
                 }
-                world->get_component<healthComponent>(ID).HP += world->get_component<healthComponent>(ID).health_regen;
-                if (world->get_component<healthComponent>(ID).HP > world->get_component<healthComponent>(ID).maxHP)
+                world->get_component<healthComponent>(entityList->entitiesID[ID]).HP += world->get_component<healthComponent>(entityList->entitiesID[ID]).health_regen;
+                if (world->get_component<healthComponent>(entityList->entitiesID[ID]).HP > world->get_component<healthComponent>(entityList->entitiesID[ID]).maxHP)
                 {
-                    world->get_component<healthComponent>(ID).HP = world->get_component<healthComponent>(ID).maxHP;
+                    world->get_component<healthComponent>(entityList->entitiesID[ID]).HP = world->get_component<healthComponent>(entityList->entitiesID[ID]).maxHP;
+                }
+                if(world->get_component<healthComponent>(entityList->entitiesID[ID]).HP < 0.0f)
+                {
+                    world->destroy_entity(entityList->entitiesID[ID]);
                 }
             }
             cur_time = 0.0f;
         }
+    
     }
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
+
     yorcvs::ECS *world;
     static constexpr float update_time = 1000.0f; // update once a second
     float cur_time = 0.0f;
@@ -524,7 +530,9 @@ class SpriteSystem
     }
 
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
+
     yorcvs::ECS *world;
+
     yorcvs::Window<yorcvs::graphics> *window;
 };
 

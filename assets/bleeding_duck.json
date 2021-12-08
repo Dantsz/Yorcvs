@@ -1,8 +1,8 @@
 {
-    "name": "Duck",
+    "name": "BleedingDuck",
     "HP": 1.0,
     "maxHP": 5.0,
-    "HPregen": 0.1,
+    "HPregen": -0.1,
     "hitbox": {
         "x": 6,
         "y": 6,
@@ -24,7 +24,7 @@
             "w": 16,
             "h": 16
         },
-        "spriteName": "duck_sheet.png",
+        "spriteName": "bleeding_duck_sheet.png",
         "animations": [
             {
                 "name": "idleR",
