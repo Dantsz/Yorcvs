@@ -5,7 +5,7 @@
 #include <cassert>
 #include <iostream>
 
-constexpr size_t number_of_additional_bleeding_ducks = 10000;
+constexpr size_t number_of_additional_bleeding_ducks = 100;
 
 int main(int argc, char **argv)
 {
@@ -73,6 +73,6 @@ int main(int argc, char **argv)
         update_time += timy.get_ticks();
         samples += 1.0f;        
         std::cout<< "Updating the map " << samples << " times  took " << update_time << " (avg : " <<  update_time / samples << " )\n "; 
-        assert(world.get_active_entities_number() != numberOfEntities - 1);
+        assert(world.get_active_entities_number() == numberOfEntities - 1);
     return 0;
 }
