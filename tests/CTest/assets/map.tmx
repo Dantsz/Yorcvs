@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="left-up" width="100" height="100" tilewidth="32" tileheight="32" infinite="1" nextlayerid="4" nextobjectid="39">
+<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="left-up" width="100" height="100" tilewidth="32" tileheight="32" infinite="1" nextlayerid="4" nextobjectid="42">
  <properties>
   <property name="Ysorted" type="bool" value="false"/>
  </properties>
@@ -180,6 +180,20 @@
   <object id="38" x="-125.25" y="81.25">
    <properties>
     <property name="testObject" type="file" value="lettuce.png"/>
+   </properties>
+  </object>
+  <object id="40" name="ChickenTest" x="-193.5" y="13.25">
+   <properties>
+    <property name="behaviour" type="file" value=""/>
+    <property name="behaviourDT" type="float" value="1000"/>
+    <property name="entityPath" type="file" value="duck.json"/>
+   </properties>
+  </object>
+  <object id="41" name="BleedingDuck" x="11.6667" y="82">
+   <properties>
+    <property name="behaviour" type="file" value=""/>
+    <property name="behaviourDT" type="float" value="1000"/>
+    <property name="entityPath" type="file" value="bleeding_duck.json"/>
    </properties>
   </object>
  </objectgroup>
