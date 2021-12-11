@@ -74,7 +74,7 @@ class DebugInfo
         frame_time_samples += 1.0f;
         avg_frame_time += ft;
         avg_frame_time /= frame_time_samples;
-        parentWindow->set_text_message(avgFrameTime,"Avg frame time :  " + std::to_string(avg_frame_time));
+        parentWindow->set_text_message(avgFrameTime, "Avg frame time :  " + std::to_string(avg_frame_time));
 
         // set player position text
         if (playerMoveSystem->entityList->entitiesID.empty())
@@ -105,7 +105,7 @@ class DebugInfo
             update(elapsed);
             parentWindow->draw_text(frameTime, FTRect);
             parentWindow->draw_text(maxframeTimeTX, maxFTRect);
-            parentWindow->draw_text(avgFrameTime,avgFrameTimeRect);
+            parentWindow->draw_text(avgFrameTime, avgFrameTimeRect);
             parentWindow->draw_text(ecsEntities, entitiesRect);
             parentWindow->draw_text(playerPosition, pPositionRect);
             parentWindow->draw_text(playerHealth, playerHealthRect);
@@ -126,13 +126,13 @@ class DebugInfo
         frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", 255, 255, 255, 255, 100, 10000);
         maxframeTimeTX =
             parentWindow->create_text("assets/font.ttf", "Max Frame Time : ", 255, 255, 255, 255, 100, 10000);
-        avgFrameTime = parentWindow->create_text("assets/font.ttf", "Avg Frame Time : ", 255, 255, 255, 255, 100, 10000);
+        avgFrameTime =
+            parentWindow->create_text("assets/font.ttf", "Avg Frame Time : ", 255, 255, 255, 255, 100, 10000);
         ecsEntities =
             parentWindow->create_text("assets/font.ttf", "Active Entities : ", 255, 255, 255, 255, 100, 10000);
         playerPosition =
             parentWindow->create_text("assets/font.ttf", "NO PLAYER FOUND ", 255, 255, 255, 255, 100, 10000);
         playerHealth = parentWindow->create_text("assets/font.ttf", "Health : -/- ", 255, 255, 255, 255, 100, 10000);
-
     }
 
     void reset()
@@ -150,13 +150,12 @@ class DebugInfo
     yorcvs::Rect<float> maxFTRect = {0, 25, 150, 25};
 
     yorcvs::Text<yorcvs::graphics> avgFrameTime;
-    yorcvs::Rect<float> avgFrameTimeRect = {0, 50,150, 25};
+    yorcvs::Rect<float> avgFrameTimeRect = {0, 50, 150, 25};
 
     yorcvs::Text<yorcvs::graphics> ecsEntities;
     yorcvs::Rect<float> entitiesRect = {0, 75, 150, 25};
     float frame_time_samples = 0.0f;
     float avg_frame_time = 0.0f;
-
 
     yorcvs::Text<yorcvs::graphics> playerPosition;
     yorcvs::Rect<float> pPositionRect = {0, 100, 300, 25};
@@ -249,6 +248,98 @@ class Map
             }
         }
     }
+
+    void update(float dt, const yorcvs::Vec2<float> & /*render_dimensions*/)
+    {
+        collisionS.update();
+        velocityS.update();
+        animS.update(dt);
+        healthS.update(dt);
+    }
+
+    void render(const yorcvs::Vec2<float> &render_dimensions, yorcvs::Window<SDL2> &r, float /*elapsed*/)
+    {
+        render_tiles(r, render_dimensions);
+    }
+    void clear()
+    {
+        entities.clear();
+        ysorted_tiles.clear();
+        tiles.clear();
+    }
+      void load_character_from_path(const size_t entity_id, const std::string &path)
+    {
+        std::filesystem::path file = path;
+        const std::string directory_path = file.remove_filename().generic_string();
+
+        std::ifstream entityIN(path);
+        std::string entityDATA{(std::istreambuf_iterator<char>(entityIN)), (std::istreambuf_iterator<char>())};
+        auto entityJSON = json::json::parse(entityDATA);
+
+        const std::string sprite_path = directory_path + std::string(entityJSON["sprite"]["spriteName"]);
+        if (!ecs->has_components<hitboxComponent>(entity_id))
+        {
+            ecs->add_component<hitboxComponent>(entity_id, {});
+        }
+        ecs->get_component<hitboxComponent>(entity_id) = {{entityJSON["hitbox"]["x"], entityJSON["hitbox"]["y"],
+                                                           entityJSON["hitbox"]["w"], entityJSON["hitbox"]["h"]}};
+        if (!ecs->has_components<positionComponent>(entity_id))
+        {
+            ecs->add_component<positionComponent>(entity_id, {});
+            // TODO: move this elsewhere
+            ecs->get_component<positionComponent>(entity_id) = {get_spawn_position()};
+        }
+
+        if (!ecs->has_components<velocityComponent>(entity_id))
+        {
+            ecs->add_component<velocityComponent>(entity_id, {});
+        }
+        ecs->get_component<velocityComponent>(entity_id) = {{0.0f, 0.0f}, {false, false}};
+
+        if (!ecs->has_components<spriteComponent>(entity_id))
+        {
+            ecs->add_component<spriteComponent>(entity_id, {});
+        }
+        ecs->get_component<spriteComponent>(entity_id) = {
+            {entityJSON["sprite"]["offset"]["x"], entityJSON["sprite"]["offset"]["y"]},
+            {entityJSON["sprite"]["size"]["x"], entityJSON["sprite"]["size"]["y"]},
+            {entityJSON["sprite"]["srcRect"]["x"], entityJSON["sprite"]["srcRect"]["y"],
+             entityJSON["sprite"]["srcRect"]["w"], entityJSON["sprite"]["srcRect"]["h"]},
+            sprite_path};
+        if (!ecs->has_components<healthComponent>(entity_id))
+        {
+            ecs->add_component<healthComponent>(entity_id, {});
+        }
+
+        ecs->get_component<healthComponent>(entity_id) = {entityJSON["HP"], entityJSON["maxHP"], entityJSON["HPregen"],
+                                                          false};
+        if (!ecs->has_components<animationComponent>(entity_id))
+        {
+            ecs->add_component<animationComponent>(entity_id, {});
+        }
+        ecs->get_component<animationComponent>(entity_id).animations.clear();
+        ecs->get_component<animationComponent>(entity_id) = {};
+        for (const auto &animation : entityJSON["sprite"]["animations"])
+        {
+            bool animation_succes = animS.add_animation(entity_id, animation["name"], animation["speed"]);
+            if (animation_succes)
+            {
+                for (const auto &frame : animation["frames"])
+                {
+                    animS.add_animation_frame(entity_id, animation["name"],
+                                              {frame["x"], frame["y"], frame["w"], frame["h"]});
+                }
+            }
+        }
+
+        AnimationSystem::set_animation(ecs, entity_id, "idleL");
+    }
+    void load_character_from_path(yorcvs::Entity &entity, const std::string &path)
+    {
+        load_character_from_path(entity.id, path);
+    }
+
+  private:
     void parse_tile_layer(tmx::Map &map, tmx::TileLayer &tileLayer)
     {
         const auto &chunks = tileLayer.getChunks();
@@ -339,6 +430,7 @@ class Map
      *  RETURN TRUE IF THE PROPERTY EXISTS
      *  RETURN FALSE IF IT'S UNKNOWN
      */
+
     bool object_handle_property_bool(size_t entity, const tmx::Property &property, const tmx::Object &object)
     {
         // Note: handles hitbox to object
@@ -551,97 +643,7 @@ class Map
         return tile_set;
     }
 
-    void update(float dt, const yorcvs::Vec2<float> & /*render_dimensions*/)
-    {
-        collisionS.update();
-        velocityS.update();
-        animS.update(dt);
-        healthS.update(dt);
-    }
-
-    void render(const yorcvs::Vec2<float> &render_dimensions, yorcvs::Window<SDL2> &r, float /*elapsed*/)
-    {
-        render_tiles(r, render_dimensions);
-    }
-
-    void load_character_from_path(const size_t entity_id, const std::string &path)
-    {
-        std::filesystem::path file = path;
-        const std::string directory_path = file.remove_filename().generic_string();
-
-        std::ifstream entityIN(path);
-        std::string entityDATA{(std::istreambuf_iterator<char>(entityIN)), (std::istreambuf_iterator<char>())};
-        auto entityJSON = json::json::parse(entityDATA);
-
-        const std::string sprite_path = directory_path + std::string(entityJSON["sprite"]["spriteName"]);
-        if (!ecs->has_components<hitboxComponent>(entity_id))
-        {
-            ecs->add_component<hitboxComponent>(entity_id, {});
-        }
-        ecs->get_component<hitboxComponent>(entity_id) = {{entityJSON["hitbox"]["x"], entityJSON["hitbox"]["y"],
-                                                           entityJSON["hitbox"]["w"], entityJSON["hitbox"]["h"]}};
-        if (!ecs->has_components<positionComponent>(entity_id))
-        {
-            ecs->add_component<positionComponent>(entity_id, {});
-            // TODO: move this elsewhere
-            ecs->get_component<positionComponent>(entity_id) = {get_spawn_position()};
-        }
-
-        if (!ecs->has_components<velocityComponent>(entity_id))
-        {
-            ecs->add_component<velocityComponent>(entity_id, {});
-        }
-        ecs->get_component<velocityComponent>(entity_id) = {{0.0f, 0.0f}, {false, false}};
-
-        if (!ecs->has_components<spriteComponent>(entity_id))
-        {
-            ecs->add_component<spriteComponent>(entity_id, {});
-        }
-        ecs->get_component<spriteComponent>(entity_id) = {
-            {entityJSON["sprite"]["offset"]["x"], entityJSON["sprite"]["offset"]["y"]},
-            {entityJSON["sprite"]["size"]["x"], entityJSON["sprite"]["size"]["y"]},
-            {entityJSON["sprite"]["srcRect"]["x"], entityJSON["sprite"]["srcRect"]["y"],
-             entityJSON["sprite"]["srcRect"]["w"], entityJSON["sprite"]["srcRect"]["h"]},
-            sprite_path};
-        if (!ecs->has_components<healthComponent>(entity_id))
-        {
-            ecs->add_component<healthComponent>(entity_id, {});
-        }
-
-        ecs->get_component<healthComponent>(entity_id) = {entityJSON["HP"], entityJSON["maxHP"], entityJSON["HPregen"],
-                                                          false};
-        if (!ecs->has_components<animationComponent>(entity_id))
-        {
-            ecs->add_component<animationComponent>(entity_id, {});
-        }
-        ecs->get_component<animationComponent>(entity_id).animations.clear();
-        ecs->get_component<animationComponent>(entity_id) = {};
-        for (const auto &animation : entityJSON["sprite"]["animations"])
-        {
-            bool animation_succes = animS.add_animation(entity_id, animation["name"], animation["speed"]);
-            if (animation_succes)
-            {
-                for (const auto &frame : animation["frames"])
-                {
-                    animS.add_animation_frame(entity_id, animation["name"],
-                                              {frame["x"], frame["y"], frame["w"], frame["h"]});
-                }
-            }
-        }
-
-        AnimationSystem::set_animation(ecs, entity_id, "idleL");
-    }
-    void load_character_from_path(yorcvs::Entity &entity, const std::string &path)
-    {
-        load_character_from_path(entity.id, path);
-    }
-    void clear()
-    {
-        entities.clear();
-        ysorted_tiles.clear();
-        tiles.clear();
-    }
-
+  public:
     yorcvs::ECS *ecs{};
 
   private:
