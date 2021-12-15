@@ -55,8 +55,8 @@ template <typename T> class Vec2
     }
     constexpr Vec2 &operator-=(const Vec2 &other)
     {
-        x += other.x;
-        y += other.y;
+        x -= other.x;
+        y -= other.y;
         return *this;
     }
     // Multiplication
