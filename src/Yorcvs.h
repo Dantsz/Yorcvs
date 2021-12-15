@@ -98,7 +98,7 @@ class DebugInfo
             }
         }
     }
-    void render(float elapsed, const yorcvs::Vec2<float> &render_dimensions)
+    void render(float elapsed, yorcvs::Vec2<float> &render_dimensions)
     {
         if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_E))
         {
@@ -111,6 +111,19 @@ class DebugInfo
             parentWindow->draw_text(playerHealth, playerHealthRect);
 
             colSystem->render_hitboxes(*parentWindow, render_dimensions, 255, 0, 0, 100);
+        }
+        if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_LCTRL))
+        {
+            if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_I))
+            {
+               render_dimensions -= render_dimensions * 0.1f;
+            }
+
+            if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_K))
+            {
+                render_dimensions += render_dimensions * 0.1f;
+            }
+            std:: cout<< render_dimensions << std::endl;            
         }
     }
 
@@ -267,7 +280,7 @@ class Map
         ysorted_tiles.clear();
         tiles.clear();
     }
-      void load_character_from_path(const size_t entity_id, const std::string &path)
+    void load_character_from_path(const size_t entity_id, const std::string &path)
     {
         std::filesystem::path file = path;
         const std::string directory_path = file.remove_filename().generic_string();
