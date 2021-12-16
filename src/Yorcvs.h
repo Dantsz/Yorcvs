@@ -171,7 +171,7 @@ class DebugInfo
             {
                 render_dimensions += render_dimensions * 0.1f;
             }
-            std::cout << render_dimensions << std::endl;
+          
         }
     }
 
@@ -762,7 +762,7 @@ class Application
         if (std::filesystem::exists(configname))
         {
             yorcvs::log("Loading config file...");
-            std::ifstream config_in(configname);
+            std::ifstream config_in(configname.data());
             // NOTE: should read whole file in string
             std::string confstr{(std::istreambuf_iterator<char>(config_in)), (std::istreambuf_iterator<char>())};
             auto config = json::json::parse(confstr);
@@ -863,7 +863,7 @@ class Application
     }
 
   private:
-    static constexpr const char *configname = "yorcvsconfig.json";
+    static constexpr std::string_view configname = "yorcvsconfig.json";
     static constexpr yorcvs::Vec2<float> default_render_dimensions = {240.0f, 120.0f};
     static constexpr float msPF = 16.6f;
 

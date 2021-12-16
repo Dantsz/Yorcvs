@@ -31,7 +31,7 @@ namespace yorcvs
 class SDL2
 {
   public:
-    const char *name = "SDL2";
+   const std::string name = "SDL2";
 };
 } // namespace yorcvs
 // SDL TEXTURE MANAGER
@@ -91,7 +91,7 @@ template <> class Window<yorcvs::SDL2>
   public:
     Window<yorcvs::SDL2>()
     {
-        const char *name = "Yorcvs";
+        const std::string_view name = "Yorcvs";
         const size_t width = 960;
         const size_t height = 480;
 
@@ -131,7 +131,7 @@ template <> class Window<yorcvs::SDL2>
             yorcvs::log("Error initializing SDL2_TTF", yorcvs::MSGSEVERITY::ERROR);
         }
 
-        sdlWindow = SDL_CreateWindow(name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, static_cast<int>(width),
+        sdlWindow = SDL_CreateWindow(name.data(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, static_cast<int>(width),
                                      static_cast<int>(height), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
         if (sdlWindow == nullptr)
         {
