@@ -326,7 +326,7 @@ template <typename interface> class Window
      */
     void serialize_settings();
 
-    bool isActive;
+    bool isActive();
 
   private:
 };

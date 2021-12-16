@@ -468,7 +468,11 @@ template <> class Window<yorcvs::SDL2>
         return scale;
     }
 
-   bool isActive = true;
+    [[nodiscard]] bool is_active() const
+    {
+        return isActive;
+    }
+  
 
   private:
 
@@ -492,7 +496,7 @@ template <> class Window<yorcvs::SDL2>
     std::unique_ptr<AssetManager<SDL_Texture>> assetm = nullptr;
     SDL_Window *sdlWindow = nullptr;
     SDL_Renderer *renderer = nullptr;
-
+     bool isActive = true;
     unsigned char const *keys{};
     int mouseX{};
     int mouseY{};

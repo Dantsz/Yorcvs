@@ -854,7 +854,7 @@ class Application
 
     [[nodiscard]] bool is_active() const
     {
-        return r.isActive;
+        return r.is_active();
     }
 
     ~Application()
