@@ -98,6 +98,53 @@ class DebugInfo
             }
         }
     }
+
+
+
+    template <typename render_backend>
+    void render_hitboxes(yorcvs::Window<render_backend> &window, const yorcvs::Vec2<float> &render_dimensions, float r,
+                         float g, float b, float a)
+    {
+        yorcvs::Vec2<float> old_rs = window.get_render_scale();
+        window.set_render_scale(window.get_size() / render_dimensions);
+
+        yorcvs::Rect<float> rect{};
+        for (const auto &ID : colSystem->entityList->entitiesID)
+        {
+            rect.x = appECS->get_component<positionComponent>(ID).position.x +
+                     appECS->get_component<hitboxComponent>(ID).hitbox.x;
+            rect.y = appECS->get_component<positionComponent>(ID).position.y +
+                     appECS->get_component<hitboxComponent>(ID).hitbox.y;
+            rect.w = appECS->get_component<hitboxComponent>(ID).hitbox.w;
+            rect.h = appECS->get_component<hitboxComponent>(ID).hitbox.h;
+            window.draw_rect(rect, r, g, b, a);
+            if (appECS->has_components<healthComponent>(ID))
+            {
+                /// draw health bar
+
+                yorcvs::Rect<float> healthBarRect{};
+                if (appECS->has_components<spriteComponent>(
+                        ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
+                {
+                    healthBarRect.y = rect.y - appECS->get_component<spriteComponent>(ID).size.y / 2;
+                }
+                else
+                {
+                    healthBarRect.y = rect.y - rect.h;
+                }
+                healthBarRect.x = rect.x - 16.0f + rect.w / 2;
+                healthBarRect.w = 32.0f;
+                healthBarRect.h = 4.0f;
+                window.draw_rect(healthBarRect, 100, 0, 0, 255);
+                healthBarRect.w =
+                    (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).maxHP) *
+                    32.0f;
+                window.draw_rect(healthBarRect, 255, 0, 0, 255);
+            }
+        }
+        window.set_render_scale(old_rs);
+    }
+
     void render(float elapsed, yorcvs::Vec2<float> &render_dimensions)
     {
         if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_E))
@@ -110,7 +157,7 @@ class DebugInfo
             parentWindow->draw_text(playerPosition, pPositionRect);
             parentWindow->draw_text(playerHealth, playerHealthRect);
 
-            colSystem->render_hitboxes(*parentWindow, render_dimensions, 255, 0, 0, 100);
+            render_hitboxes(*parentWindow, render_dimensions, 255, 0, 0, 100);
         }
         if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_LCTRL))
         {
