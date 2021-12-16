@@ -99,8 +99,6 @@ class DebugInfo
         }
     }
 
-
-
     template <typename render_backend>
     void render_hitboxes(yorcvs::Window<render_backend> &window, const yorcvs::Vec2<float> &render_dimensions, float r,
                          float g, float b, float a)
@@ -133,8 +131,10 @@ class DebugInfo
                     healthBarRect.y = rect.y - rect.h;
                 }
                 healthBarRect.x = rect.x - 16.0f + rect.w / 2;
-                healthBarRect.w = 32.0f;
-                healthBarRect.h = 4.0f;
+
+                healthBarRect.w = health_full_bar_dimension.x;
+                healthBarRect.h = health_full_bar_dimension.y;
+
                 window.draw_rect(healthBarRect, 100, 0, 0, 255);
                 healthBarRect.w =
                     (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).maxHP) *
@@ -150,6 +150,7 @@ class DebugInfo
         if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_E))
         {
             update(elapsed);
+            render_hitboxes(*parentWindow, render_dimensions, 255, 0, 0, 100);
             parentWindow->draw_text(frameTime, FTRect);
             parentWindow->draw_text(maxframeTimeTX, maxFTRect);
             parentWindow->draw_text(avgFrameTime, avgFrameTimeRect);
@@ -157,20 +158,20 @@ class DebugInfo
             parentWindow->draw_text(playerPosition, pPositionRect);
             parentWindow->draw_text(playerHealth, playerHealthRect);
 
-            render_hitboxes(*parentWindow, render_dimensions, 255, 0, 0, 100);
+           
         }
         if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_LCTRL))
         {
             if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_I))
             {
-               render_dimensions -= render_dimensions * 0.1f;
+                render_dimensions -= render_dimensions * 0.1f;
             }
 
             if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_K))
             {
                 render_dimensions += render_dimensions * 0.1f;
             }
-            std:: cout<< render_dimensions << std::endl;            
+            std::cout << render_dimensions << std::endl;
         }
     }
 
@@ -183,16 +184,18 @@ class DebugInfo
         colSystem = cols;
         healthSys = healthS;
 
-        frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", 255, 255, 255, 255, 100, 10000);
-        maxframeTimeTX =
-            parentWindow->create_text("assets/font.ttf", "Max Frame Time : ", 255, 255, 255, 255, 100, 10000);
-        avgFrameTime =
-            parentWindow->create_text("assets/font.ttf", "Avg Frame Time : ", 255, 255, 255, 255, 100, 10000);
-        ecsEntities =
-            parentWindow->create_text("assets/font.ttf", "Active Entities : ", 255, 255, 255, 255, 100, 10000);
-        playerPosition =
-            parentWindow->create_text("assets/font.ttf", "NO PLAYER FOUND ", 255, 255, 255, 255, 100, 10000);
-        playerHealth = parentWindow->create_text("assets/font.ttf", "Health : -/- ", 255, 255, 255, 255, 100, 10000);
+        frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", textR, textG, textB, textA,
+                                              text_char_size, text_line_length);
+        maxframeTimeTX = parentWindow->create_text("assets/font.ttf", "Max Frame Time : ", textR, textG, textB, textA,
+                                                   text_char_size, text_line_length);
+        avgFrameTime = parentWindow->create_text("assets/font.ttf", "Avg Frame Time : ", textR, textG, textB, textA,
+                                                 text_char_size, text_line_length);
+        ecsEntities = parentWindow->create_text("assets/font.ttf", "Active Entities : ", textR, textG, textB, textA,
+                                                text_char_size, text_line_length);
+        playerPosition = parentWindow->create_text("assets/font.ttf", "NO PLAYER FOUND ", textR, textG, textB, textA,
+                                                   text_char_size, text_line_length);
+        playerHealth = parentWindow->create_text("assets/font.ttf", "Health : -/- ", textR, textG, textB, textA,
+                                                 text_char_size, text_line_length);
     }
 
     void reset()
@@ -227,6 +230,14 @@ class DebugInfo
 
     CollisionSystem *colSystem{};
     HealthSystem *healthSys{};
+
+    static constexpr size_t textR = 255;
+    static constexpr size_t textG = 255;
+    static constexpr size_t textB = 255;
+    static constexpr size_t textA = 255;
+    static constexpr size_t text_char_size = 100;
+    static constexpr size_t text_line_length = 10000;
+    static constexpr yorcvs::Vec2<float> health_full_bar_dimension = {32.0f,4.0f};
 };
 
 struct Tile
@@ -490,7 +501,6 @@ class Map
      *  RETURN TRUE IF THE PROPERTY EXISTS
      *  RETURN FALSE IF IT'S UNKNOWN
      */
-
     bool object_handle_property_bool(size_t entity, const tmx::Property &property, const tmx::Object &object)
     {
         // Note: handles hitbox to object
@@ -854,13 +864,14 @@ class Application
 
   private:
     static constexpr const char *configname = "yorcvsconfig.json";
+    static constexpr yorcvs::Vec2<float> default_render_dimensions = {240.0f, 120.0f};
+    static constexpr float msPF = 16.6f;
 
     yorcvs::Window<yorcvs::graphics> r;
     yorcvs::Timer counter;
 
-    static constexpr float msPF = 16.6f;
     float lag = 0.0f;
-    yorcvs::Vec2<float> render_dimensions = {240.0f, 120.0f}; // how much to render
+    yorcvs::Vec2<float> render_dimensions = default_render_dimensions; // how much to render
 
     yorcvs::ECS world{};
     yorcvs::Map map{"assets/map.tmx", &world};

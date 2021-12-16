@@ -468,9 +468,10 @@ template <> class Window<yorcvs::SDL2>
         return scale;
     }
 
-    bool isActive = true;
+   bool isActive = true;
 
   private:
+
     void setup_texture(yorcvs::Text<yorcvs::SDL2> &text)
     {
         TTF_Font *font = TTF_OpenFont(text.fontPath.c_str(), text.charSize);
@@ -484,6 +485,7 @@ template <> class Window<yorcvs::SDL2>
         SDL_FreeSurface(textSurf);
         TTF_CloseFont(font);
     }
+ 
     SDL_Event event{};
     std::vector<Callback<yorcvs::SDL2>> callbacks{};
     yorcvs::Vec2<float> offset = {0.0f, 0.0f};

@@ -515,11 +515,11 @@ class BehaviourSystem
                 world->get_component<velocityComponent>(ID).vel = {velx, vely};
                 world->get_component<behaviourComponent>(ID).accumulated = 0.0f;
             }
-            if (world->get_component<velocityComponent>(ID).vel.x > 0.1f)
+            if (world->get_component<velocityComponent>(ID).vel.x > velocity_trigger_treshold)
             {
                 AnimationSystem::set_animation(world, ID, "walkingL");
             }
-            else if (world->get_component<velocityComponent>(ID).vel.x < 0.1f)
+            else if (world->get_component<velocityComponent>(ID).vel.x < velocity_trigger_treshold)
             {
                 AnimationSystem::set_animation(world, ID, "walkingR");
             }
@@ -537,6 +537,9 @@ class BehaviourSystem
 
     std::random_device dev{};
     std::mt19937 generator{dev()};
-
+    
     yorcvs::ECS *world = nullptr;
+
+
+    static constexpr float velocity_trigger_treshold = 0.0f;
 };
