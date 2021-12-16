@@ -100,8 +100,8 @@ class DebugInfo
     }
 
     template <typename render_backend>
-    void render_hitboxes(yorcvs::Window<render_backend> &window, const yorcvs::Vec2<float> &render_dimensions, float r,
-                         float g, float b, float a)
+    void render_hitboxes(yorcvs::Window<render_backend> &window, const yorcvs::Vec2<float> &render_dimensions, size_t r,
+                         size_t g, size_t b, size_t a)
     {
         yorcvs::Vec2<float> old_rs = window.get_render_scale();
         window.set_render_scale(window.get_size() / render_dimensions);
@@ -135,11 +135,11 @@ class DebugInfo
                 healthBarRect.w = health_full_bar_dimension.x;
                 healthBarRect.h = health_full_bar_dimension.y;
 
-                window.draw_rect(healthBarRect, 100, 0, 0, 255);
+                window.draw_rect(healthBarRect,  health_bar_empty_color[0],  health_bar_empty_color[1],  health_bar_empty_color[2],  health_bar_empty_color[3]);
                 healthBarRect.w =
                     (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).maxHP) *
                     32.0f;
-                window.draw_rect(healthBarRect, 255, 0, 0, 255);
+                window.draw_rect(healthBarRect, health_bar_full_color[0],  health_bar_full_color[1],  health_bar_full_color[2],  health_bar_full_color[3]);
             }
         }
         window.set_render_scale(old_rs);
@@ -150,7 +150,7 @@ class DebugInfo
         if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_E))
         {
             update(elapsed);
-            render_hitboxes(*parentWindow, render_dimensions, 255, 0, 0, 100);
+            render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],hitbox_color[3]);
             parentWindow->draw_text(frameTime, FTRect);
             parentWindow->draw_text(maxframeTimeTX, maxFTRect);
             parentWindow->draw_text(avgFrameTime, avgFrameTimeRect);
@@ -164,12 +164,12 @@ class DebugInfo
         {
             if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_I))
             {
-                render_dimensions -= render_dimensions * 0.1f;
+                render_dimensions -= render_dimensions * zoom_power;
             }
 
             if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_K))
             {
-                render_dimensions += render_dimensions * 0.1f;
+                render_dimensions += render_dimensions * zoom_power;
             }
           
         }
@@ -206,25 +206,25 @@ class DebugInfo
     yorcvs::ECS *appECS{};
 
     yorcvs::Text<yorcvs::graphics> frameTime;
-    yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
+    const  yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
 
     float maxFrameTime = 0.0f;
     yorcvs::Text<yorcvs::graphics> maxframeTimeTX;
-    yorcvs::Rect<float> maxFTRect = {0, 25, 150, 25};
+    const yorcvs::Rect<float> maxFTRect = {0, 25, 150, 25};
 
     yorcvs::Text<yorcvs::graphics> avgFrameTime;
-    yorcvs::Rect<float> avgFrameTimeRect = {0, 50, 150, 25};
+    const yorcvs::Rect<float> avgFrameTimeRect = {0, 50, 150, 25};
 
     yorcvs::Text<yorcvs::graphics> ecsEntities;
-    yorcvs::Rect<float> entitiesRect = {0, 75, 150, 25};
+    const yorcvs::Rect<float> entitiesRect = {0, 75, 150, 25};
     float frame_time_samples = 0.0f;
     float avg_frame_time = 0.0f;
 
     yorcvs::Text<yorcvs::graphics> playerPosition;
-    yorcvs::Rect<float> pPositionRect = {0, 100, 300, 25};
+    const yorcvs::Rect<float> pPositionRect = {0, 100, 300, 25};
 
     yorcvs::Text<yorcvs::graphics> playerHealth;
-    yorcvs::Rect<float> playerHealthRect = {0, 125, 200, 25};
+    const yorcvs::Rect<float> playerHealthRect = {0, 125, 200, 25};
 
     PlayerMovementControl *playerMoveSystem{};
 
@@ -238,6 +238,12 @@ class DebugInfo
     static constexpr size_t text_char_size = 100;
     static constexpr size_t text_line_length = 10000;
     static constexpr yorcvs::Vec2<float> health_full_bar_dimension = {32.0f,4.0f};
+    static constexpr float zoom_power = 0.1f;
+
+    //rgba
+    const std::vector<uint8_t> health_bar_full_color = {255,0,0,255};
+    const std::vector<uint8_t> health_bar_empty_color = {100,0,0,255};
+    const std::vector<uint8_t> hitbox_color = {255,0,0,100};
 };
 
 struct Tile
@@ -416,6 +422,7 @@ class Map
         const auto &chunks = tileLayer.getChunks();
         for (const auto &chunk : chunks) // parse chunks
         {
+            //std::cout << "Loading chunk: " << chunk.position.x/chunk.size.x << " " << chunk.position.y/chunk.size.y << '\n';
             yorcvs::Vec2<float> chunk_position = {static_cast<float>(chunk.position.x),
                                                   static_cast<float>(chunk.position.y)};
             for (auto chunk_y = 0; chunk_y < chunk.size.y; chunk_y++)
@@ -445,7 +452,7 @@ class Map
                         chunk_position * tilesSize +
                         tilesSize * yorcvs::Vec2<float>{static_cast<float>(chunk_x), static_cast<float>(chunk_y)};
                     tile.srcRect = get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID);
-
+            
                     tiles.push_back(tile);
                 }
             }
@@ -768,7 +775,7 @@ class Application
             auto config = json::json::parse(confstr);
             if (config.is_discarded())
             {
-                yorcvs::log("Inavlid config file");
+                yorcvs::log("Invalid config file");
             }
             else
             {
