@@ -127,7 +127,7 @@ class EntityManager
         }
 
         // take the id from   the front of the queue
-        size_t id = freedIndices.back();
+        const size_t id = freedIndices.back();
         // popit
         freedIndices.pop_back();
         // clear signature
@@ -290,7 +290,7 @@ template <typename T> class ComponentContainer final : public VContainer
         }
 
         // get the index of the removed entity
-        size_t removedIndex = entitytocomponent[entityID];
+        const size_t removedIndex = entitytocomponent[entityID];
 
         // add the id to the list of unused ids
         freeIndex.push(removedIndex);
@@ -794,7 +794,7 @@ class ECS
         componentmanager->add_component<T>(entityID, component);
         // modify the signature to match the new addition
         std::vector<bool> e_signature = entitymanager->get_signature(entityID);
-        size_t component_type = componentmanager->get_component_ID<T>();
+        const size_t component_type = componentmanager->get_component_ID<T>();
         // while the vector of signature doesn't have elements until the current component add 0 to the signature
         while (e_signature.size() <= component_type)
         {
@@ -821,7 +821,7 @@ class ECS
         componentmanager->add_component<T>(entityID, component);
         // modify the signature to match the new addition
         std::vector<bool> e_signature = entitymanager->get_signature(entityID);
-        size_t component_type = componentmanager->get_component_ID<T>();
+        const size_t component_type = componentmanager->get_component_ID<T>();
         // while the vector of signature doesn't have elements until the current component add 0 to the signature
         while (e_signature.size() <= component_type)
         {
@@ -842,7 +842,7 @@ class ECS
     template <typename T> void remove_component(const size_t entityID)
     {
         std::vector<bool> &e_signature = entitymanager->get_signature(entityID);
-        size_t component_type = componentmanager->get_component_ID<T>();
+        const size_t component_type = componentmanager->get_component_ID<T>();
         e_signature[component_type] = false;
         systemmanager->on_entity_signature_change(entityID, e_signature);
         componentmanager->remove_component<T>(entityID);
@@ -1048,7 +1048,7 @@ class ECS
     template <typename T> [[nodiscard]] size_t get_entities_with_component() const
     {
         // get component index
-        size_t cIndex = componentmanager->get_component_ID<T>();
+        const size_t cIndex = componentmanager->get_component_ID<T>();
         size_t entities = 0;
         // unused entites have an emtpy signature so a false pozitive should happen
         for (const auto &i : entitymanager->entitySignatures)

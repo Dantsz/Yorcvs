@@ -65,7 +65,7 @@ class CollisionSystem
             }
         }
     }
-   
+
   private:
     static bool check_collision_left_right(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                            yorcvs::Vec2<float> &rectAvel)
@@ -185,7 +185,7 @@ class VelocitySystem
         {
             yorcvs::Vec2<float> posOF = world->get_component<velocityComponent>(ID).vel;
             world->get_component<positionComponent>(ID).position += posOF;
-            //world->get_component<velocityComponent>(ID).vel = {0, 0};
+            // world->get_component<velocityComponent>(ID).vel = {0, 0};
             if (std::abs(posOF.x) > std::numeric_limits<float>::epsilon())
             {
                 world->get_component<velocityComponent>(ID).facing.x = (posOF.x < 0.0f);
@@ -321,7 +321,7 @@ class AnimationSystem
         world->get_component<animationComponent>(entityID).cur_animation = animation_name;
     }
 
-    void update(float elapsed) const
+    void update(const float elapsed) const
     {
         for (const auto &ID : entityList->entitiesID)
         {
@@ -358,31 +358,33 @@ class HealthSystem
         world->register_system<HealthSystem>(*this);
         world->add_criteria_for_iteration<HealthSystem, healthComponent>();
     }
-    void update(float dt)
+    void update(const float dt)
     {
         cur_time += dt;
         if (cur_time >= update_time)
         {
-            for (size_t ID =  0 ; ID  < entityList->entitiesID.size() ; ID++)
+            for (size_t ID = 0; ID < entityList->entitiesID.size(); ID++)
             {
                 if (world->get_component<healthComponent>(entityList->entitiesID[ID]).HP < 0.0f)
                 {
                     world->get_component<healthComponent>(entityList->entitiesID[ID]).is_dead = true;
                     continue;
                 }
-                world->get_component<healthComponent>(entityList->entitiesID[ID]).HP += world->get_component<healthComponent>(entityList->entitiesID[ID]).health_regen;
-                if (world->get_component<healthComponent>(entityList->entitiesID[ID]).HP > world->get_component<healthComponent>(entityList->entitiesID[ID]).maxHP)
+                world->get_component<healthComponent>(entityList->entitiesID[ID]).HP +=
+                    world->get_component<healthComponent>(entityList->entitiesID[ID]).health_regen;
+                if (world->get_component<healthComponent>(entityList->entitiesID[ID]).HP >
+                    world->get_component<healthComponent>(entityList->entitiesID[ID]).maxHP)
                 {
-                    world->get_component<healthComponent>(entityList->entitiesID[ID]).HP = world->get_component<healthComponent>(entityList->entitiesID[ID]).maxHP;
+                    world->get_component<healthComponent>(entityList->entitiesID[ID]).HP =
+                        world->get_component<healthComponent>(entityList->entitiesID[ID]).maxHP;
                 }
-                if(world->get_component<healthComponent>(entityList->entitiesID[ID]).HP < 0.0f)
+                if (world->get_component<healthComponent>(entityList->entitiesID[ID]).HP < 0.0f)
                 {
                     world->destroy_entity(entityList->entitiesID[ID]);
                 }
             }
             cur_time = 0.0f;
         }
-    
     }
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
 
@@ -501,6 +503,29 @@ class BehaviourSystem
         world->register_system<BehaviourSystem>(*this);
         world->add_criteria_for_iteration<BehaviourSystem, behaviourComponent, velocityComponent>();
     }
+    void chicken_behaviour(const size_t ID)
+    {
+        const float velx = static_cast<float>(generator() % 3) - 1.0f;
+        const float vely = static_cast<float>(generator() % 3) - 1.0f;
+        world->get_component<velocityComponent>(ID).vel = {velx, vely};
+        world->get_component<behaviourComponent>(ID).accumulated = 0.0f;
+        if (world->get_component<velocityComponent>(ID).vel.x > velocity_trigger_treshold)
+        {
+            AnimationSystem::set_animation(world, ID, "walkingL");
+        }
+        else if (world->get_component<velocityComponent>(ID).vel.x < velocity_trigger_treshold)
+        {
+            AnimationSystem::set_animation(world, ID, "walkingR");
+        }
+        else if (world->get_component<velocityComponent>(ID).facing.x)
+        {
+            AnimationSystem::set_animation(world, ID, "idleL");
+        }
+        else
+        {
+            AnimationSystem::set_animation(world, ID, "idleR");
+        }
+    }
     void update(const float dt)
     {
         for (const auto ID : entityList->entitiesID)
@@ -510,26 +535,7 @@ class BehaviourSystem
             if (world->get_component<behaviourComponent>(ID).accumulated >
                 world->get_component<behaviourComponent>(ID).dt)
             {
-                const float velx = static_cast<float>(generator() % 3) - 1.0f;
-                const float vely = static_cast<float>(generator() % 3) - 1.0f;
-                world->get_component<velocityComponent>(ID).vel = {velx, vely};
-                world->get_component<behaviourComponent>(ID).accumulated = 0.0f;
-            }
-            if (world->get_component<velocityComponent>(ID).vel.x > velocity_trigger_treshold)
-            {
-                AnimationSystem::set_animation(world, ID, "walkingL");
-            }
-            else if (world->get_component<velocityComponent>(ID).vel.x < velocity_trigger_treshold)
-            {
-                AnimationSystem::set_animation(world, ID, "walkingR");
-            }
-            else if (world->get_component<velocityComponent>(ID).facing.x)
-            {
-                AnimationSystem::set_animation(world, ID, "idleL");
-            }
-            else
-            {
-                AnimationSystem::set_animation(world, ID, "idleR");
+                chicken_behaviour(ID);
             }
         }
     }
@@ -537,9 +543,8 @@ class BehaviourSystem
 
     std::random_device dev{};
     std::mt19937 generator{dev()};
-    
-    yorcvs::ECS *world = nullptr;
 
+    yorcvs::ECS *world = nullptr;
 
     static constexpr float velocity_trigger_treshold = 0.0f;
 };

@@ -54,7 +54,7 @@ class DebugInfo
     DebugInfo operator=(const DebugInfo &other) = delete;
     DebugInfo operator=(DebugInfo &&other) = delete;
 
-    void update(float ft)
+    void update(const float ft)
     {
         if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_R))
         {
@@ -84,7 +84,7 @@ class DebugInfo
         }
         else
         {
-            size_t ID = playerMoveSystem->entityList->entitiesID[0];
+            const  size_t ID = playerMoveSystem->entityList->entitiesID[0];
             parentWindow->set_text_message(
                 playerPosition,
                 "Player position : X = " + std::to_string(appECS->get_component<positionComponent>(ID).position.x) +
@@ -100,8 +100,8 @@ class DebugInfo
     }
 
     template <typename render_backend>
-    void render_hitboxes(yorcvs::Window<render_backend> &window, const yorcvs::Vec2<float> &render_dimensions, size_t r,
-                         size_t g, size_t b, size_t a)
+    void render_hitboxes(yorcvs::Window<render_backend> &window, const yorcvs::Vec2<float> &render_dimensions,const  size_t r,
+                         const size_t g,const  size_t b,const size_t a)
     {
         yorcvs::Vec2<float> old_rs = window.get_render_scale();
         window.set_render_scale(window.get_size() / render_dimensions);
@@ -145,7 +145,7 @@ class DebugInfo
         window.set_render_scale(old_rs);
     }
 
-    void render(float elapsed, yorcvs::Vec2<float> &render_dimensions)
+    void render(const float elapsed, yorcvs::Vec2<float> &render_dimensions)
     {
         if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_E))
         {
@@ -326,7 +326,7 @@ class Map
         }
     }
 
-    void update(float dt, const yorcvs::Vec2<float> & /*render_dimensions*/)
+    void update(const float dt, const yorcvs::Vec2<float> & /*render_dimensions*/)
     {
         collisionS.update();
         velocityS.update();
@@ -488,7 +488,7 @@ class Map
 
                     /// add object
                     ysorted_tiles.emplace_back(ecs);
-                    size_t entity = ysorted_tiles[ysorted_tiles.size() - 1].id;
+                    const size_t entity = ysorted_tiles[ysorted_tiles.size() - 1].id;
                     ecs->add_component<positionComponent>(
                         entity,
                         {chunk_position * tilesSize +
@@ -508,7 +508,7 @@ class Map
      *  RETURN TRUE IF THE PROPERTY EXISTS
      *  RETURN FALSE IF IT'S UNKNOWN
      */
-    bool object_handle_property_bool(size_t entity, const tmx::Property &property, const tmx::Object &object)
+    bool object_handle_property_bool(const size_t entity, const tmx::Property &property, const tmx::Object &object)
     {
         // Note: handles hitbox to object
         if (property.getName() == "collision" && property.getBoolValue())
@@ -532,7 +532,7 @@ class Map
         return false;
     }
     bool object_handle_property_color(size_t entity, const tmx::Property &property);
-    [[nodiscard]] bool object_handle_property_float(size_t entity, const tmx::Property &property) const
+    [[nodiscard]] bool object_handle_property_float(const size_t entity, const tmx::Property &property) const
     {
         if (property.getName() == "behaviourDT")
         {
@@ -546,7 +546,7 @@ class Map
         }
         return false;
     }
-    bool object_handle_property_file(size_t entity, const tmx::Property &property)
+    bool object_handle_property_file(const size_t entity, const tmx::Property &property)
     {
         const std::string &filePath = property.getFileValue();
         std::filesystem::path map_file = map_file_path;
@@ -564,7 +564,7 @@ class Map
         }
         return false;
     }
-    [[nodiscard]] bool object_handle_property_int(size_t entity, const tmx::Property &property) const
+    [[nodiscard]] bool object_handle_property_int(const size_t entity, const tmx::Property &property) const
     {
         // NOTE HANDLES HP
         if (property.getName() == "HP")
@@ -597,7 +597,7 @@ class Map
         return false;
     }
     bool object_handle_property_object(size_t entity, const tmx::Property &property);
-    bool object_handle_property_string(size_t entity, const tmx::Property &property);
+    bool object_handle_property_string( size_t entity, const tmx::Property &property);
 
     void parse_object_layer(tmx::Map &map, tmx::ObjectGroup &objectLayer)
     {
@@ -606,7 +606,7 @@ class Map
         {
             // create entity
             entities.emplace_back(ecs);
-            size_t entity = entities[entities.size() - 1].id;
+            const size_t entity = entities[entities.size() - 1].id;
             ecs->add_component<positionComponent>(
                 entity, {{object.getPosition().x, object.getPosition().y - object.getAABB().height}});
             if (object.getTileID() != 0 && object.visible())
@@ -826,9 +826,7 @@ class Application
     }
     void run()
     {
-        float elapsed = counter.get_ticks<float, std::chrono::nanoseconds>();
-        elapsed /= 1000000.0f;
-
+        const float elapsed = counter.get_ticks<float, std::chrono::nanoseconds>()/1000000.0f;
         counter.stop();
         counter.start();
         lag += elapsed;

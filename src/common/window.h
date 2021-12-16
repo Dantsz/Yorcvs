@@ -328,7 +328,6 @@ template <typename interface> class Window
 
     bool isActive();
 
-  private:
 };
 
 } // namespace yorcvs
