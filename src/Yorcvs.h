@@ -34,6 +34,7 @@ namespace json = nlohmann;
 #include <filesystem>
 #include <fstream>
 #include <tmxlite/Map.hpp>
+#include <cmath>
 // TODO: move this to utlities
 namespace std
 {
@@ -109,7 +110,7 @@ class DebugInfo
                                                                  std::to_string(playerHealthC.maxHP));
             }
             // print current chunk
-            std::cout << appECS->get_component<positionComponent>(ID).position / yorcvs::Vec2<float>(64.0f * 16.0f , 64.0f * 16.0f) << "\n";
+            //std::cout << appECS->get_component<positionComponent>(ID).position / (32.0f*16.0f) << "\n";
         }
     }
 
@@ -820,7 +821,12 @@ class Application
     {
         yorcvs::Vec2<float> rs = r.get_render_scale();
         r.set_render_scale(r.get_size() / render_dimensions);
-        for (const auto &tile : p_map.tiles)
+        //get player position
+        const size_t ID = pcS.entityList->entitiesID[0];
+        const yorcvs::Vec2<float> player_position = world.get_component<positionComponent>(ID).position;
+        const std::tuple<intmax_t, intmax_t> player_position_chunk = std::tuple<intmax_t, intmax_t>(std::floor(player_position.x/(32.0f*16.0f)),std::floor(player_position.y/(32.0f*16.0f)));
+        //render chunks
+        for (const auto &tile : map.tiles_chunks.at(player_position_chunk))
         {
             r.draw_sprite(tile.texture_path, {tile.coords.x, tile.coords.y, p_map.tilesSize.x, p_map.tilesSize.y},
                           tile.srcRect);
