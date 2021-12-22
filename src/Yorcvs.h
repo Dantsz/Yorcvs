@@ -34,7 +34,19 @@ namespace json = nlohmann;
 #include <filesystem>
 #include <fstream>
 #include <tmxlite/Map.hpp>
-
+// TODO: move this to utlities
+namespace std
+{
+template <> struct hash<std::tuple<intmax_t, intmax_t>>
+{
+    size_t operator()(const std::tuple<intmax_t, intmax_t> &p) const
+    {
+        intmax_t x = std::get<0>(p);
+        intmax_t y = std::get<1>(p);
+        return hash<intmax_t>{}(x) ^ hash<intmax_t>{}(y);
+    }
+};
+} // namespace std
 namespace yorcvs
 {
 class DebugInfo
@@ -84,7 +96,7 @@ class DebugInfo
         }
         else
         {
-            const  size_t ID = playerMoveSystem->entityList->entitiesID[0];
+            const size_t ID = playerMoveSystem->entityList->entitiesID[0];
             parentWindow->set_text_message(
                 playerPosition,
                 "Player position : X = " + std::to_string(appECS->get_component<positionComponent>(ID).position.x) +
@@ -96,12 +108,14 @@ class DebugInfo
                 parentWindow->set_text_message(playerHealth, "Health: " + std::to_string(playerHealthC.HP) + " / " +
                                                                  std::to_string(playerHealthC.maxHP));
             }
+            // print current chunk
+            std::cout << appECS->get_component<positionComponent>(ID).position / yorcvs::Vec2<float>(64.0f * 16.0f , 64.0f * 16.0f) << "\n";
         }
     }
 
     template <typename render_backend>
-    void render_hitboxes(yorcvs::Window<render_backend> &window, const yorcvs::Vec2<float> &render_dimensions,const  size_t r,
-                         const size_t g,const  size_t b,const size_t a)
+    void render_hitboxes(yorcvs::Window<render_backend> &window, const yorcvs::Vec2<float> &render_dimensions,
+                         const size_t r, const size_t g, const size_t b, const size_t a)
     {
         yorcvs::Vec2<float> old_rs = window.get_render_scale();
         window.set_render_scale(window.get_size() / render_dimensions);
@@ -135,11 +149,13 @@ class DebugInfo
                 healthBarRect.w = health_full_bar_dimension.x;
                 healthBarRect.h = health_full_bar_dimension.y;
 
-                window.draw_rect(healthBarRect,  health_bar_empty_color[0],  health_bar_empty_color[1],  health_bar_empty_color[2],  health_bar_empty_color[3]);
+                window.draw_rect(healthBarRect, health_bar_empty_color[0], health_bar_empty_color[1],
+                                 health_bar_empty_color[2], health_bar_empty_color[3]);
                 healthBarRect.w =
                     (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).maxHP) *
                     32.0f;
-                window.draw_rect(healthBarRect, health_bar_full_color[0],  health_bar_full_color[1],  health_bar_full_color[2],  health_bar_full_color[3]);
+                window.draw_rect(healthBarRect, health_bar_full_color[0], health_bar_full_color[1],
+                                 health_bar_full_color[2], health_bar_full_color[3]);
             }
         }
         window.set_render_scale(old_rs);
@@ -150,15 +166,14 @@ class DebugInfo
         if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_E))
         {
             update(elapsed);
-            render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],hitbox_color[3]);
+            render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
+                            hitbox_color[3]);
             parentWindow->draw_text(frameTime, FTRect);
             parentWindow->draw_text(maxframeTimeTX, maxFTRect);
             parentWindow->draw_text(avgFrameTime, avgFrameTimeRect);
             parentWindow->draw_text(ecsEntities, entitiesRect);
             parentWindow->draw_text(playerPosition, pPositionRect);
             parentWindow->draw_text(playerHealth, playerHealthRect);
-
-           
         }
         if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_LCTRL))
         {
@@ -171,7 +186,6 @@ class DebugInfo
             {
                 render_dimensions += render_dimensions * zoom_power;
             }
-          
         }
     }
 
@@ -206,7 +220,7 @@ class DebugInfo
     yorcvs::ECS *appECS{};
 
     yorcvs::Text<yorcvs::graphics> frameTime;
-    const  yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
+    const yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
 
     float maxFrameTime = 0.0f;
     yorcvs::Text<yorcvs::graphics> maxframeTimeTX;
@@ -237,13 +251,13 @@ class DebugInfo
     static constexpr size_t textA = 255;
     static constexpr size_t text_char_size = 100;
     static constexpr size_t text_line_length = 10000;
-    static constexpr yorcvs::Vec2<float> health_full_bar_dimension = {32.0f,4.0f};
+    static constexpr yorcvs::Vec2<float> health_full_bar_dimension = {32.0f, 4.0f};
     static constexpr float zoom_power = 0.1f;
 
-    //rgba
-    const std::vector<uint8_t> health_bar_full_color = {255,0,0,255};
-    const std::vector<uint8_t> health_bar_empty_color = {100,0,0,255};
-    const std::vector<uint8_t> hitbox_color = {255,0,0,100};
+    // rgba
+    const std::vector<uint8_t> health_bar_full_color = {255, 0, 0, 255};
+    const std::vector<uint8_t> health_bar_empty_color = {100, 0, 0, 255};
+    const std::vector<uint8_t> hitbox_color = {255, 0, 0, 100};
 };
 
 struct Tile
@@ -334,10 +348,6 @@ class Map
         healthS.update(dt);
     }
 
-    void render(const yorcvs::Vec2<float> &render_dimensions, yorcvs::Window<SDL2> &r, float /*elapsed*/)
-    {
-        render_tiles(r, render_dimensions);
-    }
     void clear()
     {
         entities.clear();
@@ -422,7 +432,8 @@ class Map
         const auto &chunks = tileLayer.getChunks();
         for (const auto &chunk : chunks) // parse chunks
         {
-            //std::cout << "Loading chunk: " << chunk.position.x/chunk.size.x << " " << chunk.position.y/chunk.size.y << '\n';
+            // std::cout << "Loading chunk: " << chunk.position.x/chunk.size.x << " " << chunk.position.y/chunk.size.y
+            // << '\n';
             yorcvs::Vec2<float> chunk_position = {static_cast<float>(chunk.position.x),
                                                   static_cast<float>(chunk.position.y)};
             for (auto chunk_y = 0; chunk_y < chunk.size.y; chunk_y++)
@@ -452,7 +463,9 @@ class Map
                         chunk_position * tilesSize +
                         tilesSize * yorcvs::Vec2<float>{static_cast<float>(chunk_x), static_cast<float>(chunk_y)};
                     tile.srcRect = get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID);
-            
+                    tiles_chunks[std::make_tuple<intmax_t, intmax_t>(chunk.position.x / chunk.size.x,
+                                                                     chunk.position.y / chunk.size.y)]
+                        .push_back(tile);
                     tiles.push_back(tile);
                 }
             }
@@ -597,7 +610,7 @@ class Map
         return false;
     }
     bool object_handle_property_object(size_t entity, const tmx::Property &property);
-    bool object_handle_property_string( size_t entity, const tmx::Property &property);
+    bool object_handle_property_string(size_t entity, const tmx::Property &property);
 
     void parse_object_layer(tmx::Map &map, tmx::ObjectGroup &objectLayer)
     {
@@ -659,17 +672,6 @@ class Map
     yorcvs::Vec2<float> get_spawn_position()
     {
         return spawn_coord;
-    }
-    void render_tiles(yorcvs::Window<yorcvs::graphics> &window, const yorcvs::Vec2<float> &render_dimensions)
-    {
-        yorcvs::Vec2<float> rs = window.get_render_scale();
-        window.set_render_scale(window.get_size() / render_dimensions);
-        for (const auto &tile : tiles)
-        {
-            window.draw_sprite(tile.texture_path, {tile.coords.x, tile.coords.y, tilesSize.x, tilesSize.y},
-                               tile.srcRect);
-        }
-        window.set_render_scale(rs);
     }
 
     // NOTE: this can be a free function
@@ -745,6 +747,7 @@ class Map
     std::vector<yorcvs::Entity> entities;
     HealthSystem healthS;
     std::string map_file_path;
+    std::unordered_map<std::tuple<intmax_t, intmax_t>, std::vector<yorcvs::Tile>> tiles_chunks;
 
   private:
     yorcvs::Vec2<float> spawn_coord;
@@ -826,7 +829,7 @@ class Application
     }
     void run()
     {
-        const float elapsed = counter.get_ticks<float, std::chrono::nanoseconds>()/1000000.0f;
+        const float elapsed = counter.get_ticks<float, std::chrono::nanoseconds>() / 1000000.0f;
         counter.stop();
         counter.start();
         lag += elapsed;
@@ -850,7 +853,7 @@ class Application
             lag -= msPF;
         }
         r.clear();
-        map.render(render_dimensions, r, elapsed);
+       
         render_map_tiles(map);
         sprS.renderSprites(render_dimensions);
         dbInfo.render(elapsed, render_dimensions);

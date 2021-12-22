@@ -339,12 +339,13 @@ template <> class Window<yorcvs::SDL2>
                                                  unsigned char g, unsigned char b, unsigned char a, size_t charSize,
                                                  size_t lineLength)
     {
-        Text<yorcvs::SDL2> text;
+        Text<yorcvs::SDL2> text{};
         text.fontPath = path;
         text.message = message;
         text.color = {r, g, b, a};
         text.charSize = static_cast<int>(charSize);
         text.lineLength = static_cast<uint32_t>(lineLength);
+       
         setup_texture(text);
         return text;
     }
