@@ -33,6 +33,11 @@ template <typename T> class Vec2
     constexpr Vec2(Vec2 &&other) noexcept : x(other.x), y(other.y)
     {
     }
+    template<typename otherT>
+    explicit constexpr Vec2(const Vec2<otherT>& other) noexcept : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))
+    {
+        
+    }
     ~Vec2() = default; // trivially destructuted
     constexpr Vec2 &operator=(const Vec2 &other) = default;
     constexpr Vec2 &operator=(Vec2 &&other) noexcept = default;
