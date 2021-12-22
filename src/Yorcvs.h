@@ -31,10 +31,11 @@
 #include <vector>
 namespace json = nlohmann;
 #include "tmxlite/Layer.hpp"
+#include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <tmxlite/Map.hpp>
-#include <cmath>
+
 // TODO: move this to utlities
 namespace std
 {
@@ -110,7 +111,7 @@ class DebugInfo
                                                                  std::to_string(playerHealthC.maxHP));
             }
             // print current chunk
-            //std::cout << appECS->get_component<positionComponent>(ID).position / (32.0f*16.0f) << "\n";
+            // std::cout << appECS->get_component<positionComponent>(ID).position / (32.0f*16.0f) << "\n";
         }
     }
 
@@ -353,7 +354,7 @@ class Map
     {
         entities.clear();
         ysorted_tiles.clear();
-        tiles.clear();
+        tiles_chunks.clear();
     }
     void load_character_from_path(const size_t entity_id, const std::string &path)
     {
@@ -467,7 +468,7 @@ class Map
                     tiles_chunks[std::make_tuple<intmax_t, intmax_t>(chunk.position.x / chunk.size.x,
                                                                      chunk.position.y / chunk.size.y)]
                         .push_back(tile);
-                    tiles.push_back(tile);
+                 
                 }
             }
         }
@@ -744,7 +745,7 @@ class Map
   public:
     CollisionSystem collisionS;
     yorcvs::Vec2<float> tilesSize;
-    std::vector<yorcvs::Tile> tiles;
+  
     std::vector<yorcvs::Entity> entities;
     HealthSystem healthS;
     std::string map_file_path;
@@ -817,20 +818,36 @@ class Application
     {
         map.update(dt, render_dimensions);
     }
+    void render_map_chunk(yorcvs::Map &p_map, const std::tuple<intmax_t, intmax_t> &chunk)
+    {
+        if (p_map.tiles_chunks.find(chunk) != p_map.tiles_chunks.end())
+        {
+            const auto &tiles = p_map.tiles_chunks.at(chunk);
+            for (const auto &tile : tiles)
+            {
+                r.draw_sprite(tile.texture_path, {tile.coords.x, tile.coords.y, p_map.tilesSize.x, p_map.tilesSize.y},
+                              tile.srcRect);
+            }
+        }
+        else
+        {
+            yorcvs::log("CHUNK : " + std::to_string(std::get<0>(chunk)) + " " + std::to_string(std::get<1>(chunk)) +
+                        " does not exist");
+        }
+    }
     void render_map_tiles(yorcvs::Map &p_map)
     {
         yorcvs::Vec2<float> rs = r.get_render_scale();
         r.set_render_scale(r.get_size() / render_dimensions);
-        //get player position
+        // get player position
         const size_t ID = pcS.entityList->entitiesID[0];
         const yorcvs::Vec2<float> player_position = world.get_component<positionComponent>(ID).position;
-        const std::tuple<intmax_t, intmax_t> player_position_chunk = std::tuple<intmax_t, intmax_t>(std::floor(player_position.x/(32.0f*16.0f)),std::floor(player_position.y/(32.0f*16.0f)));
-        //render chunks
-        for (const auto &tile : map.tiles_chunks.at(player_position_chunk))
-        {
-            r.draw_sprite(tile.texture_path, {tile.coords.x, tile.coords.y, p_map.tilesSize.x, p_map.tilesSize.y},
-                          tile.srcRect);
-        }
+        std::tuple<intmax_t, intmax_t> player_position_chunk = std::tuple<intmax_t, intmax_t>(
+            std::floor(player_position.x / (32.0f * 16.0f)), std::floor(player_position.y / (32.0f * 16.0f)));
+        // render chunks
+        render_map_chunk(p_map,player_position_chunk);
+        std::get<1>(player_position_chunk)++;
+        render_map_chunk(p_map,player_position_chunk);
         r.set_render_scale(rs);
     }
     void run()
@@ -859,7 +876,7 @@ class Application
             lag -= msPF;
         }
         r.clear();
-       
+
         render_map_tiles(map);
         sprS.renderSprites(render_dimensions);
         dbInfo.render(elapsed, render_dimensions);
