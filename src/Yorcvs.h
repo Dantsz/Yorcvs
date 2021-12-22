@@ -466,8 +466,7 @@ class Map
                         tilesSize * yorcvs::Vec2<float>{static_cast<float>(chunk_x), static_cast<float>(chunk_y)};
                     tile.srcRect = get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID);
                     tiles_chunks[std::make_tuple<intmax_t, intmax_t>(chunk.position.x / chunk.size.x,
-                                                                     chunk.position.y / chunk.size.y)]
-                        .push_back(tile);
+                                                                     chunk.position.y / chunk.size.y)].push_back(tile);
                  
                 }
             }
@@ -829,11 +828,6 @@ class Application
                               tile.srcRect);
             }
         }
-        else
-        {
-            yorcvs::log("CHUNK : " + std::to_string(std::get<0>(chunk)) + " " + std::to_string(std::get<1>(chunk)) +
-                        " does not exist");
-        }
     }
     void render_map_tiles(yorcvs::Map &p_map)
     {
@@ -842,12 +836,20 @@ class Application
         // get player position
         const size_t ID = pcS.entityList->entitiesID[0];
         const yorcvs::Vec2<float> player_position = world.get_component<positionComponent>(ID).position;
-        std::tuple<intmax_t, intmax_t> player_position_chunk = std::tuple<intmax_t, intmax_t>(
-            std::floor(player_position.x / (32.0f * 16.0f)), std::floor(player_position.y / (32.0f * 16.0f)));
+        const std::tuple<intmax_t, intmax_t> player_position_chunk = std::tuple<intmax_t, intmax_t>(
+        std::floor(player_position.x / (32.0f * 16.0f)), std::floor(player_position.y / (32.0f * 16.0f)));
         // render chunks
-        render_map_chunk(p_map,player_position_chunk);
-        std::get<1>(player_position_chunk)++;
-        render_map_chunk(p_map,player_position_chunk);
+
+        std::tuple<intmax_t, intmax_t> chunk_to_be_rendered{};
+        for(intmax_t x = -1; x <= 1 ; x ++)
+        {
+            for(intmax_t y = -1 ; y <= 1 ; y++)
+            {
+                chunk_to_be_rendered = std::make_tuple<intmax_t, intmax_t>(std::get<0>(player_position_chunk) + x , std::get<1>(player_position_chunk) + y);
+                render_map_chunk(p_map,chunk_to_be_rendered);
+            }
+        }
+
         r.set_render_scale(rs);
     }
     void run()
