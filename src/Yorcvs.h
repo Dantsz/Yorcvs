@@ -841,7 +841,7 @@ class Application
         // render chunks
 
         std::tuple<intmax_t, intmax_t> chunk_to_be_rendered{};
-        for(intmax_t x = -1; x <= 1 ; x ++)
+        for(intmax_t x = render_distance * -1; x <= render_distance ; x ++)
         {
             for(intmax_t y = -1 ; y <= 1 ; y++)
             {
@@ -899,13 +899,14 @@ class Application
     static constexpr std::string_view configname = "yorcvsconfig.json";
     static constexpr yorcvs::Vec2<float> default_render_dimensions = {240.0f, 120.0f};
     static constexpr float msPF = 16.6f;
+    static constexpr intmax_t default_render_distance = 1;
 
     yorcvs::Window<yorcvs::graphics> r;
     yorcvs::Timer counter;
 
     float lag = 0.0f;
     yorcvs::Vec2<float> render_dimensions = default_render_dimensions; // how much to render
-
+    intmax_t render_distance = default_render_distance;
     yorcvs::ECS world{};
     yorcvs::Map map{"assets/map.tmx", &world};
     SpriteSystem sprS{map.ecs, &r};
