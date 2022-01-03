@@ -2,8 +2,7 @@
 #include <chrono>
 #include <iostream>
 #include <string>
-
-
+#include <cmath>
 namespace yorcvs
 {
 namespace MSGSEVERITY
