@@ -843,7 +843,7 @@ class Application
         std::tuple<intmax_t, intmax_t> chunk_to_be_rendered{};
         for(intmax_t x = render_distance * -1; x <= render_distance ; x ++)
         {
-            for(intmax_t y = -1 ; y <= 1 ; y++)
+            for(intmax_t y = -1 * render_distance ; y <= render_distance ; y++)
             {
                 chunk_to_be_rendered = std::make_tuple<intmax_t, intmax_t>(std::get<0>(player_position_chunk) + x , std::get<1>(player_position_chunk) + y);
                 render_map_chunk(p_map,chunk_to_be_rendered);
