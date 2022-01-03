@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <tuple>
 namespace yorcvs
 {
 namespace MSGSEVERITY
