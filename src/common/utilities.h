@@ -140,14 +140,14 @@ namespace spiral
      * @param n the index
      * @return constexpr std::tuple<intmax_t,intmax_t> - first element is x and the second y
      */
-    constexpr std::tuple<intmax_t,intmax_t> wrap(size_t n)
+    inline std::tuple<intmax_t,intmax_t> wrap(const size_t n)
     {
         constexpr intmax_t c[4][6] = { { -1, 0, 0, -1, 1, 0 }, { -1, 1, 1, 1, 0, 0 }, { 1, 0, 1, 1, -1, -1 }, { 1, -1, 0, -1, 0, -1 } };
 
         const intmax_t square = static_cast<intmax_t>(std::floor(std::sqrt(n / 4)));
 
-        const intmax_t index = (n - 4 * square * square) %  (2 * square + 1);
-        const intmax_t side = (n - 4 * square * square) / (2 * square + 1);
+        const intmax_t index = (static_cast<intmax_t>(n) - 4 * square * square) %  (2 * square + 1);
+        const intmax_t side =  (static_cast<intmax_t>(n) - 4 * square * square) / (2 * square + 1);
 
            
         return std::make_tuple<intmax_t,intmax_t>(c[side][0] * square + c[side][1] * index + c[side][2],c[side][3] * square + c[side][4] * index + c[side][5]);   
@@ -159,7 +159,7 @@ namespace spiral
      * @param y y coordinate 
      * @return constexpr size_t the index in the spiral 
      */
-    constexpr  size_t unwrap(intmax_t x, intmax_t y)
+    inline size_t unwrap(const intmax_t x,const intmax_t y)
     {
         const intmax_t ax = std::abs(x);
         const intmax_t ay = std::abs(y);
