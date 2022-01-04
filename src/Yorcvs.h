@@ -146,11 +146,15 @@ class DebugInfo
                 {
                     healthBarRect.y = rect.y - rect.h;
                 }
+
                 healthBarRect.x = rect.x - 16.0f + rect.w / 2;
 
                 healthBarRect.w = health_full_bar_dimension.x;
                 healthBarRect.h = health_full_bar_dimension.y;
-
+                if (appECS->has_components<staminaComponent>(ID))
+                {
+                    healthBarRect.y -= health_full_bar_dimension.y * 2;
+                }
                 window.draw_rect(healthBarRect, health_bar_empty_color[0], health_bar_empty_color[1],
                                  health_bar_empty_color[2], health_bar_empty_color[3]);
                 healthBarRect.w =
@@ -158,6 +162,31 @@ class DebugInfo
                     32.0f;
                 window.draw_rect(healthBarRect, health_bar_full_color[0], health_bar_full_color[1],
                                  health_bar_full_color[2], health_bar_full_color[3]);
+            }
+            if (appECS->has_components<staminaComponent>(ID))
+            {
+                 yorcvs::Rect<float> staminaBarRect{};
+                if (appECS->has_components<spriteComponent>(
+                        ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
+                {
+                    staminaBarRect.y = rect.y - appECS->get_component<spriteComponent>(ID).size.y / 2;
+                }
+                else
+                {
+                    staminaBarRect.y = rect.y - rect.h;
+                }
+
+                staminaBarRect.x = rect.x - 16.0f + rect.w / 2;
+
+                staminaBarRect.w = health_full_bar_dimension.x;
+                staminaBarRect.h = health_full_bar_dimension.y;
+                window.draw_rect(staminaBarRect, stamina_bar_empty_color[0], stamina_bar_empty_color[1],
+                                 stamina_bar_empty_color[2], stamina_bar_empty_color[3]);
+                staminaBarRect.w =
+                    (appECS->get_component<staminaComponent>(ID).stamina / appECS->get_component<staminaComponent>(ID).maxStamina) *
+                    32.0f;
+                window.draw_rect(staminaBarRect, stamina_bar_full_color[0], stamina_bar_full_color[1],
+                                 stamina_bar_full_color[2], stamina_bar_full_color[3]);
             }
         }
         window.set_render_scale(old_rs);
@@ -259,7 +288,11 @@ class DebugInfo
     // rgba
     const std::vector<uint8_t> health_bar_full_color = {255, 0, 0, 255};
     const std::vector<uint8_t> health_bar_empty_color = {100, 0, 0, 255};
+
     const std::vector<uint8_t> hitbox_color = {255, 0, 0, 100};
+
+    const std::vector<uint8_t> stamina_bar_full_color = {0, 255, 0, 100};
+    const std::vector<uint8_t> stamina_bar_empty_color = {0, 100, 0, 100};
 };
 
 struct Tile
@@ -402,6 +435,14 @@ class Map
 
         ecs->get_component<healthComponent>(entity_id) = {entityJSON["HP"], entityJSON["maxHP"], entityJSON["HPregen"],
                                                           false};
+
+        if (!ecs->has_components<staminaComponent>(entity_id))
+        {
+            ecs->add_component<staminaComponent>(entity_id, {});
+        }
+        ecs->get_component<staminaComponent>(entity_id) = {entityJSON["stamina"], entityJSON["maxStamina"],
+                                                           entityJSON["staminaregen"]};
+
         if (!ecs->has_components<animationComponent>(entity_id))
         {
             ecs->add_component<animationComponent>(entity_id, {});
@@ -466,8 +507,8 @@ class Map
                         tilesSize * yorcvs::Vec2<float>{static_cast<float>(chunk_x), static_cast<float>(chunk_y)};
                     tile.srcRect = get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID);
                     tiles_chunks[std::make_tuple<intmax_t, intmax_t>(chunk.position.x / chunk.size.x,
-                                                                     chunk.position.y / chunk.size.y)].push_back(tile);
-                 
+                                                                     chunk.position.y / chunk.size.y)]
+                        .push_back(tile);
                 }
             }
         }
@@ -733,7 +774,8 @@ class Map
         ecs_Initializer(yorcvs::ECS &world)
         {
             // register components
-            world.register_component<hitboxComponent, positionComponent, velocityComponent, healthComponent>();
+            world.register_component<hitboxComponent, positionComponent, velocityComponent, healthComponent,
+                                     staminaComponent>();
             world.register_component<playerMovementControlledComponent, behaviourComponent>();
             world.register_component<spriteComponent, animationComponent>();
         }
@@ -744,7 +786,7 @@ class Map
   public:
     CollisionSystem collisionS;
     yorcvs::Vec2<float> tilesSize;
-  
+
     std::vector<yorcvs::Entity> entities;
     HealthSystem healthS;
     std::string map_file_path;
@@ -837,16 +879,17 @@ class Application
         const size_t ID = pcS.entityList->entitiesID[0];
         const yorcvs::Vec2<float> player_position = world.get_component<positionComponent>(ID).position;
         const std::tuple<intmax_t, intmax_t> player_position_chunk = std::tuple<intmax_t, intmax_t>(
-        std::floor(player_position.x / (32.0f * 16.0f)), std::floor(player_position.y / (32.0f * 16.0f)));
+            std::floor(player_position.x / (32.0f * 16.0f)), std::floor(player_position.y / (32.0f * 16.0f)));
         // render chunks
 
         std::tuple<intmax_t, intmax_t> chunk_to_be_rendered{};
-        for(intmax_t x = render_distance * -1; x <= render_distance ; x ++)
+        for (intmax_t x = render_distance * -1; x <= render_distance; x++)
         {
-            for(intmax_t y = -1 * render_distance ; y <= render_distance ; y++)
+            for (intmax_t y = -1 * render_distance; y <= render_distance; y++)
             {
-                chunk_to_be_rendered = std::make_tuple<intmax_t, intmax_t>(std::get<0>(player_position_chunk) + x , std::get<1>(player_position_chunk) + y);
-                render_map_chunk(p_map,chunk_to_be_rendered);
+                chunk_to_be_rendered = std::make_tuple<intmax_t, intmax_t>(std::get<0>(player_position_chunk) + x,
+                                                                           std::get<1>(player_position_chunk) + y);
+                render_map_chunk(p_map, chunk_to_be_rendered);
             }
         }
 

@@ -34,7 +34,12 @@ struct healthComponent
     float health_regen;//per tick
     bool is_dead;// no health regen if dead
 };
-
+struct staminaComponent
+{
+    float stamina;
+    float maxStamina;
+    float stamina_regen;
+};
 struct spriteComponent
 {
     yorcvs::Vec2<float> offset;//position offset

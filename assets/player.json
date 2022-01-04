@@ -3,7 +3,11 @@
     "HP": 5.0,
     "maxHP" : 5.0,
     "HPregen" : 0.1,
-    
+
+    "stamina" : 1.0,
+    "maxStamina" : 5.0,
+    "staminaregen": 1.0,
+
     "hitbox" :
     {
         "x" : 14,
