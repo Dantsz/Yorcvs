@@ -1,13 +1,17 @@
 {
     "name" : "Danctz",
-    "HP": 5.0,
-    "maxHP" : 5.0,
-    "HPregen" : 0.1,
-
-    "stamina" : 1.0,
-    "maxStamina" : 5.0,
-    "staminaregen": 1.0,
-
+    "health":
+    {
+        "current": 1.0,
+        "max": 5.0,
+        "regen" : 0.1
+    },
+    "stamina" : 
+    {
+        "current" : 1.0,
+        "max": 5.0,
+        "regen" : 1.0
+    },
     "hitbox" :
     {
         "x" : 14,

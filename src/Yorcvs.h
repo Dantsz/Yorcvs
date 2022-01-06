@@ -165,7 +165,7 @@ class DebugInfo
             }
             if (appECS->has_components<staminaComponent>(ID))
             {
-                 yorcvs::Rect<float> staminaBarRect{};
+                yorcvs::Rect<float> staminaBarRect{};
                 if (appECS->has_components<spriteComponent>(
                         ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
                 {
@@ -182,9 +182,9 @@ class DebugInfo
                 staminaBarRect.h = health_full_bar_dimension.y;
                 window.draw_rect(staminaBarRect, stamina_bar_empty_color[0], stamina_bar_empty_color[1],
                                  stamina_bar_empty_color[2], stamina_bar_empty_color[3]);
-                staminaBarRect.w =
-                    (appECS->get_component<staminaComponent>(ID).stamina / appECS->get_component<staminaComponent>(ID).maxStamina) *
-                    32.0f;
+                staminaBarRect.w = (appECS->get_component<staminaComponent>(ID).stamina /
+                                    appECS->get_component<staminaComponent>(ID).maxStamina) *
+                                   32.0f;
                 window.draw_rect(staminaBarRect, stamina_bar_full_color[0], stamina_bar_full_color[1],
                                  stamina_bar_full_color[2], stamina_bar_full_color[3]);
             }
@@ -428,21 +428,26 @@ class Map
             {entityJSON["sprite"]["srcRect"]["x"], entityJSON["sprite"]["srcRect"]["y"],
              entityJSON["sprite"]["srcRect"]["w"], entityJSON["sprite"]["srcRect"]["h"]},
             sprite_path};
-        if (!ecs->has_components<healthComponent>(entity_id))
+
+        if (entityJSON.contains("health"))
         {
-            ecs->add_component<healthComponent>(entity_id, {});
+            if (!ecs->has_components<healthComponent>(entity_id))
+            {
+                ecs->add_component<healthComponent>(entity_id, {});
+            }
+
+            ecs->get_component<healthComponent>(entity_id) = {entityJSON["health"]["current"], entityJSON["health"]["max"],
+                                                              entityJSON["health"]["regen"], false};
         }
-
-        ecs->get_component<healthComponent>(entity_id) = {entityJSON["HP"], entityJSON["maxHP"], entityJSON["HPregen"],
-                                                          false};
-
-        if (!ecs->has_components<staminaComponent>(entity_id))
+        if(entityJSON.contains("stamina"))
         {
-            ecs->add_component<staminaComponent>(entity_id, {});
+            if (!ecs->has_components<staminaComponent>(entity_id))
+            {
+                ecs->add_component<staminaComponent>(entity_id, {});
+            }
+            ecs->get_component<staminaComponent>(entity_id) = {entityJSON["stamina"]["current"], entityJSON["stamina"]["max"],
+                                                               entityJSON["stamina"]["regen"]};
         }
-        ecs->get_component<staminaComponent>(entity_id) = {entityJSON["stamina"], entityJSON["maxStamina"],
-                                                           entityJSON["staminaregen"]};
-
         if (!ecs->has_components<animationComponent>(entity_id))
         {
             ecs->add_component<animationComponent>(entity_id, {});
