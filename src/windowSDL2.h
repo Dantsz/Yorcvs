@@ -198,6 +198,7 @@ template <> class Window<yorcvs::SDL2>
         YORCVS_KEY_E = SDL_SCANCODE_E,
         YORCVS_KEY_I = SDL_SCANCODE_I,
         YORCVS_KEY_K = SDL_SCANCODE_K,
+        YORCVS_KEY_Q = SDL_SCANCODE_Q,
         YORCVS_KEY_LCTRL = SDL_SCANCODE_LCTRL
     };
 

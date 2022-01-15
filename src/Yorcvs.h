@@ -306,7 +306,7 @@ class Map
 {
   public:
     Map(const std::string &path, yorcvs::ECS *world)
-        : ecs(world), init_ecs(*world), collisionS(world), healthS(world), velocityS(world), animS(world)
+        : ecs(world), init_ecs(*world), collisionS(world), healthS(world), sprintS(world), velocityS(world),animS(world)
     {
         load(world, path);
         entities.emplace_back(world);
@@ -381,6 +381,7 @@ class Map
         velocityS.update();
         animS.update(dt);
         healthS.update(dt);
+        sprintS.update(dt);
     }
 
     void clear()
@@ -794,6 +795,8 @@ class Map
 
     std::vector<yorcvs::Entity> entities;
     HealthSystem healthS;
+    StaminaSystem sprintS;
+
     std::string map_file_path;
     std::unordered_map<std::tuple<intmax_t, intmax_t>, std::vector<yorcvs::Tile>> tiles_chunks;
 
@@ -922,7 +925,7 @@ class Application
             update(msPF);
             bhvS.update(msPF);
             pcS.updateAnimations();
-            pcS.updateControls(render_dimensions);
+            pcS.updateControls(render_dimensions,msPF);
             lag -= msPF;
         }
         r.clear();
@@ -960,6 +963,7 @@ class Application
     SpriteSystem sprS{map.ecs, &r};
     PlayerMovementControl pcS{map.ecs, &r};
     BehaviourSystem bhvS{map.ecs};
+  
     // debug stuff
     DebugInfo dbInfo;
 };

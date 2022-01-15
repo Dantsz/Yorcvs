@@ -3,6 +3,7 @@
 #include "components.h"
 #include "windowSDL2.h"
 #include <array>
+#include <cmath>
 #include <random>
 #include <stack>
 class CollisionSystem
@@ -395,7 +396,10 @@ class HealthSystem
 
 class PlayerMovementControl
 {
+ 
   public:
+    static constexpr float sprint_multiplier  = 1.5f;
+    
     PlayerMovementControl(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *parent_window)
         : world(parent), window(parent_window)
     {
@@ -404,18 +408,39 @@ class PlayerMovementControl
                                           positionComponent, spriteComponent>();
     }
 
-    void updateControls(const yorcvs::Vec2<float> &render_size)
+    void updateControls(const yorcvs::Vec2<float> &render_size,float dt)
     {
         w_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_W);
         a_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_A);
         s_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_S);
         d_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_D);
+        q_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_Q);
 
+        cur_time += dt;
         for (const auto &ID : entityList->entitiesID)
         {
             dir = yorcvs::Vec2<float>(static_cast<float>(d_pressed) + static_cast<float>(a_pressed) * -1.0f,
                                       static_cast<float>(w_pressed) * -1.0f + static_cast<float>(s_pressed));
             dir.normalize();
+            if(q_pressed )
+            {
+                if((!world->has_components<staminaComponent>(ID)))
+                {
+                  dir *= PlayerMovementControl::sprint_multiplier;
+                }
+                else if ((world->has_components<staminaComponent>(ID) && world->get_component<staminaComponent>(ID).stamina - world->get_component<staminaComponent>(ID).stamina_regen > 0))
+                {
+                    dir *= PlayerMovementControl::sprint_multiplier;
+                    if(cur_time >= update_time)
+                    {
+                     world->get_component<staminaComponent>(ID).stamina -=  2*world->get_component<staminaComponent>(ID).stamina_regen;
+                    }
+                }
+            }
+            if(cur_time >= update_time)
+            {
+                cur_time = 0.0f;
+            }
             world->get_component<velocityComponent>(ID).vel = dir;
             window->set_drawing_offset(world->get_component<positionComponent>(ID).position + dir -
                                        (render_size - world->get_component<spriteComponent>(ID).size) / 2);
@@ -447,14 +472,20 @@ class PlayerMovementControl
             }
         }
     }
+
+    static constexpr float update_time = 1000.0f;
+    float cur_time;
+
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;
     yorcvs::Window<yorcvs::graphics> *window;
     yorcvs::Vec2<float> dir;
+
     bool w_pressed{};
     bool a_pressed{};
     bool s_pressed{};
     bool d_pressed{};
+    bool q_pressed{};
 };
 
 class SpriteSystem
@@ -547,4 +578,37 @@ class BehaviourSystem
     yorcvs::ECS *world = nullptr;
 
     static constexpr float velocity_trigger_treshold = 0.0f;
+};
+
+class StaminaSystem
+{
+  public:
+    StaminaSystem(yorcvs::ECS *parent) : world(parent)
+    {
+        world->register_system(*this);
+        world->add_criteria_for_iteration<StaminaSystem,staminaComponent>();
+    }
+
+    void update(const float dt)
+    {
+        cur_time += dt;
+        if (cur_time >= update_time)
+        {
+            for(const auto& ID : entityList->entitiesID)
+            {
+                world->get_component<staminaComponent>(ID).stamina += world->get_component<staminaComponent>(ID).stamina_regen;
+                if(world->get_component<staminaComponent>(ID).stamina > world->get_component<staminaComponent>(ID).maxStamina)
+                {
+                    world->get_component<staminaComponent>(ID).stamina = world->get_component<staminaComponent>(ID).maxStamina;
+                }
+            }
+            cur_time = 0.0f;
+        }
+
+    }
+
+    static constexpr float update_time = 1000.0f;
+    float cur_time = 0.0f;
+    yorcvs::ECS *world = nullptr;
+    std::shared_ptr<yorcvs::EntitySystemList> entityList = nullptr;
 };
