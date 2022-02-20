@@ -14,6 +14,7 @@
 #include "common/ecs.h"
 #include "common/types.h"
 #include "common/utilities.h"
+#include "components.h"
 #include "systems.h"
 
 #include "tmxlite/Object.hpp"
@@ -51,249 +52,6 @@ template <> struct hash<std::tuple<intmax_t, intmax_t>>
 } // namespace std
 namespace yorcvs
 {
-class DebugInfo
-{
-  public:
-    DebugInfo() = default;
-
-    DebugInfo(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms,
-              CollisionSystem *cols, HealthSystem *healthS)
-        : parentWindow(parentW), appECS(pECS), playerMoveSystem(pms), colSystem(cols)
-    {
-        attach(parentW, pECS, pms, cols, healthS);
-    }
-    ~DebugInfo() = default;
-    DebugInfo(const DebugInfo &other) = delete;
-    DebugInfo(DebugInfo &&other) = delete;
-    DebugInfo operator=(const DebugInfo &other) = delete;
-    DebugInfo operator=(DebugInfo &&other) = delete;
-
-    void update(const float ft)
-    {
-        if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_R))
-        {
-            reset();
-        }
-        parentWindow->set_text_message(frameTime, "Frame Time : " + std::to_string(ft));
-
-        if (ft > maxFrameTime)
-        {
-            maxFrameTime = ft;
-            parentWindow->set_text_message(maxframeTimeTX, "Max Frame Time: " + std::to_string(maxFrameTime));
-        }
-        parentWindow->set_text_message(ecsEntities,
-                                       "Active Entities : " + std::to_string(appECS->get_active_entities_number()));
-
-        avg_frame_time *= frame_time_samples;
-        frame_time_samples += 1.0f;
-        avg_frame_time += ft;
-        avg_frame_time /= frame_time_samples;
-        parentWindow->set_text_message(avgFrameTime, "Avg frame time :  " + std::to_string(avg_frame_time));
-
-        // set player position text
-        if (playerMoveSystem->entityList->entitiesID.empty())
-        {
-            parentWindow->set_text_message(playerPosition, "NO PLAYER FOUND");
-            parentWindow->set_text_message(playerHealth, "Health: -/-");
-        }
-        else
-        {
-            const size_t ID = playerMoveSystem->entityList->entitiesID[0];
-            parentWindow->set_text_message(
-                playerPosition,
-                "Player position : X = " + std::to_string(appECS->get_component<positionComponent>(ID).position.x) +
-                    " Y = " + std::to_string(appECS->get_component<positionComponent>(ID).position.y));
-
-            if (appECS->has_components<healthComponent>(ID))
-            {
-                healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
-                parentWindow->set_text_message(playerHealth, "Health: " + std::to_string(playerHealthC.HP) + " / " +
-                                                                 std::to_string(playerHealthC.maxHP));
-            }
-            // print current chunk
-            // std::cout << appECS->get_component<positionComponent>(ID).position / (32.0f*16.0f) << "\n";
-        }
-    }
-
-    template <typename render_backend>
-    void render_hitboxes(yorcvs::Window<render_backend> &window, const yorcvs::Vec2<float> &render_dimensions,
-                         const size_t r, const size_t g, const size_t b, const size_t a)
-    {
-        yorcvs::Vec2<float> old_rs = window.get_render_scale();
-        window.set_render_scale(window.get_size() / render_dimensions);
-
-        yorcvs::Rect<float> rect{};
-        for (const auto &ID : colSystem->entityList->entitiesID)
-        {
-            rect.x = appECS->get_component<positionComponent>(ID).position.x +
-                     appECS->get_component<hitboxComponent>(ID).hitbox.x;
-            rect.y = appECS->get_component<positionComponent>(ID).position.y +
-                     appECS->get_component<hitboxComponent>(ID).hitbox.y;
-            rect.w = appECS->get_component<hitboxComponent>(ID).hitbox.w;
-            rect.h = appECS->get_component<hitboxComponent>(ID).hitbox.h;
-            window.draw_rect(rect, r, g, b, a);
-            if (appECS->has_components<healthComponent>(ID))
-            {
-                /// draw health bar
-
-                yorcvs::Rect<float> healthBarRect{};
-                if (appECS->has_components<spriteComponent>(
-                        ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
-                {
-                    healthBarRect.y = rect.y - appECS->get_component<spriteComponent>(ID).size.y / 2;
-                }
-                else
-                {
-                    healthBarRect.y = rect.y - rect.h;
-                }
-
-                healthBarRect.x = rect.x - 16.0f + rect.w / 2;
-
-                healthBarRect.w = health_full_bar_dimension.x;
-                healthBarRect.h = health_full_bar_dimension.y;
-                if (appECS->has_components<staminaComponent>(ID))
-                {
-                    healthBarRect.y -= health_full_bar_dimension.y * 2;
-                }
-                window.draw_rect(healthBarRect, health_bar_empty_color[0], health_bar_empty_color[1],
-                                 health_bar_empty_color[2], health_bar_empty_color[3]);
-                healthBarRect.w =
-                    (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).maxHP) *
-                    32.0f;
-                window.draw_rect(healthBarRect, health_bar_full_color[0], health_bar_full_color[1],
-                                 health_bar_full_color[2], health_bar_full_color[3]);
-            }
-            if (appECS->has_components<staminaComponent>(ID))
-            {
-                yorcvs::Rect<float> staminaBarRect{};
-                if (appECS->has_components<spriteComponent>(
-                        ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
-                {
-                    staminaBarRect.y = rect.y - appECS->get_component<spriteComponent>(ID).size.y / 2;
-                }
-                else
-                {
-                    staminaBarRect.y = rect.y - rect.h;
-                }
-
-                staminaBarRect.x = rect.x - 16.0f + rect.w / 2;
-
-                staminaBarRect.w = health_full_bar_dimension.x;
-                staminaBarRect.h = health_full_bar_dimension.y;
-                window.draw_rect(staminaBarRect, stamina_bar_empty_color[0], stamina_bar_empty_color[1],
-                                 stamina_bar_empty_color[2], stamina_bar_empty_color[3]);
-                staminaBarRect.w = (appECS->get_component<staminaComponent>(ID).stamina /
-                                    appECS->get_component<staminaComponent>(ID).maxStamina) *
-                                   32.0f;
-                window.draw_rect(staminaBarRect, stamina_bar_full_color[0], stamina_bar_full_color[1],
-                                 stamina_bar_full_color[2], stamina_bar_full_color[3]);
-            }
-        }
-        window.set_render_scale(old_rs);
-    }
-
-    void render(const float elapsed, yorcvs::Vec2<float> &render_dimensions)
-    {
-        if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_E))
-        {
-            update(elapsed);
-            render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
-                            hitbox_color[3]);
-            parentWindow->draw_text(frameTime, FTRect);
-            parentWindow->draw_text(maxframeTimeTX, maxFTRect);
-            parentWindow->draw_text(avgFrameTime, avgFrameTimeRect);
-            parentWindow->draw_text(ecsEntities, entitiesRect);
-            parentWindow->draw_text(playerPosition, pPositionRect);
-            parentWindow->draw_text(playerHealth, playerHealthRect);
-        }
-        if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_LCTRL))
-        {
-            if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_I))
-            {
-                render_dimensions -= render_dimensions * zoom_power;
-            }
-
-            if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_K))
-            {
-                render_dimensions += render_dimensions * zoom_power;
-            }
-        }
-    }
-
-    void attach(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::ECS *pECS, PlayerMovementControl *pms,
-                CollisionSystem *cols, HealthSystem *healthS)
-    {
-        parentWindow = parentW;
-        appECS = pECS;
-        playerMoveSystem = pms;
-        colSystem = cols;
-        healthSys = healthS;
-
-        frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", textR, textG, textB, textA,
-                                              text_char_size, text_line_length);
-        maxframeTimeTX = parentWindow->create_text("assets/font.ttf", "Max Frame Time : ", textR, textG, textB, textA,
-                                                   text_char_size, text_line_length);
-        avgFrameTime = parentWindow->create_text("assets/font.ttf", "Avg Frame Time : ", textR, textG, textB, textA,
-                                                 text_char_size, text_line_length);
-        ecsEntities = parentWindow->create_text("assets/font.ttf", "Active Entities : ", textR, textG, textB, textA,
-                                                text_char_size, text_line_length);
-        playerPosition = parentWindow->create_text("assets/font.ttf", "NO PLAYER FOUND ", textR, textG, textB, textA,
-                                                   text_char_size, text_line_length);
-        playerHealth = parentWindow->create_text("assets/font.ttf", "Health : -/- ", textR, textG, textB, textA,
-                                                 text_char_size, text_line_length);
-    }
-
-    void reset()
-    {
-        maxFrameTime = 0.0f;
-    }
-    yorcvs::Window<yorcvs::graphics> *parentWindow{};
-    yorcvs::ECS *appECS{};
-
-    yorcvs::Text<yorcvs::graphics> frameTime;
-    const yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
-
-    float maxFrameTime = 0.0f;
-    yorcvs::Text<yorcvs::graphics> maxframeTimeTX;
-    const yorcvs::Rect<float> maxFTRect = {0, 25, 150, 25};
-
-    yorcvs::Text<yorcvs::graphics> avgFrameTime;
-    const yorcvs::Rect<float> avgFrameTimeRect = {0, 50, 150, 25};
-
-    yorcvs::Text<yorcvs::graphics> ecsEntities;
-    const yorcvs::Rect<float> entitiesRect = {0, 75, 150, 25};
-    float frame_time_samples = 0.0f;
-    float avg_frame_time = 0.0f;
-
-    yorcvs::Text<yorcvs::graphics> playerPosition;
-    const yorcvs::Rect<float> pPositionRect = {0, 100, 300, 25};
-
-    yorcvs::Text<yorcvs::graphics> playerHealth;
-    const yorcvs::Rect<float> playerHealthRect = {0, 125, 200, 25};
-
-    PlayerMovementControl *playerMoveSystem{};
-
-    CollisionSystem *colSystem{};
-    HealthSystem *healthSys{};
-
-    static constexpr size_t textR = 255;
-    static constexpr size_t textG = 255;
-    static constexpr size_t textB = 255;
-    static constexpr size_t textA = 255;
-    static constexpr size_t text_char_size = 100;
-    static constexpr size_t text_line_length = 10000;
-    static constexpr yorcvs::Vec2<float> health_full_bar_dimension = {32.0f, 4.0f};
-    static constexpr float zoom_power = 0.1f;
-
-    // rgba
-    const std::vector<uint8_t> health_bar_full_color = {255, 0, 0, 255};
-    const std::vector<uint8_t> health_bar_empty_color = {100, 0, 0, 255};
-
-    const std::vector<uint8_t> hitbox_color = {255, 0, 0, 100};
-
-    const std::vector<uint8_t> stamina_bar_full_color = {0, 255, 0, 100};
-    const std::vector<uint8_t> stamina_bar_empty_color = {0, 100, 0, 100};
-};
 
 struct Tile
 {
@@ -473,6 +231,67 @@ class Map
     void load_character_from_path(yorcvs::Entity &entity, const std::string &path)
     {
         load_character_from_path(entity.id, path);
+    }
+    std::string save_character_to_path(const size_t entity) const
+    {
+        json::json j;
+        if(ecs->has_components<healthComponent>(entity))
+        {
+            j["health"]["current"] = ecs->get_component<healthComponent>(entity).HP;
+            j["health"]["max"] = ecs->get_component<healthComponent>(entity).maxHP;
+            j["health"]["regen"] = ecs->get_component<healthComponent>(entity).health_regen;
+        }
+        if(ecs->has_components<staminaComponent>(entity))
+        {
+            j["stamina"]["curent"] = ecs->get_component<staminaComponent>(entity).stamina;
+            j["stamina"]["max"] = ecs->get_component<staminaComponent>(entity).maxStamina;
+            j["stamina"]["regen"] = ecs->get_component<staminaComponent>(entity).stamina_regen;
+        }
+        if(ecs->has_components<hitboxComponent>(entity))
+        {
+            j["hitbox"]["x"] = ecs->get_component<hitboxComponent>(entity).hitbox.x;
+            j["hitbox"]["y"] = ecs->get_component<hitboxComponent>(entity).hitbox.y;
+            j["hitbox"]["w"] = ecs->get_component<hitboxComponent>(entity).hitbox.w;
+            j["hitbox"]["h"] = ecs->get_component<hitboxComponent>(entity).hitbox.h;
+        }
+        if(ecs->has_components<spriteComponent>(entity))
+        {
+            
+            j["sprite"]["offset"]["x"] = ecs->get_component<spriteComponent>(entity).offset.x;
+            j["sprite"]["offset"]["y"] = ecs->get_component<spriteComponent>(entity).offset.y;
+
+            j["sprite"]["size"]["x"] = ecs->get_component<spriteComponent>(entity).size.x;
+            j["sprite"]["size"]["y"] = ecs->get_component<spriteComponent>(entity).size.y;
+
+            j["sprite"]["srcRect"]["x"] = ecs->get_component<spriteComponent>(entity).srcRect.x;
+            j["sprite"]["srcRect"]["y"] = ecs->get_component<spriteComponent>(entity).srcRect.y;
+            j["sprite"]["srcRect"]["w"] = ecs->get_component<spriteComponent>(entity).srcRect.w;
+            j["sprite"]["srcRect"]["h"] = ecs->get_component<spriteComponent>(entity).srcRect.h;
+
+            std::filesystem::path sprite_path = ecs->get_component<spriteComponent>(entity).texture_path;
+            j["sprite"]["spritename"] = sprite_path.filename();
+        }
+        if(ecs->has_components<animationComponent>(entity))
+        {
+            for(const auto [name,animation] : ecs->get_component<animationComponent>(entity).animations)
+            {
+               json::json anim;
+               anim["name"] = name;
+               anim["speed"] = animation.speed;
+               for(const auto& frame : animation.frames)
+               {
+                   json::json jframe;
+                   jframe["x"] = frame.srcRect.x;
+                   jframe["y"] = frame.srcRect.y;
+                   jframe["w"] = frame.srcRect.w;
+                   jframe["h"] = frame.srcRect.h;
+                   anim["frames"].push_back(jframe);
+               }
+
+              j["sprite"]["animation"].push_back(anim);
+            }
+        }
+        return j.dump(4);
     }
 
   private:
@@ -807,6 +626,259 @@ class Map
 
     std::vector<yorcvs::Entity> ysorted_tiles;
 };
+class DebugInfo
+{
+  public:
+    DebugInfo() = default;
+
+    DebugInfo(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::Map* map, PlayerMovementControl *pms,
+              CollisionSystem *cols, HealthSystem *healthS)
+        : parentWindow(parentW), appECS(map->ecs), map(map), playerMoveSystem(pms), colSystem(cols)
+    {
+        
+        attach(parentW, map, pms, cols, healthS);
+    }
+    ~DebugInfo() = default;
+    DebugInfo(const DebugInfo &other) = delete;
+    DebugInfo(DebugInfo &&other) = delete;
+    DebugInfo operator=(const DebugInfo &other) = delete;
+    DebugInfo operator=(DebugInfo &&other) = delete;
+
+    void update(const float ft)
+    {
+        if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_R))
+        {
+            reset();
+        }
+        if(parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_C))
+        {
+            std::cout<< "Saving player... \n";
+            std::ofstream out("assets/testPlayer.json");
+            out << map->save_character_to_path(playerMoveSystem->entityList->entitiesID[0]);
+            std::cout<< "Done.\n";
+        }
+        parentWindow->set_text_message(frameTime, "Frame Time : " + std::to_string(ft));
+
+        if (ft > maxFrameTime)
+        {
+            maxFrameTime = ft;
+            parentWindow->set_text_message(maxframeTimeTX, "Max Frame Time: " + std::to_string(maxFrameTime));
+        }
+        parentWindow->set_text_message(ecsEntities,
+                                       "Active Entities : " + std::to_string(appECS->get_active_entities_number()));
+
+        avg_frame_time *= frame_time_samples;
+        frame_time_samples += 1.0f;
+        avg_frame_time += ft;
+        avg_frame_time /= frame_time_samples;
+        parentWindow->set_text_message(avgFrameTime, "Avg frame time :  " + std::to_string(avg_frame_time));
+
+        // set player position text
+        if (playerMoveSystem->entityList->entitiesID.empty())
+        {
+            parentWindow->set_text_message(playerPosition, "NO PLAYER FOUND");
+            parentWindow->set_text_message(playerHealth, "Health: -/-");
+        }
+        else
+        {
+            const size_t ID = playerMoveSystem->entityList->entitiesID[0];
+            parentWindow->set_text_message(
+                playerPosition,
+                "Player position : X = " + std::to_string(appECS->get_component<positionComponent>(ID).position.x) +
+                    " Y = " + std::to_string(appECS->get_component<positionComponent>(ID).position.y));
+
+            if (appECS->has_components<healthComponent>(ID))
+            {
+                healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
+                parentWindow->set_text_message(playerHealth, "Health: " + std::to_string(playerHealthC.HP) + " / " +
+                                                                 std::to_string(playerHealthC.maxHP));
+            }
+            // print current chunk
+            // std::cout << appECS->get_component<positionComponent>(ID).position / (32.0f*16.0f) << "\n";
+        }
+    }
+
+    template <typename render_backend>
+    void render_hitboxes(yorcvs::Window<render_backend> &window, const yorcvs::Vec2<float> &render_dimensions,
+                         const size_t r, const size_t g, const size_t b, const size_t a)
+    {
+        yorcvs::Vec2<float> old_rs = window.get_render_scale();
+        window.set_render_scale(window.get_size() / render_dimensions);
+
+        yorcvs::Rect<float> rect{};
+        for (const auto &ID : colSystem->entityList->entitiesID)
+        {
+            rect.x = appECS->get_component<positionComponent>(ID).position.x +
+                     appECS->get_component<hitboxComponent>(ID).hitbox.x;
+            rect.y = appECS->get_component<positionComponent>(ID).position.y +
+                     appECS->get_component<hitboxComponent>(ID).hitbox.y;
+            rect.w = appECS->get_component<hitboxComponent>(ID).hitbox.w;
+            rect.h = appECS->get_component<hitboxComponent>(ID).hitbox.h;
+            window.draw_rect(rect, r, g, b, a);
+            if (appECS->has_components<healthComponent>(ID))
+            {
+                /// draw health bar
+
+                yorcvs::Rect<float> healthBarRect{};
+                if (appECS->has_components<spriteComponent>(
+                        ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
+                {
+                    healthBarRect.y = rect.y - appECS->get_component<spriteComponent>(ID).size.y / 2;
+                }
+                else
+                {
+                    healthBarRect.y = rect.y - rect.h;
+                }
+
+                healthBarRect.x = rect.x - 16.0f + rect.w / 2;
+
+                healthBarRect.w = health_full_bar_dimension.x;
+                healthBarRect.h = health_full_bar_dimension.y;
+                if (appECS->has_components<staminaComponent>(ID))
+                {
+                    healthBarRect.y -= health_full_bar_dimension.y * 2;
+                }
+                window.draw_rect(healthBarRect, health_bar_empty_color[0], health_bar_empty_color[1],
+                                 health_bar_empty_color[2], health_bar_empty_color[3]);
+                healthBarRect.w =
+                    (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).maxHP) *
+                    32.0f;
+                window.draw_rect(healthBarRect, health_bar_full_color[0], health_bar_full_color[1],
+                                 health_bar_full_color[2], health_bar_full_color[3]);
+            }
+            if (appECS->has_components<staminaComponent>(ID))
+            {
+                yorcvs::Rect<float> staminaBarRect{};
+                if (appECS->has_components<spriteComponent>(
+                        ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
+                {
+                    staminaBarRect.y = rect.y - appECS->get_component<spriteComponent>(ID).size.y / 2;
+                }
+                else
+                {
+                    staminaBarRect.y = rect.y - rect.h;
+                }
+
+                staminaBarRect.x = rect.x - 16.0f + rect.w / 2;
+
+                staminaBarRect.w = health_full_bar_dimension.x;
+                staminaBarRect.h = health_full_bar_dimension.y;
+                window.draw_rect(staminaBarRect, stamina_bar_empty_color[0], stamina_bar_empty_color[1],
+                                 stamina_bar_empty_color[2], stamina_bar_empty_color[3]);
+                staminaBarRect.w = (appECS->get_component<staminaComponent>(ID).stamina /
+                                    appECS->get_component<staminaComponent>(ID).maxStamina) *
+                                   32.0f;
+                window.draw_rect(staminaBarRect, stamina_bar_full_color[0], stamina_bar_full_color[1],
+                                 stamina_bar_full_color[2], stamina_bar_full_color[3]);
+            }
+        }
+        window.set_render_scale(old_rs);
+    }
+
+    void render(const float elapsed, yorcvs::Vec2<float> &render_dimensions)
+    {
+        if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_E))
+        {
+            update(elapsed);
+            render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
+                            hitbox_color[3]);
+            parentWindow->draw_text(frameTime, FTRect);
+            parentWindow->draw_text(maxframeTimeTX, maxFTRect);
+            parentWindow->draw_text(avgFrameTime, avgFrameTimeRect);
+            parentWindow->draw_text(ecsEntities, entitiesRect);
+            parentWindow->draw_text(playerPosition, pPositionRect);
+            parentWindow->draw_text(playerHealth, playerHealthRect);
+        }
+        if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_LCTRL))
+        {
+            if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_I))
+            {
+                render_dimensions -= render_dimensions * zoom_power;
+            }
+
+            if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_K))
+            {
+                render_dimensions += render_dimensions * zoom_power;
+            }
+        }
+ 
+    }
+
+    void attach(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::Map *map, PlayerMovementControl *pms,
+                CollisionSystem *cols, HealthSystem *healthS)
+    {
+        parentWindow = parentW;
+        this->map = map;
+        appECS = map->ecs;
+        playerMoveSystem = pms;
+        colSystem = cols;
+        healthSys = healthS;
+
+        frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", textR, textG, textB, textA,
+                                              text_char_size, text_line_length);
+        maxframeTimeTX = parentWindow->create_text("assets/font.ttf", "Max Frame Time : ", textR, textG, textB, textA,
+                                                   text_char_size, text_line_length);
+        avgFrameTime = parentWindow->create_text("assets/font.ttf", "Avg Frame Time : ", textR, textG, textB, textA,
+                                                 text_char_size, text_line_length);
+        ecsEntities = parentWindow->create_text("assets/font.ttf", "Active Entities : ", textR, textG, textB, textA,
+                                                text_char_size, text_line_length);
+        playerPosition = parentWindow->create_text("assets/font.ttf", "NO PLAYER FOUND ", textR, textG, textB, textA,
+                                                   text_char_size, text_line_length);
+        playerHealth = parentWindow->create_text("assets/font.ttf", "Health : -/- ", textR, textG, textB, textA,
+                                                 text_char_size, text_line_length);
+    }
+
+    void reset()
+    {
+        maxFrameTime = 0.0f;
+    }
+    yorcvs::Window<yorcvs::graphics> *parentWindow{};
+    yorcvs::ECS *appECS{};
+    yorcvs::Map* map{};
+    yorcvs::Text<yorcvs::graphics> frameTime;
+    const yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
+
+    float maxFrameTime = 0.0f;
+    yorcvs::Text<yorcvs::graphics> maxframeTimeTX;
+    const yorcvs::Rect<float> maxFTRect = {0, 25, 150, 25};
+
+    yorcvs::Text<yorcvs::graphics> avgFrameTime;
+    const yorcvs::Rect<float> avgFrameTimeRect = {0, 50, 150, 25};
+
+    yorcvs::Text<yorcvs::graphics> ecsEntities;
+    const yorcvs::Rect<float> entitiesRect = {0, 75, 150, 25};
+    float frame_time_samples = 0.0f;
+    float avg_frame_time = 0.0f;
+
+    yorcvs::Text<yorcvs::graphics> playerPosition;
+    const yorcvs::Rect<float> pPositionRect = {0, 100, 300, 25};
+
+    yorcvs::Text<yorcvs::graphics> playerHealth;
+    const yorcvs::Rect<float> playerHealthRect = {0, 125, 200, 25};
+
+    PlayerMovementControl *playerMoveSystem{};
+
+    CollisionSystem *colSystem{};
+    HealthSystem *healthSys{};
+
+    static constexpr size_t textR = 255;
+    static constexpr size_t textG = 255;
+    static constexpr size_t textB = 255;
+    static constexpr size_t textA = 255;
+    static constexpr size_t text_char_size = 100;
+    static constexpr size_t text_line_length = 10000;
+    static constexpr yorcvs::Vec2<float> health_full_bar_dimension = {32.0f, 4.0f};
+    static constexpr float zoom_power = 0.1f;
+
+    // rgba
+    const std::vector<uint8_t> health_bar_full_color = {255, 0, 0, 255};
+    const std::vector<uint8_t> health_bar_empty_color = {100, 0, 0, 255};
+
+    const std::vector<uint8_t> hitbox_color = {255, 0, 0, 100};
+
+    const std::vector<uint8_t> stamina_bar_full_color = {0, 255, 0, 100};
+    const std::vector<uint8_t> stamina_bar_empty_color = {0, 100, 0, 100};
+};
 
 // TODO: MAKE SOME SYSTEMS MAP-DEPENDENT AND REMOVE THIS
 
@@ -855,7 +927,7 @@ class Application
             yorcvs::log("Config file not found, loading default settings...");
         }
 
-        dbInfo.attach(&r, map.ecs, &pcS, &map.collisionS, &map.healthS);
+        dbInfo.attach(&r, &map, &pcS, &map.collisionS, &map.healthS);
         counter.start();
     }
     Application(const Application &other) = delete;
@@ -917,7 +989,7 @@ class Application
             map.clear();
             map.load(&world, "assets/map.tmx");
             map.entities.emplace_back(&world);
-            map.load_character_from_path(map.entities[map.entities.size() - 1], "assets/player.json");
+            map.load_character_from_path(map.entities[map.entities.size() - 1], "assets/testPlayer.json");
             world.add_component<playerMovementControlledComponent>(map.entities[map.entities.size() - 1].id, {});
         }
         while (lag >= msPF)
