@@ -40,8 +40,6 @@ template <typename interface> class Callback
 {
 };
 
-
-
 /**
  * @brief Windows that can render sprites and text to the screen
  *
@@ -51,19 +49,18 @@ template <typename interface> class Window
 {
   public:
     Window();
-    Window(const Window&)  = delete;
-    Window(Window&& other) = delete;
-    Window& operator=(const Window& other) = delete;
-    Window& operator=(Window&& other) = delete;
+    Window(const Window &) = delete;
+    Window(Window &&other) = delete;
+    Window &operator=(const Window &other) = delete;
+    Window &operator=(Window &&other) = delete;
     ~Window();
 
     void cleanup();
-    
+
     enum Key
     {
-      
+
     };
-  
 
     /**
      * @brief Set the size
@@ -327,7 +324,6 @@ template <typename interface> class Window
     void serialize_settings();
 
     bool isActive();
-
 };
 
 } // namespace yorcvs

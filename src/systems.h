@@ -393,13 +393,11 @@ class HealthSystem
     static constexpr float update_time = 1000.0f; // update once a second
     float cur_time = 0.0f;
 };
-
 class PlayerMovementControl
 {
- 
   public:
-    static constexpr float sprint_multiplier  = 1.5f;
-    
+    static constexpr float sprint_multiplier = 1.5f;
+
     PlayerMovementControl(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *parent_window)
         : world(parent), window(parent_window)
     {
@@ -408,7 +406,7 @@ class PlayerMovementControl
                                           positionComponent, spriteComponent>();
     }
 
-    void updateControls(const yorcvs::Vec2<float> &render_size,float dt)
+    void updateControls(const yorcvs::Vec2<float> &render_size, float dt)
     {
         w_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_W);
         a_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_A);
@@ -422,22 +420,26 @@ class PlayerMovementControl
             dir = yorcvs::Vec2<float>(static_cast<float>(d_pressed) + static_cast<float>(a_pressed) * -1.0f,
                                       static_cast<float>(w_pressed) * -1.0f + static_cast<float>(s_pressed));
             dir.normalize();
-            if(q_pressed )
+            if (q_pressed)
             {
-                if((!world->has_components<staminaComponent>(ID)))
-                {
-                  dir *= PlayerMovementControl::sprint_multiplier;
-                }
-                else if ((world->has_components<staminaComponent>(ID) && world->get_component<staminaComponent>(ID).stamina - world->get_component<staminaComponent>(ID).stamina_regen > 0))
+                if ((!world->has_components<staminaComponent>(ID)))
                 {
                     dir *= PlayerMovementControl::sprint_multiplier;
-                    if(cur_time >= update_time)
+                }
+                else if ((world->has_components<staminaComponent>(ID) &&
+                          world->get_component<staminaComponent>(ID).stamina -
+                                  world->get_component<staminaComponent>(ID).stamina_regen >
+                              0))
+                {
+                    dir *= PlayerMovementControl::sprint_multiplier;
+                    if (cur_time >= update_time)
                     {
-                     world->get_component<staminaComponent>(ID).stamina -=  2*world->get_component<staminaComponent>(ID).stamina_regen;
+                        world->get_component<staminaComponent>(ID).stamina -=
+                            2 * world->get_component<staminaComponent>(ID).stamina_regen;
                     }
                 }
             }
-            if(cur_time >= update_time)
+            if (cur_time >= update_time)
             {
                 cur_time = 0.0f;
             }
@@ -474,7 +476,7 @@ class PlayerMovementControl
     }
 
     static constexpr float update_time = 1000.0f;
-    float cur_time;
+    float cur_time{};
 
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;
@@ -586,7 +588,7 @@ class StaminaSystem
     StaminaSystem(yorcvs::ECS *parent) : world(parent)
     {
         world->register_system(*this);
-        world->add_criteria_for_iteration<StaminaSystem,staminaComponent>();
+        world->add_criteria_for_iteration<StaminaSystem, staminaComponent>();
     }
 
     void update(const float dt)
@@ -594,17 +596,19 @@ class StaminaSystem
         cur_time += dt;
         if (cur_time >= update_time)
         {
-            for(const auto& ID : entityList->entitiesID)
+            for (const auto &ID : entityList->entitiesID)
             {
-                world->get_component<staminaComponent>(ID).stamina += world->get_component<staminaComponent>(ID).stamina_regen;
-                if(world->get_component<staminaComponent>(ID).stamina > world->get_component<staminaComponent>(ID).maxStamina)
+                world->get_component<staminaComponent>(ID).stamina +=
+                    world->get_component<staminaComponent>(ID).stamina_regen;
+                if (world->get_component<staminaComponent>(ID).stamina >
+                    world->get_component<staminaComponent>(ID).maxStamina)
                 {
-                    world->get_component<staminaComponent>(ID).stamina = world->get_component<staminaComponent>(ID).maxStamina;
+                    world->get_component<staminaComponent>(ID).stamina =
+                        world->get_component<staminaComponent>(ID).maxStamina;
                 }
             }
             cur_time = 0.0f;
         }
-
     }
 
     static constexpr float update_time = 1000.0f;

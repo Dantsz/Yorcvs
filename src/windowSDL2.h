@@ -24,14 +24,13 @@
 #include <cmath>
 #include <functional> // callbacks need to be stored in a vector
 
-
 #pragma once
 namespace yorcvs
 {
 class SDL2
 {
   public:
-   const std::string name = "SDL2";
+    const std::string name = "SDL2";
 };
 } // namespace yorcvs
 // SDL TEXTURE MANAGER
@@ -78,8 +77,6 @@ template <> class Callback<yorcvs::SDL2>
   public:
     std::function<void(const SDL_Event &)> func;
 };
-
-
 
 /**
  * @brief interfaceWindow that uses SDL2 api
@@ -131,8 +128,9 @@ template <> class Window<yorcvs::SDL2>
             yorcvs::log("Error initializing SDL2_TTF", yorcvs::MSGSEVERITY::ERROR);
         }
 
-        sdlWindow = SDL_CreateWindow(name.data(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, static_cast<int>(width),
-                                     static_cast<int>(height), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+        sdlWindow =
+            SDL_CreateWindow(name.data(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, static_cast<int>(width),
+                             static_cast<int>(height), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
         if (sdlWindow == nullptr)
         {
             yorcvs::log("Error creating SDL2 window", yorcvs::MSGSEVERITY::ERROR);
@@ -183,14 +181,14 @@ template <> class Window<yorcvs::SDL2>
             },
             [](SDL_Texture *p) { SDL_DestroyTexture(p); });
     }
-    Window<yorcvs::SDL2>(const Window<yorcvs::SDL2>&)  = delete;
-    Window<yorcvs::SDL2>(Window<yorcvs::SDL2>&& ) = delete;
-    Window<yorcvs::SDL2>& operator=(const Window<yorcvs::SDL2>& ) = delete;
-    Window<yorcvs::SDL2>& operator=(Window<yorcvs::SDL2>&&) = delete;
+    Window<yorcvs::SDL2>(const Window<yorcvs::SDL2> &) = delete;
+    Window<yorcvs::SDL2>(Window<yorcvs::SDL2> &&) = delete;
+    Window<yorcvs::SDL2> &operator=(const Window<yorcvs::SDL2> &) = delete;
+    Window<yorcvs::SDL2> &operator=(Window<yorcvs::SDL2> &&) = delete;
 
     enum Key
     {
-        YORCVS_KEY_W  = SDL_SCANCODE_W,
+        YORCVS_KEY_W = SDL_SCANCODE_W,
         YORCVS_KEY_A = SDL_SCANCODE_A,
         YORCVS_KEY_C = SDL_SCANCODE_C,
         YORCVS_KEY_S = SDL_SCANCODE_S,
@@ -347,7 +345,7 @@ template <> class Window<yorcvs::SDL2>
         text.color = {r, g, b, a};
         text.charSize = static_cast<int>(charSize);
         text.lineLength = static_cast<uint32_t>(lineLength);
-       
+
         setup_texture(text);
         return text;
     }
@@ -475,10 +473,8 @@ template <> class Window<yorcvs::SDL2>
     {
         return isActive;
     }
-  
 
   private:
-
     void setup_texture(yorcvs::Text<yorcvs::SDL2> &text)
     {
         TTF_Font *font = TTF_OpenFont(text.fontPath.c_str(), text.charSize);
@@ -492,14 +488,14 @@ template <> class Window<yorcvs::SDL2>
         SDL_FreeSurface(textSurf);
         TTF_CloseFont(font);
     }
- 
+
     SDL_Event event{};
     std::vector<Callback<yorcvs::SDL2>> callbacks{};
     yorcvs::Vec2<float> offset = {0.0f, 0.0f};
     std::unique_ptr<AssetManager<SDL_Texture>> assetm = nullptr;
     SDL_Window *sdlWindow = nullptr;
     SDL_Renderer *renderer = nullptr;
-     bool isActive = true;
+    bool isActive = true;
     unsigned char const *keys{};
     int mouseX{};
     int mouseY{};

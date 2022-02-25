@@ -46,7 +46,7 @@ template <> struct hash<std::tuple<intmax_t, intmax_t>>
     {
         intmax_t x = std::get<0>(p);
         intmax_t y = std::get<1>(p);
-        return hash<intmax_t>{}(x) ^ hash<intmax_t>{}(y);
+        return yorcvs::spiral::unwrap( x,  y);
     }
 };
 } // namespace std
@@ -255,8 +255,7 @@ class Map
             j["hitbox"]["h"] = ecs->get_component<hitboxComponent>(entity).hitbox.h;
         }
         if(ecs->has_components<spriteComponent>(entity))
-        {
-            
+        { 
             j["sprite"]["offset"]["x"] = ecs->get_component<spriteComponent>(entity).offset.x;
             j["sprite"]["offset"]["y"] = ecs->get_component<spriteComponent>(entity).offset.y;
 
@@ -273,7 +272,7 @@ class Map
         }
         if(ecs->has_components<animationComponent>(entity))
         {
-            for(const auto [name,animation] : ecs->get_component<animationComponent>(entity).animations)
+            for(const auto& [name,animation] : ecs->get_component<animationComponent>(entity).animations)
             {
                json::json anim;
                anim["name"] = name;
@@ -634,8 +633,7 @@ class DebugInfo
     DebugInfo(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::Map* map, PlayerMovementControl *pms,
               CollisionSystem *cols, HealthSystem *healthS)
         : parentWindow(parentW), appECS(map->ecs), map(map), playerMoveSystem(pms), colSystem(cols)
-    {
-        
+    { 
         attach(parentW, map, pms, cols, healthS);
     }
     ~DebugInfo() = default;
