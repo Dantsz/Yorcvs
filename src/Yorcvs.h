@@ -1029,7 +1029,7 @@ class Application
     yorcvs::Vec2<float> render_dimensions = default_render_dimensions; // how much to render
     intmax_t render_distance = default_render_distance;
     yorcvs::ECS world{};
-    yorcvs::Map map{"assets/map.tmx", &world};
+    yorcvs::Map map{"assets/testmaps/duck_test.tmx", &world};
     SpriteSystem sprS{map.ecs, &r};
     PlayerMovementControl pcS{map.ecs, &r};
     BehaviourSystem bhvS{map.ecs};

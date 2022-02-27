@@ -148,7 +148,7 @@ class EntityManager
         // if the id appears in the delted entities
         if (std::binary_search(freedIndices.begin(), freedIndices.end(), id))
         {
-            yorcvs::log("Invalid id deletion : id is not a valid entity", yorcvs::MSGSEVERITY::ERROR);
+            yorcvs::log("Invalid id deletion : id " + std::to_string(id) + " is not a valid entity", yorcvs::MSGSEVERITY::ERROR);
         }
 
         entitySignatures[id].clear();
