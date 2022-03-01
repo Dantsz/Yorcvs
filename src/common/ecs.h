@@ -22,6 +22,13 @@
   ECS.
 */
 
+/**
+ * @brief Inserts the element at its ordered position in the sorted array
+ * 
+ * @param vec 
+ * @param item 
+ * @return std::vector<T>::iterator 
+ */
 template <typename T> typename std::vector<T>::iterator insert_sorted(std::vector<T> &vec, T const &item)
 {
     if (std::binary_search(vec.begin(), vec.end(), item))
@@ -148,7 +155,8 @@ class EntityManager
         // if the id appears in the delted entities
         if (std::binary_search(freedIndices.begin(), freedIndices.end(), id))
         {
-            yorcvs::log("Invalid id deletion : id " + std::to_string(id) + " is not a valid entity", yorcvs::MSGSEVERITY::ERROR);
+            yorcvs::log("Invalid id deletion : id " + std::to_string(id) + " is not a valid entity",
+                        yorcvs::MSGSEVERITY::ERROR);
         }
 
         entitySignatures[id].clear();
@@ -421,7 +429,7 @@ class ComponentManager
     }
 
     // gets the id of a component in the manager
-    template <typename T> [[nodiscard]] size_t get_component_ID()
+    template <typename T>[[nodiscard]] size_t get_component_ID()
     {
         const char *component_name = typeid(T).name();
         if (component_type.find(component_name) == component_type.end())
@@ -560,7 +568,7 @@ class SystemManager
     }
 
     // gets signature of a system
-    template <systemT T> [[nodiscard]] std::vector<bool> get_system_signature()
+    template <systemT T>[[nodiscard]] std::vector<bool> get_system_signature()
     {
         const char *systemType = typeid(T).name();
         // if the system is not found  //throw
@@ -776,7 +784,7 @@ class ECS
      * @return true the component is registered
      * @return false it's not registered
      */
-    template <typename T> [[nodiscard]] bool is_component_registered() const
+    template <typename T>[[nodiscard]] bool is_component_registered() const
     {
         const char *component_name = typeid(T).name();
         return (componentmanager->component_type.find(component_name) != componentmanager->component_type.end());
@@ -815,7 +823,7 @@ class ECS
      * @param other Other components
      */
     template <typename T, typename... Other>
-    void add_component(const size_t entityID, T component, const Other &...other)
+    void add_component(const size_t entityID, T component, const Other &... other)
     {
         // add the component
         componentmanager->add_component<T>(entityID, component);
@@ -927,7 +935,7 @@ class ECS
      * @return true It is
      * @return false It is not
      */
-    template <typename T> [[nodiscard]] bool is_system_registered() const
+    template <typename T>[[nodiscard]] bool is_system_registered() const
     {
         const char *systemType = typeid(T).name();
 
@@ -960,7 +968,7 @@ class ECS
      * @tparam T The system
      * @return std::vector<bool> Value of the systems signature
      */
-    template <typename T> [[nodiscard]] std::vector<bool> get_system_signature() const
+    template <typename T>[[nodiscard]] std::vector<bool> get_system_signature() const
     {
         return systemmanager->get_system_signature<T>();
     }
@@ -1045,7 +1053,7 @@ class ECS
      * @return size_t The number of entities with that component
      * NOTE: This is might be costly
      */
-    template <typename T> [[nodiscard]] size_t get_entities_with_component() const
+    template <typename T>[[nodiscard]] size_t get_entities_with_component() const
     {
         // get component index
         const size_t cIndex = componentmanager->get_component_ID<T>();

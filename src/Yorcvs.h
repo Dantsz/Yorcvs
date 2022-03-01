@@ -133,10 +133,10 @@ class Map
         }
     }
 
-    void update(const float dt, const yorcvs::Vec2<float> & /*render_dimensions*/)
+    void update(const float dt)
     {
-        collisionS.update();
-        velocityS.update();
+        collisionS.update(dt);
+        velocityS.update(dt);
         animS.update(dt);
         healthS.update(dt);
         sprintS.update(dt);
@@ -935,7 +935,7 @@ class Application
 
     void update(float dt)
     {
-        map.update(dt, render_dimensions);
+        map.update(dt);
     }
     void render_map_chunk(yorcvs::Map &p_map, const std::tuple<intmax_t, intmax_t> &chunk)
     {
@@ -975,21 +975,14 @@ class Application
     }
     void run()
     {
-        const float elapsed = counter.get_ticks<float, std::chrono::nanoseconds>() / 1000000.0f;
+        const float elapsed = std::min(25.0f,counter.get_ticks<float, std::chrono::nanoseconds>() / 1000000.0f);
         counter.stop();
         counter.start();
+      
         lag += elapsed;
 
         r.handle_events();
-        if (r.is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_W) &&
-            r.is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_S))
-        {
-            map.clear();
-            map.load(&world, "assets/map.tmx");
-            map.entities.emplace_back(&world);
-            map.load_character_from_path(map.entities[map.entities.size() - 1], "assets/testPlayer.json");
-            world.add_component<playerMovementControlledComponent>(map.entities[map.entities.size() - 1].id, {});
-        }
+
         while (lag >= msPF)
         {
             update(msPF);
@@ -1029,7 +1022,7 @@ class Application
     yorcvs::Vec2<float> render_dimensions = default_render_dimensions; // how much to render
     intmax_t render_distance = default_render_distance;
     yorcvs::ECS world{};
-    yorcvs::Map map{"assets/testmaps/duck_test.tmx", &world};
+    yorcvs::Map map{"assets/map.tmx", &world};
     SpriteSystem sprS{map.ecs, &r};
     PlayerMovementControl pcS{map.ecs, &r};
     BehaviourSystem bhvS{map.ecs};
