@@ -74,7 +74,7 @@ class CollisionSystem
 
   private:
     static bool check_collision_left_right(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
-                                           yorcvs::Vec2<float> &rectAvel, float dt)
+                                           yorcvs::Vec2<float> &rectAvel, float  /*dt*/)
     {
         if (rectA.x + rectA.w <= rectB.x && rectA.x + rectA.w + (rectAvel.x) > rectB.x && rectA.y + rectA.h > rectB.y &&
             rectA.y - rectB.y < rectB.h)
@@ -85,7 +85,7 @@ class CollisionSystem
         return false;
     }
     static bool check_collision_right_left(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
-                                           yorcvs::Vec2<float> &rectAvel,float dt)
+                                           yorcvs::Vec2<float> &rectAvel,float  /*dt*/)
     {
         if (rectA.x >= rectB.x + rectB.w && rectA.x + (rectAvel.x) < rectB.x + rectB.w && rectA.y + rectA.h > rectB.y &&
             rectA.y - rectB.y < rectB.h)
@@ -96,7 +96,7 @@ class CollisionSystem
         return false;
     }
     static bool check_collision_up_down(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
-                                        yorcvs::Vec2<float> &rectAvel,float dt)
+                                        yorcvs::Vec2<float> &rectAvel,float  /*dt*/)
     {
         if (rectA.y <= rectB.y && rectA.y + rectA.h + (rectAvel.y) > rectB.y && rectA.x - rectB.x < rectB.w &&
             rectA.x + rectA.w > rectB.x)
@@ -107,7 +107,7 @@ class CollisionSystem
         return false;
     }
     static bool check_collision_down_up(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
-                                        yorcvs::Vec2<float> &rectAvel,float dt)
+                                        yorcvs::Vec2<float> &rectAvel,float  /*dt*/)
     {
         if (rectA.y >= rectB.y + rectB.h && rectA.y + (rectAvel.y) < rectB.y + rectB.h && rectA.x - rectB.x < rectB.w &&
             rectA.x + rectA.w > rectB.x)
@@ -119,7 +119,7 @@ class CollisionSystem
     }
 
     static bool check_collision_corner_top_right(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
-                                                 yorcvs::Vec2<float> &rectAvel,float dt)
+                                                 yorcvs::Vec2<float> &rectAvel,float  /*dt*/)
     {
         if (rectA.x + (rectAvel.x) + rectA.w > rectB.x && rectA.x + (rectAvel.x) + rectA.w < (rectB.x + rectB.w) &&
             rectA.y + rectA.h + (rectAvel.y) > rectB.y && rectA.y + rectA.h + (rectAvel.y) < rectB.y + rectB.h &&
@@ -132,7 +132,7 @@ class CollisionSystem
         return false;
     }
     static bool check_collision_corner_top_left(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
-                                                yorcvs::Vec2<float> &rectAvel,float dt)
+                                                yorcvs::Vec2<float> &rectAvel,float  /*dt*/)
     {
         if (rectA.x + (rectAvel.x) > rectB.x && rectA.x + (rectAvel.x) < rectB.x + rectB.w &&
             rectA.y + rectA.h + (rectAvel.y) > rectB.y && rectA.y + rectA.h + (rectAvel.y) < rectB.y + rectB.h &&
@@ -145,7 +145,7 @@ class CollisionSystem
         return false;
     }
     static bool check_collision_corner_bottom_right(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
-                                                    yorcvs::Vec2<float> &rectAvel,float dt)
+                                                    yorcvs::Vec2<float> &rectAvel,float  /*dt*/)
     {
         if (rectA.x + (rectAvel.x) < rectB.x && rectA.x + (rectAvel.x) + rectA.w > rectB.x &&
             rectA.x + (rectAvel.x) + rectA.w < rectB.x + rectB.w && rectA.x < rectB.x &&
@@ -159,7 +159,7 @@ class CollisionSystem
         return false;
     }
     static bool check_collision_corner_bottom_left(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
-                                                   yorcvs::Vec2<float> &rectAvel,float dt)
+                                                   yorcvs::Vec2<float> &rectAvel,float  /*dt*/)
     {
         if (rectA.x + (rectAvel.x) > rectB.x && rectA.x + (rectAvel.x) < rectB.x + rectB.w &&
             rectA.x + (rectAvel.x) + rectA.w > rectB.x + rectB.w && rectA.y + (rectAvel.y) > rectB.y &&
@@ -370,24 +370,24 @@ class HealthSystem
         cur_time += dt;
         if (cur_time >= update_time)
         {
-            for (size_t ID = 0; ID < entityList->entitiesID.size(); ID++)
+            for (unsigned long ID : entityList->entitiesID)
             {
-                if (world->get_component<healthComponent>(entityList->entitiesID[ID]).HP < 0.0f)
+                if (world->get_component<healthComponent>(ID).HP < 0.0f)
                 {
-                    world->get_component<healthComponent>(entityList->entitiesID[ID]).is_dead = true;
+                    world->get_component<healthComponent>(ID).is_dead = true;
                     continue;
                 }
-                world->get_component<healthComponent>(entityList->entitiesID[ID]).HP +=
-                    world->get_component<healthComponent>(entityList->entitiesID[ID]).health_regen;
-                if (world->get_component<healthComponent>(entityList->entitiesID[ID]).HP >
-                    world->get_component<healthComponent>(entityList->entitiesID[ID]).maxHP)
+                world->get_component<healthComponent>(ID).HP +=
+                    world->get_component<healthComponent>(ID).health_regen;
+                if (world->get_component<healthComponent>(ID).HP >
+                    world->get_component<healthComponent>(ID).maxHP)
                 {
-                    world->get_component<healthComponent>(entityList->entitiesID[ID]).HP =
-                        world->get_component<healthComponent>(entityList->entitiesID[ID]).maxHP;
+                    world->get_component<healthComponent>(ID).HP =
+                        world->get_component<healthComponent>(ID).maxHP;
                 }
-                if (world->get_component<healthComponent>(entityList->entitiesID[ID]).HP < 0.0f)
+                if (world->get_component<healthComponent>(ID).HP < 0.0f)
                 {
-                    world->destroy_entity(entityList->entitiesID[ID]);
+                    world->destroy_entity(ID);
                 }
             }
             cur_time = 0.0f;

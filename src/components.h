@@ -6,6 +6,15 @@ namespace yorcvs{
 using graphics = yorcvs::SDL2;
 }
 /**
+ * @brief Defines some identification information for entity
+ * 
+ */
+struct identificationComponent
+{
+    std::string name;
+};
+
+/**
  * @brief Represent a hitbox (x and y represents offset from positionComponent)
  * 
  */
@@ -63,7 +72,6 @@ struct animationComponent
     std::string cur_animation; // non-owning pointer to an animation in the map
     size_t cur_frame;
     float cur_elapsed;
-   
 };
 
 struct behaviourComponent

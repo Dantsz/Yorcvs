@@ -156,6 +156,12 @@ class Map
         std::ifstream entityIN(path);
         std::string entityDATA{(std::istreambuf_iterator<char>(entityIN)), (std::istreambuf_iterator<char>())};
         auto entityJSON = json::json::parse(entityDATA);
+        if(!ecs->has_components<identificationComponent>(entity_id))
+        {
+            ecs->add_component<identificationComponent>(entity_id, {});
+        }
+        ecs->get_component<identificationComponent>(entity_id).name = entityJSON["name"];
+
 
         const std::string sprite_path = directory_path + std::string(entityJSON["sprite"]["spriteName"]);
         if (!ecs->has_components<hitboxComponent>(entity_id))
@@ -235,6 +241,10 @@ class Map
     std::string save_character_to_path(const size_t entity) const
     {
         json::json j;
+        if(ecs->has_components<identificationComponent>(entity))
+        {
+            j["name"] = ecs->get_component<identificationComponent>(entity).name;
+        }
         if(ecs->has_components<healthComponent>(entity))
         {
             j["health"]["current"] = ecs->get_component<healthComponent>(entity).HP;
@@ -975,14 +985,14 @@ class Application
     }
     void run()
     {
-        const float elapsed = std::min(25.0f,counter.get_ticks<float, std::chrono::nanoseconds>() / 1000000.0f);
+        const float elapsed = std::min(100.0f,counter.get_ticks<float, std::chrono::nanoseconds>() / 1000000.0f);
         counter.stop();
         counter.start();
       
         lag += elapsed;
 
         r.handle_events();
-
+        update_timer.start();
         while (lag >= msPF)
         {
             update(msPF);
@@ -990,13 +1000,22 @@ class Application
             pcS.updateAnimations();
             pcS.updateControls(render_dimensions,msPF);
             lag -= msPF;
-        }
-        r.clear();
 
+            updates++;
+        }
+        update_time = update_timer.get_ticks();
+        render_timer.start();
+
+        r.clear();
         render_map_tiles(map);
         sprS.renderSprites(render_dimensions);
         dbInfo.render(elapsed, render_dimensions);
         r.present();
+
+        frames++;
+        render_time = render_timer.get_ticks<float>();
+        yorcvs::log("Frame: " + std::to_string(frames) + " updates : " + std::to_string(updates) + " update_time: "
+                    + std::to_string(update_time) + " render_time: " + std::to_string(render_time));
     }
 
     [[nodiscard]] bool is_active() const
@@ -1012,7 +1031,7 @@ class Application
   private:
     static constexpr std::string_view configname = "yorcvsconfig.json";
     static constexpr yorcvs::Vec2<float> default_render_dimensions = {240.0f, 120.0f};
-    static constexpr float msPF = 16.6f;
+    static constexpr float msPF = 41.6f;
     static constexpr intmax_t default_render_distance = 1;
 
     yorcvs::Window<yorcvs::graphics> r;
@@ -1023,11 +1042,24 @@ class Application
     intmax_t render_distance = default_render_distance;
     yorcvs::ECS world{};
     yorcvs::Map map{"assets/testmaps/duck_test.tmx", &world};
+    //yorcvs::Map map{"assets/map.tmx", &world};
     SpriteSystem sprS{map.ecs, &r};
     PlayerMovementControl pcS{map.ecs, &r};
     BehaviourSystem bhvS{map.ecs};
   
     // debug stuff
     DebugInfo dbInfo;
+    yorcvs::Timer render_timer{};
+    float render_time = 0.0f;
+
+    yorcvs::Timer update_timer{};
+    float update_time = 0.0f;
+
+
+
+    size_t frames = 0;
+    size_t updates = 0;
+    
+    
 };
 } // namespace yorcvs
