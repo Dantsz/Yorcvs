@@ -1,6 +1,6 @@
 #pragma once
-#include "common/types.h"
-#include "windowSDL2.h"
+#include "../common/types.h"
+#include "../windowSDL2.h"
 #include <unordered_map>
 namespace yorcvs{
 using graphics = yorcvs::SDL2;

@@ -12,15 +12,15 @@ message(STATUS ${CMAKE_SYSTEM_NAME})
 
 set(YorcvsALLFILES  "src/Yorcvs.cpp"
                     "src/Yorcvs.h"
-                    "src/systems.h"
+                    
+                    "src/game/components.h"
+                    "src/game/systems.h"
                   
                     "src/common/assetmanager.h"
 
                     "src/common/types.h"
                     "src/common/utilities.h"
                     "src/common/ecs.h"
-                    
-                    "src/components.h"
 
                     "src/common/window.h"
                     "src/windowSDL2.h"

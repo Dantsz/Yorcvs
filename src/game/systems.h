@@ -1,7 +1,7 @@
 #pragma once
-#include "common/ecs.h"
+#include "../common/ecs.h"
 #include "components.h"
-#include "windowSDL2.h"
+#include "../windowSDL2.h"
 #include <array>
 #include <cmath>
 #include <random>

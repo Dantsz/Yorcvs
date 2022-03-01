@@ -14,8 +14,8 @@
 #include "common/ecs.h"
 #include "common/types.h"
 #include "common/utilities.h"
-#include "components.h"
-#include "systems.h"
+#include "game/components.h"
+#include "game/systems.h"
 
 #include "tmxlite/Object.hpp"
 #include "tmxlite/ObjectGroup.hpp"
