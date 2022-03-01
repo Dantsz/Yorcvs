@@ -62,7 +62,7 @@ int main(int argc, char **argv)
         timy.start();
         while(world.get_active_entities_number() != numberOfEntities - 1)
         {
-            map.update(HealthSystem::update_time, {});
+            map.update(HealthSystem::update_time);
             timy.stop();    
             update_time += timy.get_ticks();
             samples += 1.0f;
