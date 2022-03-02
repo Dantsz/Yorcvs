@@ -1,6 +1,6 @@
 {
     "health": {
-        "current": 1.100000023841858,
+        "current": 1.0,
         "max": 5.0,
         "regen": 0.10000000149011612
     },
@@ -10,9 +10,11 @@
         "x": 14.0,
         "y": 6.0
     },
-    "name": "Danctz",
+    "name": {
+        "name": "Danctz"
+    },
     "sprite": {
-        "animation": [
+        "animations": [
             {
                 "frames": [
                     {
@@ -154,7 +156,7 @@
             "x": 32.0,
             "y": 32.0
         },
-        "spritename": "test_player_sheet.png",
+        "spriteName": "test_player_sheet.png",
         "srcRect": {
             "h": 64,
             "w": 64,
@@ -163,7 +165,7 @@
         }
     },
     "stamina": {
-        "curent": 1.100000023841858,
+        "current": 1.0,
         "max": 5.0,
         "regen": 0.10000000149011612
     }

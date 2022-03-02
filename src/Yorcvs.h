@@ -14,6 +14,7 @@
 #include "common/ecs.h"
 #include "common/types.h"
 #include "common/utilities.h"
+#include "game/componentSerialization.h"
 #include "game/components.h"
 #include "game/systems.h"
 
@@ -46,7 +47,7 @@ template <> struct hash<std::tuple<intmax_t, intmax_t>>
     {
         intmax_t x = std::get<0>(p);
         intmax_t y = std::get<1>(p);
-        return yorcvs::spiral::unwrap( x,  y);
+        return yorcvs::spiral::unwrap(x, y);
     }
 };
 } // namespace std
@@ -64,7 +65,8 @@ class Map
 {
   public:
     Map(const std::string &path, yorcvs::ECS *world)
-        : ecs(world), init_ecs(*world), collisionS(world), healthS(world), sprintS(world), velocityS(world),animS(world)
+        : ecs(world), init_ecs(*world), collisionS(world), healthS(world), sprintS(world), velocityS(world),
+          animS(world)
     {
         load(world, path);
         entities.emplace_back(world);
@@ -156,43 +158,38 @@ class Map
         std::ifstream entityIN(path);
         std::string entityDATA{(std::istreambuf_iterator<char>(entityIN)), (std::istreambuf_iterator<char>())};
         auto entityJSON = json::json::parse(entityDATA);
-        if(!ecs->has_components<identificationComponent>(entity_id))
+        if (entityJSON.contains("identification"))
         {
-            ecs->add_component<identificationComponent>(entity_id, {});
+            if (!ecs->has_components<identificationComponent>(entity_id))
+            {
+                ecs->add_component<identificationComponent>(entity_id, {});
+            }
+
+            yorcvs::components::deserialize(ecs->get_component<identificationComponent>(entity_id),
+                                            entityJSON["identification"]);
         }
-        ecs->get_component<identificationComponent>(entity_id).name = entityJSON["name"];
 
-
-        const std::string sprite_path = directory_path + std::string(entityJSON["sprite"]["spriteName"]);
-        if (!ecs->has_components<hitboxComponent>(entity_id))
+        if (entityJSON.contains("hitbox"))
         {
-            ecs->add_component<hitboxComponent>(entity_id, {});
+            if (!ecs->has_components<hitboxComponent>(entity_id))
+            {
+                ecs->add_component<hitboxComponent>(entity_id, {});
+                yorcvs::components::deserialize(ecs->get_component<hitboxComponent>(entity_id), entityJSON["hitbox"]);
+            }
         }
-        ecs->get_component<hitboxComponent>(entity_id) = {{entityJSON["hitbox"]["x"], entityJSON["hitbox"]["y"],
-                                                           entityJSON["hitbox"]["w"], entityJSON["hitbox"]["h"]}};
+
+        // NOT IMPLEMENTED SERIALIZATION Yet
         if (!ecs->has_components<positionComponent>(entity_id))
         {
             ecs->add_component<positionComponent>(entity_id, {});
             // TODO: move this elsewhere
             ecs->get_component<positionComponent>(entity_id) = {get_spawn_position()};
         }
-
         if (!ecs->has_components<velocityComponent>(entity_id))
         {
             ecs->add_component<velocityComponent>(entity_id, {});
         }
         ecs->get_component<velocityComponent>(entity_id) = {{0.0f, 0.0f}, {false, false}};
-
-        if (!ecs->has_components<spriteComponent>(entity_id))
-        {
-            ecs->add_component<spriteComponent>(entity_id, {});
-        }
-        ecs->get_component<spriteComponent>(entity_id) = {
-            {entityJSON["sprite"]["offset"]["x"], entityJSON["sprite"]["offset"]["y"]},
-            {entityJSON["sprite"]["size"]["x"], entityJSON["sprite"]["size"]["y"]},
-            {entityJSON["sprite"]["srcRect"]["x"], entityJSON["sprite"]["srcRect"]["y"],
-             entityJSON["sprite"]["srcRect"]["w"], entityJSON["sprite"]["srcRect"]["h"]},
-            sprite_path};
 
         if (entityJSON.contains("health"))
         {
@@ -201,38 +198,36 @@ class Map
                 ecs->add_component<healthComponent>(entity_id, {});
             }
 
-            ecs->get_component<healthComponent>(entity_id) = {entityJSON["health"]["current"], entityJSON["health"]["max"],
-                                                              entityJSON["health"]["regen"], false};
+            yorcvs::components::deserialize(ecs->get_component<healthComponent>(entity_id), entityJSON["health"]);
         }
-        if(entityJSON.contains("stamina"))
+        if (entityJSON.contains("stamina"))
         {
             if (!ecs->has_components<staminaComponent>(entity_id))
             {
                 ecs->add_component<staminaComponent>(entity_id, {});
             }
-            ecs->get_component<staminaComponent>(entity_id) = {entityJSON["stamina"]["current"], entityJSON["stamina"]["max"],
-                                                               entityJSON["stamina"]["regen"]};
+            yorcvs::components::deserialize(ecs->get_component<staminaComponent>(entity_id), entityJSON["stamina"]);
         }
-        if (!ecs->has_components<animationComponent>(entity_id))
+        if (entityJSON.contains("sprite"))
         {
-            ecs->add_component<animationComponent>(entity_id, {});
-        }
-        ecs->get_component<animationComponent>(entity_id).animations.clear();
-        ecs->get_component<animationComponent>(entity_id) = {};
-        for (const auto &animation : entityJSON["sprite"]["animations"])
-        {
-            bool animation_succes = animS.add_animation(entity_id, animation["name"], animation["speed"]);
-            if (animation_succes)
+            if (!ecs->has_components<spriteComponent>(entity_id))
             {
-                for (const auto &frame : animation["frames"])
+                ecs->add_component<spriteComponent>(entity_id, {});
+            }
+            const std::string sprite_path = directory_path + std::string(entityJSON["sprite"]["spriteName"]);
+            entityJSON["sprite"]["spriteName"] = sprite_path;
+            yorcvs::components::deserialize(ecs->get_component<spriteComponent>(entity_id), entityJSON["sprite"]);
+            if(entityJSON["sprite"].contains("animations"))
+            {
+                if (!ecs->has_components<animationComponent>(entity_id))
                 {
-                    animS.add_animation_frame(entity_id, animation["name"],
-                                              {frame["x"], frame["y"], frame["w"], frame["h"]});
+                    ecs->add_component<animationComponent>(entity_id, {});
                 }
+                yorcvs::components::deserialize(ecs->get_component<animationComponent>(entity_id),entityJSON["sprite"]["animations"]);
+
+                AnimationSystem::set_animation(ecs, entity_id, "idleL");
             }
         }
-
-        AnimationSystem::set_animation(ecs, entity_id, "idleL");
     }
     void load_character_from_path(yorcvs::Entity &entity, const std::string &path)
     {
@@ -241,64 +236,27 @@ class Map
     std::string save_character_to_path(const size_t entity) const
     {
         json::json j;
-        if(ecs->has_components<identificationComponent>(entity))
+        if (ecs->has_components<identificationComponent>(entity))
         {
-            j["name"] = ecs->get_component<identificationComponent>(entity).name;
+            j["name"] = yorcvs::components::serialize(ecs->get_component<identificationComponent>(entity));
         }
-        if(ecs->has_components<healthComponent>(entity))
+        if (ecs->has_components<healthComponent>(entity))
         {
-            j["health"]["current"] = ecs->get_component<healthComponent>(entity).HP;
-            j["health"]["max"] = ecs->get_component<healthComponent>(entity).maxHP;
-            j["health"]["regen"] = ecs->get_component<healthComponent>(entity).health_regen;
+            j["health"] = yorcvs::components::serialize(ecs->get_component<healthComponent>(entity));
         }
-        if(ecs->has_components<staminaComponent>(entity))
+        if (ecs->has_components<staminaComponent>(entity))
         {
-            j["stamina"]["curent"] = ecs->get_component<staminaComponent>(entity).stamina;
-            j["stamina"]["max"] = ecs->get_component<staminaComponent>(entity).maxStamina;
-            j["stamina"]["regen"] = ecs->get_component<staminaComponent>(entity).stamina_regen;
+            j["stamina"] = yorcvs::components::serialize(ecs->get_component<staminaComponent>(entity));
         }
-        if(ecs->has_components<hitboxComponent>(entity))
+        if (ecs->has_components<hitboxComponent>(entity))
         {
-            j["hitbox"]["x"] = ecs->get_component<hitboxComponent>(entity).hitbox.x;
-            j["hitbox"]["y"] = ecs->get_component<hitboxComponent>(entity).hitbox.y;
-            j["hitbox"]["w"] = ecs->get_component<hitboxComponent>(entity).hitbox.w;
-            j["hitbox"]["h"] = ecs->get_component<hitboxComponent>(entity).hitbox.h;
+            j["hitbox"] = yorcvs::components::serialize(ecs->get_component<hitboxComponent>(entity));
         }
-        if(ecs->has_components<spriteComponent>(entity))
-        { 
-            j["sprite"]["offset"]["x"] = ecs->get_component<spriteComponent>(entity).offset.x;
-            j["sprite"]["offset"]["y"] = ecs->get_component<spriteComponent>(entity).offset.y;
+        if (ecs->has_components<spriteComponent>(entity))
+        {
+            j["sprite"] = yorcvs::components::serialize(ecs->get_component<spriteComponent>(entity));
+            j["sprite"]["animations"] = yorcvs::components::serialize(ecs->get_component<animationComponent>(entity));
 
-            j["sprite"]["size"]["x"] = ecs->get_component<spriteComponent>(entity).size.x;
-            j["sprite"]["size"]["y"] = ecs->get_component<spriteComponent>(entity).size.y;
-
-            j["sprite"]["srcRect"]["x"] = ecs->get_component<spriteComponent>(entity).srcRect.x;
-            j["sprite"]["srcRect"]["y"] = ecs->get_component<spriteComponent>(entity).srcRect.y;
-            j["sprite"]["srcRect"]["w"] = ecs->get_component<spriteComponent>(entity).srcRect.w;
-            j["sprite"]["srcRect"]["h"] = ecs->get_component<spriteComponent>(entity).srcRect.h;
-
-            std::filesystem::path sprite_path = ecs->get_component<spriteComponent>(entity).texture_path;
-            j["sprite"]["spritename"] = sprite_path.filename();
-        }
-        if(ecs->has_components<animationComponent>(entity))
-        {
-            for(const auto& [name,animation] : ecs->get_component<animationComponent>(entity).animations)
-            {
-               json::json anim;
-               anim["name"] = name;
-               anim["speed"] = animation.speed;
-               for(const auto& frame : animation.frames)
-               {
-                   json::json jframe;
-                   jframe["x"] = frame.srcRect.x;
-                   jframe["y"] = frame.srcRect.y;
-                   jframe["w"] = frame.srcRect.w;
-                   jframe["h"] = frame.srcRect.h;
-                   anim["frames"].push_back(jframe);
-               }
-
-              j["sprite"]["animation"].push_back(anim);
-            }
         }
         return j.dump(4);
     }
@@ -640,10 +598,10 @@ class DebugInfo
   public:
     DebugInfo() = default;
 
-    DebugInfo(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::Map* map, PlayerMovementControl *pms,
+    DebugInfo(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::Map *map, PlayerMovementControl *pms,
               CollisionSystem *cols, HealthSystem *healthS)
         : parentWindow(parentW), appECS(map->ecs), map(map), playerMoveSystem(pms), colSystem(cols)
-    { 
+    {
         attach(parentW, map, pms, cols, healthS);
     }
     ~DebugInfo() = default;
@@ -658,12 +616,12 @@ class DebugInfo
         {
             reset();
         }
-        if(parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_C))
+        if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_C))
         {
-            std::cout<< "Saving player... \n";
+            std::cout << "Saving player... \n";
             std::ofstream out("assets/testPlayer.json");
             out << map->save_character_to_path(playerMoveSystem->entityList->entitiesID[0]);
-            std::cout<< "Done.\n";
+            std::cout << "Done.\n";
         }
         parentWindow->set_text_message(frameTime, "Frame Time : " + std::to_string(ft));
 
@@ -809,7 +767,6 @@ class DebugInfo
                 render_dimensions += render_dimensions * zoom_power;
             }
         }
- 
     }
 
     void attach(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::Map *map, PlayerMovementControl *pms,
@@ -842,7 +799,7 @@ class DebugInfo
     }
     yorcvs::Window<yorcvs::graphics> *parentWindow{};
     yorcvs::ECS *appECS{};
-    yorcvs::Map* map{};
+    yorcvs::Map *map{};
     yorcvs::Text<yorcvs::graphics> frameTime;
     const yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
 
@@ -985,10 +942,10 @@ class Application
     }
     void run()
     {
-        const float elapsed = std::min(100.0f,counter.get_ticks<float, std::chrono::nanoseconds>() / 1000000.0f);
+        const float elapsed = std::min(100.0f, counter.get_ticks<float, std::chrono::nanoseconds>() / 1000000.0f);
         counter.stop();
         counter.start();
-      
+
         lag += elapsed;
 
         r.handle_events();
@@ -998,7 +955,7 @@ class Application
             update(msPF);
             bhvS.update(msPF);
             pcS.updateAnimations();
-            pcS.updateControls(render_dimensions,msPF);
+            pcS.updateControls(render_dimensions, msPF);
             lag -= msPF;
 
             updates++;
@@ -1014,8 +971,8 @@ class Application
 
         frames++;
         render_time = render_timer.get_ticks<float>();
-        yorcvs::log("Frame: " + std::to_string(frames) + " updates : " + std::to_string(updates) + " update_time: "
-                    + std::to_string(update_time) + " render_time: " + std::to_string(render_time));
+        yorcvs::log("Frame: " + std::to_string(frames) + " updates : " + std::to_string(updates) +
+                    " update_time: " + std::to_string(update_time) + " render_time: " + std::to_string(render_time));
     }
 
     [[nodiscard]] bool is_active() const
@@ -1041,12 +998,12 @@ class Application
     yorcvs::Vec2<float> render_dimensions = default_render_dimensions; // how much to render
     intmax_t render_distance = default_render_distance;
     yorcvs::ECS world{};
-    yorcvs::Map map{"assets/testmaps/duck_test.tmx", &world};
-    //yorcvs::Map map{"assets/map.tmx", &world};
+    // yorcvs::Map map{"assets/testmaps/duck_test.tmx", &world};
+    yorcvs::Map map{"assets/map.tmx", &world};
     SpriteSystem sprS{map.ecs, &r};
     PlayerMovementControl pcS{map.ecs, &r};
     BehaviourSystem bhvS{map.ecs};
-  
+
     // debug stuff
     DebugInfo dbInfo;
     yorcvs::Timer render_timer{};
@@ -1055,11 +1012,7 @@ class Application
     yorcvs::Timer update_timer{};
     float update_time = 0.0f;
 
-
-
     size_t frames = 0;
     size_t updates = 0;
-    
-    
 };
 } // namespace yorcvs

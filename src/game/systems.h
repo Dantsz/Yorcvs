@@ -216,6 +216,27 @@ class AnimationSystem
         world->register_system<AnimationSystem>(*this);
         world->add_criteria_for_iteration<AnimationSystem, animationComponent, spriteComponent>();
     }
+    [[nodiscard]]static bool add_animation_to_component(animationComponent& comp , const std::string& name, const float speed )
+    {
+        const auto &anim = comp.animations.find(name);
+        if (anim == comp.animations.end())
+        {
+            comp.animations.insert({name, {{}, speed}});
+            return true;
+        }
+
+        return false;
+    }
+    [[nodiscard]] static bool add_frame_to_animation(animationComponent& comp,  const std::string &animation_name,const yorcvs::Rect<size_t> &frame)
+    {
+        const auto &anim = comp.animations.find(animation_name);
+        if (anim == comp.animations.end())
+        {
+            return false;
+        }
+        anim->second.frames.push_back({frame});
+        return true;
+    }
     /**
      * @brief Adds an animation with that name to the component
      *
@@ -230,16 +251,12 @@ class AnimationSystem
             yorcvs::log("Entity doesn't have  an animation component", yorcvs::MSGSEVERITY::WARNING);
             return false;
         }
-        std::unordered_map<std::string, animationComponent::Animation> *entity_anims =
-            &world->get_component<animationComponent>(entityID).animations;
-        const auto &anim = entity_anims->find(name);
-        if (anim == entity_anims->end())
+        if(!add_animation_to_component(world->get_component<animationComponent>(entityID),name,speed))
         {
-            entity_anims->insert({name, {{}, speed}});
-            return true;
-        }
-        yorcvs::log("Animation " + name + " already exists", yorcvs::MSGSEVERITY::WARNING);
-        return false;
+          yorcvs::log("Animation " + name + " already exists", yorcvs::MSGSEVERITY::WARNING);
+          return false;
+        }  
+        return true;
     }
 
     /**
@@ -259,17 +276,14 @@ class AnimationSystem
             yorcvs::log("Entity doesn't have  an animation component", yorcvs::MSGSEVERITY::WARNING);
             return;
         }
-        std::unordered_map<std::string, animationComponent::Animation> *entity_anims =
-            &world->get_component<animationComponent>(entityID).animations;
-        const auto &anim = entity_anims->find(animation_name);
-        if (anim == entity_anims->end())
+        if(!add_frame_to_animation(world->get_component<animationComponent>(entityID),animation_name,frame))
         {
-            yorcvs::log("Entity " + std::to_string(entityID) + " doesn't have an animation with the name " +
+              yorcvs::log("Entity " + std::to_string(entityID) + " doesn't have an animation with the name " +
                             animation_name,
                         yorcvs::MSGSEVERITY::ERROR);
             return;
         }
-        anim->second.frames.push_back({frame});
+     
     }
 
     void remove_animation(yorcvs::Entity, size_t index);

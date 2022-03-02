@@ -1,5 +1,8 @@
 {
-    "name" : "Danctz",
+    "identification":
+    {
+      "name" : "Danctz"
+    },
     "health":
     {
         "current": 1.0,
