@@ -3,7 +3,7 @@
 #include <cassert>
 #include <iostream>
 
-int main()
+int main(int argc, char **argv)
 {
 
     yorcvs::ECS world{};

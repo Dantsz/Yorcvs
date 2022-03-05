@@ -58,9 +58,11 @@ add_executable(WorldTestnegativeHealthRegen WorldTestnegativeHealthRegen.cpp)
 add_test(NAME WorldTestnegativeHealthRegen COMMAND WorldTestnegativeHealthRegen WORKING_DIRECTORY ${test_dir})
 target_link_libraries(WorldTestnegativeHealthRegen PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main  SDL2::SDL2_image SDL2::SDL2_ttf)
 
+add_executable(GameTestLoadingEntity GameTestLoadingEntity.cpp)
+add_test(NAME GameTestLoadingEntity COMMAND GameTestLoadingEntity WORKING_DIRECTORY ${test_dir})
+target_link_libraries(GameTestLoadingEntity PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf)
+
+
 add_executable(UtilitiesTestSpiral UtilitiesTestSpiral.cpp)
 add_test(UtilitiesTestSpiral UtilitiesTestSpiral)
 
-add_executable(GameTestLoadingEntity GameTestLoadingEntity.cpp)
-add_test(NAME GameTestLoadingEntity COMMAND GameTestLoadingEntity WORKING_DIRECTORY ${test_dir})
-target_link_libraries(GameTestLoadingEntity PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main  SDL2::SDL2_image SDL2::SDL2_ttf)
