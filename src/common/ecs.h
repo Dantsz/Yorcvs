@@ -393,7 +393,7 @@ class ComponentManager
         }
         else
         {
-            yorcvs::log("Component " + std::string(componentid) + " already registered", yorcvs::MSGSEVERITY::ERROR);
+            yorcvs::log("Component " + std::string(componentid) + "  already registered", yorcvs::MSGSEVERITY::ERROR);
         }
     }
 

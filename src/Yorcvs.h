@@ -64,16 +64,19 @@ struct Tile
 class Map
 {
   public:
-    Map(const std::string &path, yorcvs::ECS *world)
-        : ecs(world), init_ecs(*world), collisionS(world), healthS(world), sprintS(world), velocityS(world),
-          animS(world)
+    Map(yorcvs::ECS* world)  :
+    ecs(world), init_ecs(*world), collisionS(world), healthS(world), sprintS(world), velocityS(world),animS(world)
     {
+        
+    }
+    Map(const std::string &path, yorcvs::ECS *world) : Map(world)
+    { 
         load(world, path);
         entities.emplace_back(world);
         load_character_from_path(entities[entities.size() - 1], "assets/player.json");
         ecs->add_component<playerMovementControlledComponent>(entities[entities.size() - 1].id, {});
     }
-
+    
     void load(yorcvs::ECS *parent, const std::string &path)
     {
         ecs = parent;
