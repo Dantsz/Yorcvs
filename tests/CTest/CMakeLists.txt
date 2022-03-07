@@ -23,6 +23,10 @@ if(NOT libtmxlite_POPULATED)
  set(TMXLITE_STATIC_LIB true)
  add_subdirectory(${libtmxlite_SOURCE_DIR} ${libtmxlite_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
+
+set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -fsanitize-undefined-trap-on-error -fno-omit-frame-pointer  -fsanitize=address,undefined,leak")
+set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fsanitize-undefined-trap-on-error -fno-omit-frame-pointer -fsanitize=address,undefined,leak")
+
 find_package(nlohmann_json CONFIG REQUIRED)
 
 find_package(SDL2 CONFIG REQUIRED)

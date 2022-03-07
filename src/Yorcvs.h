@@ -974,8 +974,8 @@ class Application
 
         frames++;
         render_time = render_timer.get_ticks<float>();
-        yorcvs::log("Frame: " + std::to_string(frames) + " updates : " + std::to_string(updates) +
-                    " update_time: " + std::to_string(update_time) + " render_time: " + std::to_string(render_time));
+        /*yorcvs::log("Frame: " + std::to_string(frames) + " updates : " + std::to_string(updates) +
+                    " update_time: " + std::to_string(update_time) + " render_time: " + std::to_string(render_time));*/
     }
 
     [[nodiscard]] bool is_active() const
