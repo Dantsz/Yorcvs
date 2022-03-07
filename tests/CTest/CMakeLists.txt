@@ -33,40 +33,40 @@ find_package(SDL2 CONFIG REQUIRED)
 find_package(SDL2-image CONFIG REQUIRED)
 find_package(SDL2-ttf CONFIG REQUIRED)
 
-add_executable(ECSTestEntitiesAndComponents ECSTestEntitiesAndComponents.cpp )
+add_executable(ECSTestEntitiesAndComponents src/ECSTestEntitiesAndComponents.cpp )
 add_test(ECSTestEntitiesAndComponents ECSTestEntitiesAndComponents )
 
-add_executable(ECSComponentCreationDeletion ECSComponentCreationDeletion.cpp)
+add_executable(ECSComponentCreationDeletion src/ECSComponentCreationDeletion.cpp)
 add_test(ECSComponentCreationDeletion ECSComponentCreationDeletion)
 
-add_executable(ECSTestComponentManagerCopyConstructor ECSTestComponentManagerCopyConstructor.cpp)
+add_executable(ECSTestComponentManagerCopyConstructor src/ECSTestComponentManagerCopyConstructor.cpp)
 add_test(ECSTestComponentManagerCopyConstructor ECSTestComponentManagerCopyConstructor)
 
-add_executable(ECSEntityManagerCopyMove ECSEntityManagerCopyMove.cpp)
+add_executable(ECSEntityManagerCopyMove src/ECSEntityManagerCopyMove.cpp)
 add_test(ECSEntityManagerCopyMove ECSEntityManagerCopyMove)
 
-add_executable(ECSSystemManagerCopyMove ECSSystemManagerCopyMove.cpp)
+add_executable(ECSSystemManagerCopyMove src/ECSSystemManagerCopyMove.cpp)
 add_test(ECSSystemManagerCopyMove ECSSystemManagerCopyMove)
 
-add_executable(ECSsystems ECSsystems.cpp)
+add_executable(ECSsystems src/ECSsystems.cpp)
 add_test(ECSsystems ECSsystems)
 
-add_executable(ECSmainclassCopyMove ECSmainclassCopyMove.cpp)
+add_executable(ECSmainclassCopyMove src/ECSmainclassCopyMove.cpp)
 add_test(ECSmainclassCopyMove ECSmainclassCopyMove)
 
-add_executable(YorcvsLoadMap YorcvsLoadMap.cpp)
+add_executable(YorcvsLoadMap src/YorcvsLoadMap.cpp)
 add_test(NAME YorcvsLoadMap  COMMAND YorcvsLoadMap WORKING_DIRECTORY ${test_dir})
 target_link_libraries(YorcvsLoadMap PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main  SDL2::SDL2_image SDL2::SDL2_ttf)
 
-add_executable(WorldTestnegativeHealthRegen WorldTestnegativeHealthRegen.cpp)
+add_executable(WorldTestnegativeHealthRegen src/WorldTestnegativeHealthRegen.cpp)
 add_test(NAME WorldTestnegativeHealthRegen COMMAND WorldTestnegativeHealthRegen WORKING_DIRECTORY ${test_dir})
 target_link_libraries(WorldTestnegativeHealthRegen PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main  SDL2::SDL2_image SDL2::SDL2_ttf)
 
-add_executable(GameTestLoadingEntity GameTestLoadingEntity.cpp)
+add_executable(GameTestLoadingEntity src/GameTestLoadingEntity.cpp)
 add_test(NAME GameTestLoadingEntity COMMAND GameTestLoadingEntity WORKING_DIRECTORY ${test_dir})
 target_link_libraries(GameTestLoadingEntity PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf)
 
 
-add_executable(UtilitiesTestSpiral UtilitiesTestSpiral.cpp)
+add_executable(UtilitiesTestSpiral src/UtilitiesTestSpiral.cpp)
 add_test(UtilitiesTestSpiral UtilitiesTestSpiral)
 

@@ -1,6 +1,6 @@
 #include<iostream>
 #include <cassert>
-#include "../../src/common/utilities.h"
+#include "../../../src/common/utilities.h"
 
 constexpr size_t limit = 100000;
 

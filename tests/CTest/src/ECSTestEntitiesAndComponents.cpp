@@ -1,4 +1,4 @@
-#include "../../src/common/ecs.h"
+#include "../../../src/common/ecs.h"
 #include <cassert>
 struct Transform
 {

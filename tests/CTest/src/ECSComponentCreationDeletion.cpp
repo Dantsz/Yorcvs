@@ -1,4 +1,4 @@
-#include "../../src/common/ecs.h"
+#include "../../../src/common/ecs.h"
 #include <cassert>
 struct Transform
 {
@@ -9,7 +9,7 @@ struct Transform
 
 int main()
 {
-    const auto* i = malloc(sizeof(int));
+   
     yorcvs::ECS world{};
     world.register_component<Transform>();
 
