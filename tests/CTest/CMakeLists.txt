@@ -68,5 +68,5 @@ target_link_libraries(GameTestLoadingEntity PRIVATE nlohmann_json::nlohmann_json
 
 
 add_executable(UtilitiesTestSpiral src/UtilitiesTestSpiral.cpp)
-add_test(UtilitiesTestSpiral UtilitiesTestSpiral)
+add_test(NAME UtilitiesTestSpiral COMMAND UtilitiesTestSpiral  WORKING_DIRECTORY ${test_dir})
 

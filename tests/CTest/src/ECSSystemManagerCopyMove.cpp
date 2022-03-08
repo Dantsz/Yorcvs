@@ -25,7 +25,7 @@ class testSystem
                 return(parent->get_component<testComp>(i).x   + parent->get_component<testComp>(i).y );
             }
         }
-        
+        return 0;
     }
     yorcvs::ECS * parent{};
     std::shared_ptr<yorcvs::EntitySystemList> entityList;

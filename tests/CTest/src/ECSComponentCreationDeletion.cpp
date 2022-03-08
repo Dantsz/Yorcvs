@@ -6,7 +6,7 @@ struct Transform
     float y{};
     int id = 0;
 };
-
+constexpr size_t nrentities = 100;
 int main()
 {
    
@@ -15,7 +15,7 @@ int main()
 
     
     std::vector<yorcvs::Entity> entities{};
-    for(auto i = 0 ; i < 100 ; i ++)
+    for(auto i = 0 ; i < nrentities ; i ++)
     {
         entities.emplace_back(&world);
         world.add_component<Transform>(entities[i].id,{1.0f,1.0f,i});
