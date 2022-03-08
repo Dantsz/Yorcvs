@@ -68,4 +68,4 @@ jobs:
           configurePreset: ${{matrix.config}}
           buildPreset:  ${{matrix.config}}
     - name: run tests
-      run: ctest --test-dir tests/CTest/builds/${{matrix.config}} -C Debug
+      run: ctest --output-on-failure --test-dir tests/CTest/builds/${{matrix.config}} -C Debug 
