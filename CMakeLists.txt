@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(FetchContent)
+include(ExternalData)
+
 
 message(STATUS ${CMAKE_SYSTEM_NAME})
 
@@ -50,7 +52,14 @@ if(WIN32)
   find_package(SDL2-ttf CONFIG REQUIRED)
   target_link_libraries(${PROJECT_NAME} SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf)
 else()
-  list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
+  #download findSDL2 and use it
+  FetchContent_Declare(amifindSDL2 GIT_REPOSITORY https://github.com/aminosbh/sdl2-cmake-modules.git GIT_TAG "master")
+  FetchContent_GetProperties(amifindSDL2)
+  if(NOT amifindSDL2_POPULATED)
+    FetchContent_Populate(amifindSDL2)
+  endif()
+  list(APPEND CMAKE_MODULE_PATH ${amifindsdl2_SOURCE_DIR})
+  
   find_package(SDL2 REQUIRED)
   find_package(SDL2_image REQUIRED)
   find_package(SDL2_ttf REQUIRED)
@@ -86,4 +95,6 @@ if(NOT libtmxlite_POPULATED)
  add_subdirectory(${libtmxlite_SOURCE_DIR} ${libtmxlite_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 target_link_libraries(${PROJECT_NAME}  tmxlite)
+
+
 
