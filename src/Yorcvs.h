@@ -859,42 +859,6 @@ class Application
   public:
     Application()
     {
-        // Load config
-        if (std::filesystem::exists(configname))
-        {
-            yorcvs::log("Loading config file...");
-            std::ifstream config_in(configname.data());
-            // NOTE: should read whole file in string
-            std::string confstr{(std::istreambuf_iterator<char>(config_in)), (std::istreambuf_iterator<char>())};
-            auto config = json::json::parse(confstr);
-            if (config.is_discarded())
-            {
-                yorcvs::log("Invalid config file");
-            }
-            else
-            {
-                if (!config["window"]["width"].is_discarded() && !config["window"]["height"].is_discarded())
-                {
-                    r.set_size(config["window"]["width"], config["window"]["height"]);
-                }
-                if (!config["engine_settings"].is_discarded())
-                {
-                    if (!config["engine_settings"]["render_width"].is_discarded())
-                    {
-                        render_dimensions.x = config["engine_settings"]["render_width"];
-                    }
-                    if (!config["engine_settings"]["render_height"].is_discarded())
-                    {
-                        render_dimensions.y = config["engine_settings"]["render_height"];
-                    }
-                }
-            }
-        }
-        else
-        {
-            yorcvs::log("Config file not found, loading default settings...");
-        }
-
         dbInfo.attach(&r, &map, &pcS, &map.collisionS, &map.healthS);
         counter.start();
     }
@@ -963,7 +927,7 @@ class Application
 
             updates++;
         }
-        update_time = update_timer.get_ticks();
+        update_time = update_timer.get_ticks<float>();
         render_timer.start();
 
         r.clear();
@@ -989,7 +953,7 @@ class Application
     }
 
   private:
-    static constexpr std::string_view configname = "yorcvsconfig.json";
+   
     static constexpr yorcvs::Vec2<float> default_render_dimensions = {240.0f, 120.0f};
     static constexpr float msPF = 41.6f;
     static constexpr intmax_t default_render_distance = 1;
