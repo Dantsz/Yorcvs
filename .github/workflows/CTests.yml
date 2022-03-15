@@ -16,11 +16,31 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   windows:
-    name: ${{matrix.os}}
+    name: win-${{matrix.os}}
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
         os: [windows-latest]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: seanmiddleditch/gha-setup-ninja@master
+    - uses: lukka/run-vcpkg@v10
+      with:
+        vcpkgGitCommitId: '5568f110b509a9fd90711978a7cb76bae75bb092'
+    - name: build
+      uses: lukka/run-cmake@v10
+      with:
+          cmakeListsTxtPath: '${{ github.workspace }}/tests/CTest/CMakeLists.txt'
+          configurePreset: 'ninja-multi-vcpkg'
+          buildPreset: 'ninja-multi-vcpkg'
+    - name: run tests
+      run: ctest --test-dir tests/CTest/builds/ninja-multi-vcpkg -C Debug
+  macos:
+    name: mac-${{matrix.os}}
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [macos-latest]
     steps:
     - uses: actions/checkout@v2
     - uses: seanmiddleditch/gha-setup-ninja@master
