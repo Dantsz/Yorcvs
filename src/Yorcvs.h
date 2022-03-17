@@ -746,7 +746,31 @@ class DebugInfo
 
     void render(const float elapsed, yorcvs::Vec2<float> &render_dimensions)
     {
-        if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_E))
+        time_accumulator += elapsed;
+        if(time_accumulator >= ui_controls_update_time)
+        {
+            if(parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_E))
+            {
+                showDebugWindow = !showDebugWindow;
+                time_accumulator = 0;
+            }
+            if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_LCTRL))
+            {
+                if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_I))
+                {
+                    render_dimensions -= render_dimensions * zoom_power;
+                     time_accumulator = 0;
+                }
+
+                if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_K))
+                {
+                    render_dimensions += render_dimensions * zoom_power;
+                     time_accumulator = 0;
+                }
+            }
+           
+        }
+        if (showDebugWindow)
         {
             update(elapsed);
             render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
@@ -757,18 +781,6 @@ class DebugInfo
             parentWindow->draw_text(ecsEntities, entitiesRect);
             parentWindow->draw_text(playerPosition, pPositionRect);
             parentWindow->draw_text(playerHealth, playerHealthRect);
-        }
-        if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_LCTRL))
-        {
-            if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_I))
-            {
-                render_dimensions -= render_dimensions * zoom_power;
-            }
-
-            if (parentWindow->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_K))
-            {
-                render_dimensions += render_dimensions * zoom_power;
-            }
         }
     }
 
@@ -828,6 +840,11 @@ class DebugInfo
 
     CollisionSystem *colSystem{};
     HealthSystem *healthSys{};
+
+    //controls
+    bool showDebugWindow = false;
+    float time_accumulator = 0;
+    static constexpr float ui_controls_update_time = 250.0f;
 
     static constexpr size_t textR = 255;
     static constexpr size_t textG = 255;
