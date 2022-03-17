@@ -6,6 +6,10 @@
 #include <cmath>
 #include <random>
 #include <stack>
+/**
+ * @brief Handles collision between entities
+ * 
+ */
 class CollisionSystem
 {
   public:
@@ -15,7 +19,11 @@ class CollisionSystem
         world->register_system<CollisionSystem>(*this);
         world->add_criteria_for_iteration<CollisionSystem, positionComponent, hitboxComponent>();
     }
-
+    /**
+     * @brief 
+     * 
+     * @param dt time passed
+     */
     void update(float dt) const // checks and resolves collisions
     {
         yorcvs::Rect<float> rectA{};
@@ -177,6 +185,10 @@ class CollisionSystem
     yorcvs::ECS *world;
 };
 
+/**
+ * @brief Handles the movement of entities
+ * 
+ */
 class VelocitySystem
 {
   public:
@@ -207,7 +219,10 @@ class VelocitySystem
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;
 };
-
+/**
+ * @brief Handles Animation
+ * 
+ */
 class AnimationSystem
 {
   public:
@@ -216,6 +231,15 @@ class AnimationSystem
         world->register_system<AnimationSystem>(*this);
         world->add_criteria_for_iteration<AnimationSystem, animationComponent, spriteComponent>();
     }
+    /**
+     * @brief ADDS an animation with the specified name to the component
+     * 
+     * @param comp - the destination component
+     * @param name - the name of the animation
+     * @param speed - the speed at which animation frames update
+     * @return true - succes
+     * @return false - the animation already exists
+     */
     [[nodiscard]]static bool add_animation_to_component(animationComponent& comp , const std::string& name, const float speed )
     {
         const auto &anim = comp.animations.find(name);
@@ -227,6 +251,15 @@ class AnimationSystem
 
         return false;
     }
+    /**
+     * @brief add the frame to the animation with the given name of the component. The frame will be placed at the end.
+     * 
+     * @param comp the component
+     * @param animation_name name of the animation
+     * @param frame frame
+     * @return true success
+     * @return false the animation was not found
+     */
     [[nodiscard]] static bool add_frame_to_animation(animationComponent& comp,  const std::string &animation_name,const yorcvs::Rect<size_t> &frame)
     {
         const auto &anim = comp.animations.find(animation_name);
@@ -285,10 +318,14 @@ class AnimationSystem
         }
      
     }
+    /**
+     * @brief Removes an animation from the entity. Currently unecessary, might be useful for editing entities
+     * 
+     * @param name i
+     */
+    void remove_animation(yorcvs::Entity, std::string animation);
 
-    void remove_animation(yorcvs::Entity, size_t index);
-
-    void remove_animation_frame(yorcvs::Entity, size_t index);
+    void remove_animation_frame(yorcvs::Entity, std::string animation ,size_t index);
     /**
      * @brief Set which animation to be used
      *
@@ -369,7 +406,10 @@ class AnimationSystem
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;
 };
-
+/**
+ * @brief Handles the health of an entity, the regeneration of health , and it deletes the entity if the health is negative
+ * 
+ */
 class HealthSystem
 {
   public:
@@ -413,6 +453,11 @@ class HealthSystem
     static constexpr float update_time = 1000.0f; // update once a second
     float cur_time = 0.0f;
 };
+
+/**
+ * @brief Handles player input
+ * 
+ */
 class PlayerMovementControl
 {
   public:
@@ -512,6 +557,10 @@ class PlayerMovementControl
     bool q_pressed{};
 };
 
+/**
+ * @brief Draws the entity to the window
+ * 
+ */
 class SpriteSystem
 {
   public:
@@ -550,6 +599,10 @@ class SpriteSystem
     yorcvs::Window<yorcvs::graphics> *window;
 };
 
+/**
+ * @brief Handles behaviour of non-player entities.
+ * 
+ */
 class BehaviourSystem
 {
   public:
@@ -604,7 +657,10 @@ class BehaviourSystem
 
     static constexpr float velocity_trigger_treshold = 0.0f;
 };
-
+/**
+ * @brief Handles stamina and stamina regeneration
+ * 
+ */
 class StaminaSystem
 {
   public:

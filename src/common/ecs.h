@@ -24,10 +24,10 @@
 
 /**
  * @brief Inserts the element at its ordered position in the sorted array
- * 
- * @param vec 
- * @param item 
- * @return std::vector<T>::iterator 
+ *
+ * @param vec
+ * @param item
+ * @return std::vector<T>::iterator
  */
 template <typename T> typename std::vector<T>::iterator insert_sorted(std::vector<T> &vec, T const &item)
 {
@@ -66,7 +66,10 @@ template <typename systemt> concept systemT = requires(systemt sys)
     {sys.entityList->entitiesID.size()};
 };
 
-// virtual container for polymorphism
+/**
+ * @brief Virtual Container
+ *
+ */
 class VContainer
 {
   public:
@@ -225,7 +228,11 @@ class EntityManager
     size_t lowestUnallocatedID = 0;
 };
 
-// contains..components
+/**
+ * @brief Stores a type of component
+ *
+ * @tparam T Type of compoent stored
+ */
 template <typename T> class ComponentContainer final : public VContainer
 {
   public:
@@ -286,7 +293,11 @@ template <typename T> class ComponentContainer final : public VContainer
 
         return components[entitytocomponent[entityID]];
     }
-
+    /**
+     * @brief Removed component from entity
+     *
+     * @param entityID
+     */
     void remove_component(const size_t entityID)
     {
         // if the entity doesn't have this type of component throw exception
@@ -308,7 +319,13 @@ template <typename T> class ComponentContainer final : public VContainer
         entity_has_component[entityID] = 0;
     }
 
-    // checks if entity has component
+    /**
+     * @brief   checks if entity has component
+     *
+     * @param entityID
+     * @return true it has the component
+     * @return false it doesn't
+     */
     [[nodiscard]] bool has_component(const size_t entityID) const
     {
         if (entity_has_component.size() <= entityID)
@@ -321,7 +338,11 @@ template <typename T> class ComponentContainer final : public VContainer
         }
         return true;
     }
-
+    /**
+     * @brief Called when an entity is destroyed
+     *
+     * @param entityID
+     */
     void on_entity_destroyed(const size_t entityID) noexcept
         override // this function never throws exception because not finding the component of the entity is  intended
     {
@@ -342,7 +363,10 @@ template <typename T> class ComponentContainer final : public VContainer
     std::queue<size_t> freeIndex{};
 };
 
-// handles all components
+/**
+ * @brief Manages containers
+ *
+ */
 class ComponentManager
 {
   public:
@@ -375,9 +399,11 @@ class ComponentManager
         return *this;
     }
 
-    // register a component
-    // Note: add_component already registers a component that has not been use before
-    // this function is not really useful at this point
+    /**
+     * @brief  register a component
+     * 
+     * @tparam T 
+     */
     template <typename T> void register_component()
     {
         const char *componentid = typeid(T).name();
@@ -396,7 +422,13 @@ class ComponentManager
             yorcvs::log("Component " + std::string(componentid) + "  already registered", yorcvs::MSGSEVERITY::ERROR);
         }
     }
-
+    /**
+     * @brief Adds a registered type of component to the entity
+     * 
+     * @tparam T type of component
+     * @param entityID entity
+     * @param component 
+     */
     template <typename T> void add_component(const size_t entityID, T &component)
     {
         if (get_container<T>() == nullptr)
@@ -428,7 +460,13 @@ class ComponentManager
         return get_container<T>()->get_component(entityID);
     }
 
-    // gets the id of a component in the manager
+     
+    /**
+     * @brief gets the id of a component in the manager
+     * 
+     * @tparam T 
+     * @return size_t 
+     */
     template <typename T>[[nodiscard]] size_t get_component_ID()
     {
         const char *component_name = typeid(T).name();
@@ -440,7 +478,11 @@ class ComponentManager
         return component_type[component_name];
     }
 
-    // iterate through all components of the entity and delete them
+    /**
+     * @brief iterate through all components of the entity and delete them
+     * 
+     * @param entityID 
+     */
     void on_entity_destroyed(const size_t entityID)
     {
         for (auto const &i : componentContainers)
@@ -456,7 +498,12 @@ class ComponentManager
         }
     }
 
-    // gets the container of the specified type
+    /**
+     * @brief gets the container of the specified type
+     * 
+     * @tparam T 
+     * @return std::shared_ptr<ComponentContainer<T>> 
+     */
     template <typename T> std::shared_ptr<ComponentContainer<T>> get_container()
     {
         //(apparently this is possible)
@@ -521,7 +568,14 @@ class SystemManager
     SystemManager &operator=(SystemManager &&other) = default;
 
     ~SystemManager() = default;
-    // creates a system of type T and puts it in the map
+    /**
+     * @brief creates a system of type T and puts it in the map
+     * 
+     * @tparam T type of the system(one system per time)
+     * @param system a valid reference to system
+     * @return true the system was registered
+     * @return false the system was already registered
+     */
     template <systemT T> bool register_system(T &system)
     {
         const char *systemType = typeid(T).name();
@@ -537,7 +591,12 @@ class SystemManager
         system.entityList = systemEVec;
         return true;
     }
-    // sets the signature of the system with type T
+    /**
+     * @brief Sets the signature of the system with type T
+     * 
+     * @tparam T 
+     * @param signature 
+     */
     template <systemT T> void set_signature(const std::vector<bool> &signature)
     {
         const char *systemType = typeid(T).name();
@@ -567,7 +626,12 @@ class SystemManager
         return typetosystem[systemType];
     }
 
-    // gets signature of a system
+    /**
+     * @brief Gets signature of a system
+     * 
+     * @tparam T 
+     * @return std::vector<bool> 
+     */
     template <systemT T>[[nodiscard]] std::vector<bool> get_system_signature()
     {
         const char *systemType = typeid(T).name();
@@ -581,7 +645,11 @@ class SystemManager
         return typetosignature[systemType];
     }
 
-    // erase entity from all systems
+    /**
+     * @brief Erase entity from all systems
+     * 
+     * @param entityID 
+     */
     void OnEntityDestroy(const size_t entityID)
     {
         for (auto const &it : typetosystem)
@@ -592,7 +660,12 @@ class SystemManager
         }
     }
 
-    // Notify each system that an entity's signature changed
+    /**
+     * @brief Notify each system that an entity's signature changed
+     * 
+     * @param entityID 
+     * @param signature 
+     */
     void on_entity_signature_change(const size_t entityID, std::vector<bool> &signature)
     {
         for (auto const &it : typetosystem)
@@ -613,7 +686,14 @@ class SystemManager
         }
     }
 
-    // compare the signature//return 1  if they are equal
+    /**
+     * @brief compare the signature
+     * 
+     * @param signature1 first signature
+     * @param signature2 second signature
+     * @return true they are the same
+     * @return false they differ
+     */
     static bool compare_signatures(const std::vector<bool> &signature1, const std::vector<bool> &signature2)
     {
         if (signature1.size() != signature2.size())
