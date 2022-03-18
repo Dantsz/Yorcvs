@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+
+option(YORCVS_EMSCRIPTEN_PRELOAD_ASSETS_FOLDER "Wheter to include the assets folder in the emscripten build or not"  OFF)
+
 include(FetchContent)
 include(ExternalData)
 
@@ -40,10 +43,12 @@ $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wno-c++
 
 #link SDL
 if(EMSCRIPTEN)
-set(CMAKE_EXECUTABLE_SUFFIX ".html")
-SET(CMAKE_CXX_FLAGS "-std=c++2a -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=\"[\"\"png\"\"]\"  -s USE_SDL_TTF=2  -s ALLOW_MEMORY_GROWTH=1 -o build/Yorcvs.html") #--preload-file ./assets" ) #commented because emscriptem requires the assets folder to be in special place and it's not necesary for compilation for CI
-else()
-
+  set(CMAKE_EXECUTABLE_SUFFIX ".html")
+    SET(CMAKE_CXX_FLAGS "-std=c++2a -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=\"[\"\"png\"\"]\"  -s USE_SDL_TTF=2  -s ALLOW_MEMORY_GROWTH=1 -o build/Yorcvs.html" ) #commented because emscriptem requires the assets folder to be in special place and it's not necesary for compilation for CI
+  if(YORCVS_EMSCRIPTEN_PRELOAD_ASSETS_FOLDER)
+    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS  "--preload-file ./assets")
+  endif()
+else() 
 
 if(WIN32)
   #set SDL for windows
