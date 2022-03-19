@@ -938,7 +938,6 @@ class Application
         {
             update(msPF);
             bhvS.update(msPF);
-            pcS.updateAnimations();
             pcS.updateControls(render_dimensions, msPF);
             lag -= msPF;
 

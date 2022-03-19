@@ -291,7 +291,6 @@ template <typename T> class ComponentContainer final : public VContainer
                             " doesn't own the specified type of component: " + std::string(typeid(T).name()),
                         yorcvs::MSGSEVERITY::ERROR);
         }
-
         return components[entity_to_component[entityID]];
     }
     /**
@@ -456,7 +455,6 @@ class ComponentManager
         {
             yorcvs::log(std::string("Component") + typeid(T).name() + " has not been registered yet !!!!",
                         yorcvs::MSGSEVERITY::ERROR);
-            exit(120);
         }
         return get_container<T>()->get_component(entityID);
     }

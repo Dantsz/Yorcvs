@@ -473,73 +473,71 @@ class PlayerMovementControl
 
     void updateControls(const yorcvs::Vec2<float> &render_size, float dt)
     {
-        w_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_W);
-        a_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_A);
-        s_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_S);
-        d_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_D);
-        q_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_Q);
-
-        cur_time += dt;
-        for (const auto &ID : entityList->entitiesID)
+        if(controls_enable)
         {
-            dir = yorcvs::Vec2<float>(static_cast<float>(d_pressed) + static_cast<float>(a_pressed) * -1.0f,
-                                      static_cast<float>(w_pressed) * -1.0f + static_cast<float>(s_pressed));
-            dir.normalize();             // now moving at 1000 units per second
-            dir *= player_default_speed; // move 30 units per second
-            if (q_pressed)
+            w_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_W);
+            a_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_A);
+            s_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_S);
+            d_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_D);
+            q_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_Q);
+
+            cur_time += dt;
+            for (const auto &ID : entityList->entitiesID)
             {
-                if ((!world->has_components<staminaComponent>(ID)))
+                dir = yorcvs::Vec2<float>(static_cast<float>(d_pressed) + static_cast<float>(a_pressed) * -1.0f,
+                                        static_cast<float>(w_pressed) * -1.0f + static_cast<float>(s_pressed));
+                dir.normalize();             // now moving at 1000 units per second
+                dir *= player_default_speed; // move 30 units per second
+                if (q_pressed)
                 {
-                    dir *= PlayerMovementControl::sprint_multiplier;
-                }
-                else if ((world->has_components<staminaComponent>(ID) &&
-                          world->get_component<staminaComponent>(ID).stamina -
-                                  world->get_component<staminaComponent>(ID).stamina_regen >
-                              0))
-                {
-                    dir *= PlayerMovementControl::sprint_multiplier;
-                    if (cur_time >= update_time)
+                    if ((!world->has_components<staminaComponent>(ID)))
                     {
-                        world->get_component<staminaComponent>(ID).stamina -=
-                            2 * world->get_component<staminaComponent>(ID).stamina_regen;
+                        dir *= PlayerMovementControl::sprint_multiplier;
+                    }
+                    else if ((world->has_components<staminaComponent>(ID) &&
+                            world->get_component<staminaComponent>(ID).stamina -
+                                    world->get_component<staminaComponent>(ID).stamina_regen >
+                                0))
+                    {
+                        dir *= PlayerMovementControl::sprint_multiplier;
+                        if (cur_time >= update_time)
+                        {
+                            world->get_component<staminaComponent>(ID).stamina -=
+                                2 * world->get_component<staminaComponent>(ID).stamina_regen;
+                        }
                     }
                 }
-            }
-            if (cur_time >= update_time)
-            {
-                cur_time = 0.0f;
-            }
-            world->get_component<velocityComponent>(ID).vel = dir;
-            window->set_drawing_offset(world->get_component<positionComponent>(ID).position + dir -
-                                       (render_size - world->get_component<spriteComponent>(ID).size) / 2);
-        }
-    }
-    void updateAnimations() const
-    {
-        for (const auto &ID : entityList->entitiesID)
-        {
-            if (a_pressed)
-            {
-                AnimationSystem::set_animation(world, ID, "walkingL");
-            }
-            else if (d_pressed)
-            {
-                AnimationSystem::set_animation(world, ID, "walkingR");
-            }
-            else if (s_pressed || w_pressed)
-            {
-                AnimationSystem::set_animation(world, ID, "walkingR");
-            }
-            else if (world->get_component<velocityComponent>(ID).facing.x)
-            {
-                AnimationSystem::set_animation(world, ID, "idleL");
-            }
-            else
-            {
-                AnimationSystem::set_animation(world, ID, "idleR");
+                if (cur_time >= update_time)
+                {
+                    cur_time = 0.0f;
+                }
+                world->get_component<velocityComponent>(ID).vel = dir;
+                window->set_drawing_offset(world->get_component<positionComponent>(ID).position + dir -
+                                        (render_size - world->get_component<spriteComponent>(ID).size) / 2);
+                if (a_pressed)
+                {
+                    AnimationSystem::set_animation(world, ID, "walkingL");
+                }
+                else if (d_pressed)
+                {
+                    AnimationSystem::set_animation(world, ID, "walkingR");
+                }
+                else if (s_pressed || w_pressed)
+                {
+                    AnimationSystem::set_animation(world, ID, "walkingR");
+                }
+                else if (world->get_component<velocityComponent>(ID).facing.x)
+                {
+                    AnimationSystem::set_animation(world, ID, "idleL");
+                }
+                else
+                {
+                    AnimationSystem::set_animation(world, ID, "idleR");
+                }
             }
         }
     }
+
 
     static constexpr float update_time = 1000.0f;
     static constexpr float player_default_speed = 0.033f;
@@ -550,6 +548,7 @@ class PlayerMovementControl
     yorcvs::Window<yorcvs::graphics> *window;
     yorcvs::Vec2<float> dir;
 
+    bool controls_enable = true;
     bool w_pressed{};
     bool a_pressed{};
     bool s_pressed{};
