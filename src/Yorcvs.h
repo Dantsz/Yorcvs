@@ -626,46 +626,53 @@ class DebugInfo
         //     out << map->save_character_to_path(playerMoveSystem->entityList->entitiesID[0]);
         //     std::cout << "Done.\n";
         // }
-        parentWindow->set_text_message(frameTime, "Frame Time : " + std::to_string(ft));
-
-        if (ft > maxFrameTime)
-        {
-            maxFrameTime = ft;
-            parentWindow->set_text_message(maxframeTimeTX, "Max Frame Time: " + std::to_string(maxFrameTime));
-        }
-        parentWindow->set_text_message(ecsEntities,
-                                       "Active Entities : " + std::to_string(appECS->get_active_entities_number()));
-
         avg_frame_time *= frame_time_samples;
         frame_time_samples += 1.0f;
         avg_frame_time += ft;
         avg_frame_time /= frame_time_samples;
-        parentWindow->set_text_message(avgFrameTime, "Avg frame time :  " + std::to_string(avg_frame_time));
-
-        // set player position text
-        if (playerMoveSystem->entityList->entitiesID.empty())
+        if(showDebugWindow)
         {
-            parentWindow->set_text_message(playerPosition, "NO PLAYER FOUND");
-            parentWindow->set_text_message(playerHealth, "Health: -/-");
-        }
-        else
-        {
-            const size_t ID = playerMoveSystem->entityList->entitiesID[0];
-            parentWindow->set_text_message(
-                playerPosition,
-                "Player position : X = " + std::to_string(appECS->get_component<positionComponent>(ID).position.x) +
-                    " Y = " + std::to_string(appECS->get_component<positionComponent>(ID).position.y));
+            parentWindow->set_text_message(frameTime, "Frame Time : " + std::to_string(ft));
 
-            if (appECS->has_components<healthComponent>(ID))
+            if (ft > maxFrameTime)
             {
-                healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
-                parentWindow->set_text_message(playerHealth, "Health: " + std::to_string(playerHealthC.HP) + " / " +
-                                                                 std::to_string(playerHealthC.maxHP));
+                maxFrameTime = ft;
+                parentWindow->set_text_message(maxframeTimeTX, "Max Frame Time: " + std::to_string(maxFrameTime));
             }
-            // print current chunk
-            // std::cout << appECS->get_component<positionComponent>(ID).position / (32.0f*16.0f) << "\n";
+            parentWindow->set_text_message(ecsEntities,
+                                        "Active Entities : " + std::to_string(appECS->get_active_entities_number()));
+
+
+            parentWindow->set_text_message(avgFrameTime, "Avg frame time :  " + std::to_string(avg_frame_time));
+
+            // set player position text
+            if (playerMoveSystem->entityList->entitiesID.empty())
+            {
+                parentWindow->set_text_message(playerPosition, "NO PLAYER FOUND");
+                parentWindow->set_text_message(playerHealth, "Health: -/-");
+            }
+            else
+            {
+                const size_t ID = playerMoveSystem->entityList->entitiesID[0];
+                parentWindow->set_text_message(
+                    playerPosition,
+                    "Player position : X = " + std::to_string(appECS->get_component<positionComponent>(ID).position.x) +
+                        " Y = " + std::to_string(appECS->get_component<positionComponent>(ID).position.y));
+
+                if (appECS->has_components<healthComponent>(ID))
+                {
+                    healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
+                    parentWindow->set_text_message(playerHealth, "Health: " + std::to_string(playerHealthC.HP) + " / " +
+                                                                    std::to_string(playerHealthC.maxHP));
+                }
+                // print current chunk
+                // std::cout << appECS->get_component<positionComponent>(ID).position / (32.0f*16.0f) << "\n";
+            }
         }
-        parentWindow->set_text_message(consoleText,">" + console_input);
+        if(showConsole)
+        {
+         parentWindow->set_text_message(consoleText,">" + console_input);
+        }
     }
 
     template <typename render_backend>
@@ -755,9 +762,14 @@ class DebugInfo
             {   
                 if(parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_E))
                 {
-                showDebugWindow = !showDebugWindow;
-                playerMoveSystem->controls_enable = !playerMoveSystem->controls_enable;
-                time_accumulator = 0;
+                    showDebugWindow = !showDebugWindow;
+                    time_accumulator = 0;
+                }
+                if(parentWindow->is_key_pressed(YORCVS_KEY_TILDE))
+                {
+                    playerMoveSystem->controls_enable = !playerMoveSystem->controls_enable;
+                    showConsole = !showConsole;
+                    time_accumulator = 0;
                 }
                 if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_I))
                 {
@@ -773,9 +785,10 @@ class DebugInfo
             }
            
         }
+        update(elapsed);
         if (showDebugWindow)
         {
-            update(elapsed);
+           
             render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
                             hitbox_color[3]);
             parentWindow->draw_text(frameTime, FTRect);
@@ -784,11 +797,16 @@ class DebugInfo
             parentWindow->draw_text(ecsEntities, entitiesRect);
             parentWindow->draw_text(playerPosition, pPositionRect);
             parentWindow->draw_text(playerHealth, playerHealthRect);
+            
+        }
+        if(showConsole)
+        {
             yorcvs::Rect<float> console_rect = consoleTextRect;
             console_rect.y = parentWindow->get_size().y - console_rect.h;
             console_rect.w = parentWindow->get_text_length(consoleText).x;
             parentWindow->draw_text(consoleText,console_rect);
         }
+       
     }
 
     void attach(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::Map *map, PlayerMovementControl *pms,
@@ -816,15 +834,15 @@ class DebugInfo
         consoleText = parentWindow->create_text("assets/font.ttf", ">",textR, textG, textB, textA,
                                                  console_char_size, text_line_length);
         callbacks.push_back(parentWindow->register_callback({[&](const yorcvs::Event<yorcvs::graphics>& event){
-            if(event.get_type() == yorcvs::Event<yorcvs::graphics>::TEXT_INPUT && showDebugWindow)
+            if(event.get_type() == yorcvs::Event<yorcvs::graphics>::TEXT_INPUT && showConsole)
             {
               console_input += event.get_text_input();
             }
-            else if(event.get_type() == yorcvs::Event<graphics>::KEYBOARD_PRESSED && showDebugWindow && event.get_key() == YORCVS_KEY_BACKSPACE && !console_input.empty())
+            else if(event.get_type() == yorcvs::Event<graphics>::KEYBOARD_PRESSED && showConsole && event.get_key() == YORCVS_KEY_BACKSPACE && !console_input.empty())
             {
                 console_input.pop_back();
             }
-            if(event.get_type() == yorcvs::Event<graphics>::KEYBOARD_PRESSED && showDebugWindow && event.get_key() == YORCVS_KEY_ENTER)
+            if(event.get_type() == yorcvs::Event<graphics>::KEYBOARD_PRESSED && showConsole && event.get_key() == YORCVS_KEY_ENTER)
             {
                 //process input
                 std::cout << console_input << '\n';
@@ -875,6 +893,7 @@ class DebugInfo
 
     //controls
     bool showDebugWindow = false;
+    bool showConsole = false;
     float time_accumulator = 0;
     static constexpr float ui_controls_update_time = 250.0f;
 
