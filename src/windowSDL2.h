@@ -10,6 +10,7 @@
  */
 #pragma once
 #include "common/assetmanager.h"
+#include "common/types.h"
 #include "common/utilities.h"
 #include "common/window.h"
 
@@ -429,6 +430,20 @@ template <> class Window<yorcvs::SDL2>
     {
         text.lineLength = static_cast<uint32_t>(lineLength);
         setup_texture(text);
+    }
+    static yorcvs::Vec2<float> get_text_length(const Text<yorcvs::SDL2> &text)
+    {
+        TTF_Font *font = TTF_OpenFont(text.fontPath.c_str(), text.charSize);
+        if (font == nullptr)
+        {
+            yorcvs::log("FONT " + text.fontPath + " could not be found", yorcvs::MSGSEVERITY::ERROR);
+            return {-1.0f,-1.0f};
+        }
+        int w = 0;
+        int h = 0;
+        TTF_SizeText(font,text.message.c_str(),&w,&h);
+        TTF_CloseFont(font);
+        return {static_cast<float>(w),static_cast<float>(h)};
     }
     void set_text_font(Text<yorcvs::SDL2> &text, const std::string &fontPath)
     {

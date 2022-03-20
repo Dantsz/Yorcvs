@@ -785,7 +785,8 @@ class DebugInfo
             parentWindow->draw_text(playerPosition, pPositionRect);
             parentWindow->draw_text(playerHealth, playerHealthRect);
             yorcvs::Rect<float> console_rect = consoleTextRect;
-            console_rect.w = console_char_size *(1 + console_input.size());
+            console_rect.y = parentWindow->get_size().y - console_rect.h;
+            console_rect.w = parentWindow->get_text_length(consoleText).x;
             parentWindow->draw_text(consoleText,console_rect);
         }
     }
@@ -813,7 +814,7 @@ class DebugInfo
         playerHealth = parentWindow->create_text("assets/font.ttf", "Health : -/- ", textR, textG, textB, textA,
                                                  text_char_size, text_line_length);
         consoleText = parentWindow->create_text("assets/font.ttf", ">",textR, textG, textB, textA,
-                                                 text_char_size, text_line_length);
+                                                 console_char_size, text_line_length);
         callbacks.push_back(parentWindow->register_callback({[&](const yorcvs::Event<yorcvs::graphics>& event){
             if(event.get_type() == yorcvs::Event<yorcvs::graphics>::TEXT_INPUT && showDebugWindow)
             {
@@ -825,7 +826,9 @@ class DebugInfo
             }
             if(event.get_type() == yorcvs::Event<graphics>::KEYBOARD_PRESSED && showDebugWindow && event.get_key() == YORCVS_KEY_ENTER)
             {
+                //process input
                 std::cout << console_input << '\n';
+                console_input.clear();
             }
            
         }}));
@@ -863,7 +866,7 @@ class DebugInfo
     const yorcvs::Rect<float> playerHealthRect = {0, 125, 200, 25};
 
     yorcvs::Text<yorcvs::graphics> consoleText;
-    const yorcvs::Rect<float> consoleTextRect = {0,440,0,40};
+    const yorcvs::Rect<float> consoleTextRect = {0,460,0,20};
 
     PlayerMovementControl *playerMoveSystem{};
 
