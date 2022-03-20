@@ -33,6 +33,16 @@ template <typename interface> class Text
 };
 
 /**
+ * @brief Window event
+ * 
+ * @tparam interface 
+ */
+template<typename interface> class Event
+{
+
+};
+
+/**
  * @brief Called in the event loop
  *
  */

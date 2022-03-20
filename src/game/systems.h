@@ -475,11 +475,11 @@ class PlayerMovementControl
     {
         if(controls_enable)
         {
-            w_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_W);
-            a_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_A);
-            s_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_S);
-            d_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_D);
-            q_pressed = window->is_key_pressed(yorcvs::Window<yorcvs::graphics>::YORCVS_KEY_Q);
+            w_pressed = window->is_key_pressed(yorcvs::YORCVS_KEY_W);
+            a_pressed = window->is_key_pressed(yorcvs::YORCVS_KEY_A);
+            s_pressed = window->is_key_pressed(yorcvs::YORCVS_KEY_S);
+            d_pressed = window->is_key_pressed(yorcvs::YORCVS_KEY_D);
+            q_pressed = window->is_key_pressed(yorcvs::YORCVS_KEY_Q);
 
             cur_time += dt;
             for (const auto &ID : entityList->entitiesID)

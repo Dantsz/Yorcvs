@@ -14,6 +14,7 @@
 #include "common/window.h"
 
 #include <SDL_render.h>
+#include <SDL_scancode.h>
 #include <SDL_video.h>
 #include <SDL_vulkan.h>
 #include <vector>
@@ -46,7 +47,23 @@ template <> struct std::default_delete<SDL_Texture>
 
 namespace yorcvs
 {
-
+enum Key
+{
+    YORCVS_KEY_W = SDL_SCANCODE_W,
+    YORCVS_KEY_A = SDL_SCANCODE_A,
+    YORCVS_KEY_C = SDL_SCANCODE_C,
+    YORCVS_KEY_S = SDL_SCANCODE_S,
+    YORCVS_KEY_D = SDL_SCANCODE_D,
+    YORCVS_KEY_R = SDL_SCANCODE_R,
+    YORCVS_KEY_E = SDL_SCANCODE_E,
+    YORCVS_KEY_I = SDL_SCANCODE_I,
+    YORCVS_KEY_K = SDL_SCANCODE_K,
+    YORCVS_KEY_Q = SDL_SCANCODE_Q,
+    YORCVS_KEY_LCTRL = SDL_SCANCODE_LCTRL,
+    YORCVS_KEY_BACKSPACE = SDL_SCANCODE_BACKSPACE,
+    YORCVS_KEY_ENTER = SDL_SCANCODE_RETURN,
+    YORCVS_KEY_UKNOWN
+};
 /**
  * @brief Interface concept for defining rendering objects that are implemented using SDL2
  *
@@ -72,10 +89,53 @@ template <> class Text<yorcvs::SDL2>
     uint32_t lineLength = 0;
 };
 
+template<> class Event<yorcvs::SDL2>
+{
+    public:
+    enum Type
+    {
+        KEYBOARD_PRESSED = SDL_KEYDOWN,
+        TEXT_INPUT = SDL_TEXTINPUT
+    };
+
+    SDL_Event event;
+    [[nodiscard]] Type get_type() const
+    {
+        return static_cast<Type>(event.type);
+    }
+    /**
+     * @brief If the event is of type text input it returns the input ,else nullptr
+     * 
+     * @return const char* 
+     */
+    [[nodiscard]] const char *  get_text_input() const
+    {
+        if(get_type() != TEXT_INPUT)
+        {
+            return nullptr;
+        }
+        return event.text.text;
+    }
+    /**
+     * @brief Get the events key if the event is of type KEYBOARD_PRESSED, else returns KEY_UKNOWN
+     * 
+     * @return yorcvs::Key 
+     */
+    yorcvs::Key get_key() const
+    {
+        if(get_type() != KEYBOARD_PRESSED)
+        {
+            return yorcvs::Key::YORCVS_KEY_UKNOWN;
+        }
+        return static_cast<yorcvs::Key>(event.key.keysym.scancode);
+    }
+
+};
+
 template <> class Callback<yorcvs::SDL2>
 {
   public:
-    std::function<void(const SDL_Event &)> func;
+    std::function<void(const Event<yorcvs::SDL2> &)> func;
 };
 
 /**
@@ -186,20 +246,7 @@ template <> class Window<yorcvs::SDL2>
     Window<yorcvs::SDL2> &operator=(const Window<yorcvs::SDL2> &) = delete;
     Window<yorcvs::SDL2> &operator=(Window<yorcvs::SDL2> &&) = delete;
 
-    enum Key
-    {
-        YORCVS_KEY_W = SDL_SCANCODE_W,
-        YORCVS_KEY_A = SDL_SCANCODE_A,
-        YORCVS_KEY_C = SDL_SCANCODE_C,
-        YORCVS_KEY_S = SDL_SCANCODE_S,
-        YORCVS_KEY_D = SDL_SCANCODE_D,
-        YORCVS_KEY_R = SDL_SCANCODE_R,
-        YORCVS_KEY_E = SDL_SCANCODE_E,
-        YORCVS_KEY_I = SDL_SCANCODE_I,
-        YORCVS_KEY_K = SDL_SCANCODE_K,
-        YORCVS_KEY_Q = SDL_SCANCODE_Q,
-        YORCVS_KEY_LCTRL = SDL_SCANCODE_LCTRL
-    };
+
 
     ~Window<yorcvs::SDL2>()
     {
@@ -227,13 +274,13 @@ template <> class Window<yorcvs::SDL2>
     }
     void handle_events()
     {
-        while (SDL_PollEvent(&event) == 1)
+        while (SDL_PollEvent(&win_event.event) == 1)
         {
             for (const auto &f : callbacks)
             {
-                f.func(event);
+                f.func(win_event);
             }
-            switch (event.type)
+            switch (win_event.event.type)
             {
             // QUIT EVENT
             case SDL_QUIT:
@@ -241,11 +288,11 @@ template <> class Window<yorcvs::SDL2>
                 break;
 
             case SDL_WINDOWEVENT:
-                if (event.window.event == SDL_WINDOWEVENT_RESTORED)
+                if (win_event.event.window.event == SDL_WINDOWEVENT_RESTORED)
                 {
                     isMinimized = false;
                 }
-                else if (event.window.event == SDL_WINDOWEVENT_MINIMIZED)
+                else if (win_event.event.window.event == SDL_WINDOWEVENT_MINIMIZED)
                 {
                     isMinimized = true;
                 }
@@ -489,7 +536,8 @@ template <> class Window<yorcvs::SDL2>
         TTF_CloseFont(font);
     }
 
-    SDL_Event event{};
+    Event<yorcvs::SDL2> win_event{};
+  
     std::vector<Callback<yorcvs::SDL2>> callbacks{};
     yorcvs::Vec2<float> offset = {0.0f, 0.0f};
     std::unique_ptr<AssetManager<SDL_Texture>> assetm = nullptr;
