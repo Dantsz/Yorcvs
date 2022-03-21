@@ -9,10 +9,10 @@
  *
  */
 #pragma once
-#include "common/assetmanager.h"
-#include "common/types.h"
-#include "common/utilities.h"
-#include "common/window.h"
+#include "../common/assetmanager.h"
+#include "../common/types.h"
+#include "../common/utilities.h"
+#include "window.h"
 
 #include <SDL_render.h>
 #include <SDL_scancode.h>
@@ -123,7 +123,7 @@ template<> class Event<yorcvs::SDL2>
      * 
      * @return yorcvs::Key 
      */
-    yorcvs::Key get_key() const
+    [[nodiscard]] yorcvs::Key get_key() const
     {
         if(get_type() != KEYBOARD_PRESSED)
         {
@@ -131,7 +131,6 @@ template<> class Event<yorcvs::SDL2>
         }
         return static_cast<yorcvs::Key>(event.key.keysym.scancode);
     }
-
 };
 
 template <> class Callback<yorcvs::SDL2>

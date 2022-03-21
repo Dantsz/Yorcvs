@@ -23,7 +23,7 @@
 #include "tmxlite/Property.hpp"
 #include "tmxlite/TileLayer.hpp"
 #include "tmxlite/Tileset.hpp"
-#include "windowSDL2.h"
+#include "engine/windowSDL2.h"
 #include <cstdlib>
 #include <exception>
 #include <future>
@@ -756,7 +756,6 @@ class DebugInfo
         time_accumulator += elapsed;
         if (time_accumulator >= ui_controls_update_time)
         {
-
             if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_LCTRL))
             {
                 if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_E))

@@ -68,7 +68,6 @@ template <typename interface> class Window
 
     enum Key
     {
-
     };
 
     /**

@@ -17,7 +17,6 @@ namespace yorcvs
  */
 template <typename assetType> class AssetManager
 {
-
   public:
     AssetManager() = default;
     AssetManager(const AssetManager &other) = delete;

@@ -113,7 +113,6 @@ template <> inline json::json serialize(const spriteComponent &comp)
 template<>
 inline void deserialize(spriteComponent &dst, const json::json &j)
 {
-    
     dst = {
         {j["offset"]["x"], j["offset"]["y"]},
         {j["size"]["x"], j["size"]["y"]},

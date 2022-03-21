@@ -22,13 +22,12 @@ set(YorcvsALLFILES  "src/Yorcvs.cpp"
                     "src/game/systems.h"
                   
                     "src/common/assetmanager.h"
-
                     "src/common/types.h"
                     "src/common/utilities.h"
                     "src/common/ecs.h"
 
-                    "src/common/window.h"
-                    "src/windowSDL2.h"
+                    "src/engine/window.h"
+                    "src/engine/windowSDL2.h"
                     )
 
 
