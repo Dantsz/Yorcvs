@@ -64,19 +64,19 @@ struct Tile
 class Map
 {
   public:
-    Map(yorcvs::ECS* world)  :
-    ecs(world), init_ecs(*world), collisionS(world), healthS(world), sprintS(world), velocityS(world),animS(world)
+    Map(yorcvs::ECS *world)
+        : ecs(world), init_ecs(*world), collisionS(world), healthS(world), sprintS(world), velocityS(world),
+          animS(world)
     {
-        
     }
     Map(const std::string &path, yorcvs::ECS *world) : Map(world)
-    { 
+    {
         load(world, path);
         entities.emplace_back(world);
         load_character_from_path(entities[entities.size() - 1], "assets/player.json");
         ecs->add_component<playerMovementControlledComponent>(entities[entities.size() - 1].id, {});
     }
-    
+
     void load(yorcvs::ECS *parent, const std::string &path)
     {
         ecs = parent;
@@ -220,13 +220,14 @@ class Map
             const std::string sprite_path = directory_path + std::string(entityJSON["sprite"]["spriteName"]);
             entityJSON["sprite"]["spriteName"] = sprite_path;
             yorcvs::components::deserialize(ecs->get_component<spriteComponent>(entity_id), entityJSON["sprite"]);
-            if(entityJSON["sprite"].contains("animations"))
+            if (entityJSON["sprite"].contains("animations"))
             {
                 if (!ecs->has_components<animationComponent>(entity_id))
                 {
                     ecs->add_component<animationComponent>(entity_id, {});
                 }
-                yorcvs::components::deserialize(ecs->get_component<animationComponent>(entity_id),entityJSON["sprite"]["animations"]);
+                yorcvs::components::deserialize(ecs->get_component<animationComponent>(entity_id),
+                                                entityJSON["sprite"]["animations"]);
 
                 AnimationSystem::set_animation(ecs, entity_id, "idleL");
             }
@@ -259,7 +260,6 @@ class Map
         {
             j["sprite"] = yorcvs::components::serialize(ecs->get_component<spriteComponent>(entity));
             j["sprite"]["animations"] = yorcvs::components::serialize(ecs->get_component<animationComponent>(entity));
-
         }
         return j.dump(4);
     }
@@ -630,7 +630,7 @@ class DebugInfo
         frame_time_samples += 1.0f;
         avg_frame_time += ft;
         avg_frame_time /= frame_time_samples;
-        if(showDebugWindow)
+        if (showDebugWindow)
         {
             parentWindow->set_text_message(frameTime, "Frame Time : " + std::to_string(ft));
 
@@ -640,8 +640,7 @@ class DebugInfo
                 parentWindow->set_text_message(maxframeTimeTX, "Max Frame Time: " + std::to_string(maxFrameTime));
             }
             parentWindow->set_text_message(ecsEntities,
-                                        "Active Entities : " + std::to_string(appECS->get_active_entities_number()));
-
+                                           "Active Entities : " + std::to_string(appECS->get_active_entities_number()));
 
             parentWindow->set_text_message(avgFrameTime, "Avg frame time :  " + std::to_string(avg_frame_time));
 
@@ -663,15 +662,15 @@ class DebugInfo
                 {
                     healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
                     parentWindow->set_text_message(playerHealth, "Health: " + std::to_string(playerHealthC.HP) + " / " +
-                                                                    std::to_string(playerHealthC.maxHP));
+                                                                     std::to_string(playerHealthC.maxHP));
                 }
                 // print current chunk
                 // std::cout << appECS->get_component<positionComponent>(ID).position / (32.0f*16.0f) << "\n";
             }
         }
-        if(showConsole)
+        if (showConsole)
         {
-         parentWindow->set_text_message(consoleText,">" + console_input);
+            parentWindow->set_text_message(consoleText, ">" + console_input);
         }
     }
 
@@ -755,17 +754,17 @@ class DebugInfo
     void render(const float elapsed, yorcvs::Vec2<float> &render_dimensions)
     {
         time_accumulator += elapsed;
-        if(time_accumulator >= ui_controls_update_time)
+        if (time_accumulator >= ui_controls_update_time)
         {
 
             if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_LCTRL))
-            {   
-                if(parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_E))
+            {
+                if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_E))
                 {
                     showDebugWindow = !showDebugWindow;
                     time_accumulator = 0;
                 }
-                if(parentWindow->is_key_pressed(YORCVS_KEY_TILDE))
+                if (parentWindow->is_key_pressed(YORCVS_KEY_TILDE))
                 {
                     playerMoveSystem->controls_enable = !playerMoveSystem->controls_enable;
                     showConsole = !showConsole;
@@ -774,21 +773,19 @@ class DebugInfo
                 if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_I))
                 {
                     render_dimensions -= render_dimensions * zoom_power;
-                     time_accumulator = 0;
+                    time_accumulator = 0;
                 }
 
                 if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_K))
                 {
                     render_dimensions += render_dimensions * zoom_power;
-                     time_accumulator = 0;
+                    time_accumulator = 0;
                 }
             }
-           
         }
         update(elapsed);
         if (showDebugWindow)
         {
-           
             render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
                             hitbox_color[3]);
             parentWindow->draw_text(frameTime, FTRect);
@@ -797,16 +794,14 @@ class DebugInfo
             parentWindow->draw_text(ecsEntities, entitiesRect);
             parentWindow->draw_text(playerPosition, pPositionRect);
             parentWindow->draw_text(playerHealth, playerHealthRect);
-            
         }
-        if(showConsole)
+        if (showConsole)
         {
             yorcvs::Rect<float> console_rect = consoleTextRect;
             console_rect.y = parentWindow->get_size().y - console_rect.h;
             console_rect.w = parentWindow->get_text_length(consoleText).x;
-            parentWindow->draw_text(consoleText,console_rect);
+            parentWindow->draw_text(consoleText, console_rect);
         }
-       
     }
 
     void attach(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::Map *map, PlayerMovementControl *pms,
@@ -831,24 +826,25 @@ class DebugInfo
                                                    text_char_size, text_line_length);
         playerHealth = parentWindow->create_text("assets/font.ttf", "Health : -/- ", textR, textG, textB, textA,
                                                  text_char_size, text_line_length);
-        consoleText = parentWindow->create_text("assets/font.ttf", ">",textR, textG, textB, textA,
-                                                 console_char_size, text_line_length);
-        callbacks.push_back(parentWindow->register_callback({[&](const yorcvs::Event<yorcvs::graphics>& event){
-            if(event.get_type() == yorcvs::Event<yorcvs::graphics>::TEXT_INPUT && showConsole)
+        consoleText = parentWindow->create_text("assets/font.ttf", ">", textR, textG, textB, textA, console_char_size,
+                                                text_line_length);
+        callbacks.push_back(parentWindow->register_callback({[&](const yorcvs::Event<yorcvs::graphics> &event) {
+            if (event.get_type() == yorcvs::Event<yorcvs::graphics>::TEXT_INPUT && showConsole)
             {
-              console_input += event.get_text_input();
+                console_input += event.get_text_input();
             }
-            else if(event.get_type() == yorcvs::Event<graphics>::KEYBOARD_PRESSED && showConsole && event.get_key() == YORCVS_KEY_BACKSPACE && !console_input.empty())
+            else if (event.get_type() == yorcvs::Event<graphics>::KEYBOARD_PRESSED && showConsole &&
+                     event.get_key() == YORCVS_KEY_BACKSPACE && !console_input.empty())
             {
                 console_input.pop_back();
             }
-            if(event.get_type() == yorcvs::Event<graphics>::KEYBOARD_PRESSED && showConsole && event.get_key() == YORCVS_KEY_ENTER)
+            if (event.get_type() == yorcvs::Event<graphics>::KEYBOARD_PRESSED && showConsole &&
+                event.get_key() == YORCVS_KEY_ENTER)
             {
-                //process input
+                // process input
                 std::cout << console_input << '\n';
                 console_input.clear();
             }
-           
         }}));
     }
 
@@ -884,14 +880,14 @@ class DebugInfo
     const yorcvs::Rect<float> playerHealthRect = {0, 125, 200, 25};
 
     yorcvs::Text<yorcvs::graphics> consoleText;
-    const yorcvs::Rect<float> consoleTextRect = {0,460,0,20};
+    const yorcvs::Rect<float> consoleTextRect = {0, 460, 0, 20};
 
     PlayerMovementControl *playerMoveSystem{};
 
     CollisionSystem *colSystem{};
     HealthSystem *healthSys{};
 
-    //controls
+    // controls
     bool showDebugWindow = false;
     bool showConsole = false;
     float time_accumulator = 0;
@@ -1020,7 +1016,6 @@ class Application
     }
 
   private:
-   
     static constexpr yorcvs::Vec2<float> default_render_dimensions = {240.0f, 120.0f};
     static constexpr float msPF = 41.6f;
     static constexpr intmax_t default_render_distance = 1;

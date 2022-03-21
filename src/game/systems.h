@@ -69,13 +69,10 @@ class CollisionSystem
                         // bottom right corner
                         check_collision_corner_bottom_right(rectA, rectB, rectAvel,dt);
                         // bottom left corner
-                        check_collision_corner_bottom_left(rectA, rectB, rectAvel,dt);
-                        
+                        check_collision_corner_bottom_left(rectA, rectB, rectAvel,dt); 
                     }
                 }
-                rectAvel /= dt;
-        
-               
+                rectAvel /= dt;               
             }
         }
     }
@@ -315,8 +312,7 @@ class AnimationSystem
                             animation_name,
                         yorcvs::MSGSEVERITY::ERROR);
             return;
-        }
-     
+        }     
     }
     /**
      * @brief Removes an animation from the entity. Currently unecessary, might be useful for editing entities
@@ -415,7 +411,6 @@ class HealthSystem
   public:
     HealthSystem(yorcvs::ECS *parent) : world(parent)
     {
-
         world->register_system<HealthSystem>(*this);
         world->add_criteria_for_iteration<HealthSystem, healthComponent>();
     }

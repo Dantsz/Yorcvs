@@ -34,12 +34,11 @@ template <typename interface> class Text
 
 /**
  * @brief Window event
- * 
- * @tparam interface 
+ *
+ * @tparam interface
  */
-template<typename interface> class Event
+template <typename interface> class Event
 {
-
 };
 
 /**
@@ -214,9 +213,9 @@ template <typename interface> class Window
     void set_text_line_length(const Text<interface> &text, size_t lineLength);
     /**
      * @brief Gets the length of the line based on the char length
-     * 
-     * @param text 
-     * @return float 
+     *
+     * @param text
+     * @return float
      */
     float get_text_length(const Text<interface> &text);
     /**

@@ -128,14 +128,12 @@ class EntityManager
      * @return size_t ID of the new entity
      */
     size_t addEntity()
-    {
-        // if there isn't any in the the queue,create a new one and a new entry in the signature list
+    { // if there isn't any in the the queue,create a new one and a new entry in the signature list
         if (freedIndices.empty())
         {
             entitySignatures.emplace_back();
             return lowestUnallocatedID++;
         }
-
         // take the id from   the front of the queue
         const size_t id = freedIndices.back();
         // popit
@@ -235,7 +233,6 @@ class EntityManager
  */
 template <typename T> class ComponentContainer final : public VContainer
 {
-
   public:
     // update a specific component
     void add_component(const size_t entityID, const T &component)
@@ -355,6 +352,7 @@ template <typename T> class ComponentContainer final : public VContainer
     {
         components[entity_to_component[dstID]] = components[entity_to_component[srcID]];
     }
+
   private:
     // components vector
     std::vector<T> components{};
@@ -401,18 +399,16 @@ class ComponentManager
 
     /**
      * @brief  register a component
-     * 
-     * @tparam T 
+     *
+     * @tparam T
      */
     template <typename T> void register_component()
     {
         const char *componentid = typeid(T).name();
         // and it does what it looks it should do
-
         // check if the container type is registered
         if (component_type.find(componentid) == component_type.end())
-        {
-            // if the type of the container is not registered ,register it
+        { // if the type of the container is not registered ,register it
             component_type.insert({componentid, nrComponents++});
 
             componentContainers.insert({componentid, std::make_shared<ComponentContainer<T>>()});
@@ -424,10 +420,10 @@ class ComponentManager
     }
     /**
      * @brief Adds a registered type of component to the entity
-     * 
+     *
      * @tparam T type of component
      * @param entityID entity
-     * @param component 
+     * @param component
      */
     template <typename T> void add_component(const size_t entityID, T &component)
     {
@@ -459,12 +455,11 @@ class ComponentManager
         return get_container<T>()->get_component(entityID);
     }
 
-     
     /**
      * @brief gets the id of a component in the manager
-     * 
-     * @tparam T 
-     * @return size_t 
+     *
+     * @tparam T
+     * @return size_t
      */
     template <typename T>[[nodiscard]] size_t get_component_ID()
     {
@@ -479,8 +474,8 @@ class ComponentManager
 
     /**
      * @brief iterate through all components of the entity and delete them
-     * 
-     * @param entityID 
+     *
+     * @param entityID
      */
     void on_entity_destroyed(const size_t entityID)
     {
@@ -499,9 +494,9 @@ class ComponentManager
 
     /**
      * @brief gets the container of the specified type
-     * 
-     * @tparam T 
-     * @return std::shared_ptr<ComponentContainer<T>> 
+     *
+     * @tparam T
+     * @return std::shared_ptr<ComponentContainer<T>>
      */
     template <typename T> std::shared_ptr<ComponentContainer<T>> get_container()
     {
@@ -569,7 +564,7 @@ class SystemManager
     ~SystemManager() = default;
     /**
      * @brief creates a system of type T and puts it in the map
-     * 
+     *
      * @tparam T type of the system(one system per time)
      * @param system a valid reference to system
      * @return true the system was registered
@@ -592,9 +587,9 @@ class SystemManager
     }
     /**
      * @brief Sets the signature of the system with type T
-     * 
-     * @tparam T 
-     * @param signature 
+     *
+     * @tparam T
+     * @param signature
      */
     template <systemT T> void set_signature(const std::vector<bool> &signature)
     {
@@ -627,9 +622,9 @@ class SystemManager
 
     /**
      * @brief Gets signature of a system
-     * 
-     * @tparam T 
-     * @return std::vector<bool> 
+     *
+     * @tparam T
+     * @return std::vector<bool>
      */
     template <systemT T>[[nodiscard]] std::vector<bool> get_system_signature()
     {
@@ -646,8 +641,8 @@ class SystemManager
 
     /**
      * @brief Erase entity from all systems
-     * 
-     * @param entityID 
+     *
+     * @param entityID
      */
     void on_entity_destroy(const size_t entityID)
     {
@@ -661,9 +656,9 @@ class SystemManager
 
     /**
      * @brief Notify each system that an entity's signature changed
-     * 
-     * @param entityID 
-     * @param signature 
+     *
+     * @param entityID
+     * @param signature
      */
     void on_entity_signature_change(const size_t entityID, std::vector<bool> &signature)
     {
@@ -687,7 +682,7 @@ class SystemManager
 
     /**
      * @brief compare the signature
-     * 
+     *
      * @param signature1 first signature
      * @param signature2 second signature
      * @return true they are the same
