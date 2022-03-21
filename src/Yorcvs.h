@@ -800,6 +800,10 @@ class DebugInfo
             console_rect.y = parentWindow->get_size().y - console_rect.h;
             console_rect.w = parentWindow->get_text_length(consoleText).x;
             parentWindow->draw_text(consoleText, console_rect);
+            for(const auto& [previous_text,previous_rect,cmd_str] : previous_commands)
+            {
+                parentWindow->draw_text(previous_text, previous_rect);
+            }
         }
     }
 
@@ -842,6 +846,17 @@ class DebugInfo
             {
                 // process input
                 std::cout << console_input << '\n';
+                for(auto& [text,rect,cmd_str] : previous_commands)
+                {
+                    rect.y -= consoleTextRect.h;
+                }
+                yorcvs::Rect<float> old_console_command_rect = consoleTextRect;
+                old_console_command_rect.w = parentWindow->get_text_length(consoleText).x;
+                old_console_command_rect.y -= consoleTextRect.h;
+                
+                previous_commands.emplace(previous_commands.begin(),std::move(consoleText),old_console_command_rect,console_input);
+                consoleText =  parentWindow->create_text("assets/font.ttf", ">", textR, textG, textB, textA, console_char_size,
+                                                text_line_length);
                 console_input.clear();
             }
         }}));
@@ -881,6 +896,8 @@ class DebugInfo
     yorcvs::Text<yorcvs::graphics> consoleText;
     const yorcvs::Rect<float> consoleTextRect = {0, 460, 0, 20};
 
+    std::vector<std::tuple<yorcvs::Text<yorcvs::graphics>,yorcvs::Rect<float>,std::string>> previous_commands;
+
     PlayerMovementControl *playerMoveSystem{};
 
     CollisionSystem *colSystem{};
@@ -890,7 +907,16 @@ class DebugInfo
     bool showDebugWindow = false;
     bool showConsole = false;
     float time_accumulator = 0;
-    static constexpr float ui_controls_update_time = 250.0f;
+
+    static constexpr float console_char_size = 32.0f;
+    static constexpr size_t console_previous_command_shown = 5;
+
+    static constexpr yorcvs::Vec2<float> health_full_bar_dimension = {32.0f, 4.0f};
+    const std::vector<uint8_t> health_bar_full_color = {255, 0, 0, 255};
+    const std::vector<uint8_t> health_bar_empty_color = {100, 0, 0, 255};
+
+    const std::vector<uint8_t> hitbox_color = {255, 0, 0, 100};
+
 
     static constexpr size_t textR = 255;
     static constexpr size_t textG = 255;
@@ -898,17 +924,12 @@ class DebugInfo
     static constexpr size_t textA = 255;
     static constexpr size_t text_char_size = 100;
     static constexpr size_t text_line_length = 10000;
-    static constexpr yorcvs::Vec2<float> health_full_bar_dimension = {32.0f, 4.0f};
-    static constexpr float zoom_power = 0.1f;
-    static constexpr float console_char_size = 32.0f;
-    // rgba
-    const std::vector<uint8_t> health_bar_full_color = {255, 0, 0, 255};
-    const std::vector<uint8_t> health_bar_empty_color = {100, 0, 0, 255};
-
-    const std::vector<uint8_t> hitbox_color = {255, 0, 0, 100};
 
     const std::vector<uint8_t> stamina_bar_full_color = {0, 255, 0, 100};
     const std::vector<uint8_t> stamina_bar_empty_color = {0, 100, 0, 100};
+
+    static constexpr float ui_controls_update_time = 250.0f;
+    static constexpr float zoom_power = 0.1f;
 };
 
 // TODO: MAKE SOME SYSTEMS MAP-DEPENDENT AND REMOVE THIS

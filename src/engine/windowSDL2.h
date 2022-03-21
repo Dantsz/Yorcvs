@@ -431,7 +431,7 @@ template <> class Window<yorcvs::SDL2>
         text.lineLength = static_cast<uint32_t>(lineLength);
         setup_texture(text);
     }
-    static yorcvs::Vec2<float> get_text_length(const Text<yorcvs::SDL2> &text)
+    yorcvs::Vec2<float> get_text_length(const Text<yorcvs::SDL2> &text)
     {
         TTF_Font *font = TTF_OpenFont(text.fontPath.c_str(), text.charSize);
         if (font == nullptr)
