@@ -13,21 +13,15 @@ int main(int argc, char **argv)
     yorcvs::ECS world{};
     timy.start();
     yorcvs::Map map{"assets/map.tmx", &world};
+
     std::cout << "Loading map took " <<  timy.get_ticks() << "ms" << '\n';
     //deleting player
     
 
-        //check if a player is on the map , it should be
-        assert(world.get_entities_with_component<playerMovementControlledComponent>() == 1);
+        ;
         //delete playerMovementControlledComponent
         const size_t numberOfEntities = world.get_active_entities_number();
-        for(size_t i =  0 ; i < numberOfEntities ; i++)
-        {
-            if(world.has_components<playerMovementControlledComponent>(i))
-            {
-                world.remove_component<playerMovementControlledComponent>(i);
-            }
-        }
+       
         //no more players
         assert(world.get_entities_with_component<playerMovementControlledComponent>() == 0 );
         //add ducks(first create valid entity IDs  and test the performance) and then load ducks data into the entities
