@@ -61,6 +61,10 @@ struct Tile
     std::string texture_path;
 };
 
+/**
+ * @brief Loads tmx map data into the ecs
+ * 
+ */
 class Map
 {
   public:
@@ -69,14 +73,26 @@ class Map
           animS(world)
     {
     }
+    /**
+     * @brief Construct a new Map object
+     * 
+     * @param path path to map file
+     * @param world the ecs in which data shoudl be added
+     */
     Map(const std::string &path, yorcvs::ECS *world) : Map(world)
     {
         load(world, path);
-        entities.emplace_back(world);
-        load_character_from_path(entities[entities.size() - 1], "assets/player.json");
-        ecs->add_component<playerMovementControlledComponent>(entities[entities.size() - 1].id, {});
     }
-
+    ~Map()
+    {
+        clear();
+    }
+    /**
+     * @brief Loads data from path into the ecs
+     * 
+     * @param parent 
+     * @param path 
+     */
     void load(yorcvs::ECS *parent, const std::string &path)
     {
         ecs = parent;
@@ -137,7 +153,11 @@ class Map
             }
         }
     }
-
+    /**
+     * @brief Updates the systems registered by the map
+     * 
+     * @param dt delta time
+     */
     void update(const float dt)
     {
         collisionS.update(dt);
@@ -146,13 +166,29 @@ class Map
         healthS.update(dt);
         sprintS.update(dt);
     }
-
+    /**
+     * @brief Removes all entitites and tiles loaded by this map
+     * 
+     */
     void clear()
     {
+        for(const auto& entity : entities)
+        {
+            if(ecs->is_valid_entity(entity))
+            {
+                ecs->destroy_entity(entity);
+            }
+        }
         entities.clear();
         ysorted_tiles.clear();
         tiles_chunks.clear();
     }
+    /**
+     * @brief Loads json entity data into the entity
+     * 
+     * @param entity_id id of the entity
+     * @param path path to the json file
+     */
     void load_character_from_path(const size_t entity_id, const std::string &path)
     {
         std::filesystem::path file = path;
@@ -237,6 +273,12 @@ class Map
     {
         load_character_from_path(entity.id, path);
     }
+    /**
+     * @brief Serializez an entities components and returns the string reprezentation
+     * 
+     * @param entity 
+     * @return std::string 
+     */
     std::string save_character_to_path(const size_t entity) const
     {
         json::json j;
@@ -455,8 +497,8 @@ class Map
         for (const auto &object : objects)
         {
             // create entity
-            entities.emplace_back(ecs);
-            const size_t entity = entities[entities.size() - 1].id;
+            entities.push_back(ecs->create_entity_ID());
+            const size_t entity = entities[entities.size() - 1];
             ecs->add_component<positionComponent>(
                 entity, {{object.getPosition().x, object.getPosition().y - object.getAABB().height}});
             if (object.getTileID() != 0 && object.visible())
@@ -582,7 +624,7 @@ class Map
     CollisionSystem collisionS;
     yorcvs::Vec2<float> tilesSize;
 
-    std::vector<yorcvs::Entity> entities;
+    std::vector<size_t> entities;//not a vector of Entities because the map is not responsible for their lifetimes( they can be destroyed by other stuff)
     HealthSystem healthS;
     StaminaSystem sprintS;
 
@@ -943,6 +985,13 @@ class Application
   public:
     Application()
     {
+        //loading two maps one on top of each other
+        map.load(&world,"assets/map.tmx");
+        map.load(&world,"assets/map2.tmx");
+        size_t player_id = world.create_entity_ID();
+        map.load_character_from_path(player_id, "assets/player.json");
+        world.add_component<playerMovementControlledComponent>(player_id, {});
+
         dbInfo.attach(&r, &map, &pcS, &map.collisionS, &map.healthS);
         counter.start();
     }
@@ -1000,18 +1049,14 @@ class Application
         lag += elapsed;
 
         r.handle_events();
-        update_timer.start();
         while (lag >= msPF)
         {
             update(msPF);
             bhvS.update(msPF);
             pcS.updateControls(render_dimensions, msPF);
             lag -= msPF;
-
-            updates++;
         }
-        update_time = update_timer.get_ticks<float>();
-        render_timer.start();
+
 
         r.clear();
         render_map_tiles(map);
@@ -1019,10 +1064,6 @@ class Application
         dbInfo.render(elapsed, render_dimensions);
         r.present();
 
-        frames++;
-        render_time = render_timer.get_ticks<float>();
-        /*yorcvs::log("Frame: " + std::to_string(frames) + " updates : " + std::to_string(updates) +
-                    " update_time: " + std::to_string(update_time) + " render_time: " + std::to_string(render_time));*/
     }
 
     [[nodiscard]] bool is_active() const
@@ -1047,21 +1088,12 @@ class Application
     yorcvs::Vec2<float> render_dimensions = default_render_dimensions; // how much to render
     intmax_t render_distance = default_render_distance;
     yorcvs::ECS world{};
-    // yorcvs::Map map{"assets/testmaps/duck_test.tmx", &world};
-    yorcvs::Map map{"assets/map.tmx", &world};
+   
+    yorcvs::Map map{&world};
     SpriteSystem sprS{map.ecs, &r};
     PlayerMovementControl pcS{map.ecs, &r};
     BehaviourSystem bhvS{map.ecs};
 
-    // debug stuff
     DebugInfo dbInfo;
-    yorcvs::Timer render_timer{};
-    float render_time = 0.0f;
-
-    yorcvs::Timer update_timer{};
-    float update_time = 0.0f;
-
-    size_t frames = 0;
-    size_t updates = 0;
 };
 } // namespace yorcvs
