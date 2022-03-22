@@ -5,7 +5,7 @@
 [![Ctests](https://github.com/Dantsz/Yorcvs/actions/workflows/CTests.yml/badge.svg)](https://github.com/Dantsz/Yorcvs/actions/workflows/CTests.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/dantsz/yorcvs/badge?s=c9aff80c39c79e9d970cb65e1572ff8096881f19)](https://www.codefactor.io/repository/github/dantsz/yorcvs)
 
-C++ game project
+C++ RPG/sandbox game project
 ## Dependencies
 |Dependency|Minimum Version|
 --- |---
