@@ -73,6 +73,7 @@ endif()
   
 endif()
 
+#INSTALL JSON LIBRARY
 FetchContent_Declare(json
   GIT_REPOSITORY https://github.com/nlohmann/json.git
   GIT_TAG v3.7.3)
@@ -85,7 +86,7 @@ endif()
 
 target_link_libraries(${PROJECT_NAME}  nlohmann_json::nlohmann_json)
 
-
+#INSTALL TMX LIBRARY
 FetchContent_Declare(libtmxlite
  GIT_REPOSITORY https://github.com/Dantsz/tmxlite.git
  GIT_TAG "main" 
@@ -100,5 +101,24 @@ if(NOT libtmxlite_POPULATED)
 endif()
 target_link_libraries(${PROJECT_NAME}  tmxlite)
 
-
-
+#INSTALL LUA Interpreter
+FetchContent_Declare(lua
+ GIT_REPOSITORY https://github.com/lubgr/lua-cmake.git
+ GIT_TAG "master" 
+)
+FetchContent_GetProperties(lua)
+if (NOT lua_POPULATED)
+   FetchContent_Populate(lua)
+   add_subdirectory(${lua_SOURCE_DIR} ${lua_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+target_link_libraries(${PROJECT_NAME} lua::lib)
+#INSTALL SOL2
+FetchContent_Declare(sol2
+ GIT_REPOSITORY https://github.com/ThePhD/sol2.git
+ GIT_TAG "main" 
+)
+FetchContent_GetProperties(sol2)
+if (NOT sol2_POPULATED)
+   FetchContent_Populate(sol2)
+  target_include_directories(${PROJECT_NAME} PUBLIC ${sol2_SOURCE_DIR}/include)
+endif()

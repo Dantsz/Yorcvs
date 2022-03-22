@@ -37,7 +37,7 @@ namespace json = nlohmann;
 #include <filesystem>
 #include <fstream>
 #include <tmxlite/Map.hpp>
-
+#include "sol/sol.hpp"
 // TODO: move this to utlities
 namespace std
 {
@@ -846,6 +846,10 @@ class DebugInfo
             {
                 // process input
                 std::cout << console_input << '\n';
+                sol::state lua;
+                // open some common libraries
+                lua.open_libraries(sol::lib::base, sol::lib::package);
+                lua.script(console_input);
                 for(auto& [text,rect,cmd_str] : previous_commands)
                 {
                     rect.y -= consoleTextRect.h;
