@@ -167,7 +167,25 @@ class EntityManager
         // the vector is always sorted in order to check if id apears in it using binary search
         std::sort(freedIndices.begin(), freedIndices.end());
     }
-
+    /**
+     * @brief Returns whether the entity is valid or not(THE ENTITY COULD'VE BEEN OVERWRITTEN)
+     * 
+     * @param id entity
+     * @return true the entity is valid
+     * @return false the entity has been destroyed or it has never existed
+     */
+    bool is_valid_entity(const size_t id)
+    {
+       if(std::find(freedIndices.begin(), freedIndices.end(),id) != freedIndices.end()) // the entity was freed
+       {
+           return false;
+       }
+       if(id > lowestUnallocatedID )// the entity was never created 
+       {
+           return false;
+       }
+       return true;
+    }
     /**
      * @brief Set the signature of an entity
      *
@@ -817,6 +835,17 @@ class ECS
         entitymanager->delete_entity(id);
         componentmanager->on_entity_destroyed(id);
         systemmanager->on_entity_destroy(id);
+    }
+    /**
+     * @brief Checks whether the entity is valid(components can be added to it)
+     * 
+     * @param id id of the entity
+     * @return true the entity is valid
+     * @return false the entity has been freed or never existed
+     */
+    bool is_valid_entity(const size_t id)
+    {
+        return entitymanager->is_valid_entity(id);
     }
     /**
      * @brief Get the Entity Signature
