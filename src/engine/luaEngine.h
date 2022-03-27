@@ -1,26 +1,11 @@
 #pragma once
 #include "sol/sol.hpp"
 #include "../common/ecs.h"
-namespace yorcvs
-{
-    class LuaEngine 
+#include "sol/state.hpp"
+namespace yorcvs::lua
+{   
+    inline bool bind_runtime(sol::state & lua_state, yorcvs::ECS* ecs)
     {
-        public:
-        LuaEngine() = delete;
-        LuaEngine(yorcvs::ECS* ecs) : world(ecs)
-        {
-
-        };
-        LuaEngine(const LuaEngine&) = delete;
-        LuaEngine& operator=(const LuaEngine&) = delete;
-        LuaEngine(LuaEngine&&) = delete;
-        LuaEngine& operator=(LuaEngine&&) = delete;
-
-                
-
-
-        private:
-        yorcvs::ECS* world;
-        sol::state lua_state;
-    };
+        return true;
+    }
 }

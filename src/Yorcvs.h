@@ -14,6 +14,7 @@
 #include "common/ecs.h"
 #include "common/types.h"
 #include "common/utilities.h"
+#include "engine/luaEngine.h"
 #include "game/componentSerialization.h"
 #include "game/components.h"
 #include "game/systems.h"
@@ -644,10 +645,10 @@ class DebugInfo
     DebugInfo() = default;
 
     DebugInfo(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::Map *map, PlayerMovementControl *pms,
-              CollisionSystem *cols, HealthSystem *healthS)
-        : parentWindow(parentW), appECS(map->ecs), map(map), playerMoveSystem(pms), colSystem(cols)
+              CollisionSystem *cols, HealthSystem *healthS,sol::state* lua)
+        : parentWindow(parentW), appECS(map->ecs), map(map), lua_state(lua), playerMoveSystem(pms),colSystem(cols)
     {
-        attach(parentW, map, pms, cols, healthS);
+        attach(parentW, map, pms, cols, healthS,lua);
     }
     ~DebugInfo() = default;
     DebugInfo(const DebugInfo &other) = delete;
@@ -657,7 +658,7 @@ class DebugInfo
 
     void update(const float ft)
     {
-        // if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_R))
+        // if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_R))  
         // {
         //     reset();
         // }
@@ -850,8 +851,9 @@ class DebugInfo
     }
 
     void attach(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::Map *map, PlayerMovementControl *pms,
-                CollisionSystem *cols, HealthSystem *healthS)
+                CollisionSystem *cols, HealthSystem *healthS,sol::state* lua)
     {
+        lua_state = lua;
         parentWindow = parentW;
         this->map = map;
         appECS = map->ecs;
@@ -888,10 +890,25 @@ class DebugInfo
             {
                 // process input
                 std::cout << console_input << '\n';
-                sol::state lua;
+                auto rez = lua_state->load(console_input);
+                if(!rez.valid())
+                {      sol::error err = rez;
+                       for(auto& [text,rect,cmd_str] : previous_commands)
+                        {
+                            rect.y -= consoleTextRect.h;
+                        }
+                        yorcvs::Rect<float> old_console_command_rect = consoleTextRect;
+                      
+                       
+                        yorcvs::Text<yorcvs::graphics> error_txt =  parentWindow->create_text("assets/font.ttf", err.what(), textR, textG, textB, textA, console_char_size,
+                        text_line_length);
+                        old_console_command_rect.w = parentWindow->get_text_length(error_txt).x;
+                        old_console_command_rect.y -= consoleTextRect.h;
+                        previous_commands.emplace(previous_commands.begin(),std::move(error_txt),old_console_command_rect,err.what());
+                }
+               // lua_state->script(console_input);
                 // open some common libraries
-                lua.open_libraries(sol::lib::base, sol::lib::package);
-                lua.script(console_input);
+               
                 for(auto& [text,rect,cmd_str] : previous_commands)
                 {
                     rect.y -= consoleTextRect.h;
@@ -918,6 +935,8 @@ class DebugInfo
     yorcvs::Window<yorcvs::graphics> *parentWindow{};
     yorcvs::ECS *appECS{};
     yorcvs::Map *map{};
+    sol::state *lua_state;
+
     yorcvs::Text<yorcvs::graphics> frameTime;
     const yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
 
@@ -989,6 +1008,8 @@ class Application
   public:
     Application()
     {
+        lua_state.open_libraries(sol::lib::base, sol::lib::package);
+        yorcvs::lua::bind_runtime(lua_state, &world);
         //loading two maps one on top of each other
         map.load(&world,"assets/map.tmx");
         map.load(&world,"assets/map2.tmx");
@@ -996,7 +1017,7 @@ class Application
         map.load_character_from_path(player_id, "assets/player.json");
         world.add_component<playerMovementControlledComponent>(player_id, {});
 
-        dbInfo.attach(&r, &map, &pcS, &map.collisionS, &map.healthS);
+        dbInfo.attach(&r, &map, &pcS, &map.collisionS, &map.healthS, &lua_state);
         counter.start();
     }
     Application(const Application &other) = delete;
@@ -1092,7 +1113,7 @@ class Application
     yorcvs::Vec2<float> render_dimensions = default_render_dimensions; // how much to render
     intmax_t render_distance = default_render_distance;
     yorcvs::ECS world{};
-   
+    sol::state lua_state;
     yorcvs::Map map{&world};
     SpriteSystem sprS{map.ecs, &r};
     PlayerMovementControl pcS{map.ecs, &r};
