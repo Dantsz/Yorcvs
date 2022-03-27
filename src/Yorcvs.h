@@ -844,7 +844,9 @@ class DebugInfo
             parentWindow->draw_text(consoleText, console_rect);
             for(const auto& [previous_text,previous_rect,cmd_str] : previous_commands)
             {
-                parentWindow->draw_text(previous_text, previous_rect);
+                console_rect = previous_rect;
+                console_rect.y += parentWindow->get_window_size().y - consoleTextRect.h;
+                parentWindow->draw_text(previous_text, console_rect);
             }
         }
     }
@@ -936,7 +938,7 @@ class DebugInfo
     const yorcvs::Rect<float> playerHealthRect = {0, 125, 200, 25};
 
     yorcvs::Text<yorcvs::graphics> consoleText;
-    const yorcvs::Rect<float> consoleTextRect = {0, 460, 0, 20};
+    const yorcvs::Rect<float> consoleTextRect = {0, 0, 0, 20};
 
     std::vector<std::tuple<yorcvs::Text<yorcvs::graphics>,yorcvs::Rect<float>,std::string>> previous_commands;
 
