@@ -845,7 +845,9 @@ class DebugInfo
             parentWindow->draw_text(consoleText, console_rect);
             for(const auto& [previous_text,previous_rect,cmd_str] : previous_commands)
             {
-                parentWindow->draw_text(previous_text, previous_rect);
+                console_rect = previous_rect;
+                console_rect.y += parentWindow->get_window_size().y - consoleTextRect.h;
+                parentWindow->draw_text(previous_text, console_rect);
             }
         }
     }
@@ -891,6 +893,20 @@ class DebugInfo
                 // process input
                 std::cout << console_input << '\n';
                 auto rez = lua_state->load(console_input);
+           
+               
+                for(auto& [text,rect,cmd_str] : previous_commands)
+                {
+                    rect.y -= consoleTextRect.h;
+                }
+                yorcvs::Rect<float> old_console_command_rect = consoleTextRect;
+                old_console_command_rect.w = parentWindow->get_text_length(consoleText).x;
+                old_console_command_rect.y -= consoleTextRect.h;
+                
+                previous_commands.emplace(previous_commands.begin(),std::move(consoleText),old_console_command_rect,console_input);
+                consoleText =  parentWindow->create_text("assets/font.ttf", ">", textR, textG, textB, textA, console_char_size,
+                                                text_line_length);
+                console_input.clear();
                 if(!rez.valid())
                 {      sol::error err = rez;
                        for(auto& [text,rect,cmd_str] : previous_commands)
@@ -906,21 +922,6 @@ class DebugInfo
                         old_console_command_rect.y -= consoleTextRect.h;
                         previous_commands.emplace(previous_commands.begin(),std::move(error_txt),old_console_command_rect,err.what());
                 }
-               // lua_state->script(console_input);
-                // open some common libraries
-               
-                for(auto& [text,rect,cmd_str] : previous_commands)
-                {
-                    rect.y -= consoleTextRect.h;
-                }
-                yorcvs::Rect<float> old_console_command_rect = consoleTextRect;
-                old_console_command_rect.w = parentWindow->get_text_length(consoleText).x;
-                old_console_command_rect.y -= consoleTextRect.h;
-                
-                previous_commands.emplace(previous_commands.begin(),std::move(consoleText),old_console_command_rect,console_input);
-                consoleText =  parentWindow->create_text("assets/font.ttf", ">", textR, textG, textB, textA, console_char_size,
-                                                text_line_length);
-                console_input.clear();
             }
         }}));
     }
@@ -959,7 +960,7 @@ class DebugInfo
     const yorcvs::Rect<float> playerHealthRect = {0, 125, 200, 25};
 
     yorcvs::Text<yorcvs::graphics> consoleText;
-    const yorcvs::Rect<float> consoleTextRect = {0, 460, 0, 20};
+    const yorcvs::Rect<float> consoleTextRect = {0, 0, 0, 20};
 
     std::vector<std::tuple<yorcvs::Text<yorcvs::graphics>,yorcvs::Rect<float>,std::string>> previous_commands;
 
