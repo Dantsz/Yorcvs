@@ -890,7 +890,7 @@ class DebugInfo
             if (event.get_type() == yorcvs::Event<graphics>::KEYBOARD_PRESSED && showConsole &&
                 event.get_key() == YORCVS_KEY_ENTER)
             {
-                // process input
+                // input
                 std::cout << console_input << '\n';
                 auto rez = lua_state->safe_script(console_input,[](lua_State*, sol::protected_function_result pfr) {return pfr;});
 
@@ -907,21 +907,30 @@ class DebugInfo
                 consoleText =  parentWindow->create_text("assets/font.ttf", ">", textR, textG, textB, textA, console_char_size,
                                                 text_line_length);
                 console_input.clear();
+                //SHOW OUTPUT ON CONSOLE
                 if(!rez.valid())
                 {      sol::error err = rez;
-                       std::cout<< err.what() << '\n';
+                       std::string text = err.what();
+                      
                        for(auto& [text,rect,cmd_str] : previous_commands)
                         {
                             rect.y -= consoleTextRect.h;
                         }
                         yorcvs::Rect<float> old_console_command_rect = consoleTextRect;
-
+          
                        
-                        yorcvs::Text<yorcvs::graphics> error_txt =  parentWindow->create_text("assets/font.ttf", err.what(), textR, textG, textB, textA, console_char_size,
+                        std::transform(text.begin(), text.end(),text.begin(),[](unsigned char c)->unsigned char{
+                            if(c == '\n')
+                            {
+                                return ' ';
+                            }
+                            return c;
+                        });
+                        yorcvs::Text<yorcvs::graphics> error_txt =  parentWindow->create_text("assets/font.ttf", text, textR, textG, textB, textA, console_char_size,
                         text_line_length);
                         old_console_command_rect.w = parentWindow->get_text_length(error_txt).x;
                         old_console_command_rect.y -= consoleTextRect.h;
-                        previous_commands.emplace(previous_commands.begin(),std::move(error_txt),old_console_command_rect,err.what());
+                        previous_commands.emplace(previous_commands.begin(),std::move(error_txt),old_console_command_rect,text);
                 }
             }
         }}));
