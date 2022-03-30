@@ -892,8 +892,8 @@ class DebugInfo
             {
                 // process input
                 std::cout << console_input << '\n';
-                auto rez = lua_state->load(console_input);
-           
+                auto rez = lua_state->safe_script(console_input,[](lua_State*, sol::protected_function_result pfr) {return pfr;});
+
                
                 for(auto& [text,rect,cmd_str] : previous_commands)
                 {
@@ -909,12 +909,13 @@ class DebugInfo
                 console_input.clear();
                 if(!rez.valid())
                 {      sol::error err = rez;
+                       std::cout<< err.what() << '\n';
                        for(auto& [text,rect,cmd_str] : previous_commands)
                         {
                             rect.y -= consoleTextRect.h;
                         }
                         yorcvs::Rect<float> old_console_command_rect = consoleTextRect;
-                      
+
                        
                         yorcvs::Text<yorcvs::graphics> error_txt =  parentWindow->create_text("assets/font.ttf", err.what(), textR, textG, textB, textA, console_char_size,
                         text_line_length);
