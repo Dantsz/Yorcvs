@@ -8,6 +8,11 @@
 
 C++ RPG/sandbox game project
 ![image](https://user-images.githubusercontent.com/19265585/160299653-ce730e2c-0307-4b0e-9bec-c16e8f078cde.png)
+## Features
+* ECS based design
+* Tmx map format
+* Lua scripting
+
 ## Dependencies
 |Dependency|Minimum Version|
 --- |---
