@@ -697,6 +697,7 @@ class DebugInfo
             {
                 const size_t ID = playerMoveSystem->entityList->entitiesID[0];
                 (*lua_state)["playerID"] = ID;
+                (*lua_state).script_file("assets/scripts/print_player_position.lua");
                 parentWindow->set_text_message(
                     playerPosition,
                     "Player position : X = " + std::to_string(appECS->get_component<positionComponent>(ID).position.x) +
