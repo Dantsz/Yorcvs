@@ -15,4 +15,4 @@ C++ RPG/sandbox game project
 |[nlohmann/json](https://github.com/nlohmann/json)|
 |[tmxlite](https://github.com/fallahn/tmxlite)|
 |[lua-cmake](https://github.com/lubgr/lua-cmake)|
-|[sol2](https://github.com/fallahn/tmxlite)|v3.2.2
+|[sol2](https://sol2.readthedocs.io/en/latest/)|v3.2.2
