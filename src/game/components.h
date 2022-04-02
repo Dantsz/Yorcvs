@@ -75,7 +75,7 @@ struct behaviourComponent
 {
     float dt;
     float accumulated;
-    std::string code;
+    std::string code_path;
 };
 struct defensiveStatsComponent;
 struct offensiveStatsComponent;

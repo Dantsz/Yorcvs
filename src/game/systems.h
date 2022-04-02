@@ -2,10 +2,12 @@
 #include "../common/ecs.h"
 #include "components.h"
 #include "../engine/windowSDL2.h"
+#include "sol/sol.hpp"
 #include <array>
 #include <cmath>
 #include <random>
 #include <stack>
+
 /**
  * @brief Handles collision between entities
  * 
@@ -600,34 +602,16 @@ class SpriteSystem
 class BehaviourSystem
 {
   public:
-    BehaviourSystem(yorcvs::ECS *parent) : world(parent)
+    BehaviourSystem(yorcvs::ECS *parent,sol::state* lua) : world(parent),lua_state(lua)
     {
         world->register_system<BehaviourSystem>(*this);
         world->add_criteria_for_iteration<BehaviourSystem, behaviourComponent, velocityComponent>();
     }
     void chicken_behaviour(const size_t ID)
     {
-        static constexpr float chicken_speed = 0.033f;
-        const float velx = static_cast<float>(generator() % 3) - 1.0f;
-        const float vely = static_cast<float>(generator() % 3) - 1.0f;
-        world->get_component<velocityComponent>(ID).vel = {velx * chicken_speed, vely * chicken_speed};
+        (*lua_state)["entityID"] = ID;
+        lua_state->safe_script_file("assets/scripts/behavior_chicken.lua");
         world->get_component<behaviourComponent>(ID).accumulated = 0.0f;
-        if (world->get_component<velocityComponent>(ID).vel.x > velocity_trigger_treshold)
-        {
-            AnimationSystem::set_animation(world, ID, "walkingL");
-        }
-        else if (world->get_component<velocityComponent>(ID).vel.x < velocity_trigger_treshold)
-        {
-            AnimationSystem::set_animation(world, ID, "walkingR");
-        }
-        else if (world->get_component<velocityComponent>(ID).facing.x)
-        {
-            AnimationSystem::set_animation(world, ID, "idleL");
-        }
-        else
-        {
-            AnimationSystem::set_animation(world, ID, "idleR");
-        }
     }
     void update(const float dt)
     {
@@ -648,7 +632,7 @@ class BehaviourSystem
     std::mt19937 generator{dev()};
 
     yorcvs::ECS *world = nullptr;
-
+    sol::state* lua_state;
     static constexpr float velocity_trigger_treshold = 0.0f;
 };
 /**

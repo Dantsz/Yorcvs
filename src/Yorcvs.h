@@ -1021,7 +1021,7 @@ class Application
   public:
     Application()
     {
-        lua_state.open_libraries(sol::lib::base, sol::lib::package);
+        lua_state.open_libraries(sol::lib::base, sol::lib::package,sol::lib::math);
         yorcvs::lua::bind_runtime(lua_state, &world);
         //loading two maps one on top of each other
         map.load(&world,"assets/map.tmx");
@@ -1130,7 +1130,7 @@ class Application
     yorcvs::Map map{&world};
     SpriteSystem sprS{map.ecs, &r};
     PlayerMovementControl pcS{map.ecs, &r};
-    BehaviourSystem bhvS{map.ecs};
+    BehaviourSystem bhvS{map.ecs,&lua_state};
 
     DebugInfo dbInfo;
 };
