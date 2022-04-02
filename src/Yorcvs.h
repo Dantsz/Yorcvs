@@ -475,7 +475,7 @@ class Map
             {
                 ecs->add_component<healthComponent>(entity, {});
             }
-            ecs->get_component<healthComponent>(entity).maxHP = property.getFloatValue();
+            ecs->get_component<healthComponent>(entity).max_HP = property.getFloatValue();
             return true;
         }
         if (property.getName() == "HP_regen")
@@ -707,7 +707,7 @@ class DebugInfo
                 {
                     healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
                     parentWindow->set_text_message(playerHealth, "Health: " + std::to_string(playerHealthC.HP) + " / " +
-                                                                     std::to_string(playerHealthC.maxHP));
+                                                                     std::to_string(playerHealthC.max_HP));
                 }
                 // print current chunk
                 // std::cout << appECS->get_component<positionComponent>(ID).position / (32.0f*16.0f) << "\n";
@@ -762,7 +762,7 @@ class DebugInfo
                 window.draw_rect(healthBarRect, health_bar_empty_color[0], health_bar_empty_color[1],
                                  health_bar_empty_color[2], health_bar_empty_color[3]);
                 healthBarRect.w =
-                    (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).maxHP) *
+                    (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).max_HP) *
                     32.0f;
                 window.draw_rect(healthBarRect, health_bar_full_color[0], health_bar_full_color[1],
                                  health_bar_full_color[2], health_bar_full_color[3]);
@@ -787,7 +787,7 @@ class DebugInfo
                 window.draw_rect(staminaBarRect, stamina_bar_empty_color[0], stamina_bar_empty_color[1],
                                  stamina_bar_empty_color[2], stamina_bar_empty_color[3]);
                 staminaBarRect.w = (appECS->get_component<staminaComponent>(ID).stamina /
-                                    appECS->get_component<staminaComponent>(ID).maxStamina) *
+                                    appECS->get_component<staminaComponent>(ID).max_stamina) *
                                    32.0f;
                 window.draw_rect(staminaBarRect, stamina_bar_full_color[0], stamina_bar_full_color[1],
                                  stamina_bar_full_color[2], stamina_bar_full_color[3]);

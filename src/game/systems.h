@@ -393,8 +393,8 @@ class AnimationSystem
                     world->get_component<animationComponent>(ID).cur_frame = 0;
                 }
 
-                world->get_component<spriteComponent>(ID).srcRect =
-                    cur_animation->frames[world->get_component<animationComponent>(ID).cur_frame].srcRect;
+                world->get_component<spriteComponent>(ID).src_rect =
+                    cur_animation->frames[world->get_component<animationComponent>(ID).cur_frame];
             }
         }
     }
@@ -429,10 +429,10 @@ class HealthSystem
                 world->get_component<healthComponent>(ID).HP +=
                     world->get_component<healthComponent>(ID).health_regen;
                 if (world->get_component<healthComponent>(ID).HP >
-                    world->get_component<healthComponent>(ID).maxHP)
+                    world->get_component<healthComponent>(ID).max_HP)
                 {
                     world->get_component<healthComponent>(ID).HP =
-                        world->get_component<healthComponent>(ID).maxHP;
+                        world->get_component<healthComponent>(ID).max_HP;
                 }
                 if (world->get_component<healthComponent>(ID).HP < 0.0f)
                 {
@@ -579,7 +579,7 @@ class SpriteSystem
             window->draw_sprite(
                 world->get_component<spriteComponent>(ID).texture_path,
                 world->get_component<spriteComponent>(ID).offset + world->get_component<positionComponent>(ID).position,
-                world->get_component<spriteComponent>(ID).size, world->get_component<spriteComponent>(ID).srcRect, 0.0);
+                world->get_component<spriteComponent>(ID).size, world->get_component<spriteComponent>(ID).src_rect, 0.0);
         }
         std::sort(entityList->entitiesID.begin(), entityList->entitiesID.end(),
                   [&](size_t ID1, size_t ID2) { return ID1 < ID2; });
@@ -674,10 +674,10 @@ class StaminaSystem
                 world->get_component<staminaComponent>(ID).stamina +=
                     world->get_component<staminaComponent>(ID).stamina_regen;
                 if (world->get_component<staminaComponent>(ID).stamina >
-                    world->get_component<staminaComponent>(ID).maxStamina)
+                    world->get_component<staminaComponent>(ID).max_stamina)
                 {
                     world->get_component<staminaComponent>(ID).stamina =
-                        world->get_component<staminaComponent>(ID).maxStamina;
+                        world->get_component<staminaComponent>(ID).max_stamina;
                 }
             }
             cur_time = 0.0f;

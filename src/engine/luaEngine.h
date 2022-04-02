@@ -25,9 +25,11 @@ inline void bind_basic_types(sol::state &lua_state)
 {
     sol::usertype<yorcvs::Vec2<float>> vec2f = lua_state.new_usertype<yorcvs::Vec2<float>>(
         "vec2f", "x", &yorcvs::Vec2<float>::x, "y", &yorcvs::Vec2<float>::y);
-    sol::usertype<yorcvs::Rect<float>> rect2f =
-        lua_state.new_usertype<yorcvs::Rect<float>>("rect2f", "x", &yorcvs::Rect<float>::x, "y", &yorcvs::Rect<float>::y, "w",
-                                           &yorcvs::Rect<float>::w, "h", &yorcvs::Rect<float>::h);
+    sol::usertype<yorcvs::Rect<float>> rect2f = lua_state.new_usertype<yorcvs::Rect<float>>(
+        "rect2f", "x", &yorcvs::Rect<float>::x, "y", &yorcvs::Rect<float>::y, "w", &yorcvs::Rect<float>::w, "h",
+        &yorcvs::Rect<float>::h);
+    sol::usertype<animationComponent::Animation> Animation = lua_state.new_usertype<animationComponent::Animation>("Animation","frames",&animationComponent::Animation::frames,
+    "speed",&animationComponent::Animation::speed);
 }
 inline bool bind_runtime(sol::state &lua_state, yorcvs::ECS *ecs)
 {
@@ -37,11 +39,20 @@ inline bool bind_runtime(sol::state &lua_state, yorcvs::ECS *ecs)
     lua_ECS["createEntity"] = &yorcvs::ECS::create_entity_ID;
     lua_ECS["isValidEntity"] = &yorcvs::ECS::is_valid_entity;
     lua_ECS["destroyEntity"] = &yorcvs::ECS::destroy_entity;
-    register_component_to_lua<healthComponent>(lua_state, "healthComponent", "HP", &healthComponent::HP, "maxHP",
-                                               &healthComponent::maxHP, "health_regen", &healthComponent::health_regen);
-    register_component_to_lua<identificationComponent>(lua_state,"identificationComponent", "name", &identificationComponent::name);
-    register_component_to_lua<hitboxComponent>(lua_state,"hitboxComponent", "hitbox", &hitboxComponent::hitbox);
-    register_component_to_lua<positionComponent>(lua_state,"positionComponent", "position", &positionComponent::position);
+    register_component_to_lua<healthComponent>(lua_state, "healthComponent", "HP", &healthComponent::HP, "max_HP",
+                                               &healthComponent::max_HP, "health_regen",
+                                               &healthComponent::health_regen);
+    register_component_to_lua<identificationComponent>(lua_state, "identificationComponent", "name",
+                                                       &identificationComponent::name);
+    register_component_to_lua<hitboxComponent>(lua_state, "hitboxComponent", "hitbox", &hitboxComponent::hitbox);
+    register_component_to_lua<positionComponent>(lua_state, "positionComponent", "position",
+                                                 &positionComponent::position);
+    register_component_to_lua<staminaComponent>(lua_state, "staminaComponent", "stamina", &staminaComponent::stamina,
+                                                "max_stamina", &staminaComponent::max_stamina, "stamina_regen",
+                                                &staminaComponent::stamina_regen);
+    register_component_to_lua<spriteComponent>(lua_state, "spriteComponent", "offset", &spriteComponent::offset, "size",
+                                               &spriteComponent::size, "src_rect", &spriteComponent::src_rect,
+                                               "texture_path", &spriteComponent::texture_path);
     return true;
 }
 

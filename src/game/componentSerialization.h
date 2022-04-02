@@ -46,14 +46,14 @@ template <> inline json::json serialize(const healthComponent &comp)
 {
     json::json j;
     j["current"] = comp.HP;
-    j["max"] = comp.maxHP;
+    j["max"] = comp.max_HP;
     j["regen"] = comp.health_regen;
     return j;
 }
 template <> inline void deserialize(healthComponent &dst, const json::json &j)
 {
     dst.HP = j["current"];
-    dst.maxHP = j["max"];
+    dst.max_HP = j["max"];
     dst.is_dead = false;
     dst.health_regen = j["regen"];
 }
@@ -62,14 +62,14 @@ template <> inline json::json serialize(const staminaComponent &comp)
 {
     json::json j;
     j["current"] = comp.stamina;
-    j["max"] = comp.maxStamina;
+    j["max"] = comp.max_stamina;
     j["regen"] = comp.stamina_regen;
     return j;
 }
 inline void deserialize(staminaComponent &dst, const json::json &j)
 {
     dst.stamina = j["current"];
-    dst.maxStamina = j["max"];
+    dst.max_stamina = j["max"];
     dst.stamina_regen = j["regen"];
 }
 // hitboxComponent
@@ -101,10 +101,10 @@ template <> inline json::json serialize(const spriteComponent &comp)
     j["size"]["x"] = comp.size.x;
     j["size"]["y"] = comp.size.y;
 
-    j["srcRect"]["x"] = comp.srcRect.x;
-    j["srcRect"]["y"] = comp.srcRect.y;
-    j["srcRect"]["w"] = comp.srcRect.w;
-    j["srcRect"]["h"] = comp.srcRect.h;
+    j["srcRect"]["x"] = comp.src_rect.x;
+    j["srcRect"]["y"] = comp.src_rect.y;
+    j["srcRect"]["w"] = comp.src_rect.w;
+    j["srcRect"]["h"] = comp.src_rect.h;
 
     std::filesystem::path sprite_path = comp.texture_path;
     j["spriteName"] = sprite_path.filename();
@@ -133,10 +133,10 @@ inline void deserialize(spriteComponent &dst, const json::json &j)
                 for (const auto &frame : animation.frames)
                 {
                     json::json jframe;
-                    jframe["x"] = frame.srcRect.x;
-                    jframe["y"] = frame.srcRect.y;
-                    jframe["w"] = frame.srcRect.w;
-                    jframe["h"] = frame.srcRect.h;
+                    jframe["x"] = frame.x;
+                    jframe["y"] = frame.y;
+                    jframe["w"] = frame.w;
+                    jframe["h"] = frame.h;
                     anim["frames"].push_back(jframe);
                 }
 
