@@ -1028,7 +1028,7 @@ class Application
         map.load(&world,"assets/map2.tmx");
         size_t player_id = world.create_entity_ID();
         map.load_character_from_path(player_id, "assets/player.json");
-        world.add_component<playerMovementControlledComponent>(player_id, {});
+        world.add_default_component<playerMovementControlledComponent>(player_id);
 
         dbInfo.attach(&r, &map, &pcS, &map.collisionS, &map.healthS, &lua_state);
         counter.start();
