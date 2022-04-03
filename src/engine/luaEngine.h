@@ -18,6 +18,7 @@ template <typename T, typename... Args>
 inline void register_component_to_lua(sol::state &lua_state, const std::string &name, Args &&... args)
 {
     sol::usertype<T> new_type = lua_state.new_usertype<T>(name, args...);
+    lua_state["ECS"]["add_" + name] = &yorcvs::ECS::add_default_component<T>;
     lua_state["ECS"]["get_" + name] = &yorcvs::ECS::get_component<T>;
     lua_state["ECS"]["remove_" + name] = &yorcvs::ECS::remove_component<T>;
 }
