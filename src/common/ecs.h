@@ -917,6 +917,17 @@ class ECS
         systemmanager->on_entity_signature_change(entityID, e_signature);
     }
     /**
+     * @brief Adds a default constructed component to the entity
+     * 
+     * @tparam T 
+     * @param entityID 
+     * @param component 
+     */
+    template <typename T> void add_default_component(const size_t entityID)
+    {
+        add_component<T>(entityID,{});
+    }
+    /**
      * @brief Adds multiple components to and entity
      *
      * @tparam T first component type
