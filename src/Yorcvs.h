@@ -948,7 +948,7 @@ class DebugInfo
     yorcvs::Window<yorcvs::graphics> *parentWindow{};
     yorcvs::ECS *appECS{};
     yorcvs::Map *map{};
-    sol::state *lua_state;
+    sol::state *lua_state{};
 
     yorcvs::Text<yorcvs::graphics> frameTime;
     const yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
@@ -1056,11 +1056,11 @@ class Application
     }
     void render_map_tiles(yorcvs::Map &p_map)
     {
-        yorcvs::Vec2<float> rs = r.get_render_scale();
+        yorcvs::Vec2<float> render_scale = r.get_render_scale();
         r.set_render_scale(r.get_size() / render_dimensions);
         // get player position
-        const size_t ID = pcS.entityList->entitiesID[0];
-        const yorcvs::Vec2<float> player_position = world.get_component<positionComponent>(ID).position;
+        const size_t entity_ID = pcS.entityList->entitiesID[0];
+        const yorcvs::Vec2<float> player_position = world.get_component<positionComponent>(entity_ID).position;
         const std::tuple<intmax_t, intmax_t> player_position_chunk = std::tuple<intmax_t, intmax_t>(
             std::floor(player_position.x / (32.0f * 16.0f)), std::floor(player_position.y / (32.0f * 16.0f)));
         // render chunks
@@ -1076,7 +1076,7 @@ class Application
             }
         }
 
-        r.set_render_scale(rs);
+        r.set_render_scale(render_scale);
     }
     void run()
     {
