@@ -548,7 +548,7 @@ class Map
             }
         }
     }
-    yorcvs::Vec2<float> get_spawn_position()
+    yorcvs::Vec2<float> get_spawn_position() const
     {
         return spawn_coord;
     }
@@ -604,11 +604,11 @@ class Map
   public:
     yorcvs::ECS *ecs{};
 
-  private:
+
     // TODO: MAKE THIS UNNECESSARY
     struct ecs_Initializer
     {
-        ecs_Initializer(yorcvs::ECS &world)
+        explicit ecs_Initializer(yorcvs::ECS &world)
         {
             // register components
             world.register_component<hitboxComponent, positionComponent, velocityComponent, healthComponent,
@@ -620,7 +620,7 @@ class Map
     // class to initialize the ecs before systems are constructed
     ecs_Initializer init_ecs;
 
-  public:
+  
     CollisionSystem collisionS;
     yorcvs::Vec2<float> tilesSize;
 
@@ -631,7 +631,7 @@ class Map
     std::string map_file_path;
     std::unordered_map<std::tuple<intmax_t, intmax_t>, std::vector<yorcvs::Tile>> tiles_chunks;
 
-  private:
+ 
     yorcvs::Vec2<float> spawn_coord;
     VelocitySystem velocityS;
     AnimationSystem animS;
