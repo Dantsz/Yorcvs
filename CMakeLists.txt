@@ -109,7 +109,6 @@ FetchContent_Declare(lua
 FetchContent_GetProperties(lua)
 if (NOT lua_POPULATED)
    FetchContent_Populate(lua)
-   set(BUILD_SHARED_LIBS OFF)
    add_subdirectory(${lua_SOURCE_DIR} ${lua_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 target_link_libraries(${PROJECT_NAME} lua::lib)

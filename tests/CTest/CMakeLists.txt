@@ -30,7 +30,7 @@ endif()
 if(WIN32)
 
 else()
-    set(LUA_CMAKE_BUILD_SHARED ON)
+    option(LUA_CMAKE_BUILD_SHARED ON)
 endif()
 find_package(nlohmann_json CONFIG REQUIRED)
 #INSTALL LUA Interpreter
@@ -41,7 +41,6 @@ FetchContent_Declare(lua
 FetchContent_GetProperties(lua)
 if (NOT lua_POPULATED)
    FetchContent_Populate(lua)
-   set(BUILD_SHARED_LIBS OFF)
    add_subdirectory(${lua_SOURCE_DIR} ${lua_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 target_link_libraries(${PROJECT_NAME} lua::lib)
