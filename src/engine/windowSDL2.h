@@ -393,7 +393,7 @@ template <> class Window<yorcvs::SDL2>
         text.color = {r, g, b, a};
         text.charSize = static_cast<int>(charSize);
         text.lineLength = static_cast<uint32_t>(lineLength);
-
+      
         setup_texture(text);
         return text;
     }

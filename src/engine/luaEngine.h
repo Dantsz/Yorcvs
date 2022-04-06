@@ -23,6 +23,11 @@ inline void register_component_to_lua(sol::state &lua_state, const std::string &
     lua_state["ECS"]["has_" + name] = &yorcvs::ECS::has_components<T>;
     lua_state["ECS"]["remove_" + name] = &yorcvs::ECS::remove_component<T>;
 }
+/**
+ * @brief Gives lua acces to basic engine types like vector and rectangle
+ * 
+ * @param lua_state 
+ */
 inline void bind_basic_types(sol::state &lua_state)
 {
     sol::usertype<yorcvs::Vec2<float>> vec2f = lua_state.new_usertype<yorcvs::Vec2<float>>(
@@ -35,6 +40,14 @@ inline void bind_basic_types(sol::state &lua_state)
     sol::usertype<animationComponent::Animation> Animation = lua_state.new_usertype<animationComponent::Animation>("Animation","frames",&animationComponent::Animation::frames,
     "speed",&animationComponent::Animation::speed);
 }
+/**
+ * @brief Gives the lua state accest to the running ECS and components
+ * 
+ * @param lua_state 
+ * @param ecs 
+ * 
+ * 
+ */
 inline bool bind_runtime(sol::state &lua_state, yorcvs::ECS *ecs)
 {
     bind_basic_types(lua_state);
