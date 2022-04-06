@@ -1,6 +1,11 @@
 #pragma once
 #include "../common/ecs.h"
 #include "../game/components.h"
+extern "C" {
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+}
 #include "sol/forward.hpp"
 #include "sol/sol.hpp"
 #include "sol/state.hpp"
