@@ -103,7 +103,7 @@ target_link_libraries(${PROJECT_NAME}  tmxlite)
 
 #INSTALL LUA Interpreter
 FetchContent_Declare(lua
- GIT_REPOSITORY https://github.com/lubgr/lua-cmake.git
+ GIT_REPOSITORY https://github.com/Dantsz/lua-cmake.git
  GIT_TAG "master" 
 )
 FetchContent_GetProperties(lua)
