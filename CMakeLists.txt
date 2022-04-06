@@ -56,7 +56,7 @@ if(WIN32)
   find_package(SDL2-ttf CONFIG REQUIRED)
   target_link_libraries(${PROJECT_NAME} SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf)
 else()
-  option(LUA_CMAKE_BUILD_SHARED ON)
+  SET(LUA_CMAKE_BUILD_SHARED ON CACHE BOOL "Build as shared library" FORCE)
   #download findSDL2 and use it
   FetchContent_Declare(amifindSDL2 GIT_REPOSITORY https://github.com/aminosbh/sdl2-cmake-modules.git GIT_TAG "master")
   FetchContent_GetProperties(amifindSDL2)

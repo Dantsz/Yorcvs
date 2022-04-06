@@ -30,7 +30,7 @@ endif()
 if(WIN32)
 
 else()
-    option(LUA_CMAKE_BUILD_SHARED ON)
+   SET(LUA_CMAKE_BUILD_SHARED ON CACHE BOOL "Build as shared library" FORCE)
 endif()
 find_package(nlohmann_json CONFIG REQUIRED)
 #INSTALL LUA Interpreter
