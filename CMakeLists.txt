@@ -35,7 +35,7 @@ add_executable(Yorcvs ${YorcvsALLFILES})
 
 #COMPILE FLAGS
 target_compile_options(Yorcvs PRIVATE
-$<$<CXX_COMPILER_ID:MSVC>:/W4 /fsanitize=address /Zi /DEBUG>
+$<$<CXX_COMPILER_ID:MSVC>:/W4 /fsanitize=address /Zi /DEBUG /bigobj>
 $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -std=c++2a>
 $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wno-c++98-compat-pedantic -Wno-c++98-compat>
 )
