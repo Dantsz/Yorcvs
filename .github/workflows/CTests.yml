@@ -26,7 +26,7 @@ jobs:
     - uses: seanmiddleditch/gha-setup-ninja@master
     - uses: lukka/run-vcpkg@v10
       with:
-        vcpkgGitCommitId: '5568f110b509a9fd90711978a7cb76bae75bb092'
+        vcpkgGitCommitId: '89295c9fe22e97ca9e380a6c771ccf2ff09dca95'
     - name: build
       uses: lukka/run-cmake@v10
       with:
