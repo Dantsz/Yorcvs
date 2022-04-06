@@ -24,11 +24,38 @@ if(NOT libtmxlite_POPULATED)
  add_subdirectory(${libtmxlite_SOURCE_DIR} ${libtmxlite_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 if(UNIX AND NOT APPLE)
-
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -fsanitize-undefined-trap-on-error -fno-omit-frame-pointer  -fsanitize=address,undefined,leak")
 set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fsanitize-undefined-trap-on-error -fno-omit-frame-pointer -fsanitize=address,undefined,leak")
 endif()
+if(WIN32)
+
+else()
+    set(LUA_CMAKE_BUILD_SHARED ON)
+endif()
 find_package(nlohmann_json CONFIG REQUIRED)
+#INSTALL LUA Interpreter
+FetchContent_Declare(lua
+ GIT_REPOSITORY https://github.com/Dantsz/lua-cmake.git
+ GIT_TAG "master" 
+)
+FetchContent_GetProperties(lua)
+if (NOT lua_POPULATED)
+   FetchContent_Populate(lua)
+   set(BUILD_SHARED_LIBS OFF)
+   add_subdirectory(${lua_SOURCE_DIR} ${lua_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+target_link_libraries(${PROJECT_NAME} lua::lib)
+#INSTALL SOL2
+FetchContent_Declare(sol2
+ GIT_REPOSITORY https://github.com/ThePhD/sol2.git
+ GIT_TAG "main" 
+)
+FetchContent_GetProperties(sol2)
+if (NOT sol2_POPULATED)
+   FetchContent_Populate(sol2)
+  target_include_directories(${PROJECT_NAME} PUBLIC ${sol2_SOURCE_DIR}/include)
+endif()
+
 
 find_package(SDL2 CONFIG REQUIRED)
 find_package(SDL2-image CONFIG REQUIRED)
