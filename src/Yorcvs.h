@@ -1097,6 +1097,7 @@ class Application
 
 
         r.clear();
+        ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();  
         render_map_tiles(map);
         sprS.renderSprites(render_dimensions);

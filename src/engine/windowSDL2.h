@@ -28,6 +28,9 @@
 
 #include "imgui.h"
 #include "imgui_sdl.h"
+#include "imgui_impl_sdl.h"
+
+
 #pragma once
 namespace yorcvs
 {
@@ -207,7 +210,7 @@ template <> class Window<yorcvs::SDL2>
         }
         ImGui::CreateContext();
         ImGuiSDL::Initialize(renderer, width, height);
-
+        ImGui_ImplSDL2_InitForSDLRenderer(sdlWindow, renderer);
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
         SDL_RendererInfo renderInfo{};
         SDL_GetRendererInfo(renderer, &renderInfo);
@@ -256,6 +259,8 @@ template <> class Window<yorcvs::SDL2>
 
     ~Window<yorcvs::SDL2>()
     {
+        ImGuiSDL::Deinitialize();
+        ImGui::DestroyContext();
         cleanup();
     }
     void set_size(size_t width, size_t height) const
@@ -273,8 +278,6 @@ template <> class Window<yorcvs::SDL2>
 
     void cleanup()
     {
-        ImGuiSDL::Deinitialize();
-        ImGui::DestroyContext();
         SDL_DestroyWindow(sdlWindow);
         IMG_Quit();
         TTF_Quit();
@@ -284,6 +287,7 @@ template <> class Window<yorcvs::SDL2>
     {
         while (SDL_PollEvent(&win_event.event) == 1)
         {
+            ImGui_ImplSDL2_ProcessEvent(&win_event.event);
             for (const auto &f : callbacks)
             {
                 f.func(win_event);
