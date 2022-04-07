@@ -112,6 +112,7 @@ if (NOT lua_POPULATED)
    add_subdirectory(${lua_SOURCE_DIR} ${lua_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 target_link_libraries(${PROJECT_NAME} lua::lib)
+target_include_directories(${PROJECT_NAME} PUBLIC lua::header})
 #INSTALL SOL2
 FetchContent_Declare(sol2
  GIT_REPOSITORY https://github.com/ThePhD/sol2.git
