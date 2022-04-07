@@ -33,6 +33,7 @@
 
 Dependencies/*
 build/
+builds/
 .vscode/
 compile_commands.json
 src/a.html

@@ -2,10 +2,12 @@
 #include "../common/ecs.h"
 #include "components.h"
 #include "../engine/windowSDL2.h"
+#include "sol/sol.hpp"
 #include <array>
 #include <cmath>
 #include <random>
 #include <stack>
+
 /**
  * @brief Handles collision between entities
  * 
@@ -393,8 +395,8 @@ class AnimationSystem
                     world->get_component<animationComponent>(ID).cur_frame = 0;
                 }
 
-                world->get_component<spriteComponent>(ID).srcRect =
-                    cur_animation->frames[world->get_component<animationComponent>(ID).cur_frame].srcRect;
+                world->get_component<spriteComponent>(ID).src_rect =
+                    cur_animation->frames[world->get_component<animationComponent>(ID).cur_frame];
             }
         }
     }
@@ -429,10 +431,10 @@ class HealthSystem
                 world->get_component<healthComponent>(ID).HP +=
                     world->get_component<healthComponent>(ID).health_regen;
                 if (world->get_component<healthComponent>(ID).HP >
-                    world->get_component<healthComponent>(ID).maxHP)
+                    world->get_component<healthComponent>(ID).max_HP)
                 {
                     world->get_component<healthComponent>(ID).HP =
-                        world->get_component<healthComponent>(ID).maxHP;
+                        world->get_component<healthComponent>(ID).max_HP;
                 }
                 if (world->get_component<healthComponent>(ID).HP < 0.0f)
                 {
@@ -579,7 +581,7 @@ class SpriteSystem
             window->draw_sprite(
                 world->get_component<spriteComponent>(ID).texture_path,
                 world->get_component<spriteComponent>(ID).offset + world->get_component<positionComponent>(ID).position,
-                world->get_component<spriteComponent>(ID).size, world->get_component<spriteComponent>(ID).srcRect, 0.0);
+                world->get_component<spriteComponent>(ID).size, world->get_component<spriteComponent>(ID).src_rect, 0.0);
         }
         std::sort(entityList->entitiesID.begin(), entityList->entitiesID.end(),
                   [&](size_t ID1, size_t ID2) { return ID1 < ID2; });
@@ -600,34 +602,16 @@ class SpriteSystem
 class BehaviourSystem
 {
   public:
-    BehaviourSystem(yorcvs::ECS *parent) : world(parent)
+    BehaviourSystem(yorcvs::ECS *parent,sol::state* lua) : world(parent),lua_state(lua)
     {
         world->register_system<BehaviourSystem>(*this);
         world->add_criteria_for_iteration<BehaviourSystem, behaviourComponent, velocityComponent>();
     }
     void chicken_behaviour(const size_t ID)
     {
-        static constexpr float chicken_speed = 0.033f;
-        const float velx = static_cast<float>(generator() % 3) - 1.0f;
-        const float vely = static_cast<float>(generator() % 3) - 1.0f;
-        world->get_component<velocityComponent>(ID).vel = {velx * chicken_speed, vely * chicken_speed};
+        (*lua_state)["entityID"] = ID;
+        lua_state->safe_script_file("assets/scripts/behavior_chicken.lua");
         world->get_component<behaviourComponent>(ID).accumulated = 0.0f;
-        if (world->get_component<velocityComponent>(ID).vel.x > velocity_trigger_treshold)
-        {
-            AnimationSystem::set_animation(world, ID, "walkingL");
-        }
-        else if (world->get_component<velocityComponent>(ID).vel.x < velocity_trigger_treshold)
-        {
-            AnimationSystem::set_animation(world, ID, "walkingR");
-        }
-        else if (world->get_component<velocityComponent>(ID).facing.x)
-        {
-            AnimationSystem::set_animation(world, ID, "idleL");
-        }
-        else
-        {
-            AnimationSystem::set_animation(world, ID, "idleR");
-        }
     }
     void update(const float dt)
     {
@@ -648,7 +632,7 @@ class BehaviourSystem
     std::mt19937 generator{dev()};
 
     yorcvs::ECS *world = nullptr;
-
+    sol::state* lua_state;
     static constexpr float velocity_trigger_treshold = 0.0f;
 };
 /**
@@ -674,10 +658,10 @@ class StaminaSystem
                 world->get_component<staminaComponent>(ID).stamina +=
                     world->get_component<staminaComponent>(ID).stamina_regen;
                 if (world->get_component<staminaComponent>(ID).stamina >
-                    world->get_component<staminaComponent>(ID).maxStamina)
+                    world->get_component<staminaComponent>(ID).max_stamina)
                 {
                     world->get_component<staminaComponent>(ID).stamina =
-                        world->get_component<staminaComponent>(ID).maxStamina;
+                        world->get_component<staminaComponent>(ID).max_stamina;
                 }
             }
             cur_time = 0.0f;

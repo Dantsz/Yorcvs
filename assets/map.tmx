@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="left-up" width="100" height="100" tilewidth="32" tileheight="32" infinite="1" nextlayerid="4" nextobjectid="42">
+<map version="1.2" tiledversion="1.3.2" orientation="orthogonal" renderorder="left-up" compressionlevel="0" width="100" height="100" tilewidth="32" tileheight="32" infinite="1" nextlayerid="4" nextobjectid="45">
  <properties>
   <property name="Ysorted" type="bool" value="false"/>
  </properties>
@@ -194,6 +194,27 @@
     <property name="behaviour" type="file" value=""/>
     <property name="behaviourDT" type="float" value="1000"/>
     <property name="entityPath" type="file" value="bleeding_duck.json"/>
+   </properties>
+  </object>
+  <object id="42" name="ChickenTest" x="80.5" y="9">
+   <properties>
+    <property name="behaviour" type="file" value=""/>
+    <property name="behaviourDT" type="float" value="1000"/>
+    <property name="entityPath" type="file" value="duck.json"/>
+   </properties>
+  </object>
+  <object id="43" name="ChickenTest" x="21" y="14">
+   <properties>
+    <property name="behaviour" type="file" value=""/>
+    <property name="behaviourDT" type="float" value="1000"/>
+    <property name="entityPath" type="file" value="duck.json"/>
+   </properties>
+  </object>
+  <object id="44" name="ChickenTest" x="132" y="77">
+   <properties>
+    <property name="behaviour" type="file" value=""/>
+    <property name="behaviourDT" type="float" value="1000"/>
+    <property name="entityPath" type="file" value="duck.json"/>
    </properties>
   </object>
  </objectgroup>

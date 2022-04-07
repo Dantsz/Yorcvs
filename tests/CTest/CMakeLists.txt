@@ -24,11 +24,37 @@ if(NOT libtmxlite_POPULATED)
  add_subdirectory(${libtmxlite_SOURCE_DIR} ${libtmxlite_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 if(UNIX AND NOT APPLE)
-
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -fsanitize-undefined-trap-on-error -fno-omit-frame-pointer  -fsanitize=address,undefined,leak")
 set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fsanitize-undefined-trap-on-error -fno-omit-frame-pointer -fsanitize=address,undefined,leak")
 endif()
+if(WIN32)
+else()
+   SET(LUA_CMAKE_BUILD_SHARED ON CACHE BOOL "Build as shared library" FORCE)
+endif()
+
 find_package(nlohmann_json CONFIG REQUIRED)
+#INSTALL LUA Interpreter
+FetchContent_Declare(lua
+ GIT_REPOSITORY https://github.com/Dantsz/lua-cmake.git
+ GIT_TAG "master" 
+)
+FetchContent_GetProperties(lua)
+if (NOT lua_POPULATED)
+   FetchContent_Populate(lua)
+   add_subdirectory(${lua_SOURCE_DIR} ${lua_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+#target_link_libraries(${PROJECT_NAME} lua::lib)
+#INSTALL SOL2
+FetchContent_Declare(sol2
+ GIT_REPOSITORY https://github.com/ThePhD/sol2.git
+ GIT_TAG "main" 
+)
+FetchContent_GetProperties(sol2)
+if (NOT sol2_POPULATED)
+   FetchContent_Populate(sol2)
+  #target_include_directories(${PROJECT_NAME} PUBLIC ${sol2_SOURCE_DIR}/include)
+endif()
+
 
 find_package(SDL2 CONFIG REQUIRED)
 find_package(SDL2-image CONFIG REQUIRED)
@@ -57,16 +83,18 @@ add_test(ECSmainclassCopyMove ECSmainclassCopyMove)
 
 add_executable(YorcvsLoadMap src/YorcvsLoadMap.cpp)
 add_test(NAME YorcvsLoadMap  COMMAND YorcvsLoadMap WORKING_DIRECTORY ${test_dir})
-target_link_libraries(YorcvsLoadMap PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main  SDL2::SDL2_image SDL2::SDL2_ttf)
+target_link_libraries(YorcvsLoadMap PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main  SDL2::SDL2_image SDL2::SDL2_ttf lua::lib)
+target_include_directories(YorcvsLoadMap PUBLIC ${sol2_SOURCE_DIR}/include)
 
 add_executable(WorldTestnegativeHealthRegen src/WorldTestnegativeHealthRegen.cpp)
 add_test(NAME WorldTestnegativeHealthRegen COMMAND WorldTestnegativeHealthRegen WORKING_DIRECTORY ${test_dir})
-target_link_libraries(WorldTestnegativeHealthRegen PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main  SDL2::SDL2_image SDL2::SDL2_ttf)
+target_link_libraries(WorldTestnegativeHealthRegen PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main  SDL2::SDL2_image SDL2::SDL2_ttf lua::lib)
+target_include_directories(WorldTestnegativeHealthRegen PUBLIC ${sol2_SOURCE_DIR}/include)
 
 add_executable(GameTestLoadingEntity src/GameTestLoadingEntity.cpp)
 add_test(NAME GameTestLoadingEntity COMMAND GameTestLoadingEntity WORKING_DIRECTORY ${test_dir})
-target_link_libraries(GameTestLoadingEntity PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf)
-
+target_link_libraries(GameTestLoadingEntity PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf lua::lib)
+target_include_directories(GameTestLoadingEntity PUBLIC ${sol2_SOURCE_DIR}/include)
 
 add_executable(UtilitiesTestSpiral src/UtilitiesTestSpiral.cpp)
 add_test(NAME UtilitiesTestSpiral COMMAND UtilitiesTestSpiral  WORKING_DIRECTORY ${test_dir})

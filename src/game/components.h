@@ -39,33 +39,30 @@ struct playerMovementControlledComponent{};
 struct healthComponent
 {
     float HP;
-    float maxHP;
+    float max_HP;
     float health_regen;//per tick
     bool is_dead;// no health regen if dead
 };
 struct staminaComponent
 {
     float stamina;
-    float maxStamina;
+    float max_stamina;
     float stamina_regen;
 };
 struct spriteComponent
 {
     yorcvs::Vec2<float> offset;//position offset
     yorcvs::Vec2<float> size;// size of sprite
-    yorcvs::Rect<size_t> srcRect;//part of texture to render
+    yorcvs::Rect<size_t> src_rect;//part of texture to render
     std::string texture_path;
 };
 
 struct animationComponent
 {
-    struct AnimationFrame
-    {
-        yorcvs::Rect<size_t> srcRect;
-    };
+  
     struct Animation
     {
-        std::vector<AnimationFrame> frames;// not ideal
+        std::vector<yorcvs::Rect<size_t>> frames;// not ideal
         float speed;// in milliseconds
     };
     std::unordered_map<std::string, Animation> animations;//ugly
@@ -78,6 +75,7 @@ struct behaviourComponent
 {
     float dt;
     float accumulated;
+    std::string code_path;
 };
 struct defensiveStatsComponent;
 struct offensiveStatsComponent;

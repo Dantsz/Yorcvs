@@ -35,7 +35,7 @@ add_executable(Yorcvs ${YorcvsALLFILES})
 
 #COMPILE FLAGS
 target_compile_options(Yorcvs PRIVATE
-$<$<CXX_COMPILER_ID:MSVC>:/W4 /fsanitize=address /Zi /DEBUG>
+$<$<CXX_COMPILER_ID:MSVC>:/W4 /Zi /DEBUG /bigobj>
 $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -std=c++2a>
 $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wno-c++98-compat-pedantic -Wno-c++98-compat>
 )
@@ -43,7 +43,7 @@ $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wno-c++
 #link SDL
 if(EMSCRIPTEN)
   set(CMAKE_EXECUTABLE_SUFFIX ".html")
-    SET(CMAKE_CXX_FLAGS "-std=c++2a -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=\"[\"\"png\"\"]\"  -s USE_SDL_TTF=2  -s ALLOW_MEMORY_GROWTH=1 -o build/Yorcvs.html" ) #commented because emscriptem requires the assets folder to be in special place and it's not necesary for compilation for CI
+    SET(CMAKE_CXX_FLAGS "-std=c++2a -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=\"[\"\"png\"\"]\"  -s USE_SDL_TTF=2  -s ALLOW_MEMORY_GROWTH=1 -s NO_DISABLE_EXCEPTION_CATCHING -o build/Yorcvs.html" ) #commented because emscriptem requires the assets folder to be in special place and it's not necesary for compilation for CI
   if(YORCVS_EMSCRIPTEN_PRELOAD_ASSETS_FOLDER)
     set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS  "--preload-file ./assets")
   endif()
@@ -56,6 +56,7 @@ if(WIN32)
   find_package(SDL2-ttf CONFIG REQUIRED)
   target_link_libraries(${PROJECT_NAME} SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf)
 else()
+  SET(LUA_CMAKE_BUILD_SHARED ON CACHE BOOL "Build as shared library" FORCE)
   #download findSDL2 and use it
   FetchContent_Declare(amifindSDL2 GIT_REPOSITORY https://github.com/aminosbh/sdl2-cmake-modules.git GIT_TAG "master")
   FetchContent_GetProperties(amifindSDL2)
@@ -63,7 +64,6 @@ else()
     FetchContent_Populate(amifindSDL2)
   endif()
   list(APPEND CMAKE_MODULE_PATH ${amifindsdl2_SOURCE_DIR})
-  
   find_package(SDL2 REQUIRED)
   find_package(SDL2_image REQUIRED)
   find_package(SDL2_ttf REQUIRED)
@@ -73,6 +73,7 @@ endif()
   
 endif()
 
+#INSTALL JSON LIBRARY
 FetchContent_Declare(json
   GIT_REPOSITORY https://github.com/nlohmann/json.git
   GIT_TAG v3.7.3)
@@ -85,7 +86,7 @@ endif()
 
 target_link_libraries(${PROJECT_NAME}  nlohmann_json::nlohmann_json)
 
-
+#INSTALL TMX LIBRARY
 FetchContent_Declare(libtmxlite
  GIT_REPOSITORY https://github.com/Dantsz/tmxlite.git
  GIT_TAG "main" 
@@ -100,5 +101,24 @@ if(NOT libtmxlite_POPULATED)
 endif()
 target_link_libraries(${PROJECT_NAME}  tmxlite)
 
-
-
+#INSTALL LUA Interpreter
+FetchContent_Declare(lua
+ GIT_REPOSITORY https://github.com/Dantsz/lua-cmake.git
+ GIT_TAG "master" 
+)
+FetchContent_GetProperties(lua)
+if (NOT lua_POPULATED)
+   FetchContent_Populate(lua)
+   add_subdirectory(${lua_SOURCE_DIR} ${lua_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+target_link_libraries(${PROJECT_NAME} lua::lib)
+#INSTALL SOL2
+FetchContent_Declare(sol2
+ GIT_REPOSITORY https://github.com/ThePhD/sol2.git
+ GIT_TAG "main" 
+)
+FetchContent_GetProperties(sol2)
+if (NOT sol2_POPULATED)
+   FetchContent_Populate(sol2)
+  target_include_directories(${PROJECT_NAME} PUBLIC ${sol2_SOURCE_DIR}/include)
+endif()

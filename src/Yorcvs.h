@@ -14,6 +14,7 @@
 #include "common/ecs.h"
 #include "common/types.h"
 #include "common/utilities.h"
+#include "engine/luaEngine.h"
 #include "game/componentSerialization.h"
 #include "game/components.h"
 #include "game/systems.h"
@@ -37,7 +38,7 @@ namespace json = nlohmann;
 #include <filesystem>
 #include <fstream>
 #include <tmxlite/Map.hpp>
-
+#include "sol/sol.hpp"
 // TODO: move this to utlities
 namespace std
 {
@@ -145,7 +146,6 @@ class Map
                 parse_object_layer(map, layer->getLayerAs<tmx::ObjectGroup>());
                 break;
             case tmx::Layer::Type::Image:
-
                 break;
             case tmx::Layer::Type::Group:
 
@@ -474,7 +474,7 @@ class Map
             {
                 ecs->add_component<healthComponent>(entity, {});
             }
-            ecs->get_component<healthComponent>(entity).maxHP = property.getFloatValue();
+            ecs->get_component<healthComponent>(entity).max_HP = property.getFloatValue();
             return true;
         }
         if (property.getName() == "HP_regen")
@@ -644,10 +644,10 @@ class DebugInfo
     DebugInfo() = default;
 
     DebugInfo(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::Map *map, PlayerMovementControl *pms,
-              CollisionSystem *cols, HealthSystem *healthS)
-        : parentWindow(parentW), appECS(map->ecs), map(map), playerMoveSystem(pms), colSystem(cols)
+              CollisionSystem *cols, HealthSystem *healthS,sol::state* lua)
+        : parentWindow(parentW), appECS(map->ecs), map(map), lua_state(lua), playerMoveSystem(pms),colSystem(cols)
     {
-        attach(parentW, map, pms, cols, healthS);
+        attach(parentW, map, pms, cols, healthS,lua);
     }
     ~DebugInfo() = default;
     DebugInfo(const DebugInfo &other) = delete;
@@ -657,7 +657,7 @@ class DebugInfo
 
     void update(const float ft)
     {
-        // if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_R))
+        // if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_R))  
         // {
         //     reset();
         // }
@@ -704,7 +704,7 @@ class DebugInfo
                 {
                     healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
                     parentWindow->set_text_message(playerHealth, "Health: " + std::to_string(playerHealthC.HP) + " / " +
-                                                                     std::to_string(playerHealthC.maxHP));
+                                                                     std::to_string(playerHealthC.max_HP));
                 }
                 // print current chunk
                 // std::cout << appECS->get_component<positionComponent>(ID).position / (32.0f*16.0f) << "\n";
@@ -759,7 +759,7 @@ class DebugInfo
                 window.draw_rect(healthBarRect, health_bar_empty_color[0], health_bar_empty_color[1],
                                  health_bar_empty_color[2], health_bar_empty_color[3]);
                 healthBarRect.w =
-                    (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).maxHP) *
+                    (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).max_HP) *
                     32.0f;
                 window.draw_rect(healthBarRect, health_bar_full_color[0], health_bar_full_color[1],
                                  health_bar_full_color[2], health_bar_full_color[3]);
@@ -784,7 +784,7 @@ class DebugInfo
                 window.draw_rect(staminaBarRect, stamina_bar_empty_color[0], stamina_bar_empty_color[1],
                                  stamina_bar_empty_color[2], stamina_bar_empty_color[3]);
                 staminaBarRect.w = (appECS->get_component<staminaComponent>(ID).stamina /
-                                    appECS->get_component<staminaComponent>(ID).maxStamina) *
+                                    appECS->get_component<staminaComponent>(ID).max_stamina) *
                                    32.0f;
                 window.draw_rect(staminaBarRect, stamina_bar_full_color[0], stamina_bar_full_color[1],
                                  stamina_bar_full_color[2], stamina_bar_full_color[3]);
@@ -852,8 +852,9 @@ class DebugInfo
     }
 
     void attach(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::Map *map, PlayerMovementControl *pms,
-                CollisionSystem *cols, HealthSystem *healthS)
+                CollisionSystem *cols, HealthSystem *healthS,sol::state* lua)
     {
+        lua_state = lua;
         parentWindow = parentW;
         this->map = map;
         appECS = map->ecs;
@@ -888,8 +889,11 @@ class DebugInfo
             if (event.get_type() == yorcvs::Event<graphics>::KEYBOARD_PRESSED && showConsole &&
                 event.get_key() == YORCVS_KEY_ENTER)
             {
-                // process input
+                // input
                 std::cout << console_input << '\n';
+                auto rez = lua_state->safe_script(console_input,[](lua_State*, sol::protected_function_result pfr) {return pfr;});
+
+               
                 for(auto& [text,rect,cmd_str] : previous_commands)
                 {
                     rect.y -= consoleTextRect.h;
@@ -902,6 +906,31 @@ class DebugInfo
                 consoleText =  parentWindow->create_text("assets/font.ttf", ">", textR, textG, textB, textA, console_char_size,
                                                 text_line_length);
                 console_input.clear();
+                //SHOW OUTPUT ON CONSOLE
+                if(!rez.valid())
+                {      sol::error err = rez;
+                       std::string text = err.what();
+                      
+                       for(auto& [text,rect,cmd_str] : previous_commands)
+                        {
+                            rect.y -= consoleTextRect.h;
+                        }
+                        yorcvs::Rect<float> old_console_command_rect = consoleTextRect;
+          
+                       
+                        std::transform(text.begin(), text.end(),text.begin(),[](unsigned char c)->unsigned char{
+                            if(c == '\n')
+                            {
+                                return ' ';
+                            }
+                            return c;
+                        });
+                        yorcvs::Text<yorcvs::graphics> error_txt =  parentWindow->create_text("assets/font.ttf", text, textR, textG, textB, textA, console_char_size,
+                        text_line_length);
+                        old_console_command_rect.w = parentWindow->get_text_length(error_txt).x;
+                        old_console_command_rect.y -= consoleTextRect.h;
+                        previous_commands.emplace(previous_commands.begin(),std::move(error_txt),old_console_command_rect,text);
+                }
             }
         }}));
     }
@@ -916,6 +945,8 @@ class DebugInfo
     yorcvs::Window<yorcvs::graphics> *parentWindow{};
     yorcvs::ECS *appECS{};
     yorcvs::Map *map{};
+    sol::state *lua_state{};
+
     yorcvs::Text<yorcvs::graphics> frameTime;
     const yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
 
@@ -987,6 +1018,8 @@ class Application
   public:
     Application()
     {
+        lua_state.open_libraries(sol::lib::base, sol::lib::package,sol::lib::math);
+        yorcvs::lua::bind_runtime(lua_state, &world);
         //loading two maps one on top of each other
         map.load(&world,"assets/map.tmx");
         map.load(&world,"assets/map2.tmx");
@@ -994,7 +1027,7 @@ class Application
         map.load_character_from_path(player_id, "assets/player.json");
         world.add_default_component<playerMovementControlledComponent>(player_id);
 
-        dbInfo.attach(&r, &map, &pcS, &map.collisionS, &map.healthS);
+        dbInfo.attach(&r, &map, &pcS, &map.collisionS, &map.healthS, &lua_state);
         counter.start();
     }
     Application(const Application &other) = delete;
@@ -1020,11 +1053,11 @@ class Application
     }
     void render_map_tiles(yorcvs::Map &p_map)
     {
-        yorcvs::Vec2<float> rs = r.get_render_scale();
+        yorcvs::Vec2<float> render_scale = r.get_render_scale();
         r.set_render_scale(r.get_size() / render_dimensions);
         // get player position
-        const size_t ID = pcS.entityList->entitiesID[0];
-        const yorcvs::Vec2<float> player_position = world.get_component<positionComponent>(ID).position;
+        const size_t entity_ID = pcS.entityList->entitiesID[0];
+        const yorcvs::Vec2<float> player_position = world.get_component<positionComponent>(entity_ID).position;
         const std::tuple<intmax_t, intmax_t> player_position_chunk = std::tuple<intmax_t, intmax_t>(
             std::floor(player_position.x / (32.0f * 16.0f)), std::floor(player_position.y / (32.0f * 16.0f)));
         // render chunks
@@ -1040,7 +1073,7 @@ class Application
             }
         }
 
-        r.set_render_scale(rs);
+        r.set_render_scale(render_scale);
     }
     void run()
     {
@@ -1090,11 +1123,11 @@ class Application
     yorcvs::Vec2<float> render_dimensions = default_render_dimensions; // how much to render
     intmax_t render_distance = default_render_distance;
     yorcvs::ECS world{};
-   
+    sol::state lua_state;
     yorcvs::Map map{&world};
     SpriteSystem sprS{map.ecs, &r};
     PlayerMovementControl pcS{map.ecs, &r};
-    BehaviourSystem bhvS{map.ecs};
+    BehaviourSystem bhvS{map.ecs,&lua_state};
 
     DebugInfo dbInfo;
 };

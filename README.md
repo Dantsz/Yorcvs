@@ -21,3 +21,5 @@ C++ RPG/sandbox game project
 |[SDL2_ttf](https://www.libsdl.org/projects/SDL_ttf/)|2.0.10|
 |[nlohmann/json](https://github.com/nlohmann/json)|
 |[tmxlite](https://github.com/fallahn/tmxlite)|
+|[lua-cmake](https://github.com/lubgr/lua-cmake)|
+|[sol2](https://sol2.readthedocs.io/en/latest/)|v3.2.2
