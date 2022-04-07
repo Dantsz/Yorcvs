@@ -107,7 +107,7 @@ template <> inline json::json serialize(const spriteComponent &comp)
     j["srcRect"]["h"] = comp.src_rect.h;
 
     std::filesystem::path sprite_path = comp.texture_path;
-    j["spriteName"] = sprite_path.filename();
+    j["spriteName"] = sprite_path.filename().string();
     return j;
 }
 template<>
