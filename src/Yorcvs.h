@@ -671,46 +671,16 @@ class DebugInfo
         //     out << map->save_character_to_path(playerMoveSystem->entityList->entitiesID[0]);
         //     std::cout << "Done.\n";
         // }
+        frame_time = ft;
         avg_frame_time *= frame_time_samples;
         frame_time_samples += 1.0f;
         avg_frame_time += ft;
         avg_frame_time /= frame_time_samples;
         if (showDebugWindow)
         {
-            parentWindow->set_text_message(frameTime, "Frame Time : " + std::to_string(ft));
-
             if (ft > maxFrameTime)
             {
                 maxFrameTime = ft;
-                parentWindow->set_text_message(maxframeTimeTX, "Max Frame Time: " + std::to_string(maxFrameTime));
-            }
-            parentWindow->set_text_message(ecsEntities,
-                                           "Active Entities : " + std::to_string(appECS->get_active_entities_number()));
-
-            parentWindow->set_text_message(avgFrameTime, "Avg frame time :  " + std::to_string(avg_frame_time));
-
-            // set player position text
-            if (playerMoveSystem->entityList->entitiesID.empty())
-            {
-                parentWindow->set_text_message(playerPosition, "NO PLAYER FOUND");
-                parentWindow->set_text_message(playerHealth, "Health: -/-");
-            }
-            else
-            {
-                const size_t ID = playerMoveSystem->entityList->entitiesID[0];
-                parentWindow->set_text_message(
-                    playerPosition,
-                    "Player position : X = " + std::to_string(appECS->get_component<positionComponent>(ID).position.x) +
-                        " Y = " + std::to_string(appECS->get_component<positionComponent>(ID).position.y));
-
-                if (appECS->has_components<healthComponent>(ID))
-                {
-                    healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
-                    parentWindow->set_text_message(playerHealth, "Health: " + std::to_string(playerHealthC.HP) + " / " +
-                                                                     std::to_string(playerHealthC.max_HP));
-                }
-                // print current chunk
-                // std::cout << appECS->get_component<positionComponent>(ID).position / (32.0f*16.0f) << "\n";
             }
         }
         if (showConsole)
@@ -830,17 +800,36 @@ class DebugInfo
         update(elapsed);
         if (showDebugWindow)
         {
+           
             render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
                             hitbox_color[3]);
-            parentWindow->draw_text(frameTime, FTRect);
-            parentWindow->draw_text(maxframeTimeTX, maxFTRect);
-            parentWindow->draw_text(avgFrameTime, avgFrameTimeRect);
-            parentWindow->draw_text(ecsEntities, entitiesRect);
-            parentWindow->draw_text(playerPosition, pPositionRect);
-            parentWindow->draw_text(playerHealth, playerHealthRect);
+            ImGui::Begin("DebugWindow");
+            ImGui::Text("frameTime: %f",frame_time);
+            ImGui::Text("maxFramTime: %f",maxFrameTime);
+            ImGui::Text("avgFrameTime: %f",avg_frame_time);
+            ImGui::Text("ecsEntities: %zu",appECS->get_active_entities_number());
+            if (!playerMoveSystem->entityList->entitiesID.empty())
+            {
+                const size_t ID = playerMoveSystem->entityList->entitiesID[0];
+                healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
+                if (appECS->has_components<positionComponent>(ID))
+                {
+                 ImGui::Text("playerPosition: (%f,%f)",appECS->get_component<positionComponent>(ID).position.x,appECS->get_component<positionComponent>(ID).position.y);
+                }
+                if (appECS->has_components<healthComponent>(ID))
+                {
+                    ImGui::Text("playerHealth: (%f/%f)",playerHealthC.HP,playerHealthC.max_HP);
+                }
+            }
+            ImGui::End();
+           
+         
         }
         if (showConsole)
         {
+            ImGui::ShowDemoWindow();
+            ImGui::Begin("Console");
+            ImGui::End();
             yorcvs::Rect<float> console_rect = consoleTextRect;
             console_rect.y = parentWindow->get_size().y - console_rect.h;
             console_rect.w = parentWindow->get_text_length(consoleText).x;
@@ -865,18 +854,7 @@ class DebugInfo
         colSystem = cols;
         healthSys = healthS;
 
-        frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", textR, textG, textB, textA,
-                                              text_char_size, text_line_length);
-        maxframeTimeTX = parentWindow->create_text("assets/font.ttf", "Max Frame Time : ", textR, textG, textB, textA,
-                                                   text_char_size, text_line_length);
-        avgFrameTime = parentWindow->create_text("assets/font.ttf", "Avg Frame Time : ", textR, textG, textB, textA,
-                                                 text_char_size, text_line_length);
-        ecsEntities = parentWindow->create_text("assets/font.ttf", "Active Entities : ", textR, textG, textB, textA,
-                                                text_char_size, text_line_length);
-        playerPosition = parentWindow->create_text("assets/font.ttf", "NO PLAYER FOUND ", textR, textG, textB, textA,
-                                                   text_char_size, text_line_length);
-        playerHealth = parentWindow->create_text("assets/font.ttf", "Health : -/- ", textR, textG, textB, textA,
-                                                 text_char_size, text_line_length);
+     
         consoleText = parentWindow->create_text("assets/font.ttf", ">", textR, textG, textB, textA, console_char_size,
                                                 text_line_length);
         callbacks.push_back(parentWindow->register_callback({[&](const yorcvs::Event<yorcvs::graphics> &event) {
@@ -950,26 +928,11 @@ class DebugInfo
     yorcvs::Map *map{};
     sol::state *lua_state{};
 
-    yorcvs::Text<yorcvs::graphics> frameTime;
-    const yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
-
+    float frame_time = 0.0f;
     float maxFrameTime = 0.0f;
-    yorcvs::Text<yorcvs::graphics> maxframeTimeTX;
-    const yorcvs::Rect<float> maxFTRect = {0, 25, 150, 25};
-
-    yorcvs::Text<yorcvs::graphics> avgFrameTime;
-    const yorcvs::Rect<float> avgFrameTimeRect = {0, 50, 150, 25};
-
-    yorcvs::Text<yorcvs::graphics> ecsEntities;
-    const yorcvs::Rect<float> entitiesRect = {0, 75, 150, 25};
     float frame_time_samples = 0.0f;
     float avg_frame_time = 0.0f;
 
-    yorcvs::Text<yorcvs::graphics> playerPosition;
-    const yorcvs::Rect<float> pPositionRect = {0, 100, 300, 25};
-
-    yorcvs::Text<yorcvs::graphics> playerHealth;
-    const yorcvs::Rect<float> playerHealthRect = {0, 125, 200, 25};
 
     yorcvs::Text<yorcvs::graphics> consoleText;
     const yorcvs::Rect<float> consoleTextRect = {0, 0, 0, 20};
@@ -1080,6 +1043,8 @@ class Application
     }
     void run()
     {
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
         const float elapsed = std::min(100.0f, counter.get_ticks<float, std::chrono::nanoseconds>() / 1000000.0f);
         counter.stop();
         counter.start();
@@ -1095,15 +1060,14 @@ class Application
             lag -= msPF;
         }
 
-
+        
         r.clear();
-        ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();  
+        
         render_map_tiles(map);
         sprS.renderSprites(render_dimensions);
         dbInfo.render(elapsed, render_dimensions);
               
-        ImGui::ShowDemoWindow();
+       
         ImGui::Render();
         ImGuiSDL::Render(ImGui::GetDrawData());
         r.present();
