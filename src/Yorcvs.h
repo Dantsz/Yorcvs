@@ -39,6 +39,9 @@ namespace json = nlohmann;
 #include <fstream>
 #include <tmxlite/Map.hpp>
 #include "sol/sol.hpp"
+
+#include "imgui.h"
+#include "imgui_sdl.h"
 // TODO: move this to utlities
 namespace std
 {
@@ -1094,9 +1097,14 @@ class Application
 
 
         r.clear();
+        ImGui::NewFrame();  
         render_map_tiles(map);
         sprS.renderSprites(render_dimensions);
         dbInfo.render(elapsed, render_dimensions);
+              
+        ImGui::ShowDemoWindow();
+        ImGui::Render();
+        ImGuiSDL::Render(ImGui::GetDrawData());
         r.present();
 
     }

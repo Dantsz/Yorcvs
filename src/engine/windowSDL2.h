@@ -26,6 +26,8 @@
 #include <cmath>
 #include <functional> // callbacks need to be stored in a vector
 
+#include "imgui.h"
+#include "imgui_sdl.h"
 #pragma once
 namespace yorcvs
 {
@@ -152,7 +154,7 @@ template <> class Window<yorcvs::SDL2>
         const std::string_view name = "Yorcvs";
         const size_t width = 960;
         const size_t height = 480;
-
+       
         SDL_version sdlversion{};
         SDL_GetVersion(&sdlversion);
 
@@ -203,6 +205,9 @@ template <> class Window<yorcvs::SDL2>
         {
             yorcvs::log("Error creating SDL2 renderer", yorcvs::MSGSEVERITY::ERROR);
         }
+        ImGui::CreateContext();
+        ImGuiSDL::Initialize(renderer, width, height);
+
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
         SDL_RendererInfo renderInfo{};
         SDL_GetRendererInfo(renderer, &renderInfo);
@@ -268,6 +273,8 @@ template <> class Window<yorcvs::SDL2>
 
     void cleanup()
     {
+        ImGuiSDL::Deinitialize();
+        ImGui::DestroyContext();
         SDL_DestroyWindow(sdlWindow);
         IMG_Quit();
         TTF_Quit();
