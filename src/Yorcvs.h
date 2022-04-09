@@ -42,6 +42,7 @@ namespace json = nlohmann;
 
 #include "imgui.h"
 #include "imgui_sdl.h"
+#include "misc/cpp/imgui_stdlib.h"
 // TODO: move this to utlities
 namespace std
 {
@@ -685,7 +686,7 @@ class DebugInfo
         }
         if (showConsole)
         {
-            parentWindow->set_text_message(consoleText, ">" + console_input);
+           
         }
     }
 
@@ -799,8 +800,7 @@ class DebugInfo
         }
         update(elapsed);
         if (showDebugWindow)
-        {
-           
+        {     
             render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
                             hitbox_color[3]);
             ImGui::Begin("DebugWindow");
@@ -822,24 +822,23 @@ class DebugInfo
                 }
             }
             ImGui::End();
-           
-         
         }
         if (showConsole)
         {
             ImGui::ShowDemoWindow();
             ImGui::Begin("Console");
-            ImGui::End();
-            yorcvs::Rect<float> console_rect = consoleTextRect;
-            console_rect.y = parentWindow->get_size().y - console_rect.h;
-            console_rect.w = parentWindow->get_text_length(consoleText).x;
-            parentWindow->draw_text(consoleText, console_rect);
-            for(const auto& [previous_text,previous_rect,cmd_str] : previous_commands)
-            {
-                console_rect = previous_rect;
-                console_rect.y += parentWindow->get_window_size().y - consoleTextRect.h;
-                parentWindow->draw_text(previous_text, console_rect);
+            ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue;
+            if(ImGui::InputText("##",&console_text,input_text_flags) != 0)
+            {  
+                
+                auto rez = lua_state->safe_script(console_text,[](lua_State*, sol::protected_function_result pfr) {return pfr;});
+                if(!rez.valid())
+                {      sol::error err = rez;
+                       std::string text = err.what();
+                }
+                console_text.clear();
             }
+            ImGui::End();
         }
     }
 
@@ -855,65 +854,6 @@ class DebugInfo
         healthSys = healthS;
 
      
-        consoleText = parentWindow->create_text("assets/font.ttf", ">", textR, textG, textB, textA, console_char_size,
-                                                text_line_length);
-        callbacks.push_back(parentWindow->register_callback({[&](const yorcvs::Event<yorcvs::graphics> &event) {
-            if (event.get_type() == yorcvs::Event<yorcvs::graphics>::TEXT_INPUT && showConsole)
-            {
-                console_input += event.get_text_input();
-            }
-            else if (event.get_type() == yorcvs::Event<graphics>::KEYBOARD_PRESSED && showConsole &&
-                     event.get_key() == YORCVS_KEY_BACKSPACE && !console_input.empty())
-            {
-                console_input.pop_back();
-            }
-            if (event.get_type() == yorcvs::Event<graphics>::KEYBOARD_PRESSED && showConsole &&
-                event.get_key() == YORCVS_KEY_ENTER)
-            {
-                // input
-                std::cout << console_input << '\n';
-                auto rez = lua_state->safe_script(console_input,[](lua_State*, sol::protected_function_result pfr) {return pfr;});
-
-               
-                for(auto& [text,rect,cmd_str] : previous_commands)
-                {
-                    rect.y -= consoleTextRect.h;
-                }
-                yorcvs::Rect<float> old_console_command_rect = consoleTextRect;
-                old_console_command_rect.w = parentWindow->get_text_length(consoleText).x;
-                old_console_command_rect.y -= consoleTextRect.h;
-                
-                previous_commands.emplace(previous_commands.begin(),std::move(consoleText),old_console_command_rect,console_input);
-                consoleText =  parentWindow->create_text("assets/font.ttf", ">", textR, textG, textB, textA, console_char_size,
-                                                text_line_length);
-                console_input.clear();
-                //SHOW OUTPUT ON CONSOLE
-                if(!rez.valid())
-                {      sol::error err = rez;
-                       std::string text = err.what();
-                      
-                       for(auto& [text,rect,cmd_str] : previous_commands)
-                        {
-                            rect.y -= consoleTextRect.h;
-                        }
-                        yorcvs::Rect<float> old_console_command_rect = consoleTextRect;
-          
-                       
-                        std::transform(text.begin(), text.end(),text.begin(),[](unsigned char c)->unsigned char{
-                            if(c == '\n')
-                            {
-                                return ' ';
-                            }
-                            return c;
-                        });
-                        yorcvs::Text<yorcvs::graphics> error_txt =  parentWindow->create_text("assets/font.ttf", text, textR, textG, textB, textA, console_char_size,
-                        text_line_length);
-                        old_console_command_rect.w = parentWindow->get_text_length(error_txt).x;
-                        old_console_command_rect.y -= consoleTextRect.h;
-                        previous_commands.emplace(previous_commands.begin(),std::move(error_txt),old_console_command_rect,text);
-                }
-            }
-        }}));
     }
 
     void reset()
@@ -927,18 +867,13 @@ class DebugInfo
     yorcvs::ECS *appECS{};
     yorcvs::Map *map{};
     sol::state *lua_state{};
-
+    //debug window
     float frame_time = 0.0f;
     float maxFrameTime = 0.0f;
     float frame_time_samples = 0.0f;
     float avg_frame_time = 0.0f;
-
-
-    yorcvs::Text<yorcvs::graphics> consoleText;
-    const yorcvs::Rect<float> consoleTextRect = {0, 0, 0, 20};
-
-    std::vector<std::tuple<yorcvs::Text<yorcvs::graphics>,yorcvs::Rect<float>,std::string>> previous_commands;
-
+    //console
+    std::string console_text;
     PlayerMovementControl *playerMoveSystem{};
 
     CollisionSystem *colSystem{};
@@ -949,9 +884,7 @@ class DebugInfo
     bool showConsole = false;
     float time_accumulator = 0;
 
-    static constexpr float console_char_size = 32.0f;
-    static constexpr size_t console_previous_command_shown = 5;
-
+    
     static constexpr yorcvs::Vec2<float> health_full_bar_dimension = {32.0f, 4.0f};
     const std::vector<uint8_t> health_bar_full_color = {255, 0, 0, 255};
     const std::vector<uint8_t> health_bar_empty_color = {100, 0, 0, 255};
