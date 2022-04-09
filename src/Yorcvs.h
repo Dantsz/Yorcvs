@@ -677,6 +677,10 @@ class DebugInfo
         frame_time_samples += 1.0f;
         avg_frame_time += ft;
         avg_frame_time /= frame_time_samples;
+        if(!playerMoveSystem->entityList->entitiesID.empty())
+        {
+            (*lua_state)["playerID"] = playerMoveSystem->entityList->entitiesID[0];
+        }
         if (showDebugWindow)
         {
             if (ft > maxFrameTime)
@@ -827,17 +831,39 @@ class DebugInfo
         {
             ImGui::ShowDemoWindow();
             ImGui::Begin("Console");
-            ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue;
-            if(ImGui::InputText("##",&console_text,input_text_flags) != 0)
+            ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue |  ImGuiInputTextFlags_CallbackHistory;
+
+            const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+            ImGui::BeginChild("ScrollingRegion", ImVec2(0, -footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar);
+            for(const auto& item : console_logs)
+            {
+                ImGui::TextUnformatted( item.c_str());
+            }
+            ImGui::EndChild();
+            ImGui::Separator();
+            bool reclaim_focus = false;
+            if(ImGui::InputText("##",&console_text,input_text_flags,&DebugInfo::TextEditCallbackStub, (void*)this) && !console_text.empty())
             {  
-                
+                console_logs.push_back(console_text);
+                HistoryPos = -1;
+                console_previous_commands.push_back(console_text);
                 auto rez = lua_state->safe_script(console_text,[](lua_State*, sol::protected_function_result pfr) {return pfr;});
                 if(!rez.valid())
-                {      sol::error err = rez;
-                       std::string text = err.what();
+                {   sol::error err = rez;
+                    std::string text = err.what();
+                    console_logs.emplace_back(std::move(text));
                 }
-                console_text.clear();
+                else
+                {
+                    //console_logs.emplace_back(rez.get<std::string>());
+                   
+                }
+                console_text = "";
+                reclaim_focus = true;
             }
+            ImGui::SetItemDefaultFocus();
+            if (reclaim_focus)
+                ImGui::SetKeyboardFocusHere(-1);
             ImGui::End();
         }
     }
@@ -846,6 +872,7 @@ class DebugInfo
                 CollisionSystem *cols, HealthSystem *healthS,sol::state* lua)
     {
         lua_state = lua;
+        attach_lua();
         parentWindow = parentW;
         this->map = map;
         appECS = map->ecs;
@@ -855,11 +882,61 @@ class DebugInfo
 
      
     }
+    void attach_lua()
+    {
+        lua_state->set_function("internal_log",&DebugInfo::add_log,this);
+        lua_state->script("function log(message) internal_log(tostring(message)) end");
+        (*lua_state)["print"] = (*lua_state)["log"];
+    }
 
     void reset()
     {
         maxFrameTime = 0.0f;
     }
+
+    void add_log(const std::string& message)
+    {
+        console_logs.push_back(message);
+    }
+    static int TextEditCallbackStub(ImGuiInputTextCallbackData* data)
+    {
+        DebugInfo* console = static_cast<DebugInfo*>(data->UserData);
+        return console->TextEditCallback(data);
+    }
+
+    int  TextEditCallback(ImGuiInputTextCallbackData* data)
+    {
+        //AddLog("cursor: %d, selection: %d-%d", data->CursorPos, data->SelectionStart, data->SelectionEnd);
+        switch (data->EventFlag)
+        {
+        case ImGuiInputTextFlags_CallbackHistory:
+            {
+                // Example of HISTORY
+                const int prev_history_pos = HistoryPos;
+                if (data->EventKey == ImGuiKey_UpArrow)
+                {
+                    if (HistoryPos == -1)
+                        HistoryPos = console_previous_commands.size() - 1;
+                    else if (HistoryPos > 0)
+                        HistoryPos--;
+                }
+                else if (data->EventKey == ImGuiKey_DownArrow)
+                {
+                    if (HistoryPos != -1)
+                        if (++HistoryPos >= console_previous_commands.size())
+                            HistoryPos = -1;
+                }
+
+                // A better implementation would preserve the data on the current input line along with cursor position.
+                if (prev_history_pos != HistoryPos)
+                {
+                    const char* history_str = (HistoryPos >= 0) ? console_previous_commands[HistoryPos].c_str() : "";
+                    data->DeleteChars(0, data->BufTextLen);
+                    data->InsertChars(0, history_str);
+                }
+            }
+        }
+    }    
     std::vector<size_t> callbacks;
     std::string console_input;
 
@@ -874,6 +951,8 @@ class DebugInfo
     float avg_frame_time = 0.0f;
     //console
     std::string console_text;
+    std::vector<std::string> console_logs;
+    std::vector<std::string> console_previous_commands;
     PlayerMovementControl *playerMoveSystem{};
 
     CollisionSystem *colSystem{};
@@ -883,7 +962,7 @@ class DebugInfo
     bool showDebugWindow = false;
     bool showConsole = false;
     float time_accumulator = 0;
-
+    int HistoryPos = 0;
     
     static constexpr yorcvs::Vec2<float> health_full_bar_dimension = {32.0f, 4.0f};
     const std::vector<uint8_t> health_bar_full_color = {255, 0, 0, 255};
