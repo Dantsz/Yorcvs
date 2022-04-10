@@ -22,13 +22,22 @@ namespace yorcvs::lua
 template <typename T, typename... Args>
 inline void register_component_to_lua(sol::state &lua_state, const std::string &name, Args &&... args)
 {
+    std::vector<std::string>& component_names = lua_state["impl"]["component_names"];
+    yorcvs::ECS* ecs = lua_state["world"];
     sol::usertype<T> new_type = lua_state.new_usertype<T>(name, args...);
     lua_state["ECS"]["create_" + name] = [](){return T();} ;
     lua_state["ECS"]["add_" + name] = &yorcvs::ECS::add_default_component<T>;
     lua_state["ECS"]["get_" + name] = &yorcvs::ECS::get_component<T>;
     lua_state["ECS"]["has_" + name] = &yorcvs::ECS::has_components<T>;
     lua_state["ECS"]["remove_" + name] = &yorcvs::ECS::remove_component<T>;
-}
+    lua_state["ECS"]["component_ID" + name] = &yorcvs::ECS::get_component_ID<T>;
+    const size_t index = ecs->get_component_ID<T>();
+    if(component_names.size() < index)
+    {
+        component_names.resize(index + 1);
+    }
+    component_names.insert(component_names.begin() + index,name);
+}   
 /**
  * @brief Gives lua acces to basic engine types like vector and rectangle
  * 
@@ -56,12 +65,26 @@ inline void bind_basic_types(sol::state &lua_state)
  */
 inline bool bind_runtime(sol::state &lua_state, yorcvs::ECS *ecs)
 {
+    lua_state["impl"] = lua_state.create_table_with("component_names",std::vector<std::string>{});
+   
     bind_basic_types(lua_state);
     sol::usertype<yorcvs::ECS> lua_ECS = lua_state.new_usertype<yorcvs::ECS>("ECS");
     lua_state["world"] = ecs;
-    lua_ECS["createEntity"] = &yorcvs::ECS::create_entity_ID;
-    lua_ECS["isValidEntity"] = &yorcvs::ECS::is_valid_entity;
-    lua_ECS["destroyEntity"] = &yorcvs::ECS::destroy_entity;
+    lua_ECS["create_entity"] = &yorcvs::ECS::create_entity_ID;
+    lua_ECS["is_valid_entity"] = &yorcvs::ECS::is_valid_entity;
+    lua_ECS["destroy_entity"] = &yorcvs::ECS::destroy_entity;
+    lua_ECS["get_active_entities"] = &yorcvs::ECS::get_active_entities_number;
+    lua_ECS["get_entity_list_size"] = &yorcvs::ECS::get_entity_list_size;
+    lua_ECS["get_entity_signature"] = &yorcvs::ECS::get_entity_signature;
+    lua_state["ECS"]["component_name"] = [&](yorcvs::ECS* ecs,size_t ID)
+    {
+        std::vector<std::string>& names = lua_state["impl"]["component_names"];
+        if(names.size() > ID)
+        {
+            return names[ID];
+        }   
+        return std::string{"null"};
+    };
     register_component_to_lua<healthComponent>(lua_state, "healthComponent", "HP", &healthComponent::HP, "max_HP",
                                                &healthComponent::max_HP, "health_regen",
                                                &healthComponent::health_regen);
