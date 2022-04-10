@@ -611,6 +611,7 @@ class Map
         explicit ecs_Initializer(yorcvs::ECS &world)
         {
             // register components
+            world.register_component<identificationComponent>();
             world.register_component<hitboxComponent, positionComponent, velocityComponent, healthComponent,
                                      staminaComponent>();
             world.register_component<playerMovementControlledComponent, behaviourComponent>();
@@ -695,6 +696,7 @@ class DebugInfo
             else
             {
                 const size_t ID = playerMoveSystem->entityList->entitiesID[0];
+               
                 parentWindow->set_text_message(
                     playerPosition,
                     "Player position : X = " + std::to_string(appECS->get_component<positionComponent>(ID).position.x) +
@@ -1026,7 +1028,8 @@ class Application
         size_t player_id = world.create_entity_ID();
         map.load_character_from_path(player_id, "assets/player.json");
         world.add_default_component<playerMovementControlledComponent>(player_id);
-
+        
+       
         dbInfo.attach(&r, &map, &pcS, &map.collisionS, &map.healthS, &lua_state);
         counter.start();
     }
