@@ -858,6 +858,16 @@ class ECS
         return entitymanager->get_signature(entityID);
     }
     /**
+     * @brief Get the component ID 
+     * 
+     * @tparam T 
+     * @return size_t 
+     */
+    template<typename T>size_t get_component_ID()
+    {
+        return componentmanager->get_component_ID<T>();
+    }
+    /**
      * @brief Registers a component making the ECS aware of it
      *
      * @tparam T The component object
@@ -1206,6 +1216,15 @@ class ECS
         return entitymanager->lowestUnallocatedID - entitymanager->freedIndices.size();
     }
     /**
+     * @brief Gets the size of the array that holds entity data , the same thing as the maximum number of entitites 
+     * 
+     * @return size_t 
+     */
+    [[nodiscard]] size_t get_entity_list_size()
+    {
+        return entitymanager->lowestUnallocatedID;
+    }
+    /**
      * @brief Get a list of names corresponding to registered components
      *
      * @return std::vector<std::string> Components registered to the ECS
@@ -1231,10 +1250,6 @@ class ECS
     template <typename comp, typename returnType = size_t> returnType get_maximum_component_count()
     {
         return componentmanager->get_container<comp>()->components.size();
-    }
-    template <typename T> size_t get_component_ID()
-    {
-        return componentmanager->get_component_ID<T>();
     }
     template <typename T> void on_system_signature_change()
     {
