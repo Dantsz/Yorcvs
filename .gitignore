@@ -52,3 +52,4 @@ yorcvs.srctrldb_tmp
 .*/
 tests/CTest/Testing/Temporary/CTestCostData.txt
 tests/CTest/Testing/Temporary/LastTest.log
+imgui.ini
