@@ -447,7 +447,7 @@ class ComponentManager
     {
         if (get_container<T>() == nullptr)
         {
-            yorcvs::log(std::string("Component") + typeid(T).name() + " has not been registered yet !!!!",
+            yorcvs::log(std::string("Component ") + typeid(T).name() + " has not been registered yet !!!!",
                         yorcvs::MSGSEVERITY::ERROR);
             return;
         }
@@ -457,7 +457,7 @@ class ComponentManager
     {
         if (get_container<T>() == nullptr)
         {
-            yorcvs::log(std::string("Component") + typeid(T).name() + " has not been registered yet !!!!",
+            yorcvs::log(std::string("Component ") + typeid(T).name() + " has not been registered yet !!!!",
                         yorcvs::MSGSEVERITY::ERROR);
             return;
         }
@@ -467,7 +467,7 @@ class ComponentManager
     {
         if (get_container<T>() == nullptr)
         {
-            yorcvs::log(std::string("Component") + typeid(T).name() + " has not been registered yet !!!!",
+            yorcvs::log(std::string("Component ") + typeid(T).name() + " has not been registered yet !!!!",
                         yorcvs::MSGSEVERITY::ERROR);
         }
         return get_container<T>()->get_component(entityID);
@@ -1006,6 +1006,11 @@ class ECS
      */
     template <typename T> bool has_components(const size_t entityID)
     {
+        if(componentmanager->get_container<T>()  == nullptr)
+        {
+            yorcvs::log("component not registered",yorcvs::MSGSEVERITY::ERROR);
+            return false;
+        }
         return componentmanager->get_container<T>()->has_component(entityID);
     }
     /**

@@ -696,7 +696,6 @@ class DebugInfo
             else
             {
                 const size_t ID = playerMoveSystem->entityList->entitiesID[0];
-               
                 parentWindow->set_text_message(
                     playerPosition,
                     "Player position : X = " + std::to_string(appECS->get_component<positionComponent>(ID).position.x) +
