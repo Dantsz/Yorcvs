@@ -864,6 +864,10 @@ class DebugInfo
             ImGui::SetItemDefaultFocus();
             if (reclaim_focus)
                 ImGui::SetKeyboardFocusHere(-1);
+            if (ImGui::SmallButton("Clear"))           
+            {
+                 clear_logs(); 
+            }
             ImGui::End();
         }
     }
@@ -897,6 +901,12 @@ class DebugInfo
     void add_log(const std::string& message)
     {
         console_logs.push_back(message);
+    }
+    void clear_logs()
+    {
+        console_logs.clear();
+        console_previous_commands.clear();
+        HistoryPos = -1;
     }
     static int TextEditCallbackStub(ImGuiInputTextCallbackData* data)
     {
@@ -938,8 +948,6 @@ class DebugInfo
         }
     }    
     std::vector<size_t> callbacks;
-    std::string console_input;
-
     yorcvs::Window<yorcvs::graphics> *parentWindow{};
     yorcvs::ECS *appECS{};
     yorcvs::Map *map{};
