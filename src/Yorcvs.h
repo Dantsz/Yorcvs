@@ -615,6 +615,7 @@ class Map
         explicit ecs_Initializer(yorcvs::ECS &world)
         {
             // register components
+            world.register_component<identificationComponent>();
             world.register_component<hitboxComponent, positionComponent, velocityComponent, healthComponent,
                                      staminaComponent>();
             world.register_component<playerMovementControlledComponent, behaviourComponent>();
@@ -1012,7 +1013,8 @@ class Application
         size_t player_id = world.create_entity_ID();
         map.load_character_from_path(player_id, "assets/player.json");
         world.add_default_component<playerMovementControlledComponent>(player_id);
-
+        
+       
         dbInfo.attach(&r, &map, &pcS, &map.collisionS, &map.healthS, &lua_state);
         counter.start();
     }
