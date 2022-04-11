@@ -39,4 +39,16 @@ Cmake (at least version 3.13) is required for all platforms
    cmake --build
    ```
 ### Windows
+1. Install and setup vcpkg from https://vcpkg.io/en/index.html
+2. Configure and build the cmake project and specify the vcpkg toolchain file
+   ```
+   cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE= <path_to_vcpkg>/scripts/buildsystems/vcpkg.cmake
+   cmake --build
+   ```
 ### Emscripten
+1. install and configure the Emscripten SDK from https://emscripten.org/
+2. configure cmake with emcmake and set the option to preload the assets folder
+   ```
+      emcmake cmake -B build -DYORCVS_EMSCRIPTEN_PRELOAD_ASSETS_FOLDER=ON
+      cmake --build
+   ```
