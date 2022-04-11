@@ -50,5 +50,5 @@ Cmake (at least version 3.13) is required for all platforms
 2. configure cmake with emcmake and set the option to preload the assets folder
    ```
       emcmake cmake -B build -DYORCVS_EMSCRIPTEN_PRELOAD_ASSETS_FOLDER=ON
-      cmake --build
+      cmake --build build
    ```
