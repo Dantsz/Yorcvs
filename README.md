@@ -50,5 +50,17 @@ Cmake (at least version 3.13) is required for all platforms
 2. configure cmake with emcmake and set the option to preload the assets folder
    ```
       emcmake cmake -B build -DYORCVS_EMSCRIPTEN_PRELOAD_ASSETS_FOLDER=ON
+   ```
+3. copy the assets folder into the build folder
+4. build the project
+   ```
       cmake --build build
    ```
+5. To the the build run 
+   ```
+   emrun /build/Yorcvs.html
+   ```
+
+
+   
+
