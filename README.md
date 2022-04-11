@@ -23,3 +23,20 @@ C++ RPG/sandbox game project
 |[tmxlite](https://github.com/fallahn/tmxlite)|
 |[lua-cmake](https://github.com/lubgr/lua-cmake)|
 |[sol2](https://sol2.readthedocs.io/en/latest/)|v3.2.2
+
+## Compiling
+Cmake (at least version 3.13) is required for all platforms
+### Linux
+1. Install SDL2 :
+   ```
+   sudo apt-get install libsdl2-dev
+   sudo apt-get install libsdl2-image-dev
+   sudo apt-get install libsdl2-ttf-dev
+   ```
+2. Configure and build with cmake
+   ```
+   cmake -B
+   cmake --build
+   ```
+### Windows
+### Emscripten
