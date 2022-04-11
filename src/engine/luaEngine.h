@@ -76,7 +76,9 @@ inline bool bind_runtime(sol::state &lua_state, yorcvs::ECS *ecs)
     lua_ECS["get_active_entities"] = &yorcvs::ECS::get_active_entities_number;
     lua_ECS["get_entity_list_size"] = &yorcvs::ECS::get_entity_list_size;
     lua_ECS["get_entity_signature"] = &yorcvs::ECS::get_entity_signature;
-    lua_state["ECS"]["component_name"] = [&](yorcvs::ECS* ecs,size_t ID)
+    lua_ECS["copy_components_to_from_entity"] = &yorcvs::ECS::copy_components_to_from_entity;
+    //returns the components name based on it's ID
+    lua_state["ECS"]["component_name"] = [&](yorcvs::ECS* ,size_t ID)
     {
         std::vector<std::string>& names = lua_state["impl"]["component_names"];
         if(names.size() > ID)
@@ -84,6 +86,12 @@ inline bool bind_runtime(sol::state &lua_state, yorcvs::ECS *ecs)
             return names[ID];
         }   
         return std::string{"null"};
+    };
+    //returns the number of registered components by the ECS that can be used in lua scripts
+    lua_state["ECS"]["components_registered"] = [&](yorcvs::ECS*)
+    {
+         std::vector<std::string>& names = lua_state["impl"]["component_names"];
+         return names.size();
     };
     register_component_to_lua<healthComponent>(lua_state, "healthComponent", "HP", &healthComponent::HP, "max_HP",
                                                &healthComponent::max_HP, "health_regen",
