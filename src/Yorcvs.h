@@ -936,6 +936,7 @@ class DebugInfo
                 }
             }
         }
+        return 1;
     }    
     std::vector<size_t> callbacks;
     yorcvs::Window<yorcvs::graphics> *parentWindow{};

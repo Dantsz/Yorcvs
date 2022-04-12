@@ -54,6 +54,36 @@ if (NOT sol2_POPULATED)
    FetchContent_Populate(sol2)
   #target_include_directories(${PROJECT_NAME} PUBLIC ${sol2_SOURCE_DIR}/include)
 endif()
+#INSTALL IMGUI BASE
+FetchContent_Declare(imgui
+ GIT_REPOSITORY https://github.com/ocornut/imgui.git
+ GIT_TAG "master" 
+)
+FetchContent_GetProperties(imgui)
+if (NOT imgui_POPULATED)
+   FetchContent_Populate(imgui)
+  target_include_directories(${PROJECT_NAME} PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
+  message(STATUS "imgui :" ${imgui_SOURCE_DIR})
+  add_library(imgui STATIC ${imgui_SOURCE_DIR}/imgui.cpp ${imgui_SOURCE_DIR}/imgui_demo.cpp ${imgui_SOURCE_DIR}/imgui_draw.cpp ${imgui_SOURCE_DIR}/imgui_tables.cpp ${imgui_SOURCE_DIR}/imgui_widgets.cpp ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl.cpp ${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp)
+  target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
+  target_link_libraries(imgui  ${SDL2lib})
+  endif()
+#INSTALL SDL2 BACKEND
+FetchContent_Declare(imguiSDL2
+ GIT_REPOSITORY https://github.com/Tyyppi77/imgui_sdl.git
+ GIT_TAG "master" 
+)
+FetchContent_GetProperties(imguiSDL2)
+if (NOT imguiSDL2_POPULATED)
+  FetchContent_Populate(imguiSDL2)
+  target_include_directories(${PROJECT_NAME} PUBLIC ${imguisdl2_SOURCE_DIR} )
+  message(STATUS "imguiSDL2 :" ${imguisdl2_SOURCE_DIR})
+  add_library(imgui-SDL2 STATIC ${imguisdl2_SOURCE_DIR}/imgui_sdl.cpp )
+  target_link_libraries(imgui-SDL2 ${SDL2lib})
+  target_link_libraries(imgui-SDL2  imgui)
+  target_include_directories(imgui-SDL2 PUBLIC ${imgui_SOURCE_DIR})
+  
+endif()
 
 
 find_package(SDL2 CONFIG REQUIRED)
@@ -84,17 +114,17 @@ add_test(ECSmainclassCopyMove ECSmainclassCopyMove)
 add_executable(YorcvsLoadMap src/YorcvsLoadMap.cpp)
 add_test(NAME YorcvsLoadMap  COMMAND YorcvsLoadMap WORKING_DIRECTORY ${test_dir})
 target_link_libraries(YorcvsLoadMap PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main  SDL2::SDL2_image SDL2::SDL2_ttf lua::lib)
-target_include_directories(YorcvsLoadMap PUBLIC ${sol2_SOURCE_DIR}/include)
+target_include_directories(YorcvsLoadMap PUBLIC ${sol2_SOURCE_DIR}/include imgui imgui-SDL2)
 
 add_executable(WorldTestnegativeHealthRegen src/WorldTestnegativeHealthRegen.cpp)
 add_test(NAME WorldTestnegativeHealthRegen COMMAND WorldTestnegativeHealthRegen WORKING_DIRECTORY ${test_dir})
 target_link_libraries(WorldTestnegativeHealthRegen PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main  SDL2::SDL2_image SDL2::SDL2_ttf lua::lib)
-target_include_directories(WorldTestnegativeHealthRegen PUBLIC ${sol2_SOURCE_DIR}/include)
+target_include_directories(WorldTestnegativeHealthRegen PUBLIC ${sol2_SOURCE_DIR}/include imgui imgui-SDL2)
 
 add_executable(GameTestLoadingEntity src/GameTestLoadingEntity.cpp)
 add_test(NAME GameTestLoadingEntity COMMAND GameTestLoadingEntity WORKING_DIRECTORY ${test_dir})
 target_link_libraries(GameTestLoadingEntity PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf lua::lib)
-target_include_directories(GameTestLoadingEntity PUBLIC ${sol2_SOURCE_DIR}/include)
+target_include_directories(GameTestLoadingEntity PUBLIC ${sol2_SOURCE_DIR}/include imgui imgui-SDL2)
 
 add_executable(UtilitiesTestSpiral src/UtilitiesTestSpiral.cpp)
 add_test(NAME UtilitiesTestSpiral COMMAND UtilitiesTestSpiral  WORKING_DIRECTORY ${test_dir})
