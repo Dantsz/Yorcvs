@@ -34,7 +34,7 @@ inline void register_component_to_lua(sol::state &lua_state, const std::string &
     const size_t index = ecs->get_component_ID<T>();
     if(component_names.size() < index)
     {
-        component_names.resize(index + 1);
+        component_names.resize(index + 1,"null");
     }
     component_names.insert(component_names.begin() + index,name);
 }   

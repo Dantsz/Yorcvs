@@ -689,10 +689,6 @@ class DebugInfo
                 maxFrameTime = ft;
             }
         }
-        if (showConsole)
-        {
-           
-        }
     }
 
     template <typename render_backend>
@@ -835,7 +831,7 @@ class DebugInfo
             ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue |  ImGuiInputTextFlags_CallbackHistory;
 
             const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
-            ImGui::BeginChild("ScrollingRegion", ImVec2(0, -footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar);
+            ImGui::BeginChild("ScrollingRegion", ImVec2(0, -3*footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar);
             for(const auto& item : console_logs)
             {
                 ImGui::TextUnformatted( item.c_str());
@@ -853,11 +849,6 @@ class DebugInfo
                 {   sol::error err = rez;
                     std::string text = err.what();
                     console_logs.emplace_back(std::move(text));
-                }
-                else
-                {
-                    //console_logs.emplace_back(rez.get<std::string>());
-                   
                 }
                 console_text = "";
                 reclaim_focus = true;
@@ -884,8 +875,6 @@ class DebugInfo
         playerMoveSystem = pms;
         colSystem = cols;
         healthSys = healthS;
-
-     
     }
     void attach_lua()
     {
@@ -1093,7 +1082,6 @@ class Application
         ImGui::Render();
         ImGuiSDL::Render(ImGui::GetDrawData());
         r.present();
-
     }
 
     [[nodiscard]] bool is_active() const
