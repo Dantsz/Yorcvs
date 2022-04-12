@@ -39,6 +39,10 @@ namespace json = nlohmann;
 #include <fstream>
 #include <tmxlite/Map.hpp>
 #include "sol/sol.hpp"
+
+#include "imgui.h"
+#include "imgui_sdl.h"
+#include "misc/cpp/imgui_stdlib.h"
 // TODO: move this to utlities
 namespace std
 {
@@ -669,51 +673,21 @@ class DebugInfo
         //     out << map->save_character_to_path(playerMoveSystem->entityList->entitiesID[0]);
         //     std::cout << "Done.\n";
         // }
+        frame_time = ft;
         avg_frame_time *= frame_time_samples;
         frame_time_samples += 1.0f;
         avg_frame_time += ft;
         avg_frame_time /= frame_time_samples;
+        if(!playerMoveSystem->entityList->entitiesID.empty())
+        {
+            (*lua_state)["playerID"] = playerMoveSystem->entityList->entitiesID[0];
+        }
         if (showDebugWindow)
         {
-            parentWindow->set_text_message(frameTime, "Frame Time : " + std::to_string(ft));
-
             if (ft > maxFrameTime)
             {
                 maxFrameTime = ft;
-                parentWindow->set_text_message(maxframeTimeTX, "Max Frame Time: " + std::to_string(maxFrameTime));
             }
-            parentWindow->set_text_message(ecsEntities,
-                                           "Active Entities : " + std::to_string(appECS->get_active_entities_number()));
-
-            parentWindow->set_text_message(avgFrameTime, "Avg frame time :  " + std::to_string(avg_frame_time));
-
-            // set player position text
-            if (playerMoveSystem->entityList->entitiesID.empty())
-            {
-                parentWindow->set_text_message(playerPosition, "NO PLAYER FOUND");
-                parentWindow->set_text_message(playerHealth, "Health: -/-");
-            }
-            else
-            {
-                const size_t ID = playerMoveSystem->entityList->entitiesID[0];
-                parentWindow->set_text_message(
-                    playerPosition,
-                    "Player position : X = " + std::to_string(appECS->get_component<positionComponent>(ID).position.x) +
-                        " Y = " + std::to_string(appECS->get_component<positionComponent>(ID).position.y));
-
-                if (appECS->has_components<healthComponent>(ID))
-                {
-                    healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
-                    parentWindow->set_text_message(playerHealth, "Health: " + std::to_string(playerHealthC.HP) + " / " +
-                                                                     std::to_string(playerHealthC.max_HP));
-                }
-                // print current chunk
-                // std::cout << appECS->get_component<positionComponent>(ID).position / (32.0f*16.0f) << "\n";
-            }
-        }
-        if (showConsole)
-        {
-            parentWindow->set_text_message(consoleText, ">" + console_input);
         }
     }
 
@@ -827,28 +801,66 @@ class DebugInfo
         }
         update(elapsed);
         if (showDebugWindow)
-        {
+        {     
             render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
                             hitbox_color[3]);
-            parentWindow->draw_text(frameTime, FTRect);
-            parentWindow->draw_text(maxframeTimeTX, maxFTRect);
-            parentWindow->draw_text(avgFrameTime, avgFrameTimeRect);
-            parentWindow->draw_text(ecsEntities, entitiesRect);
-            parentWindow->draw_text(playerPosition, pPositionRect);
-            parentWindow->draw_text(playerHealth, playerHealthRect);
+            ImGui::Begin("DebugWindow");
+            ImGui::Text("frameTime: %f",frame_time);
+            ImGui::Text("maxFramTime: %f",maxFrameTime);
+            ImGui::Text("avgFrameTime: %f",avg_frame_time);
+            ImGui::Text("ecsEntities: %zu",appECS->get_active_entities_number());
+            if (!playerMoveSystem->entityList->entitiesID.empty())
+            {
+                const size_t ID = playerMoveSystem->entityList->entitiesID[0];
+                healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
+                if (appECS->has_components<positionComponent>(ID))
+                {
+                 ImGui::Text("playerPosition: (%f,%f)",appECS->get_component<positionComponent>(ID).position.x,appECS->get_component<positionComponent>(ID).position.y);
+                }
+                if (appECS->has_components<healthComponent>(ID))
+                {
+                    ImGui::Text("playerHealth: (%f/%f)",playerHealthC.HP,playerHealthC.max_HP);
+                }
+            }
+            ImGui::End();
         }
         if (showConsole)
         {
-            yorcvs::Rect<float> console_rect = consoleTextRect;
-            console_rect.y = parentWindow->get_size().y - console_rect.h;
-            console_rect.w = parentWindow->get_text_length(consoleText).x;
-            parentWindow->draw_text(consoleText, console_rect);
-            for(const auto& [previous_text,previous_rect,cmd_str] : previous_commands)
+            ImGui::ShowDemoWindow();
+            ImGui::Begin("Console");
+            ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue |  ImGuiInputTextFlags_CallbackHistory;
+
+            const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+            ImGui::BeginChild("ScrollingRegion", ImVec2(0, -3*footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar);
+            for(const auto& item : console_logs)
             {
-                console_rect = previous_rect;
-                console_rect.y += parentWindow->get_window_size().y - consoleTextRect.h;
-                parentWindow->draw_text(previous_text, console_rect);
+                ImGui::TextUnformatted( item.c_str());
             }
+            ImGui::EndChild();
+            ImGui::Separator();
+            bool reclaim_focus = false;
+            if(ImGui::InputText("##",&console_text,input_text_flags,&DebugInfo::TextEditCallbackStub, (void*)this) && !console_text.empty())
+            {  
+                console_logs.push_back(console_text);
+                HistoryPos = -1;
+                console_previous_commands.push_back(console_text);
+                auto rez = lua_state->safe_script(console_text,[](lua_State*, sol::protected_function_result pfr) {return pfr;});
+                if(!rez.valid())
+                {   sol::error err = rez;
+                    std::string text = err.what();
+                    console_logs.emplace_back(std::move(text));
+                }
+                console_text = "";
+                reclaim_focus = true;
+            }
+            ImGui::SetItemDefaultFocus();
+            if (reclaim_focus)
+                ImGui::SetKeyboardFocusHere(-1);
+            if (ImGui::SmallButton("Clear"))           
+            {
+                 clear_logs(); 
+            }
+            ImGui::End();
         }
     }
 
@@ -856,124 +868,90 @@ class DebugInfo
                 CollisionSystem *cols, HealthSystem *healthS,sol::state* lua)
     {
         lua_state = lua;
+        attach_lua();
         parentWindow = parentW;
         this->map = map;
         appECS = map->ecs;
         playerMoveSystem = pms;
         colSystem = cols;
         healthSys = healthS;
-
-        frameTime = parentWindow->create_text("assets/font.ttf", "Frame Time : ", textR, textG, textB, textA,
-                                              text_char_size, text_line_length);
-        maxframeTimeTX = parentWindow->create_text("assets/font.ttf", "Max Frame Time : ", textR, textG, textB, textA,
-                                                   text_char_size, text_line_length);
-        avgFrameTime = parentWindow->create_text("assets/font.ttf", "Avg Frame Time : ", textR, textG, textB, textA,
-                                                 text_char_size, text_line_length);
-        ecsEntities = parentWindow->create_text("assets/font.ttf", "Active Entities : ", textR, textG, textB, textA,
-                                                text_char_size, text_line_length);
-        playerPosition = parentWindow->create_text("assets/font.ttf", "NO PLAYER FOUND ", textR, textG, textB, textA,
-                                                   text_char_size, text_line_length);
-        playerHealth = parentWindow->create_text("assets/font.ttf", "Health : -/- ", textR, textG, textB, textA,
-                                                 text_char_size, text_line_length);
-        consoleText = parentWindow->create_text("assets/font.ttf", ">", textR, textG, textB, textA, console_char_size,
-                                                text_line_length);
-        callbacks.push_back(parentWindow->register_callback({[&](const yorcvs::Event<yorcvs::graphics> &event) {
-            if (event.get_type() == yorcvs::Event<yorcvs::graphics>::TEXT_INPUT && showConsole)
-            {
-                console_input += event.get_text_input();
-            }
-            else if (event.get_type() == yorcvs::Event<graphics>::KEYBOARD_PRESSED && showConsole &&
-                     event.get_key() == YORCVS_KEY_BACKSPACE && !console_input.empty())
-            {
-                console_input.pop_back();
-            }
-            if (event.get_type() == yorcvs::Event<graphics>::KEYBOARD_PRESSED && showConsole &&
-                event.get_key() == YORCVS_KEY_ENTER)
-            {
-                // input
-                std::cout << console_input << '\n';
-                auto rez = lua_state->safe_script(console_input,[](lua_State*, sol::protected_function_result pfr) {return pfr;});
-
-               
-                for(auto& [text,rect,cmd_str] : previous_commands)
-                {
-                    rect.y -= consoleTextRect.h;
-                }
-                yorcvs::Rect<float> old_console_command_rect = consoleTextRect;
-                old_console_command_rect.w = parentWindow->get_text_length(consoleText).x;
-                old_console_command_rect.y -= consoleTextRect.h;
-                
-                previous_commands.emplace(previous_commands.begin(),std::move(consoleText),old_console_command_rect,console_input);
-                consoleText =  parentWindow->create_text("assets/font.ttf", ">", textR, textG, textB, textA, console_char_size,
-                                                text_line_length);
-                console_input.clear();
-                //SHOW OUTPUT ON CONSOLE
-                if(!rez.valid())
-                {      sol::error err = rez;
-                       std::string text = err.what();
-                      
-                       for(auto& [text,rect,cmd_str] : previous_commands)
-                        {
-                            rect.y -= consoleTextRect.h;
-                        }
-                        yorcvs::Rect<float> old_console_command_rect = consoleTextRect;
-          
-                       
-                        std::transform(text.begin(), text.end(),text.begin(),[](unsigned char c)->unsigned char{
-                            if(c == '\n')
-                            {
-                                return ' ';
-                            }
-                            return c;
-                        });
-                        yorcvs::Text<yorcvs::graphics> error_txt =  parentWindow->create_text("assets/font.ttf", text, textR, textG, textB, textA, console_char_size,
-                        text_line_length);
-                        old_console_command_rect.w = parentWindow->get_text_length(error_txt).x;
-                        old_console_command_rect.y -= consoleTextRect.h;
-                        previous_commands.emplace(previous_commands.begin(),std::move(error_txt),old_console_command_rect,text);
-                }
-            }
-        }}));
+    }
+    void attach_lua()
+    {
+        lua_state->set_function("internal_log",&DebugInfo::add_log,this);
+        lua_state->script("function log(message) internal_log(tostring(message)) end");
+        (*lua_state)["print"] = (*lua_state)["log"];
     }
 
     void reset()
     {
         maxFrameTime = 0.0f;
     }
-    std::vector<size_t> callbacks;
-    std::string console_input;
 
+    void add_log(const std::string& message)
+    {
+        console_logs.push_back(message);
+    }
+    void clear_logs()
+    {
+        console_logs.clear();
+        console_previous_commands.clear();
+        HistoryPos = -1;
+    }
+    static int TextEditCallbackStub(ImGuiInputTextCallbackData* data)
+    {
+        DebugInfo* console = static_cast<DebugInfo*>(data->UserData);
+        return console->TextEditCallback(data);
+    }
+
+    int  TextEditCallback(ImGuiInputTextCallbackData* data)
+    {
+        //AddLog("cursor: %d, selection: %d-%d", data->CursorPos, data->SelectionStart, data->SelectionEnd);
+        switch (data->EventFlag)
+        {
+        case ImGuiInputTextFlags_CallbackHistory:
+            {
+                // Example of HISTORY
+                const int prev_history_pos = HistoryPos;
+                if (data->EventKey == ImGuiKey_UpArrow)
+                {
+                    if (HistoryPos == -1)
+                        HistoryPos = console_previous_commands.size() - 1;
+                    else if (HistoryPos > 0)
+                        HistoryPos--;
+                }
+                else if (data->EventKey == ImGuiKey_DownArrow)
+                {
+                    if (HistoryPos != -1)
+                        if (++HistoryPos >= console_previous_commands.size())
+                            HistoryPos = -1;
+                }
+
+                // A better implementation would preserve the data on the current input line along with cursor position.
+                if (prev_history_pos != HistoryPos)
+                {
+                    const char* history_str = (HistoryPos >= 0) ? console_previous_commands[HistoryPos].c_str() : "";
+                    data->DeleteChars(0, data->BufTextLen);
+                    data->InsertChars(0, history_str);
+                }
+            }
+        }
+        return 1;
+    }    
+    std::vector<size_t> callbacks;
     yorcvs::Window<yorcvs::graphics> *parentWindow{};
     yorcvs::ECS *appECS{};
     yorcvs::Map *map{};
     sol::state *lua_state{};
-
-    yorcvs::Text<yorcvs::graphics> frameTime;
-    const yorcvs::Rect<float> FTRect = {0, 0, 150, 25};
-
+    //debug window
+    float frame_time = 0.0f;
     float maxFrameTime = 0.0f;
-    yorcvs::Text<yorcvs::graphics> maxframeTimeTX;
-    const yorcvs::Rect<float> maxFTRect = {0, 25, 150, 25};
-
-    yorcvs::Text<yorcvs::graphics> avgFrameTime;
-    const yorcvs::Rect<float> avgFrameTimeRect = {0, 50, 150, 25};
-
-    yorcvs::Text<yorcvs::graphics> ecsEntities;
-    const yorcvs::Rect<float> entitiesRect = {0, 75, 150, 25};
     float frame_time_samples = 0.0f;
     float avg_frame_time = 0.0f;
-
-    yorcvs::Text<yorcvs::graphics> playerPosition;
-    const yorcvs::Rect<float> pPositionRect = {0, 100, 300, 25};
-
-    yorcvs::Text<yorcvs::graphics> playerHealth;
-    const yorcvs::Rect<float> playerHealthRect = {0, 125, 200, 25};
-
-    yorcvs::Text<yorcvs::graphics> consoleText;
-    const yorcvs::Rect<float> consoleTextRect = {0, 0, 0, 20};
-
-    std::vector<std::tuple<yorcvs::Text<yorcvs::graphics>,yorcvs::Rect<float>,std::string>> previous_commands;
-
+    //console
+    std::string console_text;
+    std::vector<std::string> console_logs;
+    std::vector<std::string> console_previous_commands;
     PlayerMovementControl *playerMoveSystem{};
 
     CollisionSystem *colSystem{};
@@ -983,10 +961,8 @@ class DebugInfo
     bool showDebugWindow = false;
     bool showConsole = false;
     float time_accumulator = 0;
-
-    static constexpr float console_char_size = 32.0f;
-    static constexpr size_t console_previous_command_shown = 5;
-
+    int HistoryPos = 0;
+    
     static constexpr yorcvs::Vec2<float> health_full_bar_dimension = {32.0f, 4.0f};
     const std::vector<uint8_t> health_bar_full_color = {255, 0, 0, 255};
     const std::vector<uint8_t> health_bar_empty_color = {100, 0, 0, 255};
@@ -1079,6 +1055,8 @@ class Application
     }
     void run()
     {
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
         const float elapsed = std::min(100.0f, counter.get_ticks<float, std::chrono::nanoseconds>() / 1000000.0f);
         counter.stop();
         counter.start();
@@ -1094,13 +1072,17 @@ class Application
             lag -= msPF;
         }
 
-
+        
         r.clear();
+        
         render_map_tiles(map);
         sprS.renderSprites(render_dimensions);
         dbInfo.render(elapsed, render_dimensions);
+              
+       
+        ImGui::Render();
+        ImGuiSDL::Render(ImGui::GetDrawData());
         r.present();
-
     }
 
     [[nodiscard]] bool is_active() const

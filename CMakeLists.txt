@@ -45,6 +45,7 @@ if(EMSCRIPTEN)
   set(CMAKE_EXECUTABLE_SUFFIX ".html")
     SET(CMAKE_CXX_FLAGS "-std=c++2a -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=\"[\"\"png\"\"]\"  -s USE_SDL_TTF=2  -s ALLOW_MEMORY_GROWTH=1 -s NO_DISABLE_EXCEPTION_CATCHING -o build/Yorcvs.html" ) #commented because emscriptem requires the assets folder to be in special place and it's not necesary for compilation for CI
   if(YORCVS_EMSCRIPTEN_PRELOAD_ASSETS_FOLDER)
+    message(STATUS "Assets folder will be preloaded")
     set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS  "--preload-file ./assets")
   endif()
 else() 
@@ -55,6 +56,7 @@ if(WIN32)
   find_package(SDL2-image CONFIG REQUIRED)
   find_package(SDL2-ttf CONFIG REQUIRED)
   target_link_libraries(${PROJECT_NAME} SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf)
+  set(SDL2lib SDL2::SDL2)
 else()
   SET(LUA_CMAKE_BUILD_SHARED ON CACHE BOOL "Build as shared library" FORCE)
   #download findSDL2 and use it
@@ -68,6 +70,7 @@ else()
   find_package(SDL2_image REQUIRED)
   find_package(SDL2_ttf REQUIRED)
   target_link_libraries(${PROJECT_NAME} SDL2::Main SDL2::Image SDL2::TTF)
+  set(SDL2lib SDL2::Main)
 endif()
 
   
@@ -122,4 +125,36 @@ FetchContent_GetProperties(sol2)
 if (NOT sol2_POPULATED)
    FetchContent_Populate(sol2)
   target_include_directories(${PROJECT_NAME} PUBLIC ${sol2_SOURCE_DIR}/include)
+endif()
+#INSTALL IMGUI BASE
+FetchContent_Declare(imgui
+ GIT_REPOSITORY https://github.com/ocornut/imgui.git
+ GIT_TAG "master" 
+)
+FetchContent_GetProperties(imgui)
+if (NOT imgui_POPULATED)
+   FetchContent_Populate(imgui)
+  target_include_directories(${PROJECT_NAME} PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
+  message(STATUS "imgui :" ${imgui_SOURCE_DIR})
+  add_library(imgui STATIC ${imgui_SOURCE_DIR}/imgui.cpp ${imgui_SOURCE_DIR}/imgui_demo.cpp ${imgui_SOURCE_DIR}/imgui_draw.cpp ${imgui_SOURCE_DIR}/imgui_tables.cpp ${imgui_SOURCE_DIR}/imgui_widgets.cpp ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl.cpp ${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp)
+  target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
+  target_link_libraries(imgui  ${SDL2lib})
+  target_link_libraries(${PROJECT_NAME} imgui)
+  endif()
+#INSTALL SDL2 BACKEND
+FetchContent_Declare(imguiSDL2
+ GIT_REPOSITORY https://github.com/Tyyppi77/imgui_sdl.git
+ GIT_TAG "master" 
+)
+FetchContent_GetProperties(imguiSDL2)
+if (NOT imguiSDL2_POPULATED)
+  FetchContent_Populate(imguiSDL2)
+  target_include_directories(${PROJECT_NAME} PUBLIC ${imguisdl2_SOURCE_DIR} )
+  message(STATUS "imguiSDL2 :" ${imguisdl2_SOURCE_DIR})
+  add_library(imgui-SDL2 STATIC ${imguisdl2_SOURCE_DIR}/imgui_sdl.cpp )
+  target_link_libraries(imgui-SDL2 ${SDL2lib})
+  target_link_libraries(imgui-SDL2  imgui)
+  target_include_directories(imgui-SDL2 PUBLIC ${imgui_SOURCE_DIR})
+  target_link_libraries(${PROJECT_NAME} imgui-SDL2)
+  
 endif()

@@ -26,6 +26,11 @@
 #include <cmath>
 #include <functional> // callbacks need to be stored in a vector
 
+#include "imgui.h"
+#include "imgui_sdl.h"
+#include "imgui_impl_sdl.h"
+
+
 #pragma once
 namespace yorcvs
 {
@@ -152,7 +157,7 @@ template <> class Window<yorcvs::SDL2>
         const std::string_view name = "Yorcvs";
         const size_t width = 960;
         const size_t height = 480;
-
+       
         SDL_version sdlversion{};
         SDL_GetVersion(&sdlversion);
 
@@ -203,6 +208,9 @@ template <> class Window<yorcvs::SDL2>
         {
             yorcvs::log("Error creating SDL2 renderer", yorcvs::MSGSEVERITY::ERROR);
         }
+        ImGui::CreateContext();
+        ImGuiSDL::Initialize(renderer, width, height);
+        ImGui_ImplSDL2_InitForSDLRenderer(sdlWindow, renderer);
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
         SDL_RendererInfo renderInfo{};
         SDL_GetRendererInfo(renderer, &renderInfo);
@@ -251,6 +259,8 @@ template <> class Window<yorcvs::SDL2>
 
     ~Window<yorcvs::SDL2>()
     {
+        ImGuiSDL::Deinitialize();
+        ImGui::DestroyContext();
         cleanup();
     }
     void set_size(size_t width, size_t height) const
@@ -277,6 +287,7 @@ template <> class Window<yorcvs::SDL2>
     {
         while (SDL_PollEvent(&win_event.event) == 1)
         {
+            ImGui_ImplSDL2_ProcessEvent(&win_event.event);
             for (const auto &f : callbacks)
             {
                 f.func(win_event);
