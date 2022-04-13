@@ -45,33 +45,36 @@ class CollisionSystem
                 rectAvel *= dt;
                 for (const auto &IDB : entityList->entitiesID)
                 {
-                    rectB.x = world->get_component<positionComponent>(IDB).position.x +
-                              world->get_component<hitboxComponent>(IDB).hitbox.x;
-                    rectB.y = world->get_component<positionComponent>(IDB).position.y +
-                              world->get_component<hitboxComponent>(IDB).hitbox.y;
-
-                    rectB.w = world->get_component<hitboxComponent>(IDB).hitbox.w;
-
-                    rectB.h = world->get_component<hitboxComponent>(IDB).hitbox.h;
-                    if (IDA != IDB)
+                    if(!world->has_components<velocityComponent>(IDB))
                     {
-                        // left to right
-                        check_collision_left_right(rectA, rectB, rectAvel,dt);
-                        // right to left
-                        check_collision_right_left(rectA, rectB, rectAvel,dt);
-                        // up to down
-                        check_collision_up_down(rectA, rectB, rectAvel,dt);
-                        // down to up
-                        check_collision_down_up(rectA, rectB, rectAvel,dt);
+                        rectB.x = world->get_component<positionComponent>(IDB).position.x +
+                                world->get_component<hitboxComponent>(IDB).hitbox.x;
+                        rectB.y = world->get_component<positionComponent>(IDB).position.y +
+                                world->get_component<hitboxComponent>(IDB).hitbox.y;
 
-                        // top right corner
-                        check_collision_corner_top_right(rectA, rectB, rectAvel,dt);
-                        // top left corner
-                        check_collision_corner_top_left(rectA, rectB, rectAvel,dt);
-                        // bottom right corner
-                        check_collision_corner_bottom_right(rectA, rectB, rectAvel,dt);
-                        // bottom left corner
-                        check_collision_corner_bottom_left(rectA, rectB, rectAvel,dt); 
+                        rectB.w = world->get_component<hitboxComponent>(IDB).hitbox.w;
+
+                        rectB.h = world->get_component<hitboxComponent>(IDB).hitbox.h;
+                        if (IDA != IDB)
+                        {
+                            // left to right
+                            check_collision_left_right(rectA, rectB, rectAvel,dt);
+                            // right to left
+                            check_collision_right_left(rectA, rectB, rectAvel,dt);
+                            // up to down
+                            check_collision_up_down(rectA, rectB, rectAvel,dt);
+                            // down to up
+                            check_collision_down_up(rectA, rectB, rectAvel,dt);
+
+                            // top right corner
+                            check_collision_corner_top_right(rectA, rectB, rectAvel,dt);
+                            // top left corner
+                            check_collision_corner_top_left(rectA, rectB, rectAvel,dt);
+                            // bottom right corner
+                            check_collision_corner_bottom_right(rectA, rectB, rectAvel,dt);
+                            // bottom left corner
+                            check_collision_corner_bottom_left(rectA, rectB, rectAvel,dt); 
+                        }
                     }
                 }
                 rectAvel /= dt;               
