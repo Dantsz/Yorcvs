@@ -7,7 +7,7 @@
 #include <cmath>
 #include <random>
 #include <stack>
-
+#include <fstream>
 /**
  * @brief Handles collision between entities
  * 
@@ -606,11 +606,23 @@ class BehaviourSystem
     {
         world->register_system<BehaviourSystem>(*this);
         world->add_criteria_for_iteration<BehaviourSystem, behaviourComponent, velocityComponent>();
+        scripts = std::make_unique<yorcvs::AssetManager<std::string>>(
+            [&](const std::string& path){ 
+                std::string* program = new std::string();
+                std::ifstream in{path};
+                program->assign( (std::istreambuf_iterator<char>(in)),(std::istreambuf_iterator<char>()));
+                return program;
+                },
+            [&](std::string* str ){ delete str; }
+        );
     }
     void chicken_behaviour(const size_t ID)
     {
         (*lua_state)["entityID"] = ID;
-        lua_state->safe_script_file("assets/scripts/behavior_chicken.lua");
+        const std::string& script_path = world->get_component<behaviourComponent>(ID).code_path;
+      
+        lua_state->safe_script(*scripts->load_from_file(script_path));
+        
         world->get_component<behaviourComponent>(ID).accumulated = 0.0f;
     }
     void update(const float dt)
@@ -632,6 +644,7 @@ class BehaviourSystem
     std::mt19937 generator{dev()};
 
     yorcvs::ECS *world = nullptr;
+    std::unique_ptr<yorcvs::AssetManager<std::string>> scripts;
     sol::state* lua_state;
     static constexpr float velocity_trigger_treshold = 0.0f;
 };

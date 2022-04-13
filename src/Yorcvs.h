@@ -127,8 +127,7 @@ class Map
             bool tiles_ysorted = false;
             switch (layer->getType())
             {
-            case tmx::Layer::Type::Tile:
-
+                case tmx::Layer::Type::Tile:
                 for (const auto &property : properties)
                 {
                     if (property.getName() == "Ysorted")
@@ -447,7 +446,7 @@ class Map
         const std::string &filePath = property.getFileValue();
         std::filesystem::path map_file = map_file_path;
         const std::string directory_path = map_file.remove_filename().generic_string();
-
+    
         if (property.getName() == "entityPath")
         {
             load_character_from_path(entity, directory_path + filePath);
@@ -456,6 +455,13 @@ class Map
         if (property.getName() == "behaviour")
         {
             ecs->add_component<behaviourComponent>(entity, {});
+            if(filePath.empty())
+            {
+                yorcvs::log("Entity " + std::to_string(entity) + " has not been specified a valid behaviour, using default", yorcvs::MSGSEVERITY::ERROR );
+                ecs->get_component<behaviourComponent>(entity).code_path = directory_path + "scripts/behavior_chicken.lua";
+                return true;
+            }
+            ecs->get_component<behaviourComponent>(entity).code_path = directory_path + filePath;
             return true;
         }
         return false;
