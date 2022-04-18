@@ -271,6 +271,22 @@ class Map
                 AnimationSystem::set_animation(ecs, entity_id, "idleL");
             }
         }
+        if(entityJSON.contains("offsensive_stats"))
+        {
+            if(!ecs->has_components<offensiveStatsComponent>(entity_id))
+            {
+                ecs->add_default_component<offensiveStatsComponent>(entity_id);
+            }
+            yorcvs::components::deserialize(ecs->get_component<offensiveStatsComponent>(entity_id), entityJSON["offsensive_stats"]);
+        }
+        if(entityJSON.contains("defensive_stats"))
+        {
+            if(!ecs->has_components<offensiveStatsComponent>(entity_id))
+            {
+                ecs->add_default_component<offensiveStatsComponent>(entity_id);
+            }
+            yorcvs::components::deserialize(ecs->get_component<offensiveStatsComponent>(entity_id), entityJSON["defensive_stats"]);
+        }
     }
     void load_character_from_path(yorcvs::Entity &entity, const std::string &path)
     {
@@ -305,6 +321,14 @@ class Map
         {
             j["sprite"] = yorcvs::components::serialize(ecs->get_component<spriteComponent>(entity));
             j["sprite"]["animations"] = yorcvs::components::serialize(ecs->get_component<animationComponent>(entity));
+        }
+        if(ecs->has_components<defensiveStatsComponent>(entity))
+        {
+            j["defensive_stats"] = yorcvs::components::serialize(ecs->get_component<defensiveStatsComponent>(entity));
+        }
+        if(ecs->has_components<offensiveStatsComponent>(entity))
+        {
+            j["offsensive_stats"] = yorcvs::components::serialize(ecs->get_component<offensiveStatsComponent>(entity));
         }
         return j.dump(4);
     }
@@ -626,6 +650,7 @@ class Map
                                      staminaComponent>();
             world.register_component<playerMovementControlledComponent, behaviourComponent>();
             world.register_component<spriteComponent, animationComponent>();
+            world.register_component<offensiveStatsComponent,defensiveStatsComponent>();
         }
     };
     // class to initialize the ecs before systems are constructed
@@ -823,12 +848,52 @@ class DebugInfo
                 {
                  ImGui::Text("playerPosition: (%f,%f)",appECS->get_component<positionComponent>(ID).position.x,appECS->get_component<positionComponent>(ID).position.y);
                 }
-                if (appECS->has_components<healthComponent>(ID))
-                {
-                    ImGui::Text("playerHealth: (%f/%f)",playerHealthC.HP,playerHealthC.max_HP);
-                }
+
             }
             ImGui::End();
+        
+            if (!playerMoveSystem->entityList->entitiesID.empty())
+            {
+               
+                const size_t ID = playerMoveSystem->entityList->entitiesID[0];
+                std::string playerName = "Player : ";
+                if(appECS->has_components<identificationComponent>(ID))
+                {
+                    playerName += appECS->get_component<identificationComponent>(ID).name + " (" + std::to_string(ID) + ")";
+                }
+                ImGui::Begin(playerName.c_str());
+                if (appECS->has_components<healthComponent>(ID))
+                {
+                    healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
+                    ImGui::Text("playerHealth: (%f/%f)",playerHealthC.HP,playerHealthC.max_HP);
+                }
+                if(appECS->has_components<staminaComponent>(ID))
+                {
+                    staminaComponent &playerStaminaC = appECS->get_component<staminaComponent>(ID);
+                    ImGui::Text("stamina: (%f/%f)",playerStaminaC.stamina,playerStaminaC.max_stamina);
+                }
+                
+                if(appECS->has_components<offensiveStatsComponent>(ID))
+                {
+                    offensiveStatsComponent &offStatsC = appECS->get_component<offensiveStatsComponent>(ID);
+                    ImGui::Text("Strength : (%f)",offStatsC.strength);
+                    ImGui::Text("Agility : (%f)",offStatsC.agility);
+                    ImGui::Text("Dexterity : (%f)",offStatsC.dexterity);
+                    ImGui::Text("Piercing : (%f)",offStatsC.piercing);
+                    ImGui::Text("Intellect : (%f)",offStatsC.intellect);
+                }
+                if(appECS->has_components<defensiveStatsComponent>(ID))
+                {
+                    defensiveStatsComponent &defstats = appECS->get_component<defensiveStatsComponent>(ID);
+                    ImGui::Text("Defense : (%f)",defstats.defense);
+                    ImGui::Text("Block : (%f)",defstats.block);
+                    ImGui::Text("Dodge : (%f)" , defstats.dodge);
+                    ImGui::Text("Spirit : (%f)" , defstats.spirit);
+                }
+               
+                ImGui::End();
+            }
+           
         }
         if (showConsole)
         {

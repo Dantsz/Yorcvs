@@ -166,4 +166,68 @@ inline void deserialize(spriteComponent &dst, const json::json &j)
         }
  }
 // behaviourComponent
+
+//offensiveStatsComponent
+template<> inline json::json serialize(const offensiveStatsComponent &comp)
+{
+    json::json j;
+    j["strength"] = comp.strength;
+    j["agility"] = comp.agility;
+    j["dexterity"] = comp.dexterity;
+    j["piercing"] = comp.piercing;
+    j["intellect"] = comp.intellect;
+    return j;    
+} 
+template<> inline void deserialize(offensiveStatsComponent& dst, const json::json &json)
+{
+    if(json.contains("strength"))
+    {
+        dst.strength = json["strength"];
+    }
+    if(json.contains("agility"))
+    {
+        dst.agility = json["agility"];
+    }
+    if(json.contains("dexterity"))
+    {
+        dst.dexterity = json["dexterity"];
+    }
+    if(json.contains("piercing"))
+    {
+        dst.piercing = json["piercing"];
+    }
+    if(json.contains("intellect"))
+    {
+        dst.intellect = json["intellect"];
+    }
+}
+//defensiveStatsComponent
+template<> inline json::json serialize(const defensiveStatsComponent &comp)
+{
+    json::json j;
+    j["defense"] = comp.defense;
+    j["dodge"] = comp.dodge;
+    j["block"] = comp.block;
+    j["spirit"] = comp.spirit;
+    return j;
+}
+template<> inline void deserialize(defensiveStatsComponent& dst,const  json::json& json)
+{
+    if(json.contains("defense"))
+    {
+        dst.defense = json["defense"];
+    }
+    if(json.contains("dodge"))
+    {
+        dst.dodge = json["dodge"];
+    }
+    if(json.contains("block"))
+    {
+        dst.block = json["block"];
+    }
+    if(json.contains("spirit"))
+    {
+        dst.spirit = json["spirit"];
+    }
+}
 } // namespace yorcvs::components

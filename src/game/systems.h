@@ -689,3 +689,22 @@ class StaminaSystem
     yorcvs::ECS *world = nullptr;
     std::shared_ptr<yorcvs::EntitySystemList> entityList = nullptr;
 };
+/**
+ * @brief Handles combat 
+ * 
+ */
+class commbatSystem
+{
+    public:
+    commbatSystem(yorcvs::ECS *parent) : world(parent)
+    {
+        world->register_system(*this);
+        world->add_criteria_for_iteration<StaminaSystem, staminaComponent>();
+    }
+    void attack(size_t source,size_t target)
+    {
+        
+    }
+    std::shared_ptr<yorcvs::EntitySystemList> entityList = nullptr;
+    yorcvs::ECS *world = nullptr;
+};

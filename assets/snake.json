@@ -128,5 +128,21 @@
                 ]
             }
         ]
+    },
+    "defensive_stats":
+    {
+        "defense":0,
+        "block":0,
+        "dodge":0,
+        "spirit":0
+    },
+    "offsensive_stats":
+    {
+        "strength":0,
+        "agility":0,
+        "dexterity":0,
+        "piercing":0,
+        "intellect":0
     }
+
 }

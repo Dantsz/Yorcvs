@@ -77,5 +77,18 @@ struct behaviourComponent
     float accumulated;
     std::string code_path;
 };
-struct defensiveStatsComponent;
-struct offensiveStatsComponent;
+struct defensiveStatsComponent
+{
+    float defense;
+    float block;
+    float dodge;
+    float spirit;
+};
+struct offensiveStatsComponent
+{
+    float strength;
+    float agility;
+    float dexterity;
+    float piercing;
+    float intellect;
+};
