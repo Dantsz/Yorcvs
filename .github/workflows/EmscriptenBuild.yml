@@ -30,12 +30,9 @@ jobs:
       #install ninja
       - name: install ninja
         run: sudo apt-get install ninja-build
-        
-        
       #Compile emscripten
       - name: configure cmake
         working-directory: ${{github.workspace}}
         run: emcmake cmake -B build -G Ninja
       - name: build
         run: cmake --build ${{github.workspace}}/build
-      

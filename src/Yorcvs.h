@@ -848,7 +848,6 @@ class DebugInfo
                 {
                  ImGui::Text("playerPosition: (%f,%f)",appECS->get_component<positionComponent>(ID).position.x,appECS->get_component<positionComponent>(ID).position.y);
                 }
-
             }
             ImGui::End();
         
