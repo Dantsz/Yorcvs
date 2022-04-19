@@ -110,65 +110,61 @@ template <> inline json::json serialize(const spriteComponent &comp)
     j["spriteName"] = sprite_path.filename().string();
     return j;
 }
-template<>
-inline void deserialize(spriteComponent &dst, const json::json &j)
+template <> inline void deserialize(spriteComponent &dst, const json::json &j)
 {
-    dst = {
-        {j["offset"]["x"], j["offset"]["y"]},
-        {j["size"]["x"], j["size"]["y"]},
-        {j["srcRect"]["x"], j["srcRect"]["y"],
-         j["srcRect"]["w"], j["srcRect"]["h"]},
-        j["spriteName"]};
+    dst = {{j["offset"]["x"], j["offset"]["y"]},
+           {j["size"]["x"], j["size"]["y"]},
+           {j["srcRect"]["x"], j["srcRect"]["y"], j["srcRect"]["w"], j["srcRect"]["h"]},
+           j["spriteName"]};
 }
 // animationComponent
- template<>
- inline json::json serialize(const animationComponent& comp) 
- {
-      json::json j;
-      for (const auto &[name, animation] : comp.animations)
+template <> inline json::json serialize(const animationComponent &comp)
+{
+    json::json j;
+    for (const auto &[name, animation] : comp.animations)
+    {
+        json::json anim;
+        anim["name"] = name;
+        anim["speed"] = animation.speed;
+        for (const auto &frame : animation.frames)
         {
-                json::json anim;
-                anim["name"] = name;
-                anim["speed"] = animation.speed;
-                for (const auto &frame : animation.frames)
-                {
-                    json::json jframe;
-                    jframe["x"] = frame.x;
-                    jframe["y"] = frame.y;
-                    jframe["w"] = frame.w;
-                    jframe["h"] = frame.h;
-                    anim["frames"].push_back(jframe);
-                }
-
-                j.push_back(anim);
+            json::json jframe;
+            jframe["x"] = frame.x;
+            jframe["y"] = frame.y;
+            jframe["w"] = frame.w;
+            jframe["h"] = frame.h;
+            anim["frames"].push_back(jframe);
         }
-        return j;
- }
- template<> inline void deserialize(animationComponent& dst, const json::json& j)
- {
-        dst.animations.clear();
-        dst = {};
-        for (const auto &animation : j)
+
+        j.push_back(anim);
+    }
+    return j;
+}
+template <> inline void deserialize(animationComponent &dst, const json::json &j)
+{
+    dst.animations.clear();
+    dst = {};
+    for (const auto &animation : j)
+    {
+        bool animation_succes = AnimationSystem::add_animation_to_component(dst, animation["name"], animation["speed"]);
+        if (animation_succes)
         {
-            bool animation_succes = AnimationSystem::add_animation_to_component(dst,animation["name"],animation["speed"]);
-            if (animation_succes)
+            for (const auto &frame : animation["frames"])
             {
-                for (const auto &frame : animation["frames"])
+                bool rez = AnimationSystem::add_frame_to_animation(dst, animation["name"],
+                                                                   {frame["x"], frame["y"], frame["w"], frame["h"]});
+                if (!rez)
                 {
-                    bool rez = AnimationSystem::add_frame_to_animation(dst, animation["name"],
-                                              {frame["x"], frame["y"], frame["w"], frame["h"]});
-                    if(!rez)
-                    {
-                        yorcvs::log("Something went wriong loading an animation frame");
-                    }
+                    yorcvs::log("Something went wriong loading an animation frame");
                 }
             }
         }
- }
+    }
+}
 // behaviourComponent
 
-//offensiveStatsComponent
-template<> inline json::json serialize(const offensiveStatsComponent &comp)
+// offensiveStatsComponent
+template <> inline json::json serialize(const offensiveStatsComponent &comp)
 {
     json::json j;
     j["strength"] = comp.strength;
@@ -176,33 +172,33 @@ template<> inline json::json serialize(const offensiveStatsComponent &comp)
     j["dexterity"] = comp.dexterity;
     j["piercing"] = comp.piercing;
     j["intellect"] = comp.intellect;
-    return j;    
-} 
-template<> inline void deserialize(offensiveStatsComponent& dst, const json::json &json)
+    return j;
+}
+template <> inline void deserialize(offensiveStatsComponent &dst, const json::json &json)
 {
-    if(json.contains("strength"))
+    if (json.contains("strength"))
     {
         dst.strength = json["strength"];
     }
-    if(json.contains("agility"))
+    if (json.contains("agility"))
     {
         dst.agility = json["agility"];
     }
-    if(json.contains("dexterity"))
+    if (json.contains("dexterity"))
     {
         dst.dexterity = json["dexterity"];
     }
-    if(json.contains("piercing"))
+    if (json.contains("piercing"))
     {
         dst.piercing = json["piercing"];
     }
-    if(json.contains("intellect"))
+    if (json.contains("intellect"))
     {
         dst.intellect = json["intellect"];
     }
 }
-//defensiveStatsComponent
-template<> inline json::json serialize(const defensiveStatsComponent &comp)
+// defensiveStatsComponent
+template <> inline json::json serialize(const defensiveStatsComponent &comp)
 {
     json::json j;
     j["defense"] = comp.defense;
@@ -211,21 +207,21 @@ template<> inline json::json serialize(const defensiveStatsComponent &comp)
     j["spirit"] = comp.spirit;
     return j;
 }
-template<> inline void deserialize(defensiveStatsComponent& dst,const  json::json& json)
+template <> inline void deserialize(defensiveStatsComponent &dst, const json::json &json)
 {
-    if(json.contains("defense"))
+    if (json.contains("defense"))
     {
         dst.defense = json["defense"];
     }
-    if(json.contains("dodge"))
+    if (json.contains("dodge"))
     {
         dst.dodge = json["dodge"];
     }
-    if(json.contains("block"))
+    if (json.contains("block"))
     {
         dst.block = json["block"];
     }
-    if(json.contains("spirit"))
+    if (json.contains("spirit"))
     {
         dst.spirit = json["spirit"];
     }

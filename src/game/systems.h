@@ -1,16 +1,16 @@
 #pragma once
 #include "../common/ecs.h"
-#include "components.h"
 #include "../engine/windowSDL2.h"
+#include "components.h"
 #include "sol/sol.hpp"
 #include <array>
 #include <cmath>
+#include <fstream>
 #include <random>
 #include <stack>
-#include <fstream>
 /**
  * @brief Handles collision between entities
- * 
+ *
  */
 class CollisionSystem
 {
@@ -22,8 +22,8 @@ class CollisionSystem
         world->add_criteria_for_iteration<CollisionSystem, positionComponent, hitboxComponent>();
     }
     /**
-     * @brief 
-     * 
+     * @brief
+     *
      * @param dt time passed
      */
     void update(float dt) const // checks and resolves collisions
@@ -45,12 +45,12 @@ class CollisionSystem
                 rectAvel *= dt;
                 for (const auto &IDB : entityList->entitiesID)
                 {
-                    if(!world->has_components<velocityComponent>(IDB))
+                    if (!world->has_components<velocityComponent>(IDB))
                     {
                         rectB.x = world->get_component<positionComponent>(IDB).position.x +
-                                world->get_component<hitboxComponent>(IDB).hitbox.x;
+                                  world->get_component<hitboxComponent>(IDB).hitbox.x;
                         rectB.y = world->get_component<positionComponent>(IDB).position.y +
-                                world->get_component<hitboxComponent>(IDB).hitbox.y;
+                                  world->get_component<hitboxComponent>(IDB).hitbox.y;
 
                         rectB.w = world->get_component<hitboxComponent>(IDB).hitbox.w;
 
@@ -58,33 +58,33 @@ class CollisionSystem
                         if (IDA != IDB)
                         {
                             // left to right
-                            check_collision_left_right(rectA, rectB, rectAvel,dt);
+                            check_collision_left_right(rectA, rectB, rectAvel, dt);
                             // right to left
-                            check_collision_right_left(rectA, rectB, rectAvel,dt);
+                            check_collision_right_left(rectA, rectB, rectAvel, dt);
                             // up to down
-                            check_collision_up_down(rectA, rectB, rectAvel,dt);
+                            check_collision_up_down(rectA, rectB, rectAvel, dt);
                             // down to up
-                            check_collision_down_up(rectA, rectB, rectAvel,dt);
+                            check_collision_down_up(rectA, rectB, rectAvel, dt);
 
                             // top right corner
-                            check_collision_corner_top_right(rectA, rectB, rectAvel,dt);
+                            check_collision_corner_top_right(rectA, rectB, rectAvel, dt);
                             // top left corner
-                            check_collision_corner_top_left(rectA, rectB, rectAvel,dt);
+                            check_collision_corner_top_left(rectA, rectB, rectAvel, dt);
                             // bottom right corner
-                            check_collision_corner_bottom_right(rectA, rectB, rectAvel,dt);
+                            check_collision_corner_bottom_right(rectA, rectB, rectAvel, dt);
                             // bottom left corner
-                            check_collision_corner_bottom_left(rectA, rectB, rectAvel,dt); 
+                            check_collision_corner_bottom_left(rectA, rectB, rectAvel, dt);
                         }
                     }
                 }
-                rectAvel /= dt;               
+                rectAvel /= dt;
             }
         }
     }
 
   private:
     static bool check_collision_left_right(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
-                                           yorcvs::Vec2<float> &rectAvel, float  /*dt*/)
+                                           yorcvs::Vec2<float> &rectAvel, float /*dt*/)
     {
         if (rectA.x + rectA.w <= rectB.x && rectA.x + rectA.w + (rectAvel.x) > rectB.x && rectA.y + rectA.h > rectB.y &&
             rectA.y - rectB.y < rectB.h)
@@ -95,7 +95,7 @@ class CollisionSystem
         return false;
     }
     static bool check_collision_right_left(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
-                                           yorcvs::Vec2<float> &rectAvel,float  /*dt*/)
+                                           yorcvs::Vec2<float> &rectAvel, float /*dt*/)
     {
         if (rectA.x >= rectB.x + rectB.w && rectA.x + (rectAvel.x) < rectB.x + rectB.w && rectA.y + rectA.h > rectB.y &&
             rectA.y - rectB.y < rectB.h)
@@ -106,7 +106,7 @@ class CollisionSystem
         return false;
     }
     static bool check_collision_up_down(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
-                                        yorcvs::Vec2<float> &rectAvel,float  /*dt*/)
+                                        yorcvs::Vec2<float> &rectAvel, float /*dt*/)
     {
         if (rectA.y <= rectB.y && rectA.y + rectA.h + (rectAvel.y) > rectB.y && rectA.x - rectB.x < rectB.w &&
             rectA.x + rectA.w > rectB.x)
@@ -117,7 +117,7 @@ class CollisionSystem
         return false;
     }
     static bool check_collision_down_up(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
-                                        yorcvs::Vec2<float> &rectAvel,float  /*dt*/)
+                                        yorcvs::Vec2<float> &rectAvel, float /*dt*/)
     {
         if (rectA.y >= rectB.y + rectB.h && rectA.y + (rectAvel.y) < rectB.y + rectB.h && rectA.x - rectB.x < rectB.w &&
             rectA.x + rectA.w > rectB.x)
@@ -129,7 +129,7 @@ class CollisionSystem
     }
 
     static bool check_collision_corner_top_right(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
-                                                 yorcvs::Vec2<float> &rectAvel,float  /*dt*/)
+                                                 yorcvs::Vec2<float> &rectAvel, float /*dt*/)
     {
         if (rectA.x + (rectAvel.x) + rectA.w > rectB.x && rectA.x + (rectAvel.x) + rectA.w < (rectB.x + rectB.w) &&
             rectA.y + rectA.h + (rectAvel.y) > rectB.y && rectA.y + rectA.h + (rectAvel.y) < rectB.y + rectB.h &&
@@ -142,7 +142,7 @@ class CollisionSystem
         return false;
     }
     static bool check_collision_corner_top_left(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
-                                                yorcvs::Vec2<float> &rectAvel,float  /*dt*/)
+                                                yorcvs::Vec2<float> &rectAvel, float /*dt*/)
     {
         if (rectA.x + (rectAvel.x) > rectB.x && rectA.x + (rectAvel.x) < rectB.x + rectB.w &&
             rectA.y + rectA.h + (rectAvel.y) > rectB.y && rectA.y + rectA.h + (rectAvel.y) < rectB.y + rectB.h &&
@@ -155,7 +155,7 @@ class CollisionSystem
         return false;
     }
     static bool check_collision_corner_bottom_right(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
-                                                    yorcvs::Vec2<float> &rectAvel,float  /*dt*/)
+                                                    yorcvs::Vec2<float> &rectAvel, float /*dt*/)
     {
         if (rectA.x + (rectAvel.x) < rectB.x && rectA.x + (rectAvel.x) + rectA.w > rectB.x &&
             rectA.x + (rectAvel.x) + rectA.w < rectB.x + rectB.w && rectA.x < rectB.x &&
@@ -169,7 +169,7 @@ class CollisionSystem
         return false;
     }
     static bool check_collision_corner_bottom_left(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
-                                                   yorcvs::Vec2<float> &rectAvel,float  /*dt*/)
+                                                   yorcvs::Vec2<float> &rectAvel, float /*dt*/)
     {
         if (rectA.x + (rectAvel.x) > rectB.x && rectA.x + (rectAvel.x) < rectB.x + rectB.w &&
             rectA.x + (rectAvel.x) + rectA.w > rectB.x + rectB.w && rectA.y + (rectAvel.y) > rectB.y &&
@@ -189,7 +189,7 @@ class CollisionSystem
 
 /**
  * @brief Handles the movement of entities
- * 
+ *
  */
 class VelocitySystem
 {
@@ -223,7 +223,7 @@ class VelocitySystem
 };
 /**
  * @brief Handles Animation
- * 
+ *
  */
 class AnimationSystem
 {
@@ -235,14 +235,15 @@ class AnimationSystem
     }
     /**
      * @brief ADDS an animation with the specified name to the component
-     * 
+     *
      * @param comp - the destination component
      * @param name - the name of the animation
      * @param speed - the speed at which animation frames update
      * @return true - succes
      * @return false - the animation already exists
      */
-    [[nodiscard]]static bool add_animation_to_component(animationComponent& comp , const std::string& name, const float speed )
+    [[nodiscard]] static bool add_animation_to_component(animationComponent &comp, const std::string &name,
+                                                         const float speed)
     {
         const auto &anim = comp.animations.find(name);
         if (anim == comp.animations.end())
@@ -255,14 +256,15 @@ class AnimationSystem
     }
     /**
      * @brief add the frame to the animation with the given name of the component. The frame will be placed at the end.
-     * 
+     *
      * @param comp the component
      * @param animation_name name of the animation
      * @param frame frame
      * @return true success
      * @return false the animation was not found
      */
-    [[nodiscard]] static bool add_frame_to_animation(animationComponent& comp,  const std::string &animation_name,const yorcvs::Rect<size_t> &frame)
+    [[nodiscard]] static bool add_frame_to_animation(animationComponent &comp, const std::string &animation_name,
+                                                     const yorcvs::Rect<size_t> &frame)
     {
         const auto &anim = comp.animations.find(animation_name);
         if (anim == comp.animations.end())
@@ -286,11 +288,11 @@ class AnimationSystem
             yorcvs::log("Entity doesn't have  an animation component", yorcvs::MSGSEVERITY::WARNING);
             return false;
         }
-        if(!add_animation_to_component(world->get_component<animationComponent>(entityID),name,speed))
+        if (!add_animation_to_component(world->get_component<animationComponent>(entityID), name, speed))
         {
-          yorcvs::log("Animation " + name + " already exists", yorcvs::MSGSEVERITY::WARNING);
-          return false;
-        }  
+            yorcvs::log("Animation " + name + " already exists", yorcvs::MSGSEVERITY::WARNING);
+            return false;
+        }
         return true;
     }
 
@@ -311,22 +313,22 @@ class AnimationSystem
             yorcvs::log("Entity doesn't have  an animation component", yorcvs::MSGSEVERITY::WARNING);
             return;
         }
-        if(!add_frame_to_animation(world->get_component<animationComponent>(entityID),animation_name,frame))
+        if (!add_frame_to_animation(world->get_component<animationComponent>(entityID), animation_name, frame))
         {
-              yorcvs::log("Entity " + std::to_string(entityID) + " doesn't have an animation with the name " +
+            yorcvs::log("Entity " + std::to_string(entityID) + " doesn't have an animation with the name " +
                             animation_name,
                         yorcvs::MSGSEVERITY::ERROR);
             return;
-        }     
+        }
     }
     /**
      * @brief Removes an animation from the entity. Currently unecessary, might be useful for editing entities
-     * 
+     *
      * @param name i
      */
     void remove_animation(yorcvs::Entity, std::string animation);
 
-    void remove_animation_frame(yorcvs::Entity, std::string animation ,size_t index);
+    void remove_animation_frame(yorcvs::Entity, std::string animation, size_t index);
     /**
      * @brief Set which animation to be used
      *
@@ -408,8 +410,9 @@ class AnimationSystem
     yorcvs::ECS *world;
 };
 /**
- * @brief Handles the health of an entity, the regeneration of health , and it deletes the entity if the health is negative
- * 
+ * @brief Handles the health of an entity, the regeneration of health , and it deletes the entity if the health is
+ * negative
+ *
  */
 class HealthSystem
 {
@@ -431,13 +434,10 @@ class HealthSystem
                     world->get_component<healthComponent>(ID).is_dead = true;
                     continue;
                 }
-                world->get_component<healthComponent>(ID).HP +=
-                    world->get_component<healthComponent>(ID).health_regen;
-                if (world->get_component<healthComponent>(ID).HP >
-                    world->get_component<healthComponent>(ID).max_HP)
+                world->get_component<healthComponent>(ID).HP += world->get_component<healthComponent>(ID).health_regen;
+                if (world->get_component<healthComponent>(ID).HP > world->get_component<healthComponent>(ID).max_HP)
                 {
-                    world->get_component<healthComponent>(ID).HP =
-                        world->get_component<healthComponent>(ID).max_HP;
+                    world->get_component<healthComponent>(ID).HP = world->get_component<healthComponent>(ID).max_HP;
                 }
                 if (world->get_component<healthComponent>(ID).HP < 0.0f)
                 {
@@ -456,7 +456,7 @@ class HealthSystem
 
 /**
  * @brief Handles player input
- * 
+ *
  */
 class PlayerMovementControl
 {
@@ -473,7 +473,7 @@ class PlayerMovementControl
 
     void updateControls(const yorcvs::Vec2<float> &render_size, float dt)
     {
-        if(controls_enable)
+        if (controls_enable)
         {
             w_pressed = window->is_key_pressed(yorcvs::YORCVS_KEY_W);
             a_pressed = window->is_key_pressed(yorcvs::YORCVS_KEY_A);
@@ -485,7 +485,7 @@ class PlayerMovementControl
             for (const auto &ID : entityList->entitiesID)
             {
                 dir = yorcvs::Vec2<float>(static_cast<float>(d_pressed) + static_cast<float>(a_pressed) * -1.0f,
-                                        static_cast<float>(w_pressed) * -1.0f + static_cast<float>(s_pressed));
+                                          static_cast<float>(w_pressed) * -1.0f + static_cast<float>(s_pressed));
                 dir.normalize();             // now moving at 1000 units per second
                 dir *= player_default_speed; // move 30 units per second
                 if (q_pressed)
@@ -495,9 +495,9 @@ class PlayerMovementControl
                         dir *= PlayerMovementControl::sprint_multiplier;
                     }
                     else if ((world->has_components<staminaComponent>(ID) &&
-                            world->get_component<staminaComponent>(ID).stamina -
-                                    world->get_component<staminaComponent>(ID).stamina_regen >
-                                0))
+                              world->get_component<staminaComponent>(ID).stamina -
+                                      world->get_component<staminaComponent>(ID).stamina_regen >
+                                  0))
                     {
                         dir *= PlayerMovementControl::sprint_multiplier;
                         if (cur_time >= update_time)
@@ -513,7 +513,7 @@ class PlayerMovementControl
                 }
                 world->get_component<velocityComponent>(ID).vel = dir;
                 window->set_drawing_offset(world->get_component<positionComponent>(ID).position + dir -
-                                        (render_size - world->get_component<spriteComponent>(ID).size) / 2);
+                                           (render_size - world->get_component<spriteComponent>(ID).size) / 2);
                 if (a_pressed)
                 {
                     AnimationSystem::set_animation(world, ID, "walkingL");
@@ -538,7 +538,6 @@ class PlayerMovementControl
         }
     }
 
-
     static constexpr float update_time = 1000.0f;
     static constexpr float player_default_speed = 0.033f;
     float cur_time{};
@@ -558,7 +557,7 @@ class PlayerMovementControl
 
 /**
  * @brief Draws the entity to the window
- * 
+ *
  */
 class SpriteSystem
 {
@@ -581,10 +580,11 @@ class SpriteSystem
         });
         for (const auto &ID : entityList->entitiesID)
         {
-            window->draw_sprite(
-                world->get_component<spriteComponent>(ID).texture_path,
-                world->get_component<spriteComponent>(ID).offset + world->get_component<positionComponent>(ID).position,
-                world->get_component<spriteComponent>(ID).size, world->get_component<spriteComponent>(ID).src_rect, 0.0);
+            window->draw_sprite(world->get_component<spriteComponent>(ID).texture_path,
+                                world->get_component<spriteComponent>(ID).offset +
+                                    world->get_component<positionComponent>(ID).position,
+                                world->get_component<spriteComponent>(ID).size,
+                                world->get_component<spriteComponent>(ID).src_rect, 0.0);
         }
         std::sort(entityList->entitiesID.begin(), entityList->entitiesID.end(),
                   [&](size_t ID1, size_t ID2) { return ID1 < ID2; });
@@ -600,32 +600,31 @@ class SpriteSystem
 
 /**
  * @brief Handles behaviour of non-player entities.
- * 
+ *
  */
 class BehaviourSystem
 {
   public:
-    BehaviourSystem(yorcvs::ECS *parent,sol::state* lua) : world(parent),lua_state(lua)
+    BehaviourSystem(yorcvs::ECS *parent, sol::state *lua) : world(parent), lua_state(lua)
     {
         world->register_system<BehaviourSystem>(*this);
         world->add_criteria_for_iteration<BehaviourSystem, behaviourComponent, velocityComponent>();
         scripts = std::make_unique<yorcvs::AssetManager<std::string>>(
-            [&](const std::string& path){ 
-                std::string* program = new std::string();
+            [&](const std::string &path) {
+                std::string *program = new std::string();
                 std::ifstream in{path};
-                program->assign( (std::istreambuf_iterator<char>(in)),(std::istreambuf_iterator<char>()));
+                program->assign((std::istreambuf_iterator<char>(in)), (std::istreambuf_iterator<char>()));
                 return program;
-                },
-            [&](std::string* str ){ delete str; }
-        );
+            },
+            [&](std::string *str) { delete str; });
     }
     void chicken_behaviour(const size_t ID)
     {
         (*lua_state)["entityID"] = ID;
-        const std::string& script_path = world->get_component<behaviourComponent>(ID).code_path;
-      
+        const std::string &script_path = world->get_component<behaviourComponent>(ID).code_path;
+
         lua_state->safe_script(*scripts->load_from_file(script_path));
-        
+
         world->get_component<behaviourComponent>(ID).accumulated = 0.0f;
     }
     void update(const float dt)
@@ -648,12 +647,12 @@ class BehaviourSystem
 
     yorcvs::ECS *world = nullptr;
     std::unique_ptr<yorcvs::AssetManager<std::string>> scripts;
-    sol::state* lua_state;
+    sol::state *lua_state;
     static constexpr float velocity_trigger_treshold = 0.0f;
 };
 /**
  * @brief Handles stamina and stamina regeneration
- * 
+ *
  */
 class StaminaSystem
 {
@@ -690,20 +689,20 @@ class StaminaSystem
     std::shared_ptr<yorcvs::EntitySystemList> entityList = nullptr;
 };
 /**
- * @brief Handles combat 
- * 
+ * @brief Handles combat
+ *
  */
 class commbatSystem
 {
-    public:
+  public:
     commbatSystem(yorcvs::ECS *parent) : world(parent)
     {
         world->register_system(*this);
         world->add_criteria_for_iteration<StaminaSystem, staminaComponent>();
     }
-    void attack(size_t source,size_t target)
+    void attack(size_t source, size_t target)
     {
-        
+        // TODO: implement attacking
     }
     std::shared_ptr<yorcvs::EntitySystemList> entityList = nullptr;
     yorcvs::ECS *world = nullptr;

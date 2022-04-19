@@ -854,7 +854,6 @@ class DebugInfo
         
             if (!playerMoveSystem->entityList->entitiesID.empty())
             {
-               
                 const size_t ID = playerMoveSystem->entityList->entitiesID[0];
                 std::string playerName = "Player : ";
                 if(appECS->has_components<identificationComponent>(ID))
@@ -893,7 +892,6 @@ class DebugInfo
                
                 ImGui::End();
             }
-           
         }
         if (showConsole)
         {
