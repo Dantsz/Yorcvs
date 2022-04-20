@@ -61,7 +61,6 @@ struct spriteComponent
 
 struct animationComponent
 {
-
     struct Animation
     {
         std::vector<yorcvs::Rect<size_t>> frames; // not ideal

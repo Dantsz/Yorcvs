@@ -187,6 +187,29 @@ class Map
         tiles_chunks.clear();
     }
     /**
+     * @brief Checks if the passed json object contains an compoennt of the specified name, tests if the entity has the component, if it doesn't it's default constructed, and deserealizez the data to it
+     * 
+     * @tparam T 
+     * @param entity_id 
+     * @param json_entity_obj 
+     * @param component_name 
+     * @param transform function to be applied to the component after it has been added
+     */
+    template<typename T>
+    void deserialize_component_from_json(const size_t entity_id, json::json& json_entity_obj, const std::string& component_name, [[maybe_unused]]std::function<void(T&)> transform = [](T&){})
+    {
+        if (json_entity_obj.contains(component_name))
+        {
+            if (!ecs->has_components<T>(entity_id))
+            {
+                ecs->add_component<T>(entity_id, {});
+            }
+            yorcvs::components::deserialize(ecs->get_component<T>(entity_id),
+                                            json_entity_obj[component_name]);
+            transform(ecs->get_component<T>(entity_id));
+        }
+    }
+    /**
      * @brief Loads json entity data into the entity
      * 
      * @param entity_id id of the entity
@@ -200,62 +223,13 @@ class Map
         std::ifstream entityIN(path);
         std::string entityDATA{(std::istreambuf_iterator<char>(entityIN)), (std::istreambuf_iterator<char>())};
         auto entityJSON = json::json::parse(entityDATA);
-        if (entityJSON.contains("identification"))
-        {
-            if (!ecs->has_components<identificationComponent>(entity_id))
-            {
-                ecs->add_component<identificationComponent>(entity_id, {});
-            }
-
-            yorcvs::components::deserialize(ecs->get_component<identificationComponent>(entity_id),
-                                            entityJSON["identification"]);
-        }
-
-        if (entityJSON.contains("hitbox"))
-        {
-            if (!ecs->has_components<hitboxComponent>(entity_id))
-            {
-                ecs->add_component<hitboxComponent>(entity_id, {});
-                yorcvs::components::deserialize(ecs->get_component<hitboxComponent>(entity_id), entityJSON["hitbox"]);
-            }
-        }
-
-        // NOT IMPLEMENTED SERIALIZATION Yet
-        if (!ecs->has_components<positionComponent>(entity_id))
-        {
-            ecs->add_component<positionComponent>(entity_id, {});
-            // TODO: move this elsewhere
-            ecs->get_component<positionComponent>(entity_id) = {get_spawn_position()};
-        }
-        if (!ecs->has_components<velocityComponent>(entity_id))
-        {
-            ecs->add_component<velocityComponent>(entity_id, {});
-        }
-        ecs->get_component<velocityComponent>(entity_id) = {{0.0f, 0.0f}, {false, false}};
-
-        if (entityJSON.contains("health"))
-        {
-            if (!ecs->has_components<healthComponent>(entity_id))
-            {
-                ecs->add_component<healthComponent>(entity_id, {});
-            }
-
-            yorcvs::components::deserialize(ecs->get_component<healthComponent>(entity_id), entityJSON["health"]);
-        }
-        if (entityJSON.contains("stamina"))
-        {
-            if (!ecs->has_components<staminaComponent>(entity_id))
-            {
-                ecs->add_component<staminaComponent>(entity_id, {});
-            }
-            yorcvs::components::deserialize(ecs->get_component<staminaComponent>(entity_id), entityJSON["stamina"]);
-        }
-        if (entityJSON.contains("sprite"))
-        {
-            if (!ecs->has_components<spriteComponent>(entity_id))
-            {
-                ecs->add_component<spriteComponent>(entity_id, {});
-            }
+        deserialize_component_from_json<identificationComponent>(entity_id,entityJSON,"identification");
+        deserialize_component_from_json<hitboxComponent>(entity_id,entityJSON,"hitbox");
+        deserialize_component_from_json<healthComponent>(entity_id,entityJSON,"health");
+        deserialize_component_from_json<staminaComponent>(entity_id,entityJSON,"stamina");
+        deserialize_component_from_json<offensiveStatsComponent>(entity_id,entityJSON,"offsensive_stats");
+        deserialize_component_from_json<defensiveStatsComponent>(entity_id,entityJSON,"defensive_stats");
+        deserialize_component_from_json<spriteComponent>(entity_id,entityJSON,"sprite",[&](spriteComponent& spr){  
             const std::string sprite_path = directory_path + std::string(entityJSON["sprite"]["spriteName"]);
             entityJSON["sprite"]["spriteName"] = sprite_path;
             yorcvs::components::deserialize(ecs->get_component<spriteComponent>(entity_id), entityJSON["sprite"]);
@@ -269,31 +243,27 @@ class Map
                                                 entityJSON["sprite"]["animations"]);
 
                 AnimationSystem::set_animation(ecs, entity_id, "idleL");
-            }
-        }
-        if(entityJSON.contains("offsensive_stats"))
+            }});
+        // These components should not be serialized as the position and velocity is relative to the map!!!
+        if (!ecs->has_components<positionComponent>(entity_id))
         {
-            if(!ecs->has_components<offensiveStatsComponent>(entity_id))
-            {
-                ecs->add_default_component<offensiveStatsComponent>(entity_id);
-            }
-            yorcvs::components::deserialize(ecs->get_component<offensiveStatsComponent>(entity_id), entityJSON["offsensive_stats"]);
+            ecs->add_component<positionComponent>(entity_id, {});
+            // TODO: move this elsewhere
+            ecs->get_component<positionComponent>(entity_id) = {get_spawn_position()};
         }
-        if(entityJSON.contains("defensive_stats"))
+        if (!ecs->has_components<velocityComponent>(entity_id))
         {
-            if(!ecs->has_components<offensiveStatsComponent>(entity_id))
-            {
-                ecs->add_default_component<offensiveStatsComponent>(entity_id);
-            }
-            yorcvs::components::deserialize(ecs->get_component<offensiveStatsComponent>(entity_id), entityJSON["defensive_stats"]);
+            ecs->add_component<velocityComponent>(entity_id, {});
         }
+        ecs->get_component<velocityComponent>(entity_id) = {{0.0f, 0.0f}, {false, false}};
+        
     }
     void load_character_from_path(yorcvs::Entity &entity, const std::string &path)
     {
         load_character_from_path(entity.id, path);
     }
     /**
-     * @brief Serializez an entities components and returns the string reprezentation
+     * @brief Serializes an entities components and returns the string reprezentation
      * 
      * @param entity 
      * @return std::string 
