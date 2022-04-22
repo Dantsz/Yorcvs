@@ -210,6 +210,24 @@ class Map
         }
     }
     /**
+     * @brief serializes the component and adds it to the json to the as an object with the name <component_name>
+     * 
+     * @tparam T 
+     * @param entity_id 
+     * @param component_name 
+     * @param json_obj 
+     * @param transform transform json before serialization
+     */
+    template<typename T> 
+    void serialize_component_to_json(const size_t entity_id, const std::string & component_name,json::json& json_obj, [[maybe_unused]]std::function<void(json::json&,const T&)> transform = [](json::json&,const T&){}) const
+    {
+        if(ecs->has_components<T>(entity_id))
+        {
+            transform(json_obj,ecs->get_component<T>(entity_id));
+            json_obj[component_name] = yorcvs::components::serialize(ecs->get_component<T>(entity_id));
+        }
+    }
+    /**
      * @brief Loads json entity data into the entity
      * 
      * @param entity_id id of the entity
@@ -219,7 +237,7 @@ class Map
     {
         std::filesystem::path file = path;
         const std::string directory_path = file.remove_filename().generic_string();
-
+        
         std::ifstream entityIN(path);
         std::string entityDATA{(std::istreambuf_iterator<char>(entityIN)), (std::istreambuf_iterator<char>())};
         auto entityJSON = json::json::parse(entityDATA);
@@ -262,6 +280,7 @@ class Map
     {
         load_character_from_path(entity.id, path);
     }
+
     /**
      * @brief Serializes an entities components and returns the string reprezentation
      * 
@@ -271,35 +290,18 @@ class Map
     std::string save_character_to_path(const size_t entity) const
     {
         json::json j;
-        if (ecs->has_components<identificationComponent>(entity))
-        {
-            j["name"] = yorcvs::components::serialize(ecs->get_component<identificationComponent>(entity));
-        }
-        if (ecs->has_components<healthComponent>(entity))
-        {
-            j["health"] = yorcvs::components::serialize(ecs->get_component<healthComponent>(entity));
-        }
-        if (ecs->has_components<staminaComponent>(entity))
-        {
-            j["stamina"] = yorcvs::components::serialize(ecs->get_component<staminaComponent>(entity));
-        }
-        if (ecs->has_components<hitboxComponent>(entity))
-        {
-            j["hitbox"] = yorcvs::components::serialize(ecs->get_component<hitboxComponent>(entity));
-        }
-        if (ecs->has_components<spriteComponent>(entity))
-        {
-            j["sprite"] = yorcvs::components::serialize(ecs->get_component<spriteComponent>(entity));
-            j["sprite"]["animations"] = yorcvs::components::serialize(ecs->get_component<animationComponent>(entity));
-        }
-        if(ecs->has_components<defensiveStatsComponent>(entity))
-        {
-            j["defensive_stats"] = yorcvs::components::serialize(ecs->get_component<defensiveStatsComponent>(entity));
-        }
-        if(ecs->has_components<offensiveStatsComponent>(entity))
-        {
-            j["offsensive_stats"] = yorcvs::components::serialize(ecs->get_component<offensiveStatsComponent>(entity));
-        }
+       
+        serialize_component_to_json<identificationComponent>(entity, "name", j);
+        serialize_component_to_json<healthComponent>(entity, "health", j);
+        serialize_component_to_json<staminaComponent>(entity, "stamina", j);
+        serialize_component_to_json<hitboxComponent>(entity, "hitbox", j);
+        serialize_component_to_json<spriteComponent>(entity, "sprite", j,
+        [&](json::json& json_object,const spriteComponent& spr)
+        {   //if sprite is serialized, also serialize sprites
+            serialize_component_to_json<animationComponent>(entity, "animations",j["sprite"]);
+        });
+        serialize_component_to_json<defensiveStatsComponent>(entity, "defensive_stats", j);
+        serialize_component_to_json<offensiveStatsComponent>(entity, "offsensive_stats", j);
         return j.dump(4);
     }
 
@@ -667,13 +669,13 @@ class DebugInfo
         // {
         //     reset();
         // }
-        // if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_C))
-        // {
-        //     std::cout << "Saving player... \n";
-        //     std::ofstream out("assets/testPlayer.json");
-        //     out << map->save_character_to_path(playerMoveSystem->entityList->entitiesID[0]);
-        //     std::cout << "Done.\n";
-        // }
+         if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_C))
+         {
+            std::cout << "Saving player... \n";
+            std::ofstream out("assets/testPlayer.json");
+            out << map->save_character_to_path(playerMoveSystem->entityList->entitiesID[0]);
+             std::cout << "Done.\n";
+         }
         frame_time = ft;
         avg_frame_time *= frame_time_samples;
         frame_time_samples += 1.0f;
