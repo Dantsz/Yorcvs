@@ -15,7 +15,7 @@
 class CollisionSystem
 {
   public:
-    CollisionSystem(yorcvs::ECS *parent) : world(parent)
+    explicit CollisionSystem(yorcvs::ECS *parent) : world(parent)
     {
         // is this legal? yee
         world->register_system<CollisionSystem>(*this);
@@ -194,7 +194,7 @@ class CollisionSystem
 class VelocitySystem
 {
   public:
-    VelocitySystem(yorcvs::ECS *parent) : world(parent)
+    explicit VelocitySystem(yorcvs::ECS *parent) : world(parent)
     {
         world->register_system<VelocitySystem>(*this);
         world->add_criteria_for_iteration<VelocitySystem, positionComponent, velocityComponent>();
@@ -228,7 +228,7 @@ class VelocitySystem
 class AnimationSystem
 {
   public:
-    AnimationSystem(yorcvs::ECS *parent) : world(parent)
+    explicit AnimationSystem(yorcvs::ECS *parent) : world(parent)
     {
         world->register_system<AnimationSystem>(*this);
         world->add_criteria_for_iteration<AnimationSystem, animationComponent, spriteComponent>();
@@ -417,7 +417,7 @@ class AnimationSystem
 class HealthSystem
 {
   public:
-    HealthSystem(yorcvs::ECS *parent) : world(parent)
+    explicit HealthSystem(yorcvs::ECS *parent) : world(parent)
     {
         world->register_system<HealthSystem>(*this);
         world->add_criteria_for_iteration<HealthSystem, healthComponent>();
@@ -657,7 +657,7 @@ class BehaviourSystem
 class StaminaSystem
 {
   public:
-    StaminaSystem(yorcvs::ECS *parent) : world(parent)
+    explicit StaminaSystem(yorcvs::ECS *parent) : world(parent)
     {
         world->register_system(*this);
         world->add_criteria_for_iteration<StaminaSystem, staminaComponent>();
@@ -692,10 +692,10 @@ class StaminaSystem
  * @brief Handles combat
  *
  */
-class commbatSystem
+class CombatSystem
 {
   public:
-    commbatSystem(yorcvs::ECS *parent) : world(parent)
+    explicit CombatSystem(yorcvs::ECS *parent) : world(parent)
     {
         world->register_system(*this);
         world->add_criteria_for_iteration<StaminaSystem, staminaComponent>();
