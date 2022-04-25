@@ -296,7 +296,7 @@ class Map
         serialize_component_to_json<staminaComponent>(entity, "stamina", j);
         serialize_component_to_json<hitboxComponent>(entity, "hitbox", j);
         serialize_component_to_json<spriteComponent>(entity, "sprite", j,
-        [&](json::json& json_object,const spriteComponent& spr)
+        [&](json::json&  /*json_object*/,const spriteComponent& spr)
         {   //if sprite is serialized, also serialize sprites
             serialize_component_to_json<animationComponent>(entity, "animations",j["sprite"]);
         });
@@ -822,7 +822,7 @@ class DebugInfo
                 }
             }
             ImGui::End();
-        
+
             if (!playerMoveSystem->entityList->entitiesID.empty())
             {
                 const size_t ID = playerMoveSystem->entityList->entitiesID[0];
@@ -899,6 +899,63 @@ class DebugInfo
             if (ImGui::SmallButton("Clear"))           
             {
                  clear_logs(); 
+            }
+            ImGui::End();
+            ImGui::Begin("Debug");
+            if(ImGui::CollapsingHeader("Entities"))
+            {
+                const ImGuiTableFlags flags1 = ImGuiTableFlags_BordersV | ImGuiTableFlags_SortMulti | ImGuiTableFlags_Resizable;
+                if(ImGui::BeginTable("table1", 4,flags1))
+                {
+                    ImGui::TableSetupColumn("ID");
+                    ImGui::TableSetupColumn("Name");
+                    ImGui::TableSetupColumn("Signature");
+                    ImGui::TableSetupColumn("Position");
+                    ImGui::TableHeadersRow();
+                    for(size_t i = 0 ; i < appECS->get_entity_list_size(); i++)
+                    {
+                        if(appECS->is_valid_entity(i))
+                        {   ImGui::TableNextRow();
+                            ImGui::TableSetColumnIndex(0);
+                            ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_None;
+                            ImGui::Selectable("",false,selectable_flags);
+                            ImGui::SameLine();
+                            ImGui::Text("%zu",i);
+
+                            ImGui::TableSetColumnIndex(1);
+                            if(appECS->has_components<identificationComponent>(i))
+                            {
+                                
+                                ImGui::Text("%s", appECS->get_component<identificationComponent>(i).name.c_str());
+                            }
+                            else
+                            {
+                                ImGui::Text("%s", "Unknown");
+                            }
+
+                            ImGui::TableSetColumnIndex(2);
+                            std::string signature{};
+                            signature.resize(appECS->get_entity_signature(i).size());
+                            for(size_t j = 0 ;  j < appECS->get_entity_signature(i).size(); j++)
+                            {
+                                signature[j] = appECS->get_entity_signature(i)[j] ? '1' : '0';
+                            }
+                            ImGui::Text( "%s", signature.c_str());
+                            ImGui::TableSetColumnIndex(3);
+                            if(appECS->has_components<positionComponent>(i))
+                            {
+                                const auto& position = appECS->get_component<positionComponent>(i).position;
+                                ImGui::Text("%f/%f",position.x,position.y);
+                            }
+                            else
+                            {
+                                ImGui::Text("(-/-)");
+                            }
+                        }
+                    }
+                    ImGui::EndTable();
+                }
+               
             }
             ImGui::End();
         }

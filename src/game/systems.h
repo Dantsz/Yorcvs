@@ -432,16 +432,13 @@ class HealthSystem
                 if (world->get_component<healthComponent>(ID).HP < 0.0f)
                 {
                     world->get_component<healthComponent>(ID).is_dead = true;
+                    world->destroy_entity(ID);
                     continue;
                 }
                 world->get_component<healthComponent>(ID).HP += world->get_component<healthComponent>(ID).health_regen;
                 if (world->get_component<healthComponent>(ID).HP > world->get_component<healthComponent>(ID).max_HP)
                 {
                     world->get_component<healthComponent>(ID).HP = world->get_component<healthComponent>(ID).max_HP;
-                }
-                if (world->get_component<healthComponent>(ID).HP < 0.0f)
-                {
-                    world->destroy_entity(ID);
                 }
             }
             cur_time = 0.0f;
@@ -704,6 +701,61 @@ class CombatSystem
     {
         // TODO: implement attacking
     }
+    /**
+     * @brief Calculates the percentage of the damage reduced by the armor stat
+     * 
+     * @param armor 
+     * @return constexpr float 
+     */
+    static constexpr float calculate_armor_damage_reduction(float armor)
+    {
+        constexpr float maximum_reduction = 95.0f;//the limits to infinity
+        constexpr float slope = 2000.0f;//not the actual slope, but this affects the slope calculation
+        return (maximum_reduction* armor )/(std::abs(armor)+ slope);
+    }
+    /**
+     * @brief Calculates the block value from the block stat
+     * 
+     * @param block block stat
+     * @return constexpr float the block values, a number between 0.0 and 1.0 representing the chance the character block the attack
+     */
+    static constexpr float calculate_block_chance(float block)
+    {
+        constexpr float slope = 1500.0f;
+        return block/(std::abs(block) + slope);
+    }
+    /**
+     * @brief Calculates the dodge value from the dodge stat
+     * 
+     * @param dodge 
+     * @return constexpr float 
+     */
+    static constexpr float calculate_dodge_chance(float dodge)
+    {    
+        constexpr float slope = 2000.0f;
+        return dodge/(std::abs(dodge) + slope);
+    }
+    /**
+     * @brief Calculates the bonus damage from the strength stat
+     * 
+     * @param strength 
+     * @return constexpr float 
+     */
+    static constexpr float calculate_strength_bonus(float strength)
+    {
+        return strength;
+    }
+    /**
+     * @brief Calculates the added chance for an attack to do double damage
+     * 
+     * @param agility 
+     * @return constexpr float 
+     */
+    static constexpr float calculate_agility_bonus(float agility)
+    {
+        constexpr float slope = 2500.0f;
+        return agility/(std::abs(agility) + slope);
+    }
     std::shared_ptr<yorcvs::EntitySystemList> entityList = nullptr;
-    yorcvs::ECS *world = nullptr;
+    yorcvs::ECS *world = nullptr;   
 };
