@@ -1152,6 +1152,7 @@ class Application
     }
     void run()
     {
+       
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
         const float elapsed = std::min(100.0f, counter.get_ticks<float, std::chrono::nanoseconds>() / 1000000.0f);
@@ -1170,8 +1171,8 @@ class Application
         }
 
         
+       
         r.clear();
-        
         render_map_tiles(map);
         sprS.renderSprites(render_dimensions);
         dbInfo.render(elapsed, render_dimensions);
