@@ -428,12 +428,14 @@ class HealthSystem
         cur_time += dt;
         if (cur_time >= update_time)
         {
-            for (size_t ID : entityList->entitiesID)
+            for(size_t i = 0; i  <  entityList->entitiesID.size() ; i++)//enchanced for doesn't work here because it can invalidate iterators
             {
+                const size_t ID = entityList->entitiesID[i];
                 if (world->get_component<healthComponent>(ID).HP < 0.0f)
                 {
                     world->get_component<healthComponent>(ID).is_dead = true;
                     world->destroy_entity(ID);
+                    i--;
                     continue;
                 }
                 world->get_component<healthComponent>(ID).HP += world->get_component<healthComponent>(ID).health_regen;
