@@ -20,6 +20,7 @@ set(YorcvsALLFILES  "src/Yorcvs.cpp"
                     
                     "src/game/components.h"
                     "src/game/systems.h"
+                   
                   
                     "src/common/assetmanager.h"
                     "src/common/types.h"
@@ -28,6 +29,7 @@ set(YorcvsALLFILES  "src/Yorcvs.cpp"
 
                     "src/engine/window.h"
                     "src/engine/windowSDL2.h"
+                    "src/engine/luaEngine.h"
                     )
 
 

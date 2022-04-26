@@ -5,6 +5,7 @@
 #include "sol/sol.hpp"
 #include <array>
 #include <cmath>
+#include <cstddef>
 #include <fstream>
 #include <random>
 #include <stack>
@@ -427,7 +428,7 @@ class HealthSystem
         cur_time += dt;
         if (cur_time >= update_time)
         {
-            for (unsigned long ID : entityList->entitiesID)
+            for (size_t ID : entityList->entitiesID)
             {
                 if (world->get_component<healthComponent>(ID).HP < 0.0f)
                 {

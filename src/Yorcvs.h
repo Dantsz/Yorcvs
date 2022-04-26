@@ -273,8 +273,7 @@ class Map
         {
             ecs->add_component<velocityComponent>(entity_id, {});
         }
-        ecs->get_component<velocityComponent>(entity_id) = {{0.0f, 0.0f}, {false, false}};
-        
+        ecs->get_component<velocityComponent>(entity_id) = {{0.0f, 0.0f}, {false, false}};        
     }
     void load_character_from_path(yorcvs::Entity &entity, const std::string &path)
     {
@@ -925,7 +924,6 @@ class DebugInfo
                             ImGui::TableSetColumnIndex(1);
                             if(appECS->has_components<identificationComponent>(i))
                             {
-                                
                                 ImGui::Text("%s", appECS->get_component<identificationComponent>(i).name.c_str());
                             }
                             else
@@ -954,8 +952,7 @@ class DebugInfo
                         }
                     }
                     ImGui::EndTable();
-                }
-               
+                } 
             }
             ImGui::End();
         }
@@ -1152,7 +1149,6 @@ class Application
     }
     void run()
     {
-       
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
         const float elapsed = std::min(100.0f, counter.get_ticks<float, std::chrono::nanoseconds>() / 1000000.0f);
@@ -1192,7 +1188,6 @@ class Application
     {
         r.cleanup();
     }
-
   private:
     static constexpr yorcvs::Vec2<float> default_render_dimensions = {240.0f, 120.0f};
     static constexpr float msPF = 41.6f;
