@@ -618,7 +618,7 @@ class BehaviourSystem
             },
             [&](std::string *str) { delete str; });
     }
-    void chicken_behaviour(const size_t ID)
+    void run_behaviour(const size_t ID)
     {
         (*lua_state)["entityID"] = ID;
         const std::string &script_path = world->get_component<behaviourComponent>(ID).code_path;
@@ -636,7 +636,7 @@ class BehaviourSystem
             if (world->get_component<behaviourComponent>(ID).accumulated >
                 world->get_component<behaviourComponent>(ID).dt)
             {
-                chicken_behaviour(ID);
+                run_behaviour(ID);
             }
         }
     }
