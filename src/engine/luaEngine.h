@@ -47,8 +47,12 @@ inline void register_component_to_lua(sol::state &lua_state, const std::string &
 template<systemT T,typename... Args>
 inline void register_system_to_lua(sol::state& lua_state, const std::string& name,T& system,Args &&... args)
 {
-    sol::usertype<T> system_type = lua_state.new_usertype<T>(name,std::forward<Args>(args)...);
-    lua_state[name] = system;
+    const std::string system_type_name = name + "_t";//name of the system metatable
+    sol::usertype<T> system_type = lua_state.new_usertype<T>(system_type_name, std::forward<Args>(args)...);//registe the system type
+    lua_state[name] = system; // set the instance of system used
+    lua_state[system_type_name]["get_entities"] = [](T& sys) {
+        return sys.entityList->entitiesID;
+    };
 }
 /**
  * @brief Gives lua acces to basic engine types like vector and rectangle

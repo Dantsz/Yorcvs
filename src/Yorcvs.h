@@ -1098,7 +1098,12 @@ class Application
     {
         lua_state.open_libraries(sol::lib::base, sol::lib::package,sol::lib::math);
         yorcvs::lua::bind_runtime(lua_state, &world);
+
+        yorcvs::lua::register_system_to_lua(lua_state, "health_system", map.healthS);
+        yorcvs::lua::register_system_to_lua(lua_state, "collision_system", map.collisionS);
+        yorcvs::lua::register_system_to_lua(lua_state, "animation_system", map.animS);
         yorcvs::lua::register_system_to_lua(lua_state, "combat_system",map.combat_system, "attack", &CombatSystem::attack);
+        
         //loading two maps one on top of each other
         map.load(&world,"assets/map.tmx");
         map.load(&world,"assets/map2.tmx");
