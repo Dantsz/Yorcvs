@@ -1,6 +1,7 @@
 #pragma once
 #include "../common/ecs.h"
 #include "../game/components.h"
+#include "map.h"
 extern "C"
 {
 #include <lauxlib.h>
@@ -42,7 +43,7 @@ inline void register_component_to_lua(sol::state &lua_state, const std::string &
 }
 /**
 * @brief Exposes a system to lua
-* 
+*
 */
 template<systemT T,typename... Args>
 inline void register_system_to_lua(sol::state& lua_state, const std::string& name,T& system,Args &&... args)
