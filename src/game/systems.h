@@ -698,11 +698,13 @@ class CombatSystem
     explicit CombatSystem(yorcvs::ECS *parent) : world(parent)
     {
         world->register_system(*this);
-        world->add_criteria_for_iteration<StaminaSystem, staminaComponent>();
+        world->add_criteria_for_iteration<CombatSystem,healthComponent,offensiveStatsComponent,defensiveStatsComponent>();
     }
     void attack(size_t source, size_t target)
     {
         // TODO: implement attacking
+        float damage = world->get_component<offensiveStatsComponent>(source).strength;
+        world->get_component<healthComponent>(target).HP -= damage;
     }
     /**
      * @brief Calculates the percentage of the damage reduced by the armor stat

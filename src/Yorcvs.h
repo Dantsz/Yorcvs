@@ -75,7 +75,7 @@ class Map
   public:
     Map(yorcvs::ECS *world)
         : ecs(world), init_ecs(*world), collisionS(world), healthS(world), sprintS(world), velocityS(world),
-          animS(world)
+          animS(world),combat_system(world)
     {
     }
     /**
@@ -248,10 +248,10 @@ class Map
         deserialize_component_from_json<offensiveStatsComponent>(entity_id,entityJSON,"offsensive_stats");
         deserialize_component_from_json<defensiveStatsComponent>(entity_id,entityJSON,"defensive_stats");
         deserialize_component_from_json<spriteComponent>(entity_id,entityJSON,"sprite",[&](spriteComponent& spr){  
-            const std::string sprite_path = directory_path + std::string(entityJSON["sprite"]["spriteName"]);
-            entityJSON["sprite"]["spriteName"] = sprite_path;
-            yorcvs::components::deserialize(ecs->get_component<spriteComponent>(entity_id), entityJSON["sprite"]);
-            if (entityJSON["sprite"].contains("animations"))
+        const std::string sprite_path = directory_path + std::string(entityJSON["sprite"]["spriteName"]);
+        entityJSON["sprite"]["spriteName"] = sprite_path;
+        yorcvs::components::deserialize(ecs->get_component<spriteComponent>(entity_id), entityJSON["sprite"]);
+        if (entityJSON["sprite"].contains("animations"))
             {
                 if (!ecs->has_components<animationComponent>(entity_id))
                 {
@@ -261,7 +261,7 @@ class Map
                                                 entityJSON["sprite"]["animations"]);
 
                 AnimationSystem::set_animation(ecs, entity_id, "idleL");
-            }});
+        }});
         // These components should not be serialized as the position and velocity is relative to the map!!!
         if (!ecs->has_components<positionComponent>(entity_id))
         {
@@ -336,8 +336,15 @@ class Map
                     }
                     // put the tile in the vector
                     yorcvs::Tile tile{};
-                    tile.texture_path = tile_set->getImagePath();
-                    tile.coords =
+                    if (tile_set == nullptr)
+                    {
+                        yorcvs::log("No tileset in map " + map.getWorkingDirectory() + "  contains tile: " + std::to_string(chunk.tiles[tileIndex].ID), yorcvs::MSGSEVERITY::ERROR);
+                    }
+                    else
+                    {
+                        tile.texture_path = tile_set->getImagePath();
+                    }
+                     tile.coords =
                         chunk_position * tilesSize +
                         tilesSize * yorcvs::Vec2<float>{static_cast<float>(chunk_x), static_cast<float>(chunk_y)};
                     tile.srcRect = get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID);
@@ -642,7 +649,7 @@ class Map
     yorcvs::Vec2<float> spawn_coord;
     VelocitySystem velocityS;
     AnimationSystem animS;
-
+    CombatSystem combat_system;
     std::vector<yorcvs::Entity> ysorted_tiles;
 };
 class DebugInfo
@@ -1091,6 +1098,7 @@ class Application
     {
         lua_state.open_libraries(sol::lib::base, sol::lib::package,sol::lib::math);
         yorcvs::lua::bind_runtime(lua_state, &world);
+        yorcvs::lua::register_system_to_lua(lua_state, "combat_system",map.combat_system, "attack", &CombatSystem::attack);
         //loading two maps one on top of each other
         map.load(&world,"assets/map.tmx");
         map.load(&world,"assets/map2.tmx");

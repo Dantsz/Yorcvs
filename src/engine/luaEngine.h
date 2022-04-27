@@ -19,13 +19,14 @@ namespace yorcvs::lua
  * @tparam T
  * @param lua_state
  * @param name
+ * @params args pairs made of a string which is the name sued by lua  and the parameter of the component 
  */
 template <typename T, typename... Args>
 inline void register_component_to_lua(sol::state &lua_state, const std::string &name, Args &&... args)
 {
     std::vector<std::string> &component_names = lua_state["impl"]["component_names"];
     yorcvs::ECS *ecs = lua_state["world"];
-    sol::usertype<T> new_type = lua_state.new_usertype<T>(name, args...);
+    sol::usertype<T> new_type = lua_state.new_usertype<T>(name, std::forward<Args>(args)...);
     lua_state["ECS"]["create_" + name] = []() { return T(); };
     lua_state["ECS"]["add_" + name] = &yorcvs::ECS::add_default_component<T>;
     lua_state["ECS"]["get_" + name] = &yorcvs::ECS::get_component<T>;
@@ -38,6 +39,16 @@ inline void register_component_to_lua(sol::state &lua_state, const std::string &
         component_names.resize(index + 1, "null");
     }
     component_names.insert(component_names.begin() + index, name);
+}
+/**
+* @brief Exposes a system to lua
+* 
+*/
+template<systemT T,typename... Args>
+inline void register_system_to_lua(sol::state& lua_state, const std::string& name,T& system,Args &&... args)
+{
+    sol::usertype<T> system_type = lua_state.new_usertype<T>(name,std::forward<Args>(args)...);
+    lua_state[name] = system;
 }
 /**
  * @brief Gives lua acces to basic engine types like vector and rectangle
