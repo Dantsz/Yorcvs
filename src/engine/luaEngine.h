@@ -72,6 +72,19 @@ inline void bind_basic_types(sol::state &lua_state)
     sol::usertype<animationComponent::Animation> Animation = lua_state.new_usertype<animationComponent::Animation>(
         "Animation", "frames", &animationComponent::Animation::frames, "speed", &animationComponent::Animation::speed);
 }
+inline void bind_map_functions(sol::state& lua_state)
+{
+    sol::usertype<yorcvs::Map> map_type = lua_state.new_usertype<yorcvs::Map>("Map");
+    //lua_state["create_map"] = []() {};
+    lua_state["Map"]["load_content"] = [](yorcvs::Map& map, const std::string path) // loads alll tiles and object from the path to the map
+    {
+        map.load(map.ecs, path);
+    };
+    lua_state["load_entity"] = [](yorcvs::Map& map,const std::string path){ // creates a new entity and assigns components from the file
+        map.load_character_from_path(map.ecs->create_entity_ID(), path);
+    };
+
+}
 /**
  * @brief Gives the lua state accest to the running ECS and components
  *
@@ -85,6 +98,7 @@ inline bool bind_runtime(sol::state &lua_state, yorcvs::ECS *ecs)
     lua_state["impl"] = lua_state.create_table_with("component_names", std::vector<std::string>{});
 
     bind_basic_types(lua_state);
+    bind_map_functions(lua_state);
     sol::usertype<yorcvs::ECS> lua_ECS = lua_state.new_usertype<yorcvs::ECS>("ECS");
     lua_state["world"] = ecs;
     lua_ECS["create_entity"] = &yorcvs::ECS::create_entity_ID;

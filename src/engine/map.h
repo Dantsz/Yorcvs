@@ -281,8 +281,6 @@ namespace yorcvs
             const auto& chunks = tileLayer.getChunks();
             for (const auto& chunk : chunks) // parse chunks
             {
-                // std::cout << "Loading chunk: " << chunk.position.x/chunk.size.x << " " << chunk.position.y/chunk.size.y
-                // << '\n';
                 yorcvs::Vec2<float> chunk_position = { static_cast<float>(chunk.position.x),
                                                       static_cast<float>(chunk.position.y) };
                 for (auto chunk_y = 0; chunk_y < chunk.size.y; chunk_y++)

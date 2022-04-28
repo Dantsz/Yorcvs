@@ -493,7 +493,7 @@ class Application
         yorcvs::lua::register_system_to_lua(lua_state, "Collision_system", map.collisionS);
         yorcvs::lua::register_system_to_lua(lua_state, "Animation_system", map.animS);
         yorcvs::lua::register_system_to_lua(lua_state, "Combat_system",map.combat_system, "attack", &CombatSystem::attack);
-        lua_state["test_map"] = map;
+        lua_state["test_map"] = &map;
         //loading two maps one on top of each other
         map.load(&world,"assets/map.tmx");
         //map.load(&world,"assets/map2.tmx");
@@ -570,7 +570,7 @@ class Application
         }
 
         
-       
+        std::cout << map.tiles_chunks.size() << '\n';
         r.clear();
         render_map_tiles(map);
         sprS.renderSprites(render_dimensions);
