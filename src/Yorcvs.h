@@ -501,7 +501,7 @@ class Application
         //loading two maps one on top of each other
         lua_state.safe_script(R"(
             test_map:load_content("assets/map.tmx")
-            local pl = test_map:load_entity("assets/player.json")
+            local pl = test_map:load_entity(world:create_entity(),"assets/player.json")
             world:add_playerMovementControl(pl)
             )");
 

@@ -80,10 +80,9 @@ inline void bind_map_functions(sol::state& lua_state)
     {
         map.load(map.ecs, path);
     };
-    lua_state["Map"]["load_entity"] = [](yorcvs::Map& map, const std::string path) { // creates a new entity and assigns components from the file
-        const size_t new_entity = map.ecs->create_entity_ID();
-        map.load_character_from_path(new_entity, path);
-        return new_entity;
+    lua_state["Map"]["load_entity"] = [](yorcvs::Map& map,const size_t entityID, const std::string path) { // creates a new entity and assigns components from the file
+        map.load_character_from_path(entityID, path);
+        return entityID;
     };
     lua_state["Map"]["save_entity"] = [](yorcvs::Map& map,const size_t ID)
     {
