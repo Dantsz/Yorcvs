@@ -69,7 +69,7 @@ class DebugInfo
          {
             std::cout << "Saving player... \n";
             std::ofstream out("assets/testPlayer.json");
-            out << map->save_character_to_path(playerMoveSystem->entityList->entitiesID[0]);
+            out << map->save_character(playerMoveSystem->entityList->entitiesID[0]);
              std::cout << "Done.\n";
          }
         frame_time = ft;

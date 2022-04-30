@@ -257,7 +257,7 @@ namespace yorcvs
          * @param entity
          * @return std::string
          */
-        std::string save_character_to_path(const size_t entity) const
+        std::string save_character(const size_t entity) const
         {
             json::json j;
 

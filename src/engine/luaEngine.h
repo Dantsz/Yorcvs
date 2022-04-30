@@ -85,7 +85,10 @@ inline void bind_map_functions(sol::state& lua_state)
         map.load_character_from_path(new_entity, path);
         return new_entity;
     };
-
+    lua_state["Map"]["save_entity"] = [](yorcvs::Map& map,const size_t ID)
+    {
+        return map.save_character(ID);
+    };
 }
 /**
  * @brief Gives the lua state accest to the running ECS and components
