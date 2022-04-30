@@ -109,7 +109,7 @@ class CollisionSystem
     static bool check_collision_up_down(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                         yorcvs::Vec2<float> &rectAvel, float /*dt*/)
     {
-        if (rectA.y <= rectB.y && rectA.y + rectA.h + (rectAvel.y) > rectB.y && rectA.x - rectB.x < rectB.w &&
+        if (rectA.y <= rectB.y && rectA.y + rectA.h + rectAvel.y > rectB.y && rectA.x - rectB.x < rectB.w &&
             rectA.x + rectA.w > rectB.x)
         {
             rectAvel.y = (rectB.y - rectA.y - rectA.h);
@@ -120,7 +120,7 @@ class CollisionSystem
     static bool check_collision_down_up(const yorcvs::Rect<float> &rectA, const yorcvs::Rect<float> &rectB,
                                         yorcvs::Vec2<float> &rectAvel, float /*dt*/)
     {
-        if (rectA.y >= rectB.y + rectB.h && rectA.y + (rectAvel.y) < rectB.y + rectB.h && rectA.x - rectB.x < rectB.w &&
+        if ((rectA.y >=  rectB.y + rectB.h || std::fabs(rectA.y - rectB.y - rectB.h) <= fp_epsilon) && rectA.y + rectAvel.y <= rectB.y + rectB.h && rectA.x - rectB.x < rectB.w &&
             rectA.x + rectA.w > rectB.x)
         {
             rectAvel.y = (rectB.y + rectB.h - rectA.y);
@@ -186,6 +186,7 @@ class CollisionSystem
   public:
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;
+    static constexpr float fp_epsilon = .01f;
 };
 
 /**

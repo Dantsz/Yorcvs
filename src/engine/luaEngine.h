@@ -80,8 +80,10 @@ inline void bind_map_functions(sol::state& lua_state)
     {
         map.load(map.ecs, path);
     };
-    lua_state["load_entity"] = [](yorcvs::Map& map,const std::string path){ // creates a new entity and assigns components from the file
-        map.load_character_from_path(map.ecs->create_entity_ID(), path);
+    lua_state["Map"]["load_entity"] = [](yorcvs::Map& map, const std::string path) { // creates a new entity and assigns components from the file
+        const size_t new_entity = map.ecs->create_entity_ID();
+        map.load_character_from_path(new_entity, path);
+        return new_entity;
     };
 
 }
@@ -150,6 +152,7 @@ inline bool bind_runtime(sol::state &lua_state, yorcvs::ECS *ecs)
         lua_state, "offensiveStatsComponent", "strength", &offensiveStatsComponent::strength, "agility",
         &offensiveStatsComponent::agility, "dexterity", &offensiveStatsComponent::dexterity, "piercing",
         &offensiveStatsComponent::piercing, "intellect", &offensiveStatsComponent::intellect);
+    register_component_to_lua<playerMovementControlledComponent>(lua_state, "playerMovementControl");
     return true;
 }
 

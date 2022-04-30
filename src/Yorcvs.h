@@ -216,6 +216,10 @@ class DebugInfo
                 {
                  ImGui::Text("playerPosition: (%f,%f)",appECS->get_component<positionComponent>(ID).position.x,appECS->get_component<positionComponent>(ID).position.y);
                 }
+                if (appECS->has_components<velocityComponent>(ID))
+                {
+                    ImGui::Text("playerVelocity: (%f,%f)", appECS->get_component<velocityComponent>(ID).vel.x, appECS->get_component<velocityComponent>(ID).vel.y);
+                }
             }
             ImGui::End();
 
@@ -495,12 +499,12 @@ class Application
         yorcvs::lua::register_system_to_lua(lua_state, "Combat_system",map.combat_system, "attack", &CombatSystem::attack);
         lua_state["test_map"] = &map;
         //loading two maps one on top of each other
-        map.load(&world,"assets/map.tmx");
-        //map.load(&world,"assets/map2.tmx");
-        size_t player_id = world.create_entity_ID();
-        map.load_character_from_path(player_id, "assets/player.json");
-        world.add_default_component<playerMovementControlledComponent>(player_id);
-        
+        lua_state.safe_script(R"(
+            test_map:load_content("assets/map.tmx")
+            local pl = test_map:load_entity("assets/player.json")
+            world:add_playerMovementControl(pl)
+            )");
+
        
         dbInfo.attach(&r, &map, &pcS, &map.collisionS, &map.healthS, &lua_state);
         counter.start();
@@ -510,10 +514,7 @@ class Application
     Application &operator=(const Application &other) = delete;
     Application &operator=(Application &&other) = delete;
 
-    void update(float dt)
-    {
-        map.update(dt);
-    }
+
     void render_map_chunk(yorcvs::Map &p_map, const std::tuple<intmax_t, intmax_t> &chunk)
     {
         if (p_map.tiles_chunks.find(chunk) != p_map.tiles_chunks.end())
@@ -563,14 +564,11 @@ class Application
         r.handle_events();
         while (lag >= msPF)
         {
-            update(msPF);
-            bhvS.update(msPF);
             pcS.updateControls(render_dimensions, msPF);
+            bhvS.update(msPF);
+            map.update(msPF);
             lag -= msPF;
         }
-
-        
-        std::cout << map.tiles_chunks.size() << '\n';
         r.clear();
         render_map_tiles(map);
         sprS.renderSprites(render_dimensions);
