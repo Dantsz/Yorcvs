@@ -28,6 +28,48 @@ template <typename T> json::json serialize(const T &);
  *
  */
 template <typename T> void deserialize(T &dst, const json::json &);
+//WORK IN PROGRESS 
+template<typename JSON_TYPE, typename T, typename Member_ptr>
+void exp_serialize_member(JSON_TYPE& json_obj, const T& comp, std::tuple<const char*, Member_ptr T::*> member)
+{
+    json_obj[std::get<0>(member)] = comp.*std::get<1>(member);
+}
+template<typename T, typename ...Args>
+json::json exp_serialize(const T& comp, Args ...args)
+{
+    json::json j;
+    (exp_serialize_member(j, comp, args), ...);
+    return j;
+}
+template<typename JSON_TYPE, typename T, typename Member_ptr>
+void exp_deserialize_member(T& dst, const JSON_TYPE& json, std::tuple<const char*, Member_ptr T::*> member)
+{
+    dst.*std::get<1>(member) = json[std::get<0>(member)];
+}
+
+template <typename T, typename ...Args>
+void exp_deserialize(T& dst, const json::json& j, Args ...args)
+{
+    (exp_deserialize_member(dst, j, args), ...);
+}
+//Specialization for simple types
+template <typename T> inline json::json serialize(const yorcvs::Vec2<T>& vec)
+{
+    return exp_serialize(vec, std::make_tuple("x", &yorcvs::Vec2<T>::x), std::make_tuple("y", &yorcvs::Vec2<T>::y));
+}
+template <typename T> inline void deserialize(yorcvs::Vec2<T>& vec, const json::json& j)
+{
+    exp_deserialize(vec, j, std::make_tuple("x", &yorcvs::Vec2<T>::x), std::make_tuple("y", &yorcvs::Vec2<T>::y));
+}
+
+template <typename T> inline json::json serialize(const yorcvs::Rect<T>& rect)
+{
+    return exp_serialize(rect, std::make_tuple("x", &yorcvs::Rect<T>::x), std::make_tuple("y", &yorcvs::Rect<T>::y), std::make_tuple("w", &yorcvs::Rect<T>::w), std::make_tuple("h", &yorcvs::Rect<T>::h));
+}
+template <typename T> inline void deserialize(yorcvs::Rect<T>& rect, const json::json& j)
+{
+    exp_deserialize(rect, j, std::make_tuple("x", &yorcvs::Rect<T>::x), std::make_tuple("y", &yorcvs::Rect<T>::y), std::make_tuple("w", &yorcvs::Rect<T>::w), std::make_tuple("h", &yorcvs::Rect<T>::h));
+}
 
 // Specialization for each component
 // identificationComponent
@@ -75,19 +117,11 @@ inline void deserialize(staminaComponent &dst, const json::json &j)
 // hitboxComponent
 template <> inline json::json serialize(const hitboxComponent &comp)
 {
-    json::json j;
-    j["x"] = comp.hitbox.x;
-    j["y"] = comp.hitbox.y;
-    j["w"] = comp.hitbox.w;
-    j["h"] = comp.hitbox.h;
-    return j;
+    return serialize(comp.hitbox);
 }
 template <> inline void deserialize(hitboxComponent &dst, const json::json &j)
 {
-    dst.hitbox.x = j["x"];
-    dst.hitbox.y = j["y"];
-    dst.hitbox.w = j["w"];
-    dst.hitbox.h = j["h"];
+    deserialize(dst.hitbox, j);
 }
 // positionComponent
 
@@ -95,17 +129,9 @@ template <> inline void deserialize(hitboxComponent &dst, const json::json &j)
 template <> inline json::json serialize(const spriteComponent &comp)
 {
     json::json j;
-    j["offset"]["x"] = comp.offset.x;
-    j["offset"]["y"] = comp.offset.y;
-
-    j["size"]["x"] = comp.size.x;
-    j["size"]["y"] = comp.size.y;
-
-    j["srcRect"]["x"] = comp.src_rect.x;
-    j["srcRect"]["y"] = comp.src_rect.y;
-    j["srcRect"]["w"] = comp.src_rect.w;
-    j["srcRect"]["h"] = comp.src_rect.h;
-
+    j["offset"] = serialize(comp.offset);
+    j["size"] = serialize(comp.size);
+    j["srcRect"] = serialize(comp.src_rect);
     std::filesystem::path sprite_path = comp.texture_path;
     j["spriteName"] = sprite_path.filename().string();
     return j;
@@ -128,14 +154,9 @@ template <> inline json::json serialize(const animationComponent &comp)
         anim["speed"] = animation.speed;
         for (const auto &frame : animation.frames)
         {
-            json::json jframe;
-            jframe["x"] = frame.x;
-            jframe["y"] = frame.y;
-            jframe["w"] = frame.w;
-            jframe["h"] = frame.h;
+            json::json jframe = serialize(frame);
             anim["frames"].push_back(jframe);
         }
-
         j.push_back(anim);
     }
     return j;
@@ -155,7 +176,7 @@ template <> inline void deserialize(animationComponent &dst, const json::json &j
                                                                    {frame["x"], frame["y"], frame["w"], frame["h"]});
                 if (!rez)
                 {
-                    yorcvs::log("Something went wriong loading an animation frame");
+                    yorcvs::log("Something went wrong loading an animation frame");
                 }
             }
         }
@@ -226,30 +247,7 @@ template <> inline void deserialize(defensiveStatsComponent &dst, const json::js
         dst.spirit = json["spirit"];
     }
 }
- //WORK IN PROGRESS 
-template<typename JSON_TYPE, typename T, typename Member_ptr>
-void exp_serialize_member(JSON_TYPE& json_obj,const T& comp, std::tuple<const char*, Member_ptr T::*> member)
-{
-    json_obj[std::get<0>(member)] = comp.*std::get<1>(member);
-}
-template<typename T, typename ...Args> 
-json::json exp_serialize(const T& comp, Args ...args)
-{
-    json::json j;
-    (exp_serialize_member(j, comp, args),...);
-    return j;
-}
-template<typename JSON_TYPE , typename T,typename Member_ptr>
-void exp_deserialize_member(T& dst, const JSON_TYPE& json, std::tuple<const char*, Member_ptr T::*> member)
-{
-    dst.*std::get<1>(member) = json[std::get<0>(member)];
-}
 
-template <typename T , typename ...Args>
-void exp_deserialize(T& dst,const json::json& j, Args ...args )
-{
-    (exp_deserialize_member(dst, j, args),...);
-}
 
 
 } // namespace yorcvs::components
