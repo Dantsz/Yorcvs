@@ -226,4 +226,30 @@ template <> inline void deserialize(defensiveStatsComponent &dst, const json::js
         dst.spirit = json["spirit"];
     }
 }
+ //WORK IN PROGRESS 
+template<typename JSON_TYPE, typename T, typename Member_ptr>
+void exp_serialize_member(JSON_TYPE& json_obj,const T& comp, std::tuple<const char*, Member_ptr T::*> member)
+{
+    json_obj[std::get<0>(member)] = comp.*std::get<1>(member);
+}
+template<typename T, typename ...Args> 
+json::json exp_serialize(const T& comp, Args ...args)
+{
+    json::json j;
+    (exp_serialize_member(j, comp, args),...);
+    return j;
+}
+template<typename JSON_TYPE , typename T,typename Member_ptr>
+void exp_deserialize_member(T& dst, const JSON_TYPE& json, std::tuple<const char*, Member_ptr T::*> member)
+{
+    dst.*std::get<1>(member) = json[std::get<0>(member)];
+}
+
+template <typename T , typename ...Args>
+void exp_deserialize(T& dst,const json::json& j, Args ...args )
+{
+    (exp_deserialize_member(dst, j, args),...);
+}
+
+
 } // namespace yorcvs::components
