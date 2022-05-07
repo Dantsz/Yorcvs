@@ -1,6 +1,6 @@
 #pragma once
 #include "../common/ecs.h"
-#include "../engine/windowSDL2.h"
+#include "../engine/window/windowsdl2.h"
 #include "components.h"
 #include "sol/sol.hpp"
 #include <array>
@@ -464,7 +464,7 @@ class PlayerMovementControl
   public:
     static constexpr float sprint_multiplier = 1.5f;
 
-    PlayerMovementControl(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *parent_window)
+    PlayerMovementControl(yorcvs::ECS *parent, yorcvs::sdl2_window *parent_window)
         : world(parent), window(parent_window)
     {
         world->register_system<PlayerMovementControl>(*this);
@@ -476,11 +476,11 @@ class PlayerMovementControl
     {
         if (controls_enable)
         {
-            w_pressed = window->is_key_pressed(yorcvs::YORCVS_KEY_W);
-            a_pressed = window->is_key_pressed(yorcvs::YORCVS_KEY_A);
-            s_pressed = window->is_key_pressed(yorcvs::YORCVS_KEY_S);
-            d_pressed = window->is_key_pressed(yorcvs::YORCVS_KEY_D);
-            q_pressed = window->is_key_pressed(yorcvs::YORCVS_KEY_Q);
+            w_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_W);
+            a_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_A);
+            s_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_S);
+            d_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_D);
+            q_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_Q);
 
             cur_time += dt;
             for (const auto &ID : entityList->entitiesID)
@@ -545,7 +545,7 @@ class PlayerMovementControl
 
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS *world;
-    yorcvs::Window<yorcvs::graphics> *window;
+    yorcvs::sdl2_window* window;
     yorcvs::Vec2<float> dir;
 
     bool controls_enable = true;
@@ -563,7 +563,7 @@ class PlayerMovementControl
 class SpriteSystem
 {
   public:
-    SpriteSystem(yorcvs::ECS *parent, yorcvs::Window<yorcvs::graphics> *parentWindow)
+    SpriteSystem(yorcvs::ECS *parent, yorcvs::sdl2_window* parentWindow)
         : world(parent), window(parentWindow)
     {
         world->register_system<SpriteSystem>(*this);
@@ -572,7 +572,7 @@ class SpriteSystem
     void renderSprites(const yorcvs::Vec2<float> &render_dimensions) const
     {
         yorcvs::Vec2<float> rs = window->get_render_scale();
-        window->set_render_scale(window->get_size() / render_dimensions);
+        window->set_render_scale(window->get_window_size() / render_dimensions);
         std::sort(entityList->entitiesID.begin(), entityList->entitiesID.end(), [&](size_t ID1, size_t ID2) {
             return (world->get_component<spriteComponent>(ID1).offset.y +
                     world->get_component<positionComponent>(ID1).position.y) <
@@ -581,7 +581,7 @@ class SpriteSystem
         });
         for (const auto &ID : entityList->entitiesID)
         {
-            window->draw_sprite(world->get_component<spriteComponent>(ID).texture_path,
+            window->draw_texture(world->get_component<spriteComponent>(ID).texture_path,
                                 world->get_component<spriteComponent>(ID).offset +
                                     world->get_component<positionComponent>(ID).position,
                                 world->get_component<spriteComponent>(ID).size,
@@ -596,7 +596,7 @@ class SpriteSystem
 
     yorcvs::ECS *world;
 
-    yorcvs::Window<yorcvs::graphics> *window;
+    yorcvs::sdl2_window* window;
 };
 
 /**

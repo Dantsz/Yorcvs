@@ -21,7 +21,7 @@
 #include "game/systems.h"
 
 
-#include "engine/windowSDL2.h"
+#include "engine/window/windowsdl2.h"
 #include <cstdlib>
 #include <exception>
 #include <future>
@@ -47,7 +47,7 @@ class DebugInfo
   public:
     DebugInfo() = default;
 
-    DebugInfo(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::Map *map, PlayerMovementControl *pms,
+    DebugInfo(yorcvs::sdl2_window *parentW, yorcvs::Map *map, PlayerMovementControl *pms,
               CollisionSystem *cols, HealthSystem *healthS,sol::state* lua)
         : parentWindow(parentW), appECS(map->ecs), map(map), lua_state(lua), playerMoveSystem(pms),colSystem(cols)
     {
@@ -65,7 +65,7 @@ class DebugInfo
         // {
         //     reset();
         // }
-         if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_C))
+         if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_C))
          {
             std::cout << "Saving player... \n";
             std::ofstream out("assets/testPlayer.json");
@@ -90,12 +90,11 @@ class DebugInfo
         }
     }
 
-    template <typename render_backend>
-    void render_hitboxes(yorcvs::Window<render_backend> &window, const yorcvs::Vec2<float> &render_dimensions,
+    void render_hitboxes(yorcvs::sdl2_window &window, const yorcvs::Vec2<float> &render_dimensions,
                          const size_t r, const size_t g, const size_t b, const size_t a)
     {
         yorcvs::Vec2<float> old_rs = window.get_render_scale();
-        window.set_render_scale(window.get_size() / render_dimensions);
+        window.set_render_scale(window.get_window_size() / render_dimensions);
 
         yorcvs::Rect<float> rect{};
         for (const auto &ID : colSystem->entityList->entitiesID)
@@ -172,26 +171,26 @@ class DebugInfo
         time_accumulator += elapsed;
         if (time_accumulator >= ui_controls_update_time)
         {
-            if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_LCTRL))
+            if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_LCTRL))
             {
-                if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_E))
+                if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_E))
                 {
                     showDebugWindow = !showDebugWindow;
                     time_accumulator = 0;
                 }
-                if (parentWindow->is_key_pressed(YORCVS_KEY_TILDE))
+                if (parentWindow->is_key_pressed(Events::Key::YORCVS_KEY_TILDE))
                 {
                     playerMoveSystem->controls_enable = !playerMoveSystem->controls_enable;
                     showConsole = !showConsole;
                     time_accumulator = 0;
                 }
-                if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_I))
+                if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_I))
                 {
                     render_dimensions -= render_dimensions * zoom_power;
                     time_accumulator = 0;
                 }
 
-                if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_K))
+                if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_K))
                 {
                     render_dimensions += render_dimensions * zoom_power;
                     time_accumulator = 0;
@@ -359,7 +358,7 @@ class DebugInfo
         }
     }
 
-    void attach(yorcvs::Window<yorcvs::graphics> *parentW, yorcvs::Map *map, PlayerMovementControl *pms,
+    void attach(yorcvs::sdl2_window *parentW, yorcvs::Map *map, PlayerMovementControl *pms,
                 CollisionSystem *cols, HealthSystem *healthS,sol::state* lua)
     {
         lua_state = lua;
@@ -434,7 +433,7 @@ class DebugInfo
         return 1;
     }    
     std::vector<size_t> callbacks;
-    yorcvs::Window<yorcvs::graphics> *parentWindow{};
+    yorcvs::sdl2_window*parentWindow{};
     yorcvs::ECS *appECS{};
     yorcvs::Map *map{};
     sol::state *lua_state{};
@@ -522,7 +521,7 @@ class Application
             const auto &tiles = p_map.tiles_chunks.at(chunk);
             for (const auto &tile : tiles)
             {
-                r.draw_sprite(tile.texture_path, {tile.coords.x, tile.coords.y, p_map.tilesSize.x, p_map.tilesSize.y},
+                r.draw_texture(tile.texture_path, {tile.coords.x, tile.coords.y, p_map.tilesSize.x, p_map.tilesSize.y},
                               tile.srcRect);
             }
         }
@@ -530,7 +529,7 @@ class Application
     void render_map_tiles(yorcvs::Map &p_map)
     {
         yorcvs::Vec2<float> render_scale = r.get_render_scale();
-        r.set_render_scale(r.get_size() / render_dimensions);
+        r.set_render_scale(r.get_window_size() / render_dimensions);
         // get player position
         const size_t entity_ID = pcS.entityList->entitiesID[0];
         const yorcvs::Vec2<float> player_position = world.get_component<positionComponent>(entity_ID).position;
@@ -582,19 +581,19 @@ class Application
 
     [[nodiscard]] bool is_active() const
     {
-        return r.is_active();
+        return true;
     }
 
     ~Application()
     {
-        r.cleanup();
+        
     }
   private:
     static constexpr yorcvs::Vec2<float> default_render_dimensions = {240.0f, 120.0f};
     static constexpr float msPF = 41.6f;
     static constexpr intmax_t default_render_distance = 1;
 
-    yorcvs::Window<yorcvs::graphics> r;
+    yorcvs::sdl2_window r;
     yorcvs::Timer counter;
 
     float lag = 0.0f;

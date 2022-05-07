@@ -27,10 +27,14 @@ set(YorcvsALLFILES  "src/Yorcvs.cpp"
                     "src/common/utilities.h"
                     "src/common/ecs.h"
 
-                    "src/engine/window.h"
-                    "src/engine/windowSDL2.h"
+
                     "src/engine/luaEngine.h"
                     "src/engine/map.h"
+
+                    "src/engine/window/window.h"
+                    "src/engine/window/eventhandler.h"
+                    "src/engine/window/windowsdl2"
+                    "src/engine/window/eventhandlersdl2.h"
                     )
 
 
