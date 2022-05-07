@@ -102,7 +102,8 @@ template<> class Event<yorcvs::SDL2>
     enum Type
     {
         KEYBOARD_PRESSED = SDL_KEYDOWN,
-        TEXT_INPUT = SDL_TEXTINPUT
+        TEXT_INPUT = SDL_TEXTINPUT,
+        UNKOWN
     };
 
     SDL_Event event;
