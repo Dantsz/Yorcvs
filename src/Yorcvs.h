@@ -503,7 +503,12 @@ class Application
             local pl = test_map:load_entity_from_path(world:create_entity(),"assets/player.json")
             world:add_playerMovementControl(pl)
             )");
-
+        r.add_callback([&app_active = active](const yorcvs::event&e){
+             if(e.get_type() == yorcvs::Events::Type::WINDOW_QUIT)
+            {
+             app_active = false;       
+            }
+        });
        
         dbInfo.attach(&r, &map, &pcS, &map.collisionS, &map.healthS, &lua_state);
         counter.start();
@@ -581,7 +586,7 @@ class Application
 
     [[nodiscard]] bool is_active() const
     {
-        return true;
+        return active;
     }
 
     ~Application()
@@ -607,5 +612,7 @@ class Application
     BehaviourSystem bhvS{map.ecs,&lua_state};
 
     DebugInfo dbInfo;
+
+    bool active = true;
 };
 } // namespace yorcvs

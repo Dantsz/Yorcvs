@@ -135,6 +135,7 @@ namespace yorcvs
                     isMinimized = false;
                 }
                 });
+
         }
         ~sdl2_window() override
         {
