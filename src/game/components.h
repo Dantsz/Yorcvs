@@ -2,7 +2,7 @@
 #include "../common/types.h"
 #include <unordered_map>
 #include <vector>
-
+#include <string>
 /**
  * @brief Defines some identification information for entity
  *

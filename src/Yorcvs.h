@@ -20,7 +20,6 @@
 #include "game/components.h"
 #include "game/systems.h"
 
-
 #include "engine/window/windowsdl2.h"
 #include <cstdlib>
 #include <exception>
@@ -28,7 +27,6 @@
 
 #include <string>
 #include <vector>
-
 
 #include <cmath>
 #include <filesystem>
@@ -47,11 +45,11 @@ class DebugInfo
   public:
     DebugInfo() = default;
 
-    DebugInfo(yorcvs::sdl2_window *parentW, yorcvs::Map *map, PlayerMovementControl *pms,
-              CollisionSystem *cols, HealthSystem *healthS,sol::state* lua)
-        : parentWindow(parentW), appECS(map->ecs), map(map), lua_state(lua), playerMoveSystem(pms),colSystem(cols)
+    DebugInfo(yorcvs::sdl2_window *parentW, yorcvs::Map *map, PlayerMovementControl *pms, CollisionSystem *cols,
+              HealthSystem *healthS, sol::state *lua)
+        : parentWindow(parentW), appECS(map->ecs), map(map), lua_state(lua), playerMoveSystem(pms), colSystem(cols)
     {
-        attach(parentW, map, pms, cols, healthS,lua);
+        attach(parentW, map, pms, cols, healthS, lua);
     }
     ~DebugInfo() = default;
     DebugInfo(const DebugInfo &other) = delete;
@@ -61,23 +59,23 @@ class DebugInfo
 
     void update(const float ft)
     {
-        // if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_R))  
+        // if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_R))
         // {
         //     reset();
         // }
-         if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_C))
-         {
+        if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_C))
+        {
             std::cout << "Saving player... \n";
             std::ofstream out("assets/testPlayer.json");
             out << map->save_character(playerMoveSystem->entityList->entitiesID[0]);
-             std::cout << "Done.\n";
-         }
+            std::cout << "Done.\n";
+        }
         frame_time = ft;
         avg_frame_time *= frame_time_samples;
         frame_time_samples += 1.0f;
         avg_frame_time += ft;
         avg_frame_time /= frame_time_samples;
-        if(!playerMoveSystem->entityList->entitiesID.empty())
+        if (!playerMoveSystem->entityList->entitiesID.empty())
         {
             (*lua_state)["playerID"] = playerMoveSystem->entityList->entitiesID[0];
         }
@@ -90,8 +88,8 @@ class DebugInfo
         }
     }
 
-    void render_hitboxes(yorcvs::sdl2_window &window, const yorcvs::Vec2<float> &render_dimensions,
-                         const size_t r, const size_t g, const size_t b, const size_t a)
+    void render_hitboxes(yorcvs::sdl2_window &window, const yorcvs::Vec2<float> &render_dimensions, const size_t r,
+                         const size_t g, const size_t b, const size_t a)
     {
         yorcvs::Vec2<float> old_rs = window.get_render_scale();
         window.set_render_scale(window.get_window_size() / render_dimensions);
@@ -131,9 +129,9 @@ class DebugInfo
                 }
                 window.draw_rect(healthBarRect, health_bar_empty_color[0], health_bar_empty_color[1],
                                  health_bar_empty_color[2], health_bar_empty_color[3]);
-                healthBarRect.w =
-                    (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).max_HP) *
-                    32.0f;
+                healthBarRect.w = (appECS->get_component<healthComponent>(ID).HP /
+                                   appECS->get_component<healthComponent>(ID).max_HP) *
+                                  32.0f;
                 window.draw_rect(healthBarRect, health_bar_full_color[0], health_bar_full_color[1],
                                  health_bar_full_color[2], health_bar_full_color[3]);
             }
@@ -199,25 +197,27 @@ class DebugInfo
         }
         update(elapsed);
         if (showDebugWindow)
-        {     
+        {
             render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
                             hitbox_color[3]);
             ImGui::Begin("DebugWindow");
-            ImGui::Text("frameTime: %f",frame_time);
-            ImGui::Text("maxFramTime: %f",maxFrameTime);
-            ImGui::Text("avgFrameTime: %f",avg_frame_time);
-            ImGui::Text("ecsEntities: %zu",appECS->get_active_entities_number());
+            ImGui::Text("frameTime: %f", frame_time);
+            ImGui::Text("maxFramTime: %f", maxFrameTime);
+            ImGui::Text("avgFrameTime: %f", avg_frame_time);
+            ImGui::Text("ecsEntities: %zu", appECS->get_active_entities_number());
             if (!playerMoveSystem->entityList->entitiesID.empty())
             {
                 const size_t ID = playerMoveSystem->entityList->entitiesID[0];
                 healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
                 if (appECS->has_components<positionComponent>(ID))
                 {
-                 ImGui::Text("playerPosition: (%f,%f)",appECS->get_component<positionComponent>(ID).position.x,appECS->get_component<positionComponent>(ID).position.y);
+                    ImGui::Text("playerPosition: (%f,%f)", appECS->get_component<positionComponent>(ID).position.x,
+                                appECS->get_component<positionComponent>(ID).position.y);
                 }
                 if (appECS->has_components<velocityComponent>(ID))
                 {
-                    ImGui::Text("playerVelocity: (%f,%f)", appECS->get_component<velocityComponent>(ID).vel.x, appECS->get_component<velocityComponent>(ID).vel.y);
+                    ImGui::Text("playerVelocity: (%f,%f)", appECS->get_component<velocityComponent>(ID).vel.x,
+                                appECS->get_component<velocityComponent>(ID).vel.y);
                 }
             }
             ImGui::End();
@@ -226,40 +226,41 @@ class DebugInfo
             {
                 const size_t ID = playerMoveSystem->entityList->entitiesID[0];
                 std::string playerName = "Player : ";
-                if(appECS->has_components<identificationComponent>(ID))
+                if (appECS->has_components<identificationComponent>(ID))
                 {
-                    playerName += appECS->get_component<identificationComponent>(ID).name + " (" + std::to_string(ID) + ")";
+                    playerName +=
+                        appECS->get_component<identificationComponent>(ID).name + " (" + std::to_string(ID) + ")";
                 }
                 ImGui::Begin(playerName.c_str());
                 if (appECS->has_components<healthComponent>(ID))
                 {
                     healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
-                    ImGui::Text("playerHealth: (%f/%f)",playerHealthC.HP,playerHealthC.max_HP);
+                    ImGui::Text("playerHealth: (%f/%f)", playerHealthC.HP, playerHealthC.max_HP);
                 }
-                if(appECS->has_components<staminaComponent>(ID))
+                if (appECS->has_components<staminaComponent>(ID))
                 {
                     staminaComponent &playerStaminaC = appECS->get_component<staminaComponent>(ID);
-                    ImGui::Text("stamina: (%f/%f)",playerStaminaC.stamina,playerStaminaC.max_stamina);
+                    ImGui::Text("stamina: (%f/%f)", playerStaminaC.stamina, playerStaminaC.max_stamina);
                 }
-                
-                if(appECS->has_components<offensiveStatsComponent>(ID))
+
+                if (appECS->has_components<offensiveStatsComponent>(ID))
                 {
                     offensiveStatsComponent &offStatsC = appECS->get_component<offensiveStatsComponent>(ID);
-                    ImGui::Text("Strength : (%f)",offStatsC.strength);
-                    ImGui::Text("Agility : (%f)",offStatsC.agility);
-                    ImGui::Text("Dexterity : (%f)",offStatsC.dexterity);
-                    ImGui::Text("Piercing : (%f)",offStatsC.piercing);
-                    ImGui::Text("Intellect : (%f)",offStatsC.intellect);
+                    ImGui::Text("Strength : (%f)", offStatsC.strength);
+                    ImGui::Text("Agility : (%f)", offStatsC.agility);
+                    ImGui::Text("Dexterity : (%f)", offStatsC.dexterity);
+                    ImGui::Text("Piercing : (%f)", offStatsC.piercing);
+                    ImGui::Text("Intellect : (%f)", offStatsC.intellect);
                 }
-                if(appECS->has_components<defensiveStatsComponent>(ID))
+                if (appECS->has_components<defensiveStatsComponent>(ID))
                 {
                     defensiveStatsComponent &defstats = appECS->get_component<defensiveStatsComponent>(ID);
-                    ImGui::Text("Defense : (%f)",defstats.defense);
-                    ImGui::Text("Block : (%f)",defstats.block);
-                    ImGui::Text("Dodge : (%f)" , defstats.dodge);
-                    ImGui::Text("Spirit : (%f)" , defstats.spirit);
+                    ImGui::Text("Defense : (%f)", defstats.defense);
+                    ImGui::Text("Block : (%f)", defstats.block);
+                    ImGui::Text("Dodge : (%f)", defstats.dodge);
+                    ImGui::Text("Spirit : (%f)", defstats.spirit);
                 }
-               
+
                 ImGui::End();
             }
         }
@@ -267,25 +268,31 @@ class DebugInfo
         {
             ImGui::ShowDemoWindow();
             ImGui::Begin("Console");
-            ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue |  ImGuiInputTextFlags_CallbackHistory;
+            ImGuiInputTextFlags input_text_flags =
+                ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackHistory;
 
             const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
-            ImGui::BeginChild("ScrollingRegion", ImVec2(0, -3*footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar);
-            for(const auto& item : console_logs)
+            ImGui::BeginChild("ScrollingRegion", ImVec2(0, -3 * footer_height_to_reserve), false,
+                              ImGuiWindowFlags_HorizontalScrollbar);
+            for (const auto &item : console_logs)
             {
-                ImGui::TextUnformatted( item.c_str());
+                ImGui::TextUnformatted(item.c_str());
             }
             ImGui::EndChild();
             ImGui::Separator();
             bool reclaim_focus = false;
-            if(ImGui::InputText("##",&console_text,input_text_flags,&DebugInfo::TextEditCallbackStub, (void*)this) && !console_text.empty())
-            {  
+            if (ImGui::InputText("##", &console_text, input_text_flags, &DebugInfo::TextEditCallbackStub,
+                                 (void *)this) &&
+                !console_text.empty())
+            {
                 console_logs.push_back(console_text);
                 HistoryPos = -1;
                 console_previous_commands.push_back(console_text);
-                auto rez = lua_state->safe_script(console_text,[](lua_State*, sol::protected_function_result pfr) {return pfr;});
-                if(!rez.valid())
-                {   sol::error err = rez;
+                auto rez = lua_state->safe_script(console_text,
+                                                  [](lua_State *, sol::protected_function_result pfr) { return pfr; });
+                if (!rez.valid())
+                {
+                    sol::error err = rez;
                     std::string text = err.what();
                     console_logs.emplace_back(std::move(text));
                 }
@@ -294,35 +301,40 @@ class DebugInfo
             }
             ImGui::SetItemDefaultFocus();
             if (reclaim_focus)
-                ImGui::SetKeyboardFocusHere(-1);
-            if (ImGui::SmallButton("Clear"))           
             {
-                 clear_logs(); 
+                ImGui::SetKeyboardFocusHere(-1);
+            }
+            if (ImGui::SmallButton("Clear"))
+            {
+                clear_logs();
             }
             ImGui::End();
             ImGui::Begin("Debug");
-            if(ImGui::CollapsingHeader("Entities"))
+            if (ImGui::CollapsingHeader("Entities"))
             {
-                const ImGuiTableFlags flags1 = ImGuiTableFlags_BordersV | ImGuiTableFlags_SortMulti | ImGuiTableFlags_Resizable;
-                if(ImGui::BeginTable("table1", 4,flags1))
+                const ImGuiTableFlags flags1 =
+                    ImGuiTableFlags_BordersV | ImGuiTableFlags_SortMulti | ImGuiTableFlags_Resizable;
+                if (ImGui::BeginTable("table1", 4, flags1))
                 {
                     ImGui::TableSetupColumn("ID");
                     ImGui::TableSetupColumn("Name");
                     ImGui::TableSetupColumn("Signature");
                     ImGui::TableSetupColumn("Position");
                     ImGui::TableHeadersRow();
-                    for(size_t i = 0 ; i < appECS->get_entity_list_size(); i++)
+                    for (size_t i = 0; i < appECS->get_entity_list_size(); i++)
                     {
-                        if(appECS->is_valid_entity(i))
-                        {   ImGui::TableNextRow();
+                        if (appECS->is_valid_entity(i))
+                        {
+                            ImGui::TableNextRow();
                             ImGui::TableSetColumnIndex(0);
-                            ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_None;
-                            ImGui::Selectable("",false,selectable_flags);
+                            ImGuiSelectableFlags selectable_flags =
+                                ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_None;
+                            ImGui::Selectable("", false, selectable_flags);
                             ImGui::SameLine();
-                            ImGui::Text("%zu",i);
+                            ImGui::Text("%zu", i);
 
                             ImGui::TableSetColumnIndex(1);
-                            if(appECS->has_components<identificationComponent>(i))
+                            if (appECS->has_components<identificationComponent>(i))
                             {
                                 ImGui::Text("%s", appECS->get_component<identificationComponent>(i).name.c_str());
                             }
@@ -334,16 +346,16 @@ class DebugInfo
                             ImGui::TableSetColumnIndex(2);
                             std::string signature{};
                             signature.resize(appECS->get_entity_signature(i).size());
-                            for(size_t j = 0 ;  j < appECS->get_entity_signature(i).size(); j++)
+                            for (size_t j = 0; j < appECS->get_entity_signature(i).size(); j++)
                             {
                                 signature[j] = appECS->get_entity_signature(i)[j] ? '1' : '0';
                             }
-                            ImGui::Text( "%s", signature.c_str());
+                            ImGui::Text("%s", signature.c_str());
                             ImGui::TableSetColumnIndex(3);
-                            if(appECS->has_components<positionComponent>(i))
+                            if (appECS->has_components<positionComponent>(i))
                             {
-                                const auto& position = appECS->get_component<positionComponent>(i).position;
-                                ImGui::Text("%f/%f",position.x,position.y);
+                                const auto &position = appECS->get_component<positionComponent>(i).position;
+                                ImGui::Text("%f/%f", position.x, position.y);
                             }
                             else
                             {
@@ -352,14 +364,14 @@ class DebugInfo
                         }
                     }
                     ImGui::EndTable();
-                } 
+                }
             }
             ImGui::End();
         }
     }
 
-    void attach(yorcvs::sdl2_window *parentW, yorcvs::Map *map, PlayerMovementControl *pms,
-                CollisionSystem *cols, HealthSystem *healthS,sol::state* lua)
+    void attach(yorcvs::sdl2_window *parentW, yorcvs::Map *map, PlayerMovementControl *pms, CollisionSystem *cols,
+                HealthSystem *healthS, sol::state *lua)
     {
         lua_state = lua;
         attach_lua();
@@ -372,7 +384,7 @@ class DebugInfo
     }
     void attach_lua()
     {
-        lua_state->set_function("internal_log",&DebugInfo::add_log,this);
+        lua_state->set_function("internal_log", &DebugInfo::add_log, this);
         lua_state->script("function log(message) internal_log(tostring(message)) end");
         (*lua_state)["print"] = (*lua_state)["log"];
     }
@@ -382,7 +394,7 @@ class DebugInfo
         maxFrameTime = 0.0f;
     }
 
-    void add_log(const std::string& message)
+    void add_log(const std::string &message)
     {
         console_logs.push_back(message);
     }
@@ -392,57 +404,64 @@ class DebugInfo
         console_previous_commands.clear();
         HistoryPos = -1;
     }
-    static int TextEditCallbackStub(ImGuiInputTextCallbackData* data)
+    static int TextEditCallbackStub(ImGuiInputTextCallbackData *data)
     {
-        DebugInfo* console = static_cast<DebugInfo*>(data->UserData);
+        DebugInfo *console = static_cast<DebugInfo *>(data->UserData);
         return console->TextEditCallback(data);
     }
 
-    int  TextEditCallback(ImGuiInputTextCallbackData* data)
+    int TextEditCallback(ImGuiInputTextCallbackData *data)
     {
-        //AddLog("cursor: %d, selection: %d-%d", data->CursorPos, data->SelectionStart, data->SelectionEnd);
+        // AddLog("cursor: %d, selection: %d-%d", data->CursorPos, data->SelectionStart, data->SelectionEnd);
         switch (data->EventFlag)
         {
-        case ImGuiInputTextFlags_CallbackHistory:
+        case ImGuiInputTextFlags_CallbackHistory: {
+            // Example of HISTORY
+            const int prev_history_pos = HistoryPos;
+            if (data->EventKey == ImGuiKey_UpArrow)
             {
-                // Example of HISTORY
-                const int prev_history_pos = HistoryPos;
-                if (data->EventKey == ImGuiKey_UpArrow)
+                if (HistoryPos == -1)
                 {
-                    if (HistoryPos == -1)
-                        HistoryPos = console_previous_commands.size() - 1;
-                    else if (HistoryPos > 0)
-                        HistoryPos--;
+                    HistoryPos = static_cast<int>(console_previous_commands.size()) - 1;
                 }
-                else if (data->EventKey == ImGuiKey_DownArrow)
+                else if (HistoryPos > 0)
                 {
-                    if (HistoryPos != -1)
-                        if (++HistoryPos >= console_previous_commands.size())
-                            HistoryPos = -1;
-                }
-
-                // A better implementation would preserve the data on the current input line along with cursor position.
-                if (prev_history_pos != HistoryPos)
-                {
-                    const char* history_str = (HistoryPos >= 0) ? console_previous_commands[HistoryPos].c_str() : "";
-                    data->DeleteChars(0, data->BufTextLen);
-                    data->InsertChars(0, history_str);
+                    HistoryPos--;
                 }
             }
+            else if (data->EventKey == ImGuiKey_DownArrow)
+            {
+                if (HistoryPos != -1)
+                {
+                    if (++HistoryPos >= console_previous_commands.size())
+                    {
+                        HistoryPos = -1;
+                    }
+                }
+            }
+
+            // A better implementation would preserve the data on the current input line along with cursor position.
+            if (prev_history_pos != HistoryPos)
+            {
+                const char *history_str = (HistoryPos >= 0) ? console_previous_commands[HistoryPos].c_str() : "";
+                data->DeleteChars(0, data->BufTextLen);
+                data->InsertChars(0, history_str);
+            }
+        }
         }
         return 1;
-    }    
+    }
     std::vector<size_t> callbacks;
-    yorcvs::sdl2_window*parentWindow{};
+    yorcvs::sdl2_window *parentWindow{};
     yorcvs::ECS *appECS{};
     yorcvs::Map *map{};
     sol::state *lua_state{};
-    //debug window
+    // debug window
     float frame_time = 0.0f;
     float maxFrameTime = 0.0f;
     float frame_time_samples = 0.0f;
     float avg_frame_time = 0.0f;
-    //console
+    // console
     std::string console_text;
     std::vector<std::string> console_logs;
     std::vector<std::string> console_previous_commands;
@@ -456,13 +475,12 @@ class DebugInfo
     bool showConsole = false;
     float time_accumulator = 0;
     int HistoryPos = 0;
-    
+
     static constexpr yorcvs::Vec2<float> health_full_bar_dimension = {32.0f, 4.0f};
     const std::vector<uint8_t> health_bar_full_color = {255, 0, 0, 255};
     const std::vector<uint8_t> health_bar_empty_color = {100, 0, 0, 255};
 
     const std::vector<uint8_t> hitbox_color = {255, 0, 0, 100};
-
 
     static constexpr size_t textR = 255;
     static constexpr size_t textG = 255;
@@ -489,27 +507,28 @@ class Application
   public:
     Application()
     {
-        lua_state.open_libraries(sol::lib::base, sol::lib::package,sol::lib::math);
+        lua_state.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
         yorcvs::lua::bind_runtime(lua_state, &world);
-        
+
         yorcvs::lua::register_system_to_lua(lua_state, "Health_system", map.healthS);
         yorcvs::lua::register_system_to_lua(lua_state, "Collision_system", map.collisionS);
         yorcvs::lua::register_system_to_lua(lua_state, "Animation_system", map.animS);
-        yorcvs::lua::register_system_to_lua(lua_state, "Combat_system",map.combat_system, "attack", &CombatSystem::attack);
+        yorcvs::lua::register_system_to_lua(lua_state, "Combat_system", map.combat_system, "attack",
+                                            &CombatSystem::attack);
         lua_state["test_map"] = &map;
-        //loading two maps one on top of each other
+        // loading two maps one on top of each other
         lua_state.safe_script(R"(
             test_map:load_content("assets/map.tmx")
             local pl = test_map:load_entity_from_path(world:create_entity(),"assets/player.json")
             world:add_playerMovementControl(pl)
             )");
-        r.add_callback([&app_active = active](const yorcvs::event&e){
-             if(e.get_type() == yorcvs::Events::Type::WINDOW_QUIT)
+        r.add_callback([&app_active = active](const yorcvs::event &e) {
+            if (e.get_type() == yorcvs::Events::Type::WINDOW_QUIT)
             {
-             app_active = false;       
+                app_active = false;
             }
         });
-       
+
         dbInfo.attach(&r, &map, &pcS, &map.collisionS, &map.healthS, &lua_state);
         counter.start();
     }
@@ -517,7 +536,6 @@ class Application
     Application(Application &&other) = delete;
     Application &operator=(const Application &other) = delete;
     Application &operator=(Application &&other) = delete;
-
 
     void render_map_chunk(yorcvs::Map &p_map, const std::tuple<intmax_t, intmax_t> &chunk)
     {
@@ -527,7 +545,7 @@ class Application
             for (const auto &tile : tiles)
             {
                 r.draw_texture(tile.texture_path, {tile.coords.x, tile.coords.y, p_map.tilesSize.x, p_map.tilesSize.y},
-                              tile.srcRect);
+                               tile.srcRect);
             }
         }
     }
@@ -577,8 +595,7 @@ class Application
         render_map_tiles(map);
         sprS.renderSprites(render_dimensions);
         dbInfo.render(elapsed, render_dimensions);
-              
-       
+
         ImGui::Render();
         ImGuiSDL::Render(ImGui::GetDrawData());
         r.present();
@@ -589,10 +606,8 @@ class Application
         return active;
     }
 
-    ~Application()
-    {
-        
-    }
+    ~Application() = default;
+
   private:
     static constexpr yorcvs::Vec2<float> default_render_dimensions = {240.0f, 120.0f};
     static constexpr float msPF = 41.6f;
@@ -609,7 +624,7 @@ class Application
     yorcvs::Map map{&world};
     SpriteSystem sprS{map.ecs, &r};
     PlayerMovementControl pcS{map.ecs, &r};
-    BehaviourSystem bhvS{map.ecs,&lua_state};
+    BehaviourSystem bhvS{map.ecs, &lua_state};
 
     DebugInfo dbInfo;
 

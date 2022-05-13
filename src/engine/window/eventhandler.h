@@ -35,6 +35,12 @@ enum Type
 class event
 {
     public:
+        event() = default;
+        event(const event&) = default;
+        event(event&&) = default;
+        virtual ~event() = default;
+        event& operator=(const event&) = default;
+        event& operator=(event&&) = default;
         [[nodiscard]] virtual yorcvs::Events::Type get_type() const  = 0;
         [[nodiscard]] virtual yorcvs::Events::Key get_key() const = 0;
     private:
