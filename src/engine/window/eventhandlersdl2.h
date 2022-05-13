@@ -76,7 +76,6 @@ namespace yorcvs
                 {yorcvs::Events::Key::YORCVS_KEY_TILDE,SDL_SCANCODE_GRAVE}
             }),impl_to_key(yorcvs::build_reverse_unordered_map(key_to_impl))
         {
-            
         }
         void handle_events()
         {
@@ -111,6 +110,5 @@ namespace yorcvs
         std::unordered_map<yorcvs::Events::Key,SDL_Scancode> key_to_impl{};
         std::unordered_map<SDL_Scancode,yorcvs::Events::Key> impl_to_key{};
         unsigned char const *keys{};
-        
     };
 }

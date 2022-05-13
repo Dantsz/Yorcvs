@@ -76,7 +76,6 @@ namespace yorcvs
             {
                 yorcvs::log("Error creating SDL2 window", yorcvs::MSGSEVERITY::ERROR);
             }
-
             renderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
 
             if (renderer == nullptr)
@@ -135,7 +134,6 @@ namespace yorcvs
                     isMinimized = false;
                 }
                 });
-
         }
         ~sdl2_window() override
         {
