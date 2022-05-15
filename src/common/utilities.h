@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <tuple>
+#include <unordered_map>
 namespace yorcvs
 {
 namespace MSGSEVERITY
@@ -194,4 +195,17 @@ inline size_t unwrap(const intmax_t x, const intmax_t y)
     return 0;
 }
 } // namespace spiral
+/*
+* @brief reverses the key with the value in a unordered_map
+*/
+template<typename K, typename V>
+std::unordered_map<V, K> build_reverse_unordered_map(const std::unordered_map<K, V>& map)
+{
+    std::unordered_map<V, K> reversed{};
+    for (const auto& [k, v] : map)
+    {
+        reversed.insert(std::make_pair(v, k));
+    }
+    return reversed;
+}
 } // namespace yorcvs

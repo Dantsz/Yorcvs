@@ -27,10 +27,14 @@ set(YorcvsALLFILES  "src/Yorcvs.cpp"
                     "src/common/utilities.h"
                     "src/common/ecs.h"
 
-                    "src/engine/window.h"
-                    "src/engine/windowSDL2.h"
+
                     "src/engine/luaEngine.h"
                     "src/engine/map.h"
+
+                    "src/engine/window/window.h"
+                    "src/engine/window/eventhandler.h"
+                    "src/engine/window/windowsdl2"
+                    "src/engine/window/eventhandlersdl2.h"
                     )
 
 
@@ -118,7 +122,7 @@ if (NOT lua_POPULATED)
    add_subdirectory(${lua_SOURCE_DIR} ${lua_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 target_link_libraries(${PROJECT_NAME} lua::lib)
-target_include_directories(${PROJECT_NAME} PUBLIC lua::header})
+target_include_directories(${PROJECT_NAME} PUBLIC lua::header)
 #INSTALL SOL2
 FetchContent_Declare(sol2
  GIT_REPOSITORY https://github.com/ThePhD/sol2.git
