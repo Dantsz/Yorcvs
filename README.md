@@ -59,7 +59,7 @@ Cmake (at least version 3.13) is required for all platforms
    ```
 5. To run the build 
    ```
-   emrun /build/Yorcvs.html
+   emrun build/Yorcvs.html
    ```
 
 
