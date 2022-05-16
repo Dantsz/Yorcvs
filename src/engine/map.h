@@ -1,8 +1,9 @@
 #pragma once
 
+#include <filesystem>
 #include <tmxlite/Map.hpp>
 #include "tmxlite/Layer.hpp"
-#include <nlohmann/json.hpp>
+#include "nlohmann/json.hpp"
 #include "tmxlite/Object.hpp"
 #include "tmxlite/ObjectGroup.hpp"
 #include "tmxlite/Property.hpp"
@@ -78,6 +79,7 @@ namespace yorcvs
             if (!map.load(path))
             {
                 yorcvs::log("Map loading failed", yorcvs::MSGSEVERITY::ERROR);
+                return;
             }
             const auto& tilesets = map.getTilesets();
             yorcvs::log("Map contains " + std::to_string(tilesets.size()) + " tile sets: ");
@@ -88,6 +90,7 @@ namespace yorcvs
             if (!map.isInfinite())
             {
                 yorcvs::log("Cannot load finite  maps", yorcvs::MSGSEVERITY::ERROR);
+                return;
             }
             tilesSize = { static_cast<float>(map.getTileSize().x), static_cast<float>(map.getTileSize().y) };
             const auto& layers = map.getLayers();

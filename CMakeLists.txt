@@ -6,15 +6,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 
-option(YORCVS_EMSCRIPTEN_PRELOAD_ASSETS_FOLDER "Wheter to include the assets folder in the emscripten build or not"  OFF)
+option(YORCVS_EMSCRIPTEN_PRELOAD_ASSETS_FOLDER "Whether to include the assets folder in the emscripten build or not"  OFF)
 
 include(FetchContent)
 include(ExternalData)
 
 
-message(STATUS ${CMAKE_SYSTEM_NAME})
-
-
+message(STATUS "BUILDING YORCVS ON "${CMAKE_SYSTEM_NAME})
 set(YorcvsALLFILES  "src/Yorcvs.cpp"
                     "src/Yorcvs.h"
                     
@@ -47,7 +45,7 @@ $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -Wmisleading-indentation -Wdup
 $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wno-c++98-compat-pedantic -Wno-c++98-compat>
 )
 
-#link SDL
+
 if(EMSCRIPTEN)
   set(CMAKE_EXECUTABLE_SUFFIX ".html")
     SET(CMAKE_CXX_FLAGS "-std=c++2a -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=\"[\"\"png\"\"]\"  -s USE_SDL_TTF=2  -s ALLOW_MEMORY_GROWTH=1 -s NO_DISABLE_EXCEPTION_CATCHING -o build/Yorcvs.html" ) #commented because emscriptem requires the assets folder to be in special place and it's not necesary for compilation for CI
@@ -57,6 +55,8 @@ if(EMSCRIPTEN)
   endif()
 else() 
 
+#link SDL
+message(STATUS "LINKING SDL2")
 if(WIN32)
   #set SDL for windows
   find_package(SDL2 CONFIG REQUIRED)
@@ -83,20 +83,20 @@ endif()
   
 endif()
 
+
+
 #INSTALL JSON LIBRARY
-FetchContent_Declare(json
-  GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG v3.7.3)
+message(STATUS "LINKING  JSON LIBRARY")
 
-FetchContent_GetProperties(json)
-if(NOT json_POPULATED)
-  FetchContent_Populate(json)
-  add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
-endif()
-
-target_link_libraries(${PROJECT_NAME}  nlohmann_json::nlohmann_json)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.10.5/json.tar.xz)
+FetchContent_MakeAvailable(json)
+message(STATUS "SOURCE DIR : " ${json_SOURCE_DIR})
+message(STATUS "BUILD DIR : " ${json_BUILD_DIR} )
+target_include_directories(${PROJECT_NAME} PUBLIC  nlohmann_json::nlohmann_json)
+target_link_libraries(${PROJECT_NAME} nlohmann_json::nlohmann_json)
 
 #INSTALL TMX LIBRARY
+message(STATUS "BUILDING TMX LIBRARY")
 FetchContent_Declare(libtmxlite
  GIT_REPOSITORY https://github.com/Dantsz/tmxlite.git
  GIT_TAG "main" 

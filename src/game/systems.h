@@ -3,6 +3,7 @@
 #include "../engine/window/windowsdl2.h"
 #include "components.h"
 #include "sol/sol.hpp"
+#include "sol/types.hpp"
 #include <array>
 #include <cmath>
 #include <cstddef>
@@ -608,7 +609,7 @@ class BehaviourSystem
   public:
     BehaviourSystem(yorcvs::ECS *parent, sol::state *lua) : world(parent), lua_state(lua)
     {
-        world->register_system<BehaviourSystem>(*this);
+        world->register_system<BehaviourSystem>(*this); // registers itself
         world->add_criteria_for_iteration<BehaviourSystem, behaviourComponent, velocityComponent>();
         scripts = std::make_unique<yorcvs::AssetManager<std::string>>(
             [&](const std::string &path) {
@@ -617,8 +618,9 @@ class BehaviourSystem
                 program->assign((std::istreambuf_iterator<char>(in)), (std::istreambuf_iterator<char>()));
                 return program;
             },
-            [&](std::string *str) { delete str; });
-    }
+            [&](std::string *str) { delete str; }); //creates an asset manager that manages lua programs from path
+    } 
+
     void run_behaviour(const size_t ID)
     {
         (*lua_state)["entityID"] = ID;
