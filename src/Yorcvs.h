@@ -293,7 +293,7 @@ class DebugInfo
                 {
                     sol::error err = rez;
                     std::string text = err.what();
-                    console_logs.emplace_back(std::move(text));
+                    console_logs.push_back(std::move(text));
                 }
                 console_text = "";
                 reclaim_focus = true;

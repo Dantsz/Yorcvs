@@ -76,15 +76,15 @@ inline void bind_map_functions(sol::state& lua_state)
 {
     sol::usertype<yorcvs::Map> map_type = lua_state.new_usertype<yorcvs::Map>("Map");
     //lua_state["create_map"] = []() {};
-    lua_state["Map"]["load_content"] = [](yorcvs::Map& map, const std::string path) // loads alll tiles and object from the path to the map
+    lua_state["Map"]["load_content"] = [](yorcvs::Map& map, const std::string& path) // loads alll tiles and object from the path to the map
     {
         map.load(map.ecs, path);
     };
-    lua_state["Map"]["load_entity_from_string"] = [](yorcvs::Map& map, const size_t entityID, const std::string path) { // creates a new entity and assigns components from the file
+    lua_state["Map"]["load_entity_from_string"] = [](yorcvs::Map& map, const size_t entityID, const std::string& path) { // creates a new entity and assigns components from the file
         map.load_character_from_path(entityID, path);
         return entityID;
     };
-    lua_state["Map"]["load_entity_from_path"] = [](yorcvs::Map& map,const size_t entityID, const std::string path) { // creates a new entity and assigns components from the file
+    lua_state["Map"]["load_entity_from_path"] = [](yorcvs::Map& map,const size_t entityID, const std::string& path) { // creates a new entity and assigns components from the file
         map.load_character_from_path(entityID, path);
         return entityID;
     };
