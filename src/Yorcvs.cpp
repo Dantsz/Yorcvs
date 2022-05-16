@@ -4,14 +4,15 @@
 #endif
 
 #include "Yorcvs.h"
-
+[[maybe_unused]]
 static yorcvs::Application *m_app;
+[[maybe_unused]]
 static void run_emscripten()
 {
     m_app->run();
 }
 
-int main(int argc, char **argv) // NOLINT
+int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) // NOLINT
 {
     yorcvs::Application app;
     m_app = &app;

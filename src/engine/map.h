@@ -45,7 +45,7 @@ namespace yorcvs
     class Map
     {
     public:
-        Map(yorcvs::ECS* world)
+        explicit Map(yorcvs::ECS* world)
             : ecs(world), init_ecs(*world), collisionS(world), healthS(world), sprintS(world), velocityS(world),
             animS(world), combat_system(world)
         {
@@ -60,10 +60,14 @@ namespace yorcvs
         {
             load(world, path);
         }
+        Map(const Map& other) = delete;
+        Map(Map &&other) = delete;
         ~Map()
         {
             clear();
         }
+        Map& operator=(const Map& other) = delete;
+        Map& operator=(Map&& other) = delete;
         /**
          * @brief Loads data from path into the ecs
          *
@@ -117,7 +121,6 @@ namespace yorcvs
                     {
                         parse_tile_layer(map, layer->getLayerAs<tmx::TileLayer>());
                     }
-
                     break;
                 case tmx::Layer::Type::Object:
                     parse_object_layer(map, layer->getLayerAs<tmx::ObjectGroup>());
@@ -125,7 +128,6 @@ namespace yorcvs
                 case tmx::Layer::Type::Image:
                     break;
                 case tmx::Layer::Type::Group:
-
                     break;
                 }
             }
@@ -221,7 +223,7 @@ namespace yorcvs
             deserialize_component_from_json<staminaComponent>(entity_id, entityJSON, "stamina");
             deserialize_component_from_json<offensiveStatsComponent>(entity_id, entityJSON, "offsensive_stats");
             deserialize_component_from_json<defensiveStatsComponent>(entity_id, entityJSON, "defensive_stats");
-            deserialize_component_from_json<spriteComponent>(entity_id, entityJSON, "sprite", [&](spriteComponent& spr) {
+            deserialize_component_from_json<spriteComponent>(entity_id, entityJSON, "sprite", [&](spriteComponent&  /*spr*/) {
                 const std::string sprite_path = directory_path + std::string(entityJSON["sprite"]["spriteName"]);
                 entityJSON["sprite"]["spriteName"] = sprite_path;
                 yorcvs::components::deserialize(ecs->get_component<spriteComponent>(entity_id), entityJSON["sprite"]);
@@ -269,7 +271,7 @@ namespace yorcvs
             serialize_component_to_json<staminaComponent>(entity, "stamina", j);
             serialize_component_to_json<hitboxComponent>(entity, "hitbox", j);
             serialize_component_to_json<spriteComponent>(entity, "sprite", j,
-                [&](json::json&  /*json_object*/, const spriteComponent& spr)
+                [&](json::json&  /*json_object*/, const spriteComponent&)
                 {   //if sprite is serialized, also serialize sprites
                     serialize_component_to_json<animationComponent>(entity, "animations", j["sprite"]);
                 });

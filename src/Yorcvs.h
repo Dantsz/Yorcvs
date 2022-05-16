@@ -208,7 +208,6 @@ class DebugInfo
             if (!playerMoveSystem->entityList->entitiesID.empty())
             {
                 const size_t ID = playerMoveSystem->entityList->entitiesID[0];
-                healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
                 if (appECS->has_components<positionComponent>(ID))
                 {
                     ImGui::Text("playerPosition: (%f,%f)", appECS->get_component<positionComponent>(ID).position.x,
@@ -433,7 +432,7 @@ class DebugInfo
             {
                 if (HistoryPos != -1)
                 {
-                    if (++HistoryPos >= console_previous_commands.size())
+                    if (++HistoryPos >= static_cast<int>(console_previous_commands.size()))
                     {
                         HistoryPos = -1;
                     }
