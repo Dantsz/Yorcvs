@@ -102,7 +102,7 @@ class EntityManager
     EntityManager(const EntityManager &other) = default;
     EntityManager(EntityManager &&other) noexcept
         : freedIndices(std::move(other.freedIndices)), entitySignatures(std::move(other.entitySignatures)),
-          lowestUnallocatedID(other.lowestUnallocatedID){};
+          lowestUnallocatedID(other.lowestUnallocatedID){}
     EntityManager &operator=(const EntityManager &other)
     {
         if (this == &other)
@@ -113,7 +113,7 @@ class EntityManager
         this->freedIndices = other.freedIndices;
         this->lowestUnallocatedID = other.lowestUnallocatedID;
         return *this;
-    };
+    }
     EntityManager &operator=(EntityManager &&other) noexcept
     {
         this->entitySignatures = std::move(other.entitySignatures);

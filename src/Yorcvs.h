@@ -46,11 +46,11 @@ class DebugInfo
   public:
     DebugInfo() = default;
 
-    DebugInfo(yorcvs::sdl2_window *parentW, yorcvs::Map *map, PlayerMovementControl *pms, CollisionSystem *cols,
+    DebugInfo(yorcvs::sdl2_window *parentW, yorcvs::Map *map_object, PlayerMovementControl *pms, CollisionSystem *cols,
               HealthSystem *healthS, sol::state *lua)
-        : parentWindow(parentW), appECS(map->ecs), map(map), lua_state(lua), playerMoveSystem(pms), colSystem(cols)
+        : parentWindow(parentW), appECS(map_object->ecs), map(map_object), lua_state(lua), playerMoveSystem(pms), colSystem(cols)
     {
-        attach(parentW, map, pms, cols, healthS, lua);
+        attach(parentW, map_object, pms, cols, healthS, lua);
     }
     ~DebugInfo() = default;
     DebugInfo(const DebugInfo &other) = delete;
@@ -209,13 +209,13 @@ class DebugInfo
         }
     }
 
-    void attach(yorcvs::sdl2_window *parentW, yorcvs::Map *map, PlayerMovementControl *pms, CollisionSystem *cols,
+    void attach(yorcvs::sdl2_window *parentW, yorcvs::Map *map_object, PlayerMovementControl *pms, CollisionSystem *cols,
                 HealthSystem *healthS, sol::state *lua)
     {
         lua_state = lua;
         attach_lua();
         parentWindow = parentW;
-        this->map = map;
+        map = map_object;
         appECS = map->ecs;
         playerMoveSystem = pms;
         colSystem = cols;

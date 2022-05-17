@@ -1588,6 +1588,7 @@
 											"top": 631,
 											"width": 423.8203125,
 											"height": 13,
+											"underline": true,
 											"text": "+get_pointer_position(): yorcvs::Vec2<float>",
 											"horizontalAlignment": 0
 										}
@@ -4782,6 +4783,7 @@
 								"$ref": "AAAAAAGAmoupdOMbMlc="
 							},
 							"name": "get_pointer_position",
+							"isStatic": true,
 							"parameters": [
 								{
 									"_type": "UMLParameter",

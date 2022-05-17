@@ -20,7 +20,7 @@ namespace yorcvs::lua
  * @tparam T
  * @param lua_state
  * @param name
- * @params args pairs made of a string which is the name sued by lua  and the parameter of the component 
+ * @param args pairs made of a string which is the name sued by lua  and the parameter of the component 
  */
 template <typename T, typename... Args>
 inline void register_component_to_lua(sol::state &lua_state, const std::string &name, Args &&... args)

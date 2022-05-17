@@ -305,8 +305,6 @@ class AnimationSystem
      * @param entityID
      * @param animation_name
      * @param frame
-     * @param frame_pass_time amount of time to pass until next frame
-     * @return bool - false if failed
      */
     void add_animation_frame(const size_t entityID, const std::string &animation_name,
                              const yorcvs::Rect<size_t> &frame) const
@@ -327,7 +325,7 @@ class AnimationSystem
     /**
      * @brief Removes an animation from the entity. Currently unecessary, might be useful for editing entities
      *
-     * @param name i
+     * @param animation i
      */
     void remove_animation(yorcvs::Entity, std::string animation);
 
