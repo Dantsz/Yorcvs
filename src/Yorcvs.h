@@ -59,8 +59,6 @@ class DebugInfo
 
     void update(const float elapsed, yorcvs::Vec2<float> &render_dimensions)
     {
-        yorcvs::log(parentWindow->get_mouse_pos());
-
         time_accumulator += elapsed;
         if (time_accumulator >= ui_controls_update_time)
         {
@@ -101,7 +99,6 @@ class DebugInfo
                     reset();
                 }
             }
-            
         }
         frame_time = elapsed;
         avg_frame_time *= frame_time_samples;
@@ -164,7 +161,7 @@ class DebugInfo
                                  health_bar_empty_color[2], health_bar_empty_color[3]);
                 healthBarRect.w = (appECS->get_component<healthComponent>(ID).HP /
                                    appECS->get_component<healthComponent>(ID).max_HP) *
-                                   health_bar_base_width;
+                                  health_bar_base_width;
                 window.draw_rect(healthBarRect, health_bar_full_color[0], health_bar_full_color[1],
                                  health_bar_full_color[2], health_bar_full_color[3]);
             }
@@ -189,7 +186,7 @@ class DebugInfo
                                  stamina_bar_empty_color[2], stamina_bar_empty_color[3]);
                 staminaBarRect.w = (appECS->get_component<staminaComponent>(ID).stamina /
                                     appECS->get_component<staminaComponent>(ID).max_stamina) *
-                                    health_bar_base_width;
+                                   health_bar_base_width;
                 window.draw_rect(staminaBarRect, stamina_bar_full_color[0], stamina_bar_full_color[1],
                                  stamina_bar_full_color[2], stamina_bar_full_color[3]);
             }
@@ -199,177 +196,15 @@ class DebugInfo
 
     void render(yorcvs::Vec2<float> &render_dimensions)
     {
-      
+
         if (showDebugWindow)
         {
-            render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
-                            hitbox_color[3]);
-            ImGui::Begin("DebugWindow");
-            ImGui::Text("frameTime: %f", frame_time);
-            ImGui::Text("maxFramTime: %f", maxFrameTime);
-            ImGui::Text("avgFrameTime: %f", avg_frame_time);
-            ImGui::Text("ecsEntities: %zu", appECS->get_active_entities_number());
-            if (!playerMoveSystem->entityList->entitiesID.empty())
-            {
-                const size_t ID = playerMoveSystem->entityList->entitiesID[0];
-                if (appECS->has_components<positionComponent>(ID))
-                {
-                    ImGui::Text("playerPosition: (%f,%f)", appECS->get_component<positionComponent>(ID).position.x,
-                                appECS->get_component<positionComponent>(ID).position.y);
-                }
-                if (appECS->has_components<velocityComponent>(ID))
-                {
-                    ImGui::Text("playerVelocity: (%f,%f)", appECS->get_component<velocityComponent>(ID).vel.x,
-                                appECS->get_component<velocityComponent>(ID).vel.y);
-                }
-            }
-            ImGui::End();
-
-            if (!playerMoveSystem->entityList->entitiesID.empty())
-            {
-                const size_t ID = playerMoveSystem->entityList->entitiesID[0];
-                std::string playerName = "Player : ";
-                if (appECS->has_components<identificationComponent>(ID))
-                {
-                    playerName +=
-                        appECS->get_component<identificationComponent>(ID).name + " (" + std::to_string(ID) + ")";
-                }
-                ImGui::Begin(playerName.c_str());
-                if (appECS->has_components<healthComponent>(ID))
-                {
-                    healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
-                    ImGui::Text("playerHealth: (%f/%f)", playerHealthC.HP, playerHealthC.max_HP);
-                }
-                if (appECS->has_components<staminaComponent>(ID))
-                {
-                    staminaComponent &playerStaminaC = appECS->get_component<staminaComponent>(ID);
-                    ImGui::Text("stamina: (%f/%f)", playerStaminaC.stamina, playerStaminaC.max_stamina);
-                }
-
-                if (appECS->has_components<offensiveStatsComponent>(ID))
-                {
-                    offensiveStatsComponent &offStatsC = appECS->get_component<offensiveStatsComponent>(ID);
-                    ImGui::Text("Strength : (%f)", offStatsC.strength);
-                    ImGui::Text("Agility : (%f)", offStatsC.agility);
-                    ImGui::Text("Dexterity : (%f)", offStatsC.dexterity);
-                    ImGui::Text("Piercing : (%f)", offStatsC.piercing);
-                    ImGui::Text("Intellect : (%f)", offStatsC.intellect);
-                }
-                if (appECS->has_components<defensiveStatsComponent>(ID))
-                {
-                    defensiveStatsComponent &defstats = appECS->get_component<defensiveStatsComponent>(ID);
-                    ImGui::Text("Defense : (%f)", defstats.defense);
-                    ImGui::Text("Block : (%f)", defstats.block);
-                    ImGui::Text("Dodge : (%f)", defstats.dodge);
-                    ImGui::Text("Spirit : (%f)", defstats.spirit);
-                }
-
-                ImGui::End();
-            }
+            show_debug_window(render_dimensions);
         }
         if (showConsole)
         {
-            ImGui::ShowDemoWindow();
-            ImGui::Begin("Console");
-            ImGuiInputTextFlags input_text_flags =
-                ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackHistory;
-
-            const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
-            ImGui::BeginChild("ScrollingRegion", ImVec2(0, -3 * footer_height_to_reserve), false,
-                              ImGuiWindowFlags_HorizontalScrollbar);
-            for (const auto &item : console_logs)
-            {
-                ImGui::TextUnformatted(item.c_str());
-            }
-            ImGui::EndChild();
-            ImGui::Separator();
-            bool reclaim_focus = false;
-            if (ImGui::InputText("##", &console_text, input_text_flags, &DebugInfo::TextEditCallbackStub,
-                                 (void *)this) &&
-                !console_text.empty())
-            {
-                console_logs.push_back(console_text);
-                HistoryPos = -1;
-                console_previous_commands.push_back(console_text);
-                auto rez = lua_state->safe_script(console_text,
-                                                  [](lua_State *, sol::protected_function_result pfr) { return pfr; });
-                if (!rez.valid())
-                {
-                    sol::error err = rez;
-                    std::string text = err.what();
-                    console_logs.push_back(std::move(text));
-                }
-                console_text = "";
-                reclaim_focus = true;
-            }
-            ImGui::SetItemDefaultFocus();
-            if (reclaim_focus)
-            {
-                ImGui::SetKeyboardFocusHere(-1);
-            }
-            if (ImGui::SmallButton("Clear"))
-            {
-                clear_logs();
-            }
-            ImGui::End();
-            ImGui::Begin("Debug");
-            if (ImGui::CollapsingHeader("Entities"))
-            {
-                const ImGuiTableFlags flags1 =
-                    ImGuiTableFlags_BordersV | ImGuiTableFlags_SortMulti | ImGuiTableFlags_Resizable;
-                if (ImGui::BeginTable("table1", 4, flags1))
-                {
-                    ImGui::TableSetupColumn("ID");
-                    ImGui::TableSetupColumn("Name");
-                    ImGui::TableSetupColumn("Signature");
-                    ImGui::TableSetupColumn("Position");
-                    ImGui::TableHeadersRow();
-                    for (size_t i = 0; i < appECS->get_entity_list_size(); i++)
-                    {
-                        if (appECS->is_valid_entity(i))
-                        {
-                            ImGui::TableNextRow();
-                            ImGui::TableSetColumnIndex(0);
-                            ImGuiSelectableFlags selectable_flags =
-                                ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_None;
-                            ImGui::Selectable("", false, selectable_flags);
-                            ImGui::SameLine();
-                            ImGui::Text("%zu", i);
-
-                            ImGui::TableSetColumnIndex(1);
-                            if (appECS->has_components<identificationComponent>(i))
-                            {
-                                ImGui::Text("%s", appECS->get_component<identificationComponent>(i).name.c_str());
-                            }
-                            else
-                            {
-                                ImGui::Text("%s", "Unknown");
-                            }
-
-                            ImGui::TableSetColumnIndex(2);
-                            std::string signature{};
-                            signature.resize(appECS->get_entity_signature(i).size());
-                            for (size_t j = 0; j < appECS->get_entity_signature(i).size(); j++)
-                            {
-                                signature[j] = appECS->get_entity_signature(i)[j] ? '1' : '0';
-                            }
-                            ImGui::Text("%s", signature.c_str());
-                            ImGui::TableSetColumnIndex(3);
-                            if (appECS->has_components<positionComponent>(i))
-                            {
-                                const auto &position = appECS->get_component<positionComponent>(i).position;
-                                ImGui::Text("%f/%f", position.x, position.y);
-                            }
-                            else
-                            {
-                                ImGui::Text("(-/-)");
-                            }
-                        }
-                    }
-                    ImGui::EndTable();
-                }
-            }
-            ImGui::End();
+            show_console_window();
+            show_entities_table();
         }
     }
 
@@ -392,7 +227,177 @@ class DebugInfo
         (*lua_state)["print"] = (*lua_state)["log"];
     }
 
-    private:
+  private:
+    void show_debug_window(yorcvs::Vec2<float> &render_dimensions)
+    {
+        render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
+                        hitbox_color[3]);
+        ImGui::Begin("DebugWindow");
+        ImGui::Text("frameTime: %f", frame_time);
+        ImGui::Text("maxFramTime: %f", maxFrameTime);
+        ImGui::Text("avgFrameTime: %f", avg_frame_time);
+        ImGui::Text("ecsEntities: %zu", appECS->get_active_entities_number());
+        if (!playerMoveSystem->entityList->entitiesID.empty())
+        {
+            const size_t ID = playerMoveSystem->entityList->entitiesID[0];
+            if (appECS->has_components<positionComponent>(ID))
+            {
+                ImGui::Text("playerPosition: (%f,%f)", appECS->get_component<positionComponent>(ID).position.x,
+                            appECS->get_component<positionComponent>(ID).position.y);
+            }
+            if (appECS->has_components<velocityComponent>(ID))
+            {
+                ImGui::Text("playerVelocity: (%f,%f)", appECS->get_component<velocityComponent>(ID).vel.x,
+                            appECS->get_component<velocityComponent>(ID).vel.y);
+            }
+        }
+        ImGui::End();
+
+        if (!playerMoveSystem->entityList->entitiesID.empty())
+        {
+            const size_t ID = playerMoveSystem->entityList->entitiesID[0];
+            std::string playerName = "Player : ";
+            if (appECS->has_components<identificationComponent>(ID))
+            {
+                playerName += appECS->get_component<identificationComponent>(ID).name + " (" + std::to_string(ID) + ")";
+            }
+            ImGui::Begin(playerName.c_str());
+            if (appECS->has_components<healthComponent>(ID))
+            {
+                healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
+                ImGui::Text("playerHealth: (%f/%f)", playerHealthC.HP, playerHealthC.max_HP);
+            }
+            if (appECS->has_components<staminaComponent>(ID))
+            {
+                staminaComponent &playerStaminaC = appECS->get_component<staminaComponent>(ID);
+                ImGui::Text("stamina: (%f/%f)", playerStaminaC.stamina, playerStaminaC.max_stamina);
+            }
+
+            if (appECS->has_components<offensiveStatsComponent>(ID))
+            {
+                offensiveStatsComponent &offStatsC = appECS->get_component<offensiveStatsComponent>(ID);
+                ImGui::Text("Strength : (%f)", offStatsC.strength);
+                ImGui::Text("Agility : (%f)", offStatsC.agility);
+                ImGui::Text("Dexterity : (%f)", offStatsC.dexterity);
+                ImGui::Text("Piercing : (%f)", offStatsC.piercing);
+                ImGui::Text("Intellect : (%f)", offStatsC.intellect);
+            }
+            if (appECS->has_components<defensiveStatsComponent>(ID))
+            {
+                defensiveStatsComponent &defstats = appECS->get_component<defensiveStatsComponent>(ID);
+                ImGui::Text("Defense : (%f)", defstats.defense);
+                ImGui::Text("Block : (%f)", defstats.block);
+                ImGui::Text("Dodge : (%f)", defstats.dodge);
+                ImGui::Text("Spirit : (%f)", defstats.spirit);
+            }
+
+            ImGui::End();
+        }
+    }
+    void show_console_window()
+    {
+        ImGui::ShowDemoWindow();
+        ImGui::Begin("Console");
+        ImGuiInputTextFlags input_text_flags =
+            ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackHistory;
+
+        const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+        ImGui::BeginChild("ScrollingRegion", ImVec2(0, -3 * footer_height_to_reserve), false,
+                          ImGuiWindowFlags_HorizontalScrollbar);
+        for (const auto &item : console_logs)
+        {
+            ImGui::TextUnformatted(item.c_str());
+        }
+        ImGui::EndChild();
+        ImGui::Separator();
+        bool reclaim_focus = false;
+        if (ImGui::InputText("##", &console_text, input_text_flags, &DebugInfo::TextEditCallbackStub, (void *)this) &&
+            !console_text.empty())
+        {
+            console_logs.push_back(console_text);
+            HistoryPos = -1;
+            console_previous_commands.push_back(console_text);
+            auto rez = lua_state->safe_script(console_text,
+                                              [](lua_State *, sol::protected_function_result pfr) { return pfr; });
+            if (!rez.valid())
+            {
+                sol::error err = rez;
+                std::string text = err.what();
+                console_logs.push_back(std::move(text));
+            }
+            console_text = "";
+            reclaim_focus = true;
+        }
+        ImGui::SetItemDefaultFocus();
+        if (reclaim_focus)
+        {
+            ImGui::SetKeyboardFocusHere(-1);
+        }
+        if (ImGui::SmallButton("Clear"))
+        {
+            clear_logs();
+        }
+        ImGui::End();
+    }
+    void show_entities_table()
+    {
+        const ImGuiTableFlags flags1 = ImGuiTableFlags_BordersV | ImGuiTableFlags_SortMulti | ImGuiTableFlags_Resizable;
+        ImGui::Begin("Debug");
+        if (ImGui::CollapsingHeader("Entities") && ImGui::BeginTable("table1", 4, flags1))
+        {
+
+            ImGui::TableSetupColumn("ID");
+            ImGui::TableSetupColumn("Name");
+            ImGui::TableSetupColumn("Signature");
+            ImGui::TableSetupColumn("Position");
+            ImGui::TableHeadersRow();
+            for (size_t i = 0; i < appECS->get_entity_list_size(); i++)
+            {
+                if (!appECS->is_valid_entity(i))
+                {
+                    continue;
+                }
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_None;
+                ImGui::Selectable("", false, selectable_flags);
+                ImGui::SameLine();
+                ImGui::Text("%zu", i);
+
+                ImGui::TableSetColumnIndex(1);
+                if (appECS->has_components<identificationComponent>(i))
+                {
+                    ImGui::Text("%s", appECS->get_component<identificationComponent>(i).name.c_str());
+                }
+                else
+                {
+                    ImGui::Text("%s", "Unknown");
+                }
+
+                ImGui::TableSetColumnIndex(2);
+                std::string signature{};
+                signature.resize(appECS->get_entity_signature(i).size());
+                for (size_t j = 0; j < appECS->get_entity_signature(i).size(); j++)
+                {
+                    signature[j] = appECS->get_entity_signature(i)[j] ? '1' : '0';
+                }
+                ImGui::Text("%s", signature.c_str());
+                ImGui::TableSetColumnIndex(3);
+                if (appECS->has_components<positionComponent>(i))
+                {
+                    const auto &position = appECS->get_component<positionComponent>(i).position;
+                    ImGui::Text("%f/%f", position.x, position.y);
+                }
+                else
+                {
+                    ImGui::Text("(-/-)");
+                }
+            }
+            ImGui::EndTable();
+        }
+        ImGui::End();
+    }
+
     void reset()
     {
         maxFrameTime = 0.0f;
@@ -455,7 +460,7 @@ class DebugInfo
         }
         return 1;
     }
-  
+
     std::vector<size_t> callbacks;
     yorcvs::sdl2_window *parentWindow{};
     yorcvs::ECS *appECS{};

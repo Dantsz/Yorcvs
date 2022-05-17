@@ -65,7 +65,7 @@ class event_handler
     }
     yorcvs::Vec2<float> get_pointer_position()
     {
-        return static_cast<event_manager_implementation&>(*this).get_mouse_pos();
+        return static_cast<event_manager_implementation&>(*this).get_pointer_position();
     }
 };
 }
