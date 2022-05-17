@@ -1291,7 +1291,7 @@ class ECS
 class Entity
 {
   public:
-    Entity(ECS *ecs) : parent(ecs)
+    explicit Entity(ECS *ecs) : parent(ecs)
     {
         id = parent->create_entity_ID();
         yorcvs::log("Created entity with id: " + std::to_string(id), yorcvs::MSGSEVERITY::INFO);
@@ -1334,14 +1334,12 @@ class Entity
     ~Entity() noexcept
     {
         if (parent != nullptr)
-        {
+        {   
             parent->destroy_entity(id);
             yorcvs::log("Destroyed entity with id: " + std::to_string(id), yorcvs::MSGSEVERITY::INFO);
         }
     }
-
     size_t id = 0;
     ECS *parent = nullptr; // non-owning pointer to parent
 };
-
 } // namespace yorcvs

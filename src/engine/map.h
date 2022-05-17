@@ -9,7 +9,6 @@
 #include "tmxlite/Property.hpp"
 #include "tmxlite/TileLayer.hpp"
 #include "tmxlite/Tileset.hpp"
-
 #include "../common/ecs.h"
 
 #include "../game/systems.h"
@@ -125,9 +124,10 @@ namespace yorcvs
                 case tmx::Layer::Type::Object:
                     parse_object_layer(map, layer->getLayerAs<tmx::ObjectGroup>());
                     break;
-                case tmx::Layer::Type::Image:
-                    break;
-                case tmx::Layer::Type::Group:
+                // case tmx::Layer::Type::Image:
+                //     break;
+                // case tmx::Layer::Type::Group:
+                default:
                     break;
                 }
             }

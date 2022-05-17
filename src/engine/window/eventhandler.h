@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include "../../common/types.h"
 namespace yorcvs{
 namespace Events
 {
@@ -61,6 +62,10 @@ class event_handler
     bool is_key_pressed(yorcvs::Events::Key key)
     {
         return static_cast<event_manager_implementation&>(*this).is_key_pressed(key);
+    }
+    yorcvs::Vec2<float> get_pointer_position()
+    {
+        return static_cast<event_manager_implementation&>(*this).get_mouse_pos();
     }
 };
 }

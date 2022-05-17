@@ -57,23 +57,56 @@ class DebugInfo
     DebugInfo operator=(const DebugInfo &other) = delete;
     DebugInfo operator=(DebugInfo &&other) = delete;
 
-    void update(const float ft)
+    void update(const float elapsed, yorcvs::Vec2<float> &render_dimensions)
     {
-        // if (parentWindow->is_key_pressed(yorcvs::YORCVS_KEY_R))
-        // {
-        //     reset();
-        // }
-        if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_C))
+        yorcvs::log(parentWindow->get_mouse_pos());
+
+        time_accumulator += elapsed;
+        if (time_accumulator >= ui_controls_update_time)
         {
-            std::cout << "Saving player... \n";
-            std::ofstream out("assets/testPlayer.json");
-            out << map->save_character(playerMoveSystem->entityList->entitiesID[0]);
-            std::cout << "Done.\n";
+            if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_LCTRL))
+            {
+                if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_E))
+                {
+                    showDebugWindow = !showDebugWindow;
+                    time_accumulator = 0;
+                }
+                if (parentWindow->is_key_pressed(Events::Key::YORCVS_KEY_TILDE))
+                {
+                    playerMoveSystem->controls_enable = !playerMoveSystem->controls_enable;
+                    showConsole = !showConsole;
+                    time_accumulator = 0;
+                }
+                if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_I))
+                {
+                    render_dimensions -= render_dimensions * zoom_power;
+                    time_accumulator = 0;
+                }
+
+                if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_K))
+                {
+                    render_dimensions += render_dimensions * zoom_power;
+                    time_accumulator = 0;
+                }
+                if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_C))
+                {
+                    yorcvs::log("Saving player...");
+                    std::ofstream out("assets/testPlayer.json");
+                    out << map->save_character(playerMoveSystem->entityList->entitiesID[0]);
+                    yorcvs::log("Done.");
+                    time_accumulator = 0;
+                }
+                if (parentWindow->is_key_pressed(yorcvs::Events::YORCVS_KEY_R))
+                {
+                    reset();
+                }
+            }
+            
         }
-        frame_time = ft;
+        frame_time = elapsed;
         avg_frame_time *= frame_time_samples;
         frame_time_samples += 1.0f;
-        avg_frame_time += ft;
+        avg_frame_time += elapsed;
         avg_frame_time /= frame_time_samples;
         if (!playerMoveSystem->entityList->entitiesID.empty())
         {
@@ -81,9 +114,9 @@ class DebugInfo
         }
         if (showDebugWindow)
         {
-            if (ft > maxFrameTime)
+            if (elapsed > maxFrameTime)
             {
-                maxFrameTime = ft;
+                maxFrameTime = elapsed;
             }
         }
     }
@@ -119,7 +152,7 @@ class DebugInfo
                     healthBarRect.y = rect.y - rect.h;
                 }
 
-                healthBarRect.x = rect.x - 16.0f + rect.w / 2;
+                healthBarRect.x = rect.x - health_bar_x_offset + rect.w / 2;
 
                 healthBarRect.w = health_full_bar_dimension.x;
                 healthBarRect.h = health_full_bar_dimension.y;
@@ -131,7 +164,7 @@ class DebugInfo
                                  health_bar_empty_color[2], health_bar_empty_color[3]);
                 healthBarRect.w = (appECS->get_component<healthComponent>(ID).HP /
                                    appECS->get_component<healthComponent>(ID).max_HP) *
-                                  32.0f;
+                                   health_bar_base_width;
                 window.draw_rect(healthBarRect, health_bar_full_color[0], health_bar_full_color[1],
                                  health_bar_full_color[2], health_bar_full_color[3]);
             }
@@ -148,7 +181,7 @@ class DebugInfo
                     staminaBarRect.y = rect.y - rect.h;
                 }
 
-                staminaBarRect.x = rect.x - 16.0f + rect.w / 2;
+                staminaBarRect.x = rect.x - health_bar_x_offset + rect.w / 2;
 
                 staminaBarRect.w = health_full_bar_dimension.x;
                 staminaBarRect.h = health_full_bar_dimension.y;
@@ -156,7 +189,7 @@ class DebugInfo
                                  stamina_bar_empty_color[2], stamina_bar_empty_color[3]);
                 staminaBarRect.w = (appECS->get_component<staminaComponent>(ID).stamina /
                                     appECS->get_component<staminaComponent>(ID).max_stamina) *
-                                   32.0f;
+                                    health_bar_base_width;
                 window.draw_rect(staminaBarRect, stamina_bar_full_color[0], stamina_bar_full_color[1],
                                  stamina_bar_full_color[2], stamina_bar_full_color[3]);
             }
@@ -164,38 +197,9 @@ class DebugInfo
         window.set_render_scale(old_rs);
     }
 
-    void render(const float elapsed, yorcvs::Vec2<float> &render_dimensions)
+    void render(yorcvs::Vec2<float> &render_dimensions)
     {
-        time_accumulator += elapsed;
-        if (time_accumulator >= ui_controls_update_time)
-        {
-            if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_LCTRL))
-            {
-                if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_E))
-                {
-                    showDebugWindow = !showDebugWindow;
-                    time_accumulator = 0;
-                }
-                if (parentWindow->is_key_pressed(Events::Key::YORCVS_KEY_TILDE))
-                {
-                    playerMoveSystem->controls_enable = !playerMoveSystem->controls_enable;
-                    showConsole = !showConsole;
-                    time_accumulator = 0;
-                }
-                if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_I))
-                {
-                    render_dimensions -= render_dimensions * zoom_power;
-                    time_accumulator = 0;
-                }
-
-                if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_K))
-                {
-                    render_dimensions += render_dimensions * zoom_power;
-                    time_accumulator = 0;
-                }
-            }
-        }
-        update(elapsed);
+      
         if (showDebugWindow)
         {
             render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
@@ -388,6 +392,7 @@ class DebugInfo
         (*lua_state)["print"] = (*lua_state)["log"];
     }
 
+    private:
     void reset()
     {
         maxFrameTime = 0.0f;
@@ -450,6 +455,7 @@ class DebugInfo
         }
         return 1;
     }
+  
     std::vector<size_t> callbacks;
     yorcvs::sdl2_window *parentWindow{};
     yorcvs::ECS *appECS{};
@@ -478,7 +484,8 @@ class DebugInfo
     static constexpr yorcvs::Vec2<float> health_full_bar_dimension = {32.0f, 4.0f};
     const std::vector<uint8_t> health_bar_full_color = {255, 0, 0, 255};
     const std::vector<uint8_t> health_bar_empty_color = {100, 0, 0, 255};
-
+    static constexpr float health_bar_base_width = 32.0f;
+    static constexpr float health_bar_x_offset = 16.0f;
     const std::vector<uint8_t> hitbox_color = {255, 0, 0, 100};
 
     static constexpr size_t textR = 255;
@@ -585,6 +592,7 @@ class Application
         r.handle_events();
         while (lag >= msPF)
         {
+            dbInfo.update(msPF, render_dimensions);
             pcS.updateControls(render_dimensions, msPF);
             bhvS.update(msPF);
             map.update(msPF);
@@ -593,8 +601,7 @@ class Application
         r.clear();
         render_map_tiles(map);
         sprS.renderSprites(render_dimensions);
-        dbInfo.render(elapsed, render_dimensions);
-
+        dbInfo.render(render_dimensions);
         ImGui::Render();
         ImGuiSDL::Render(ImGui::GetDrawData());
         r.present();

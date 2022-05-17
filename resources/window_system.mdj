@@ -996,7 +996,7 @@
 											"visible": false,
 											"font": "Arial;13;0",
 											"left": 1648,
-											"top": -352,
+											"top": -368,
 											"height": 13
 										},
 										{
@@ -1007,8 +1007,8 @@
 											},
 											"font": "Arial;13;1",
 											"left": 1093,
-											"top": 161,
-											"width": 357,
+											"top": 153,
+											"width": 358.533203125,
 											"height": 13,
 											"text": "EventHandler"
 										},
@@ -1021,7 +1021,7 @@
 											"visible": false,
 											"font": "Arial;13;0",
 											"left": 1648,
-											"top": -352,
+											"top": -368,
 											"width": 73.67724609375,
 											"height": 13,
 											"text": "(from Model)"
@@ -1035,15 +1035,15 @@
 											"visible": false,
 											"font": "Arial;13;0",
 											"left": 1648,
-											"top": -352,
+											"top": -368,
 											"height": 13,
 											"horizontalAlignment": 1
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 1088,
-									"top": 154,
-									"width": 367,
+									"top": 146,
+									"width": 368.533203125,
 									"height": 25,
 									"stereotypeLabel": {
 										"$ref": "AAAAAAGAmoUFxuLyrTc="
@@ -1069,8 +1069,8 @@
 									},
 									"font": "Arial;13;0",
 									"left": 1088,
-									"top": 179,
-									"width": 367,
+									"top": 171,
+									"width": 368.533203125,
 									"height": 10
 								},
 								{
@@ -1094,8 +1094,8 @@
 											},
 											"font": "Arial;13;0",
 											"left": 1093,
-											"top": 194,
-											"width": 357,
+											"top": 186,
+											"width": 358.533203125,
 											"height": 13,
 											"text": "+handleEvents()",
 											"horizontalAlignment": 0
@@ -1112,7 +1112,7 @@
 											"visible": false,
 											"font": "Arial;13;0",
 											"left": 1109,
-											"top": 167,
+											"top": 151,
 											"width": 343,
 											"height": 13,
 											"text": "+Operation1()",
@@ -1129,10 +1129,10 @@
 											},
 											"font": "Arial;13;0",
 											"left": 1093,
-											"top": 209,
-											"width": 357,
+											"top": 201,
+											"width": 358.533203125,
 											"height": 13,
-											"text": "+add_callback()",
+											"text": "+add_callback(std::function<void(const yorcvs::event&)>&)",
 											"horizontalAlignment": 0
 										},
 										{
@@ -1147,7 +1147,7 @@
 											"visible": false,
 											"font": "Arial;13;0",
 											"left": 1109,
-											"top": 182,
+											"top": 166,
 											"width": 343,
 											"height": 13,
 											"text": "+remove_callback()",
@@ -1164,18 +1164,35 @@
 											},
 											"font": "Arial;13;0",
 											"left": 1093,
-											"top": 224,
-											"width": 357,
+											"top": 216,
+											"width": 358.533203125,
 											"height": 13,
 											"text": "+is_key_pressed(Key)",
+											"horizontalAlignment": 0
+										},
+										{
+											"_type": "UMLOperationView",
+											"_id": "AAAAAAGA0R4LcslYswA=",
+											"_parent": {
+												"$ref": "AAAAAAGAmoUFxuL3oXI="
+											},
+											"model": {
+												"$ref": "AAAAAAGA0R4LVclV+/I="
+											},
+											"font": "Arial;13;0",
+											"left": 1093,
+											"top": 231,
+											"width": 358.533203125,
+											"height": 13,
+											"text": "+get_pointer_position(): yorcvs::Vec2<float>",
 											"horizontalAlignment": 0
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 1088,
-									"top": 189,
-									"width": 367,
-									"height": 53
+									"top": 181,
+									"width": 368.533203125,
+									"height": 68
 								},
 								{
 									"_type": "UMLReceptionCompartmentView",
@@ -1189,7 +1206,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 824,
-									"top": -176,
+									"top": -184,
 									"width": 10,
 									"height": 10
 								},
@@ -1213,8 +1230,8 @@
 												"$ref": "AAAAAAGAnuhRPb+pWz4="
 											},
 											"font": "Arial;13;0",
-											"left": 1281.21484375,
-											"top": 141,
+											"left": 1282.748046875,
+											"top": 133,
 											"width": 177.78515625,
 											"height": 13,
 											"text": "event_handler_implementation",
@@ -1222,8 +1239,8 @@
 										}
 									],
 									"font": "Arial;13;0",
-									"left": 1276.21484375,
-									"top": 136,
+									"left": 1277.748046875,
+									"top": 128,
 									"width": 187.78515625,
 									"height": 23
 								}
@@ -1231,8 +1248,8 @@
 							"font": "Arial;13;0",
 							"containerChangeable": true,
 							"left": 1088,
-							"top": 136,
-							"width": 377,
+							"top": 128,
+							"width": 378.533203125,
 							"height": 257,
 							"nameCompartment": {
 								"$ref": "AAAAAAGAmoUFxuLxuXI="
@@ -1537,7 +1554,7 @@
 											"top": 601,
 											"width": 423.8203125,
 											"height": 13,
-											"text": "+add_callback()",
+											"text": "+add_callback(std::function<void(const yorcvs::event&)>&)",
 											"horizontalAlignment": 0
 										},
 										{
@@ -1556,13 +1573,30 @@
 											"height": 13,
 											"text": "+is_key_pressed(Key)",
 											"horizontalAlignment": 0
+										},
+										{
+											"_type": "UMLOperationView",
+											"_id": "AAAAAAGA0SQG78l7534=",
+											"_parent": {
+												"$ref": "AAAAAAGAmoupdOMkKcI="
+											},
+											"model": {
+												"$ref": "AAAAAAGA0SQG28l43CU="
+											},
+											"font": "Arial;13;0",
+											"left": 1061,
+											"top": 631,
+											"width": 423.8203125,
+											"height": 13,
+											"text": "+get_pointer_position(): yorcvs::Vec2<float>",
+											"horizontalAlignment": 0
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 1056,
 									"top": 579,
 									"width": 433.8203125,
-									"height": 55
+									"height": 70
 								},
 								{
 									"_type": "UMLReceptionCompartmentView",
@@ -2374,8 +2408,8 @@
 										"$ref": "AAAAAAGAnigXIX2h67A="
 									},
 									"font": "Arial;13;0",
-									"left": 1185,
-									"top": 424,
+									"left": 1184,
+									"top": 418,
 									"width": 74.05810546875,
 									"height": 13,
 									"alpha": -4.597512140304019,
@@ -2398,7 +2432,7 @@
 									"visible": null,
 									"font": "Arial;13;0",
 									"left": 1244,
-									"top": 417,
+									"top": 413,
 									"height": 13,
 									"alpha": 1.5707963267948966,
 									"distance": 30,
@@ -2419,7 +2453,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 1288,
-									"top": 418,
+									"top": 414,
 									"height": 13,
 									"alpha": -1.5707963267948966,
 									"distance": 15,
@@ -2437,7 +2471,7 @@
 								"$ref": "AAAAAAGAmoupdOMd/lc="
 							},
 							"lineStyle": 1,
-							"points": "1274:455;1274:393",
+							"points": "1274:455;1275:385",
 							"showVisibility": true,
 							"nameLabel": {
 								"$ref": "AAAAAAGAnigXIX2kWqw="
@@ -3524,8 +3558,8 @@
 										"$ref": "AAAAAAGAnz9/S+t4JUw="
 									},
 									"font": "Arial;13;0",
-									"left": 1482,
-									"top": 172,
+									"left": 1483,
+									"top": 170,
 									"width": 35.0517578125,
 									"height": 13,
 									"alpha": 1.5707963267948966,
@@ -3547,8 +3581,8 @@
 									},
 									"visible": null,
 									"font": "Arial;13;0",
-									"left": 1495,
-									"top": 158,
+									"left": 1496,
+									"top": 156,
 									"height": 13,
 									"alpha": 1.5707963267948966,
 									"distance": 30,
@@ -3568,8 +3602,8 @@
 									},
 									"visible": false,
 									"font": "Arial;13;0",
-									"left": 1508,
-									"top": 201,
+									"left": 1509,
+									"top": 199,
 									"height": 13,
 									"alpha": -1.5707963267948966,
 									"distance": 15,
@@ -3587,7 +3621,7 @@
 								"$ref": "AAAAAAGAmoUFxuLwZ1E="
 							},
 							"lineStyle": 1,
-							"points": "1465:205;1543:181",
+							"points": "1467:202;1543:180",
 							"showVisibility": true,
 							"nameLabel": {
 								"$ref": "AAAAAAGAnz9/S+t7jP0="
@@ -4524,7 +4558,18 @@
 							"_parent": {
 								"$ref": "AAAAAAGAmoUFxeLuTQk="
 							},
-							"name": "add_callback"
+							"name": "add_callback",
+							"parameters": [
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAGA0SHguclljTA=",
+									"_parent": {
+										"$ref": "AAAAAAGAnjjZT6roW6Q="
+									},
+									"name": "std::function<void(const yorcvs::event&)>&",
+									"type": ""
+								}
+							]
 						},
 						{
 							"_type": "UMLOperation",
@@ -4550,6 +4595,25 @@
 									},
 									"name": "Key",
 									"type": ""
+								}
+							]
+						},
+						{
+							"_type": "UMLOperation",
+							"_id": "AAAAAAGA0R4LVclV+/I=",
+							"_parent": {
+								"$ref": "AAAAAAGAmoUFxeLuTQk="
+							},
+							"name": "get_pointer_position",
+							"parameters": [
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAGA0SM/T8lxcBI=",
+									"_parent": {
+										"$ref": "AAAAAAGA0R4LVclV+/I="
+									},
+									"type": "yorcvs::Vec2<float>",
+									"direction": "return"
 								}
 							]
 						}
@@ -4679,7 +4743,18 @@
 							"_parent": {
 								"$ref": "AAAAAAGAmoupdOMbMlc="
 							},
-							"name": "add_callback"
+							"name": "add_callback",
+							"parameters": [
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAGA0SIfPslpxMg=",
+									"_parent": {
+										"$ref": "AAAAAAGAn0P98euT9D8="
+									},
+									"name": "std::function<void(const yorcvs::event&)>&",
+									"type": ""
+								}
+							]
 						},
 						{
 							"_type": "UMLOperation",
@@ -4697,6 +4772,25 @@
 									},
 									"name": "Key",
 									"type": ""
+								}
+							]
+						},
+						{
+							"_type": "UMLOperation",
+							"_id": "AAAAAAGA0SQG28l43CU=",
+							"_parent": {
+								"$ref": "AAAAAAGAmoupdOMbMlc="
+							},
+							"name": "get_pointer_position",
+							"parameters": [
+								{
+									"_type": "UMLParameter",
+									"_id": "AAAAAAGA0SRQS8l/Fvw=",
+									"_parent": {
+										"$ref": "AAAAAAGA0SQG28l43CU="
+									},
+									"type": "yorcvs::Vec2<float>",
+									"direction": "return"
 								}
 							]
 						}
@@ -4767,7 +4861,8 @@
 							"_parent": {
 								"$ref": "AAAAAAGAnibil3obr1s="
 							},
-							"name": "Type"
+							"name": "Type",
+							"type": ""
 						}
 					],
 					"operations": [

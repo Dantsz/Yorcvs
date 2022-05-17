@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL.h>
 #include <SDL_events.h>
+#include <SDL_mouse.h>
 #include <SDL_scancode.h>
 #include <SDL_video.h>
 #include <functional>
@@ -70,6 +71,7 @@ namespace yorcvs
                 {yorcvs::Events::Key::YORCVS_KEY_S,SDL_SCANCODE_S},
                 {yorcvs::Events::Key::YORCVS_KEY_W,SDL_SCANCODE_W},
                 {yorcvs::Events::Key::YORCVS_KEY_Q,SDL_SCANCODE_Q},
+                {yorcvs::Events::Key::YORCVS_KEY_R,SDL_SCANCODE_R},
                 {yorcvs::Events::Key::YORCVS_KEY_BACKSPACE,SDL_SCANCODE_BACKSPACE},
                 {yorcvs::Events::Key::YORCVS_KEY_LCTRL,SDL_SCANCODE_LCTRL},
                 {yorcvs::Events::Key::YORCVS_KEY_ENTER,SDL_SCANCODE_RETURN},
@@ -102,6 +104,13 @@ namespace yorcvs
         {
             keys = SDL_GetKeyboardState(nullptr);
             return keys[key_to_impl.at(key)] ? 1 : 0; // NOLINT
+        }
+        yorcvs::Vec2<float> get_pointer_position()
+        {
+            int x = 0;
+            int y = 0;
+            SDL_GetMouseState(&x, &y);
+            return yorcvs::Vec2<float>{static_cast<float>(x), static_cast<float>(y)};    
         }
         private:
         SDL_Event sdl_event{};
