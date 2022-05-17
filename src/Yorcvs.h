@@ -10,6 +10,10 @@
  */
 #pragma once
 
+#include "imgui.h"
+#include "imgui_sdl.h"
+#include "misc/cpp/imgui_stdlib.h"
+
 #include "Yorcvs.h"
 #include "common/ecs.h"
 #include "common/types.h"
@@ -34,9 +38,6 @@
 
 #include "sol/sol.hpp"
 
-#include "imgui.h"
-#include "imgui_sdl.h"
-#include "misc/cpp/imgui_stdlib.h"
 
 namespace yorcvs
 {
