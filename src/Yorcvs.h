@@ -38,7 +38,6 @@
 
 #include "sol/sol.hpp"
 
-
 namespace yorcvs
 {
 class DebugInfo
@@ -48,7 +47,8 @@ class DebugInfo
 
     DebugInfo(yorcvs::sdl2_window *parentW, yorcvs::Map *map_object, PlayerMovementControl *pms, CollisionSystem *cols,
               HealthSystem *healthS, sol::state *lua)
-        : parentWindow(parentW), appECS(map_object->ecs), map(map_object), lua_state(lua), playerMoveSystem(pms), colSystem(cols)
+        : parentWindow(parentW), appECS(map_object->ecs), map(map_object), lua_state(lua), playerMoveSystem(pms),
+          colSystem(cols)
     {
         attach(parentW, map_object, pms, cols, healthS, lua);
     }
@@ -209,8 +209,8 @@ class DebugInfo
         }
     }
 
-    void attach(yorcvs::sdl2_window *parentW, yorcvs::Map *map_object, PlayerMovementControl *pms, CollisionSystem *cols,
-                HealthSystem *healthS, sol::state *lua)
+    void attach(yorcvs::sdl2_window *parentW, yorcvs::Map *map_object, PlayerMovementControl *pms,
+                CollisionSystem *cols, HealthSystem *healthS, sol::state *lua)
     {
         lua_state = lua;
         attach_lua();
@@ -344,13 +344,14 @@ class DebugInfo
     {
         const ImGuiTableFlags flags1 = ImGuiTableFlags_BordersV | ImGuiTableFlags_SortMulti | ImGuiTableFlags_Resizable;
         ImGui::Begin("Debug");
-        if (ImGui::CollapsingHeader("Entities") && ImGui::BeginTable("table1", 4, flags1))
+        if (ImGui::CollapsingHeader("Entities") && ImGui::BeginTable("table1", 5, flags1))
         {
 
             ImGui::TableSetupColumn("ID");
             ImGui::TableSetupColumn("Name");
             ImGui::TableSetupColumn("Signature");
             ImGui::TableSetupColumn("Position");
+            ImGui::TableSetupColumn("Actions");
             ImGui::TableHeadersRow();
             for (size_t i = 0; i < appECS->get_entity_list_size(); i++)
             {
@@ -358,11 +359,16 @@ class DebugInfo
                 {
                     continue;
                 }
+
+                ImGui::PushID(i);
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-                ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_None;
-                ImGui::Selectable("", false, selectable_flags);
-                ImGui::SameLine();
+                // ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_None;
+                // if(ImGui::Selectable("", false, selectable_flags))
+                // {
+                    
+                // }
+                //ImGui::SameLine();
                 ImGui::Text("%zu", i);
 
                 ImGui::TableSetColumnIndex(1);
@@ -374,15 +380,21 @@ class DebugInfo
                 {
                     ImGui::Text("%s", "Unknown");
                 }
-
+                if(i == 100)
+                {
+                    printf("nile");
+                }
                 ImGui::TableSetColumnIndex(2);
                 std::string signature{};
-                signature.resize(appECS->get_entity_signature(i).size());
-                for (size_t j = 0; j < appECS->get_entity_signature(i).size(); j++)
+                const size_t signatureSize = appECS->get_entity_signature(i).size();
+                signature.resize(signatureSize);
+                for (size_t j = 0; j < signatureSize; j++)
                 {
                     signature[j] = appECS->get_entity_signature(i)[j] ? '1' : '0';
                 }
                 ImGui::Text("%s", signature.c_str());
+
+
                 ImGui::TableSetColumnIndex(3);
                 if (appECS->has_components<positionComponent>(i))
                 {
@@ -393,6 +405,24 @@ class DebugInfo
                 {
                     ImGui::Text("(-/-)");
                 }
+
+                ImGui::TableSetColumnIndex(4);
+                
+                if(ImGui::SmallButton("Delete"))
+                {
+                    yorcvs::log("Deleting entity with index : " + std::to_string(i));
+                    appECS->destroy_entity(i);
+                }
+                ImGui::SameLine();
+                if(ImGui::SmallButton("Duplicate"))
+                {
+                    size_t ID = appECS->create_entity_ID();
+                    appECS->copy_components_to_from_entity(ID, i);
+                }
+              
+     
+                ImGui::PopID();
+               
             }
             ImGui::EndTable();
         }
@@ -594,8 +624,9 @@ class Application
         counter.start();
 
         lag += elapsed;
-
         r.handle_events();
+      
+       
         while (lag >= msPF)
         {
             dbInfo.update(msPF, render_dimensions);
