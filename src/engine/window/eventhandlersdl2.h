@@ -81,10 +81,10 @@ namespace yorcvs
         }
         void handle_events()
         {
+            
             while (SDL_PollEvent(&sdl_event) == 1)
             {
                 ImGui_ImplSDL2_ProcessEvent(&sdl_event);
-     
                 i_event.update_type(&sdl_event);
                 if(i_event.get_type() == yorcvs::Events::Type::KEYBOARD_PRESSED && impl_to_key.contains(sdl_event.key.keysym.scancode))
                 {
@@ -105,7 +105,7 @@ namespace yorcvs
             keys = SDL_GetKeyboardState(nullptr);
             return keys[key_to_impl.at(key)] ? 1 : 0; // NOLINT
         }
-        yorcvs::Vec2<float> get_pointer_position()
+        yorcvs::Vec2<float> get_pointer_position() 
         {
             int x = 0;
             int y = 0;

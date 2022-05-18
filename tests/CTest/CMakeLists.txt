@@ -32,7 +32,15 @@ else()
    SET(LUA_CMAKE_BUILD_SHARED ON CACHE BOOL "Build as shared library" FORCE)
 endif()
 
-find_package(nlohmann_json CONFIG REQUIRED)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.10.5/json.tar.xz)
+FetchContent_MakeAvailable(json)
+message(STATUS "SOURCE DIR : " ${json_SOURCE_DIR})
+message(STATUS "BUILD DIR : " ${json_BUILD_DIR} )
+
+find_package(SDL2 CONFIG REQUIRED)
+find_package(SDL2-image CONFIG REQUIRED)
+find_package(SDL2-ttf CONFIG REQUIRED)
+
 #INSTALL LUA Interpreter
 FetchContent_Declare(lua
  GIT_REPOSITORY https://github.com/Dantsz/lua-cmake.git
@@ -87,9 +95,7 @@ if (NOT imguiSDL2_POPULATED)
 endif()
 
 
-find_package(SDL2 CONFIG REQUIRED)
-find_package(SDL2-image CONFIG REQUIRED)
-find_package(SDL2-ttf CONFIG REQUIRED)
+
 
 add_executable(ECSTestEntitiesAndComponents src/ECSTestEntitiesAndComponents.cpp )
 add_test(ECSTestEntitiesAndComponents ECSTestEntitiesAndComponents )
@@ -130,3 +136,5 @@ target_include_directories(GameTestLoadingEntity PUBLIC ${sol2_SOURCE_DIR}/inclu
 add_executable(UtilitiesTestSpiral src/UtilitiesTestSpiral.cpp)
 add_test(NAME UtilitiesTestSpiral COMMAND UtilitiesTestSpiral  WORKING_DIRECTORY ${test_dir})
 
+add_executable(ECStestentityduplicate src/ECStestentityduplicate.cpp)
+add_test(NAME ECStestentityduplicate COMMAND ECStestentityduplicate  WORKING_DIRECTORY ${test_dir})

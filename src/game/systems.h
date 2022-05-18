@@ -448,7 +448,6 @@ class HealthSystem
         }
     }
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
-
     yorcvs::ECS *world;
     static constexpr float update_time = 1000.0f; // update once a second
     float cur_time = 0.0f;
@@ -480,7 +479,6 @@ class PlayerMovementControl
             s_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_S);
             d_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_D);
             q_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_Q);
-
             cur_time += dt;
             for (const auto &ID : entityList->entitiesID)
             {
@@ -642,10 +640,6 @@ class BehaviourSystem
         }
     }
     std::shared_ptr<yorcvs::EntitySystemList> entityList = nullptr;
-
-    std::random_device dev{};
-    std::mt19937 generator{dev()};
-
     yorcvs::ECS *world = nullptr;
     std::unique_ptr<yorcvs::AssetManager<std::string>> scripts;
     sol::state *lua_state;

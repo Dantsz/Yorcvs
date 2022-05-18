@@ -1209,6 +1209,7 @@ class ECS
         componentmanager->copy_component_data_to_from_entity(dstEntityID, srcEntityID);
         std::vector<bool> newSignature = get_entity_signature(srcEntityID);
         systemmanager->on_entity_signature_change(dstEntityID, newSignature);
+        entitymanager->set_signature(dstEntityID,newSignature);
     }
     // NOTE: DEBUG FUNCTIONS
     /**
