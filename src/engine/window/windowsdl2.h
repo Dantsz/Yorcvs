@@ -265,8 +265,8 @@ namespace yorcvs
             SDL_RenderGetScale(renderer, &scale.x, &scale.y);
             return scale;
         }
-    private:
         std::unique_ptr<yorcvs::AssetManager<SDL_Texture>> assetm = nullptr;
+    private:
         SDL_Window* sdlWindow = nullptr;
         SDL_Renderer* renderer = nullptr;
         bool isMinimized = false;

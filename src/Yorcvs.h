@@ -25,6 +25,7 @@
 #include "game/systems.h"
 
 #include "engine/window/windowsdl2.h"
+#include <SDL_render.h>
 #include <cstdlib>
 #include <exception>
 #include <future>
@@ -43,13 +44,14 @@ namespace yorcvs
 class DebugInfo
 {
   public:
-    DebugInfo() = default;
+    DebugInfo() = delete;
 
     DebugInfo(yorcvs::sdl2_window *parentW, yorcvs::Map *map_object, PlayerMovementControl *pms, CollisionSystem *cols,
               HealthSystem *healthS, sol::state *lua)
         : parentWindow(parentW), appECS(map_object->ecs), map(map_object), lua_state(lua), playerMoveSystem(pms),
           colSystem(cols)
     {
+
         attach(parentW, map_object, pms, cols, healthS, lua);
     }
     ~DebugInfo() = default;
@@ -238,63 +240,77 @@ class DebugInfo
         ImGui::Text("maxFramTime: %f", maxFrameTime);
         ImGui::Text("avgFrameTime: %f", avg_frame_time);
         ImGui::Text("ecsEntities: %zu", appECS->get_active_entities_number());
-        if (!playerMoveSystem->entityList->entitiesID.empty())
-        {
-            const size_t ID = playerMoveSystem->entityList->entitiesID[0];
-            if (appECS->has_components<positionComponent>(ID))
-            {
-                ImGui::Text("playerPosition: (%f,%f)", appECS->get_component<positionComponent>(ID).position.x,
-                            appECS->get_component<positionComponent>(ID).position.y);
-            }
-            if (appECS->has_components<velocityComponent>(ID))
-            {
-                ImGui::Text("playerVelocity: (%f,%f)", appECS->get_component<velocityComponent>(ID).vel.x,
-                            appECS->get_component<velocityComponent>(ID).vel.y);
-            }
-        }
         ImGui::End();
 
         if (!playerMoveSystem->entityList->entitiesID.empty())
         {
             const size_t ID = playerMoveSystem->entityList->entitiesID[0];
-            std::string playerName = "Player : ";
-            if (appECS->has_components<identificationComponent>(ID))
-            {
-                playerName += appECS->get_component<identificationComponent>(ID).name + " (" + std::to_string(ID) + ")";
-            }
-            ImGui::Begin(playerName.c_str());
-            if (appECS->has_components<healthComponent>(ID))
-            {
-                healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
-                ImGui::Text("playerHealth: (%f/%f)", playerHealthC.HP, playerHealthC.max_HP);
-            }
-            if (appECS->has_components<staminaComponent>(ID))
-            {
-                staminaComponent &playerStaminaC = appECS->get_component<staminaComponent>(ID);
-                ImGui::Text("stamina: (%f/%f)", playerStaminaC.stamina, playerStaminaC.max_stamina);
-            }
-
-            if (appECS->has_components<offensiveStatsComponent>(ID))
-            {
-                offensiveStatsComponent &offStatsC = appECS->get_component<offensiveStatsComponent>(ID);
-                ImGui::Text("Strength : (%f)", offStatsC.strength);
-                ImGui::Text("Agility : (%f)", offStatsC.agility);
-                ImGui::Text("Dexterity : (%f)", offStatsC.dexterity);
-                ImGui::Text("Piercing : (%f)", offStatsC.piercing);
-                ImGui::Text("Intellect : (%f)", offStatsC.intellect);
-            }
-            if (appECS->has_components<defensiveStatsComponent>(ID))
-            {
-                defensiveStatsComponent &defstats = appECS->get_component<defensiveStatsComponent>(ID);
-                ImGui::Text("Defense : (%f)", defstats.defense);
-                ImGui::Text("Block : (%f)", defstats.block);
-                ImGui::Text("Dodge : (%f)", defstats.dodge);
-                ImGui::Text("Spirit : (%f)", defstats.spirit);
-            }
-
+            ImGui::Begin("Player");
+            show_entity_stats(ID, "Player : ");
             ImGui::End();
         }
     }
+    void show_entity_stats(size_t ID, std::string pre_name = "Entity : ")
+    {
+        if (appECS->has_components<identificationComponent>(ID))
+        {
+            pre_name += appECS->get_component<identificationComponent>(ID).name + " (" + std::to_string(ID) + ")";
+        }
+        ImGui::Text("%s", pre_name.c_str());
+        if(appECS->has_components<spriteComponent>(ID))
+        {
+            static constexpr float size_multiplier = 4.0f;
+            const spriteComponent& comp = appECS->get_component<spriteComponent>(ID);
+
+            int texture_size_x{};
+            int texture_size_y{};
+            
+            SDL_QueryTexture(parentWindow->assetm->load_from_file(comp.texture_path).get(), nullptr, nullptr, &texture_size_x, &texture_size_y);
+
+            const yorcvs::Vec2<float> top_corner = {static_cast<float>(comp.src_rect.x)/static_cast<float>(texture_size_x),static_cast<float>(comp.src_rect.y)/static_cast<float>(texture_size_y)};
+            const yorcvs::Vec2<float> bottom_corner = {static_cast<float>(comp.src_rect.x + comp.src_rect.w)/static_cast<float>(texture_size_x),static_cast<float>(comp.src_rect.y + comp.src_rect.h)/static_cast<float>(texture_size_y)};
+            ImGui::Image(parentWindow->assetm->load_from_file(comp.texture_path).get(),{size_multiplier*comp.size.x,size_multiplier*comp.size.y},{top_corner.x,top_corner.y},{bottom_corner.x,bottom_corner.y});
+        }
+        if (appECS->has_components<positionComponent>(ID))
+        {
+            ImGui::Text("Position: (%f,%f)", appECS->get_component<positionComponent>(ID).position.x,
+                        appECS->get_component<positionComponent>(ID).position.y);
+        }
+        if (appECS->has_components<velocityComponent>(ID))
+        {
+            ImGui::Text("Velocity: (%f,%f)", appECS->get_component<velocityComponent>(ID).vel.x,
+                        appECS->get_component<velocityComponent>(ID).vel.y);
+        }
+        if (appECS->has_components<healthComponent>(ID))
+        {
+            healthComponent &playerHealthC = appECS->get_component<healthComponent>(ID);
+            ImGui::Text("Health: (%f/%f)", playerHealthC.HP, playerHealthC.max_HP);
+        }
+        if (appECS->has_components<staminaComponent>(ID))
+        {
+            staminaComponent &playerStaminaC = appECS->get_component<staminaComponent>(ID);
+            ImGui::Text("Stamina: (%f/%f)", playerStaminaC.stamina, playerStaminaC.max_stamina);
+        }
+
+        if (appECS->has_components<offensiveStatsComponent>(ID))
+        {
+            offensiveStatsComponent &offStatsC = appECS->get_component<offensiveStatsComponent>(ID);
+            ImGui::Text("Strength : (%f)", offStatsC.strength);
+            ImGui::Text("Agility : (%f)", offStatsC.agility);
+            ImGui::Text("Dexterity : (%f)", offStatsC.dexterity);
+            ImGui::Text("Piercing : (%f)", offStatsC.piercing);
+            ImGui::Text("Intellect : (%f)", offStatsC.intellect);
+        }
+        if (appECS->has_components<defensiveStatsComponent>(ID))
+        {
+            defensiveStatsComponent &defstats = appECS->get_component<defensiveStatsComponent>(ID);
+            ImGui::Text("Defense : (%f)", defstats.defense);
+            ImGui::Text("Block : (%f)", defstats.block);
+            ImGui::Text("Dodge : (%f)", defstats.dodge);
+            ImGui::Text("Spirit : (%f)", defstats.spirit);
+        }
+    }
+
     void show_console_window()
     {
         ImGui::ShowDemoWindow();
@@ -363,12 +379,18 @@ class DebugInfo
                 ImGui::PushID(i);
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-                // ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_None;
-                // if(ImGui::Selectable("", false, selectable_flags))
-                // {
-                    
-                // }
-                //ImGui::SameLine();
+
+                if (ImGui::Selectable("", false))
+                {
+                    ImGui::OpenPopup("Entity");
+                }
+                if (ImGui::BeginPopup("Entity"))
+                {
+                    ImGui::Text("%s", std::to_string(i).c_str());
+                    show_entity_stats(i);
+                    ImGui::EndPopup();
+                }
+                ImGui::SameLine();
                 ImGui::Text("%zu", i);
 
                 ImGui::TableSetColumnIndex(1);
@@ -380,10 +402,6 @@ class DebugInfo
                 {
                     ImGui::Text("%s", "Unknown");
                 }
-                if(i == 100)
-                {
-                    printf("nile");
-                }
                 ImGui::TableSetColumnIndex(2);
                 std::string signature{};
                 const size_t signatureSize = appECS->get_entity_signature(i).size();
@@ -393,7 +411,6 @@ class DebugInfo
                     signature[j] = appECS->get_entity_signature(i)[j] ? '1' : '0';
                 }
                 ImGui::Text("%s", signature.c_str());
-
 
                 ImGui::TableSetColumnIndex(3);
                 if (appECS->has_components<positionComponent>(i))
@@ -407,22 +424,20 @@ class DebugInfo
                 }
 
                 ImGui::TableSetColumnIndex(4);
-                
-                if(ImGui::SmallButton("Delete"))
+
+                if (ImGui::SmallButton("Delete"))
                 {
                     yorcvs::log("Deleting entity with index : " + std::to_string(i));
                     appECS->destroy_entity(i);
                 }
                 ImGui::SameLine();
-                if(ImGui::SmallButton("Duplicate"))
+                if (ImGui::SmallButton("Duplicate"))
                 {
                     size_t ID = appECS->create_entity_ID();
                     appECS->copy_components_to_from_entity(ID, i);
                 }
-              
-     
+
                 ImGui::PopID();
-               
             }
             ImGui::EndTable();
         }
@@ -494,6 +509,7 @@ class DebugInfo
 
     std::vector<size_t> callbacks;
     yorcvs::sdl2_window *parentWindow{};
+    
     yorcvs::ECS *appECS{};
     yorcvs::Map *map{};
     sol::state *lua_state{};
@@ -536,6 +552,7 @@ class DebugInfo
 
     static constexpr float ui_controls_update_time = 250.0f;
     static constexpr float zoom_power = 0.1f;
+   
 };
 
 // TODO: MAKE SOME SYSTEMS MAP-DEPENDENT AND REMOVE THIS
@@ -547,7 +564,7 @@ class DebugInfo
 class Application
 {
   public:
-    Application()
+    Application() : dbInfo(&r, &map, &pcS, &map.collisionS, &map.healthS, &lua_state)
     {
         lua_state.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
         yorcvs::lua::bind_runtime(lua_state, &world);
@@ -570,8 +587,6 @@ class Application
                 app_active = false;
             }
         });
-
-        dbInfo.attach(&r, &map, &pcS, &map.collisionS, &map.healthS, &lua_state);
         counter.start();
     }
     Application(const Application &other) = delete;
@@ -625,8 +640,7 @@ class Application
 
         lag += elapsed;
         r.handle_events();
-      
-       
+
         while (lag >= msPF)
         {
             dbInfo.update(msPF, render_dimensions);
