@@ -25,8 +25,10 @@
 #include "game/systems.h"
 
 #include "engine/window/windowsdl2.h"
+#include "nlohmann/json.hpp"
 #include <SDL_render.h>
-
+#include <chrono>
+#include <tuple>
 
 #include "sol/sol.hpp"
 
@@ -42,7 +44,7 @@ class DebugInfo
         : parentWindow(parentW), appECS(map_object->ecs), map(map_object), lua_state(lua), playerMoveSystem(pms),
           colSystem(cols)
     {
-        
+
         attach(parentW, map_object, pms, cols, healthS, lua);
     }
     ~DebugInfo() = default;
@@ -190,6 +192,7 @@ class DebugInfo
 
         if (showDebugWindow)
         {
+            show_performance_window();
             show_debug_window(render_dimensions);
         }
         if (showConsole)
@@ -218,7 +221,44 @@ class DebugInfo
         (*lua_state)["print"] = (*lua_state)["log"];
     }
 
+    enum update_time_item : size_t
+    {
+        collision = 0,
+        health = 1,
+        stamina = 2,
+        velocity = 3,
+        animation = 4,
+        behaviour = 5,
+    };
+
+    template <update_time_item item> void record_update_time(float value)
+    {
+        std::deque<float> &queue = std::get<1>(update_time_history[static_cast<size_t>(item)]);
+        if (queue.size() == update_time_maximum_samples)
+        {
+            queue.pop_front();
+        }
+        queue.push_back(value);
+    }
+
   private:
+    static float get_update_time_sample(void *data, int index)
+    {
+        std::deque<float> *queue = static_cast<std::deque<float> *>(data);
+        return (*queue)[index];
+    }
+    void show_performance_window() const
+    {
+        ImGui::Begin("Performance");
+        for(const auto& [label,queue] : update_time_history)
+        {
+            ImGui::PlotLines(label.c_str(),get_update_time_sample,(void*)(&queue),static_cast<int>(queue.size()));
+            ImGui::SameLine();
+            ImGui::Text("%f",queue.back());
+        }
+        ImGui::End();
+    }
+
     void show_debug_window(yorcvs::Vec2<float> &render_dimensions)
     {
         render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
@@ -238,26 +278,33 @@ class DebugInfo
             ImGui::End();
         }
     }
-    void show_entity_stats(size_t ID, std::string pre_name = "Entity : ")
+    void show_entity_stats(size_t ID, [[maybe_unused]] std::string pre_name = "Entity : ")
     {
         if (appECS->has_components<identificationComponent>(ID))
         {
             pre_name += appECS->get_component<identificationComponent>(ID).name + " (" + std::to_string(ID) + ")";
         }
         ImGui::Text("%s", pre_name.c_str());
-        if(appECS->has_components<spriteComponent>(ID))
+        if (appECS->has_components<spriteComponent>(ID))
         {
             static constexpr float size_multiplier = 4.0f;
-            const spriteComponent& comp = appECS->get_component<spriteComponent>(ID);
+            const spriteComponent &comp = appECS->get_component<spriteComponent>(ID);
 
             int texture_size_x{};
             int texture_size_y{};
-            
-            SDL_QueryTexture(parentWindow->assetm->load_from_file(comp.texture_path).get(), nullptr, nullptr, &texture_size_x, &texture_size_y);
 
-            const yorcvs::Vec2<float> top_corner = {static_cast<float>(comp.src_rect.x)/static_cast<float>(texture_size_x),static_cast<float>(comp.src_rect.y)/static_cast<float>(texture_size_y)};
-            const yorcvs::Vec2<float> bottom_corner = {static_cast<float>(comp.src_rect.x + comp.src_rect.w)/static_cast<float>(texture_size_x),static_cast<float>(comp.src_rect.y + comp.src_rect.h)/static_cast<float>(texture_size_y)};
-            ImGui::Image(parentWindow->assetm->load_from_file(comp.texture_path).get(),{size_multiplier*comp.size.x,size_multiplier*comp.size.y},{top_corner.x,top_corner.y},{bottom_corner.x,bottom_corner.y});
+            SDL_QueryTexture(parentWindow->assetm->load_from_file(comp.texture_path).get(), nullptr, nullptr,
+                             &texture_size_x, &texture_size_y);
+
+            const yorcvs::Vec2<float> top_corner = {
+                static_cast<float>(comp.src_rect.x) / static_cast<float>(texture_size_x),
+                static_cast<float>(comp.src_rect.y) / static_cast<float>(texture_size_y)};
+            const yorcvs::Vec2<float> bottom_corner = {
+                static_cast<float>(comp.src_rect.x + comp.src_rect.w) / static_cast<float>(texture_size_x),
+                static_cast<float>(comp.src_rect.y + comp.src_rect.h) / static_cast<float>(texture_size_y)};
+            ImGui::Image(parentWindow->assetm->load_from_file(comp.texture_path).get(),
+                         {size_multiplier * comp.size.x, size_multiplier * comp.size.y}, {top_corner.x, top_corner.y},
+                         {bottom_corner.x, bottom_corner.y});
         }
         if (appECS->has_components<positionComponent>(ID))
         {
@@ -497,7 +544,7 @@ class DebugInfo
 
     std::vector<size_t> callbacks;
     yorcvs::sdl2_window *parentWindow{};
-    
+
     yorcvs::ECS *appECS{};
     yorcvs::Map *map{};
     sol::state *lua_state{};
@@ -506,6 +553,14 @@ class DebugInfo
     float maxFrameTime = 0.0f;
     float frame_time_samples = 0.0f;
     float avg_frame_time = 0.0f;
+
+    // performance
+    static constexpr size_t update_time_tracked = 6;
+    static constexpr size_t update_time_maximum_samples = 200;
+    std::array<std::tuple<std::string, std::deque<float>>, update_time_tracked> update_time_history{
+        {{"collision", {}},{"health", {}},{"stamina", {}},{"velocity", {}},{"animation", {}},{"behaviour", {}}}
+    };
+
     // console
     std::string console_text;
     std::vector<std::string> console_logs;
@@ -540,7 +595,6 @@ class DebugInfo
 
     static constexpr float ui_controls_update_time = 250.0f;
     static constexpr float zoom_power = 0.1f;
-   
 };
 
 // TODO: MAKE SOME SYSTEMS MAP-DEPENDENT AND REMOVE THIS
@@ -633,8 +687,31 @@ class Application
         {
             dbInfo.update(msPF, render_dimensions);
             pcS.updateControls(render_dimensions, msPF);
+
+            update_timer.start();
             bhvS.update(msPF);
-            map.update(msPF);
+            dbInfo.record_update_time<DebugInfo::update_time_item::behaviour>(update_timer.get_ticks<float, std::chrono::nanoseconds>());
+           
+            update_timer.start();
+            map.collisionS.update(msPF);
+            dbInfo.record_update_time<DebugInfo::update_time_item::collision>(update_timer.get_ticks<float, std::chrono::nanoseconds>());
+           
+            update_timer.start();
+            map.velocityS.update(msPF);
+            dbInfo.record_update_time<DebugInfo::update_time_item::velocity>(update_timer.get_ticks<float, std::chrono::nanoseconds>());
+           
+            update_timer.start();
+            map.animS.update(msPF);
+            dbInfo.record_update_time<DebugInfo::update_time_item::animation>(update_timer.get_ticks<float, std::chrono::nanoseconds>());
+           
+            update_timer.start();
+            map.healthS.update(msPF);
+            dbInfo.record_update_time<DebugInfo::update_time_item::health>(update_timer.get_ticks<float, std::chrono::nanoseconds>());
+           
+            update_timer.start();
+            map.sprintS.update(msPF);
+            dbInfo.record_update_time<DebugInfo::update_time_item::stamina>(update_timer.get_ticks<float, std::chrono::nanoseconds>());
+           
             lag -= msPF;
         }
         r.clear();
@@ -660,7 +737,7 @@ class Application
 
     yorcvs::sdl2_window r;
     yorcvs::Timer counter;
-
+    yorcvs::Timer update_timer;
     float lag = 0.0f;
     yorcvs::Vec2<float> render_dimensions = default_render_dimensions; // how much to render
     intmax_t render_distance = default_render_distance;
@@ -672,7 +749,7 @@ class Application
     BehaviourSystem bhvS{map.ecs, &lua_state};
 
     DebugInfo dbInfo;
-    
+
     bool active = true;
 };
 } // namespace yorcvs

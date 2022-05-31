@@ -12,7 +12,7 @@ include(FetchContent)
 include(ExternalData)
 
 
-message(STATUS "BUILDING YORCVS ON "${CMAKE_SYSTEM_NAME})
+message(STATUS "BUILDING YORCVS ON " ${CMAKE_SYSTEM_NAME})
 set(YorcvsALLFILES  "src/Yorcvs.cpp"
                     "src/Yorcvs.h"
                     

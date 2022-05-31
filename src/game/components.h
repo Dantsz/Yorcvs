@@ -60,7 +60,7 @@ struct animationComponent
 {
     struct Animation
     {
-        std::vector<yorcvs::Rect<size_t>> frames; // not ideal
+        std::vector<yorcvs::Rect<size_t>> frames{}; // not ideal
         float speed;                              // in milliseconds
     };
     std::unordered_map<std::string, Animation> animations; // ugly

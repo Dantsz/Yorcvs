@@ -1,10 +1,8 @@
 #pragma once
-
 #include <filesystem>
-#include <tmxlite/Map.hpp>
+#include "nlohmann/json.hpp"      
+#include "tmxlite/Map.hpp"
 #include "tmxlite/Layer.hpp"
-
-#include "nlohmann/json.hpp"
 
 #include "tmxlite/Object.hpp"
 #include "tmxlite/ObjectGroup.hpp"
@@ -12,9 +10,9 @@
 #include "tmxlite/TileLayer.hpp"
 #include "tmxlite/Tileset.hpp"
 #include "../common/ecs.h"
-
 #include "../game/systems.h"
 #include "../game/componentSerialization.h"
+
 namespace json = nlohmann;
 // TODO: move this to utlities
 namespace std
@@ -133,19 +131,7 @@ namespace yorcvs
                 }
             }
         }
-        /**
-         * @brief Updates the systems registered by the map
-         *
-         * @param dt delta time
-         */
-        void update(const float dt)
-        {
-            collisionS.update(dt);
-            velocityS.update(dt);
-            animS.update(dt);
-            healthS.update(dt);
-            sprintS.update(dt);
-        }
+       
         /**
          * @brief Removes all entitites and tiles loaded by this map
          *
@@ -263,7 +249,7 @@ namespace yorcvs
          * @param entity
          * @return std::string
          */
-        std::string save_character(const size_t entity) const
+        [[nodiscard]]std::string save_character(const size_t entity) const
         {
             json::json j;
 
@@ -534,7 +520,7 @@ namespace yorcvs
                 }
             }
         }
-        yorcvs::Vec2<float> get_spawn_position() const
+        [[nodiscard]]yorcvs::Vec2<float> get_spawn_position() const
         {
             return spawn_coord;
         }
@@ -612,18 +598,18 @@ namespace yorcvs
         CollisionSystem collisionS;
         yorcvs::Vec2<float> tilesSize;
 
-        std::vector<size_t> entities;//not a vector of Entities because the map is not responsible for their lifetimes( they can be destroyed by other stuff)
+        std::vector<size_t> entities{};//not a vector of Entities because the map is not responsible for their lifetimes( they can be destroyed by other stuff)
         HealthSystem healthS;
         StaminaSystem sprintS;
 
         std::string map_file_path;
-        std::unordered_map<std::tuple<intmax_t, intmax_t>, std::vector<yorcvs::Tile>> tiles_chunks;
+        std::unordered_map<std::tuple<intmax_t, intmax_t>, std::vector<yorcvs::Tile>> tiles_chunks{};
 
 
         yorcvs::Vec2<float> spawn_coord;
         VelocitySystem velocityS;
         AnimationSystem animS;
         CombatSystem combat_system;
-        std::vector<yorcvs::Entity> ysorted_tiles;
+        std::vector<yorcvs::Entity> ysorted_tiles{};
     };
 }
