@@ -26,16 +26,7 @@
 
 #include "engine/window/windowsdl2.h"
 #include <SDL_render.h>
-#include <cstdlib>
-#include <exception>
-#include <future>
 
-#include <string>
-#include <vector>
-
-#include <cmath>
-#include <filesystem>
-#include <fstream>
 
 #include "sol/sol.hpp"
 
@@ -51,7 +42,7 @@ class DebugInfo
         : parentWindow(parentW), appECS(map_object->ecs), map(map_object), lua_state(lua), playerMoveSystem(pms),
           colSystem(cols)
     {
-
+        
         attach(parentW, map_object, pms, cols, healthS, lua);
     }
     ~DebugInfo() = default;
@@ -140,7 +131,6 @@ class DebugInfo
             if (appECS->has_components<healthComponent>(ID))
             {
                 /// draw health bar
-
                 yorcvs::Rect<float> healthBarRect{};
                 if (appECS->has_components<spriteComponent>(
                         ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
@@ -151,9 +141,7 @@ class DebugInfo
                 {
                     healthBarRect.y = rect.y - rect.h;
                 }
-
                 healthBarRect.x = rect.x - health_bar_x_offset + rect.w / 2;
-
                 healthBarRect.w = health_full_bar_dimension.x;
                 healthBarRect.h = health_full_bar_dimension.y;
                 if (appECS->has_components<staminaComponent>(ID))
@@ -358,9 +346,10 @@ class DebugInfo
     }
     void show_entities_table()
     {
+        const int collumn_count = 5;
         const ImGuiTableFlags flags1 = ImGuiTableFlags_BordersV | ImGuiTableFlags_SortMulti | ImGuiTableFlags_Resizable;
         ImGui::Begin("Debug");
-        if (ImGui::CollapsingHeader("Entities") && ImGui::BeginTable("table1", 5, flags1))
+        if (ImGui::CollapsingHeader("Entities") && ImGui::BeginTable("table1", collumn_count, flags1))
         {
 
             ImGui::TableSetupColumn("ID");
@@ -375,8 +364,7 @@ class DebugInfo
                 {
                     continue;
                 }
-
-                ImGui::PushID(i);
+                ImGui::PushID(static_cast<int>(i));
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
 
@@ -684,7 +672,7 @@ class Application
     BehaviourSystem bhvS{map.ecs, &lua_state};
 
     DebugInfo dbInfo;
-
+    
     bool active = true;
 };
 } // namespace yorcvs

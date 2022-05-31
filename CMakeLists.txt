@@ -87,11 +87,10 @@ endif()
 
 #INSTALL JSON LIBRARY
 message(STATUS "LINKING  JSON LIBRARY")
-
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.10.5/json.tar.xz)
 FetchContent_MakeAvailable(json)
-message(STATUS "SOURCE DIR : " ${json_SOURCE_DIR})
-message(STATUS "BUILD DIR : " ${json_BUILD_DIR} )
+message(STATUS "JSON SOURCE DIR : " ${json_SOURCE_DIR})
+message(STATUS "JSONBUILD DIR : " ${json_BUILD_DIR} )
 target_include_directories(${PROJECT_NAME} PUBLIC  nlohmann_json::nlohmann_json)
 target_link_libraries(${PROJECT_NAME} nlohmann_json::nlohmann_json)
 

@@ -3,7 +3,9 @@
 #include <filesystem>
 #include <tmxlite/Map.hpp>
 #include "tmxlite/Layer.hpp"
+
 #include "nlohmann/json.hpp"
+
 #include "tmxlite/Object.hpp"
 #include "tmxlite/ObjectGroup.hpp"
 #include "tmxlite/Property.hpp"
@@ -29,7 +31,6 @@ namespace std
 } // namespace std
 namespace yorcvs
 {
-
     struct Tile
     {
         yorcvs::Vec2<float> coords;
@@ -385,7 +386,6 @@ namespace yorcvs
             if (property.getName() == "collision" && property.getBoolValue())
             {
                 ecs->add_component<hitboxComponent>(entity, { {0, 0, object.getAABB().width, object.getAABB().height} });
-
                 // TILED HAS A WEIRD BEHAVIOUR THAT IF AN TILE IS INSERTED AS A OBJECT IT'S Y POSITION IS DIFFERENT
                 // FROM AN RECTANGLE OBJECT AND DOESN'T LOOK LIKE IN THE EDITOR
                 if (!ecs->has_components<spriteComponent>(entity))

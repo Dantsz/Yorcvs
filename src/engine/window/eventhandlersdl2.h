@@ -110,14 +110,14 @@ namespace yorcvs
             int x = 0;
             int y = 0;
             SDL_GetMouseState(&x, &y);
-            return yorcvs::Vec2<float>{static_cast<float>(x), static_cast<float>(y)};    
+            return yorcvs::Vec2<float>{static_cast<float>(x), static_cast<float>(y)};
         }
         private:
         SDL_Event sdl_event{};
         yorcvs::event_sdl2 i_event{};
         std::vector<std::function<void(const yorcvs::event&)>> callbacks{};
         std::unordered_map<yorcvs::Events::Key,SDL_Scancode> key_to_impl{};
-        std::unordered_map<SDL_Scancode,yorcvs::Events::Key> impl_to_key{};
+        std::unordered_map<SDL_Scancode,yorcvs::Events::Key> impl_to_key{}; 
         unsigned char const *keys{};
     };
 }
