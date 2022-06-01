@@ -237,27 +237,26 @@ class DebugInfo
     template <update_time_item item> void record_update_time(float value)
     {
         std::deque<float> &queue = std::get<1>(update_time_history[static_cast<size_t>(item)]);
-        auto& statistics = update_time_statistics[static_cast<size_t>(item)];
+        auto &statistics = update_time_statistics[static_cast<size_t>(item)];
         if (queue.size() == update_time_maximum_samples)
         {
             queue.pop_front();
         }
         queue.push_back(value);
 
-        //compute statistics
+        // compute statistics
         std::get<3>(statistics) *= std::get<0>(statistics);
         std::get<0>(statistics) += 1.0f;
-        if(std::get<1>(statistics) < value)
+        if (std::get<1>(statistics) < value)
         {
             std::get<1>(statistics) = value;
         }
-        if(std::get<2>(statistics) > value)
+        if (std::get<2>(statistics) > value)
         {
             std::get<2>(statistics) = value;
         }
         std::get<3>(statistics) += value;
         std::get<3>(statistics) /= std::get<0>(statistics);
-
     }
 
   private:
@@ -269,25 +268,25 @@ class DebugInfo
     void show_performance_window()
     {
         ImGui::Begin("Performance");
-        for(size_t i = 0 ; i < update_time_item::update_time_tracked ; i++){
+        for (size_t i = 0; i < update_time_item::update_time_tracked; i++)
+        {
             show_performance_parameter(i);
         }
         ImGui::End();
     }
-   
+
     void show_performance_parameter(size_t index)
     {
-        const auto& [label,queue] = update_time_history.at(index);
-        const auto [samples,max,min,avg] = update_time_statistics.at(index);
-        if(ImGui::CollapsingHeader(label.c_str()))
+        const auto &[label, queue] = update_time_history.at(index);
+        const auto [samples, max, min, avg] = update_time_statistics.at(index);
+        if (ImGui::CollapsingHeader(label.c_str()))
         {
-            ImGui::PlotLines("",get_update_time_sample,(void*)(&queue),static_cast<int>(queue.size()));
-            ImGui::Text("Current: %f",queue.back());
-            ImGui::Text("Max: %f",max);
+            ImGui::PlotLines("", get_update_time_sample, (void *)(&queue), static_cast<int>(queue.size()));
+            ImGui::Text("Current: %f", queue.back());
+            ImGui::Text("Max: %f", max);
             ImGui::Text("Avg: %f", avg);
-            ImGui::Text("Min: %f",min);
+            ImGui::Text("Min: %f", min);
         }
-        
     }
 
     void show_debug_window(yorcvs::Vec2<float> &render_dimensions)
@@ -454,6 +453,17 @@ class DebugInfo
                 {
                     ImGui::Text("%s", std::to_string(i).c_str());
                     show_entity_stats(i);
+                    
+                    const size_t player_id = get_first_player_id();
+                    
+                    if(ImGui::Button("go to") && appECS->has_components<positionComponent>(i) && appECS->has_components<positionComponent>(i))
+                    {
+                        appECS->get_component<positionComponent>(player_id) = appECS->get_component<positionComponent>(i);
+                    }
+                    if(ImGui::Button("teleport here") && appECS->has_components<positionComponent>(i) && appECS->has_components<positionComponent>(i))
+                    {
+                        appECS->get_component<positionComponent>(i) = appECS->get_component<positionComponent>(player_id);
+                    }
                     ImGui::EndPopup();
                 }
                 ImGui::SameLine();
@@ -573,6 +583,17 @@ class DebugInfo
         return 1;
     }
 
+    size_t get_first_player_id()
+    {
+        if (!playerMoveSystem->entityList->entitiesID.empty())
+        {
+            return playerMoveSystem->entityList->entitiesID[0];
+            
+        }
+        const size_t invalidID = appECS->create_entity_ID();
+        appECS->destroy_entity(invalidID);
+        return invalidID;
+    }
     std::vector<size_t> callbacks;
     yorcvs::sdl2_window *parentWindow{};
 
@@ -588,9 +609,15 @@ class DebugInfo
     // performance
     static constexpr size_t update_time_maximum_samples = 200;
     std::array<std::tuple<std::string, std::deque<float>>, update_time_item::update_time_tracked> update_time_history{
-        {{"collision", {}},{"health", {}},{"stamina", {}},{"velocity", {}},{"animation", {}},{"behaviour", {}},{"overall",{}}}
-    };
-    std::array<std::tuple<float,float,float,float>,update_time_item::update_time_tracked> update_time_statistics{}; // samples , max , min , avg
+        {{"collision", {}},
+         {"health", {}},
+         {"stamina", {}},
+         {"velocity", {}},
+         {"animation", {}},
+         {"behaviour", {}},
+         {"overall", {}}}};
+    std::array<std::tuple<float, float, float, float>, update_time_item::update_time_tracked>
+        update_time_statistics{}; // samples , max , min , avg
     // console
     std::string console_text;
     std::vector<std::string> console_logs;
@@ -721,31 +748,37 @@ class Application
 
             update_timer.start();
             bhvS.update(msPF);
-            dbInfo.record_update_time<DebugInfo::update_time_item::behaviour>(update_timer.get_ticks<float, std::chrono::nanoseconds>());
-           
+            dbInfo.record_update_time<DebugInfo::update_time_item::behaviour>(
+                update_timer.get_ticks<float, std::chrono::nanoseconds>());
+
             update_timer.start();
             map.collisionS.update(msPF);
-            dbInfo.record_update_time<DebugInfo::update_time_item::collision>(update_timer.get_ticks<float, std::chrono::nanoseconds>());
-           
+            dbInfo.record_update_time<DebugInfo::update_time_item::collision>(
+                update_timer.get_ticks<float, std::chrono::nanoseconds>());
+
             update_timer.start();
             map.velocityS.update(msPF);
-            dbInfo.record_update_time<DebugInfo::update_time_item::velocity>(update_timer.get_ticks<float, std::chrono::nanoseconds>());
-           
+            dbInfo.record_update_time<DebugInfo::update_time_item::velocity>(
+                update_timer.get_ticks<float, std::chrono::nanoseconds>());
+
             update_timer.start();
             map.animS.update(msPF);
-            dbInfo.record_update_time<DebugInfo::update_time_item::animation>(update_timer.get_ticks<float, std::chrono::nanoseconds>());
-           
+            dbInfo.record_update_time<DebugInfo::update_time_item::animation>(
+                update_timer.get_ticks<float, std::chrono::nanoseconds>());
+
             update_timer.start();
             map.healthS.update(msPF);
-            dbInfo.record_update_time<DebugInfo::update_time_item::health>(update_timer.get_ticks<float, std::chrono::nanoseconds>());
-           
+            dbInfo.record_update_time<DebugInfo::update_time_item::health>(
+                update_timer.get_ticks<float, std::chrono::nanoseconds>());
+
             update_timer.start();
             map.sprintS.update(msPF);
-            dbInfo.record_update_time<DebugInfo::update_time_item::stamina>(update_timer.get_ticks<float, std::chrono::nanoseconds>());
-           
+            dbInfo.record_update_time<DebugInfo::update_time_item::stamina>(
+                update_timer.get_ticks<float, std::chrono::nanoseconds>());
+
             lag -= msPF;
-            dbInfo.record_update_time<DebugInfo::update_time_item::overall>(update_loop_timer.get_ticks<float, std::chrono::nanoseconds>());
-           
+            dbInfo.record_update_time<DebugInfo::update_time_item::overall>(
+                update_loop_timer.get_ticks<float, std::chrono::nanoseconds>());
         }
         r.clear();
         render_map_tiles(map);
@@ -771,7 +804,7 @@ class Application
     yorcvs::sdl2_window r;
     yorcvs::Timer counter;
     yorcvs::Timer update_timer;
-    yorcvs::Timer update_loop_timer;                                 
+    yorcvs::Timer update_loop_timer;
 
     float lag = 0.0f;
     yorcvs::Vec2<float> render_dimensions = default_render_dimensions; // how much to render
