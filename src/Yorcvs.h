@@ -28,6 +28,7 @@
 #include "nlohmann/json.hpp"
 #include <SDL_render.h>
 #include <chrono>
+#include <deque>
 #include <tuple>
 
 #include "sol/sol.hpp"
@@ -229,16 +230,34 @@ class DebugInfo
         velocity = 3,
         animation = 4,
         behaviour = 5,
+        overall = 6,
+        update_time_tracked
     };
 
     template <update_time_item item> void record_update_time(float value)
     {
         std::deque<float> &queue = std::get<1>(update_time_history[static_cast<size_t>(item)]);
+        auto& statistics = update_time_statistics[static_cast<size_t>(item)];
         if (queue.size() == update_time_maximum_samples)
         {
             queue.pop_front();
         }
         queue.push_back(value);
+
+        //compute statistics
+        std::get<3>(statistics) *= std::get<0>(statistics);
+        std::get<0>(statistics) += 1.0f;
+        if(std::get<1>(statistics) < value)
+        {
+            std::get<1>(statistics) = value;
+        }
+        if(std::get<2>(statistics) > value)
+        {
+            std::get<2>(statistics) = value;
+        }
+        std::get<3>(statistics) += value;
+        std::get<3>(statistics) /= std::get<0>(statistics);
+
     }
 
   private:
@@ -247,16 +266,28 @@ class DebugInfo
         std::deque<float> *queue = static_cast<std::deque<float> *>(data);
         return (*queue)[index];
     }
-    void show_performance_window() const
+    void show_performance_window()
     {
         ImGui::Begin("Performance");
-        for(const auto& [label,queue] : update_time_history)
-        {
-            ImGui::PlotLines(label.c_str(),get_update_time_sample,(void*)(&queue),static_cast<int>(queue.size()));
-            ImGui::SameLine();
-            ImGui::Text("%f",queue.back());
+        for(size_t i = 0 ; i < update_time_item::update_time_tracked ; i++){
+            show_performance_parameter(i);
         }
         ImGui::End();
+    }
+   
+    void show_performance_parameter(size_t index)
+    {
+        const auto& [label,queue] = update_time_history.at(index);
+        const auto [samples,max,min,avg] = update_time_statistics.at(index);
+        if(ImGui::CollapsingHeader(label.c_str()))
+        {
+            ImGui::PlotLines("",get_update_time_sample,(void*)(&queue),static_cast<int>(queue.size()));
+            ImGui::Text("Current: %f",queue.back());
+            ImGui::Text("Max: %f",max);
+            ImGui::Text("Avg: %f", avg);
+            ImGui::Text("Min: %f",min);
+        }
+        
     }
 
     void show_debug_window(yorcvs::Vec2<float> &render_dimensions)
@@ -555,12 +586,11 @@ class DebugInfo
     float avg_frame_time = 0.0f;
 
     // performance
-    static constexpr size_t update_time_tracked = 6;
     static constexpr size_t update_time_maximum_samples = 200;
-    std::array<std::tuple<std::string, std::deque<float>>, update_time_tracked> update_time_history{
-        {{"collision", {}},{"health", {}},{"stamina", {}},{"velocity", {}},{"animation", {}},{"behaviour", {}}}
+    std::array<std::tuple<std::string, std::deque<float>>, update_time_item::update_time_tracked> update_time_history{
+        {{"collision", {}},{"health", {}},{"stamina", {}},{"velocity", {}},{"animation", {}},{"behaviour", {}},{"overall",{}}}
     };
-
+    std::array<std::tuple<float,float,float,float>,update_time_item::update_time_tracked> update_time_statistics{}; // samples , max , min , avg
     // console
     std::string console_text;
     std::vector<std::string> console_logs;
@@ -685,6 +715,7 @@ class Application
 
         while (lag >= msPF)
         {
+            update_loop_timer.start();
             dbInfo.update(msPF, render_dimensions);
             pcS.updateControls(render_dimensions, msPF);
 
@@ -713,6 +744,8 @@ class Application
             dbInfo.record_update_time<DebugInfo::update_time_item::stamina>(update_timer.get_ticks<float, std::chrono::nanoseconds>());
            
             lag -= msPF;
+            dbInfo.record_update_time<DebugInfo::update_time_item::overall>(update_loop_timer.get_ticks<float, std::chrono::nanoseconds>());
+           
         }
         r.clear();
         render_map_tiles(map);
@@ -738,6 +771,8 @@ class Application
     yorcvs::sdl2_window r;
     yorcvs::Timer counter;
     yorcvs::Timer update_timer;
+    yorcvs::Timer update_loop_timer;                                 
+
     float lag = 0.0f;
     yorcvs::Vec2<float> render_dimensions = default_render_dimensions; // how much to render
     intmax_t render_distance = default_render_distance;
