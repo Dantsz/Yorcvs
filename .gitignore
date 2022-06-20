@@ -32,6 +32,9 @@
 *.app
 # User file
 *.user
+#build files
+build*/
+
 Dependencies/*
 build/
 builds/

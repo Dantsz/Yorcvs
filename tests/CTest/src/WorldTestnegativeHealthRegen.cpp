@@ -56,7 +56,12 @@ int main(int argc, char **argv)
         timy.start();
         while(world.get_active_entities_number() != numberOfEntities - 1)
         {
-            map.update(HealthSystem::update_time);
+            const auto dt = HealthSystem::update_time;
+            map.collisionS.update(dt);
+            map.velocityS.update(dt);
+            map.animS.update(dt);
+            map.healthS.update(dt);
+
             timy.stop();    
             update_time += timy.get_ticks();
             samples += 1.0f;
