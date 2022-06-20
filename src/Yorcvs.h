@@ -14,7 +14,6 @@
 #include "imgui_sdl.h"
 #include "misc/cpp/imgui_stdlib.h"
 
-#include "Yorcvs.h"
 #include "common/ecs.h"
 #include "common/types.h"
 #include "common/utilities.h"
