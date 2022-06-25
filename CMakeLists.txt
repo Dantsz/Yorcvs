@@ -18,6 +18,16 @@ set(YorcvsALLFILES  "src/Yorcvs.cpp"
                     
                     "src/game/components.h"
                     "src/game/systems.h"
+
+                    "src/game/systems/animation.h"
+                    "src/game/systems/behaviour.h"
+                    "src/game/systems/collision.h"
+                    "src/game/systems/combat.h"
+                    "src/game/systems/health.h"
+                    "src/game/systems/playercontrol.h"
+                    "src/game/systems/spritesystem.h"
+                    "src/game/systems/staminasystem.h"
+                    "src/game/systems/velocity.h"
                    
                   
                     "src/common/assetmanager.h"
