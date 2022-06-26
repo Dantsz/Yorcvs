@@ -16,6 +16,8 @@ message(STATUS "BUILDING YORCVS ON " ${CMAKE_SYSTEM_NAME})
 set(YorcvsALLFILES  "src/Yorcvs.cpp"
                     "src/Yorcvs.h"
                     
+                    "src/ui/debuginfo.h"
+
                     "src/game/components.h"
                     "src/game/systems.h"
 
