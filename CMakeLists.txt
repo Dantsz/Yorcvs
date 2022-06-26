@@ -32,8 +32,12 @@ set(YorcvsALLFILES  "src/Yorcvs.cpp"
                   
                     "src/common/assetmanager.h"
                     "src/common/types.h"
-                    "src/common/utilities.h"
                     "src/common/ecs.h"
+
+                    "src/common/utilities.h"
+                    "src/common/utilities/timer.h"
+                    "src/common/utilities/ulamspiral.h"
+                    "src/common/utilities/log.h"
 
 
                     "src/engine/luaEngine.h"

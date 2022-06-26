@@ -118,6 +118,12 @@ add_test(ECSsystems ECSsystems)
 add_executable(ECSmainclassCopyMove src/ECSmainclassCopyMove.cpp)
 add_test(ECSmainclassCopyMove ECSmainclassCopyMove)
 
+add_executable(UtilitiesTestSpiral src/UtilitiesTestSpiral.cpp)
+add_test(NAME UtilitiesTestSpiral COMMAND UtilitiesTestSpiral WORKING_DIRECTORY ${test_dir} )
+
+add_executable(ECStestentityduplicate src/ECStestentityduplicate.cpp)
+add_test(NAME ECStestentityduplicate COMMAND ECStestentityduplicate  WORKING_DIRECTORY ${test_dir} )
+
 add_executable(YorcvsLoadMap src/YorcvsLoadMap.cpp)
 add_test(NAME YorcvsLoadMap  COMMAND YorcvsLoadMap WORKING_DIRECTORY ${test_dir})
 target_link_libraries(YorcvsLoadMap PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main  SDL2::SDL2_image SDL2::SDL2_ttf lua::lib imgui imgui-SDL2)
@@ -129,12 +135,8 @@ target_link_libraries(WorldTestnegativeHealthRegen PRIVATE nlohmann_json::nlohma
 target_include_directories(WorldTestnegativeHealthRegen PUBLIC ${sol2_SOURCE_DIR}/include ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends  ${imguisdl2_SOURCE_DIR})
 
 add_executable(GameTestLoadingEntity src/GameTestLoadingEntity.cpp)
-add_test(NAME GameTestLoadingEntity COMMAND GameTestLoadingEntity WORKING_DIRECTORY ${test_dir})
+add_test(NAME GameTestLoadingEntity COMMAND GameTestLoadingEntity WORKING_DIRECTORY ${test_dir} )
 target_link_libraries(GameTestLoadingEntity PRIVATE nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf lua::lib imgui imgui-SDL2)
 target_include_directories(GameTestLoadingEntity PUBLIC ${sol2_SOURCE_DIR}/include  ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends  ${imguisdl2_SOURCE_DIR})
 
-add_executable(UtilitiesTestSpiral src/UtilitiesTestSpiral.cpp)
-add_test(NAME UtilitiesTestSpiral COMMAND UtilitiesTestSpiral  WORKING_DIRECTORY ${test_dir})
 
-add_executable(ECStestentityduplicate src/ECStestentityduplicate.cpp)
-add_test(NAME ECStestentityduplicate COMMAND ECStestentityduplicate  WORKING_DIRECTORY ${test_dir})
