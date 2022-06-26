@@ -1,14 +1,12 @@
 #pragma once
 #include <chrono>
-namespace yorcvs
-{
+namespace yorcvs {
 /**
  * @brief Class for measuring time intervals
  *
  */
-class Timer
-{
-  public:
+class Timer {
+public:
     using time_type = std::chrono::time_point<std::chrono::steady_clock>;
 
     /**
@@ -35,7 +33,6 @@ class Timer
         mStopped = true;
         stop_point = std::chrono::steady_clock::now();
     }
-
     /**
      * @brief Checks if the timer has been stopped
      *
@@ -68,8 +65,7 @@ class Timer
     template <typename return_type = size_t, typename cast_format = std::chrono::milliseconds>
     [[nodiscard]] return_type get_ticks() const
     {
-        if (mStopped)
-        {
+        if (mStopped) {
             return static_cast<return_type>(std::chrono::duration_cast<cast_format>(stop_point - begin_point).count());
         }
         return static_cast<return_type>(

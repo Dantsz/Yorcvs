@@ -26,19 +26,17 @@
 #include "engine/window/windowsdl2.h"
 #include "nlohmann/json.hpp"
 
-
 #include "sol/sol.hpp"
 #include "ui/debuginfo.h"
-namespace yorcvs
-{
+namespace yorcvs {
 /**
  * @brief Main game class
  *
  */
-class Application
-{
-  public:
-    Application() : dbInfo(&r, &map, &pcS, &map.collisionS, &map.healthS, &lua_state)
+class Application {
+public:
+    Application()
+        : dbInfo(&r, &map, &pcS, &map.collisionS, &map.healthS, &lua_state)
     {
         lua_state.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
         yorcvs::lua::bind_runtime(lua_state, &world);
@@ -47,7 +45,7 @@ class Application
         yorcvs::lua::register_system_to_lua(lua_state, "Collision_system", map.collisionS);
         yorcvs::lua::register_system_to_lua(lua_state, "Animation_system", map.animS);
         yorcvs::lua::register_system_to_lua(lua_state, "Combat_system", map.combat_system, "attack",
-                                            &CombatSystem::attack);
+            &CombatSystem::attack);
         lua_state["test_map"] = &map;
         // loading two maps one on top of each other
         lua_state.safe_script(R"(
@@ -55,32 +53,29 @@ class Application
             local pl = test_map:load_entity_from_path(world:create_entity(),"assets/player.json")
             world:add_playerMovementControl(pl)
             )");
-        r.add_callback([&app_active = active](const yorcvs::event &e) {
-            if (e.get_type() == yorcvs::Events::Type::WINDOW_QUIT)
-            {
+        r.add_callback([&app_active = active](const yorcvs::event& e) {
+            if (e.get_type() == yorcvs::Events::Type::WINDOW_QUIT) {
                 app_active = false;
             }
         });
         counter.start();
     }
-    Application(const Application &other) = delete;
-    Application(Application &&other) = delete;
-    Application &operator=(const Application &other) = delete;
-    Application &operator=(Application &&other) = delete;
+    Application(const Application& other) = delete;
+    Application(Application&& other) = delete;
+    Application& operator=(const Application& other) = delete;
+    Application& operator=(Application&& other) = delete;
 
-    void render_map_chunk(yorcvs::Map &p_map, const std::tuple<intmax_t, intmax_t> &chunk)
+    void render_map_chunk(yorcvs::Map& p_map, const std::tuple<intmax_t, intmax_t>& chunk)
     {
-        if (p_map.tiles_chunks.find(chunk) != p_map.tiles_chunks.end())
-        {
-            const auto &tiles = p_map.tiles_chunks.at(chunk);
-            for (const auto &tile : tiles)
-            {
-                r.draw_texture(tile.texture_path, {tile.coords.x, tile.coords.y, p_map.tilesSize.x, p_map.tilesSize.y},
-                               tile.srcRect);
+        if (p_map.tiles_chunks.find(chunk) != p_map.tiles_chunks.end()) {
+            const auto& tiles = p_map.tiles_chunks.at(chunk);
+            for (const auto& tile : tiles) {
+                r.draw_texture(tile.texture_path, { tile.coords.x, tile.coords.y, p_map.tilesSize.x, p_map.tilesSize.y },
+                    tile.srcRect);
             }
         }
     }
-    void render_map_tiles(yorcvs::Map &p_map)
+    void render_map_tiles(yorcvs::Map& p_map)
     {
         yorcvs::Vec2<float> render_scale = r.get_render_scale();
         r.set_render_scale(r.get_window_size() / render_dimensions);
@@ -91,13 +86,11 @@ class Application
             std::floor(player_position.x / (32.0f * 16.0f)), std::floor(player_position.y / (32.0f * 16.0f)));
         // render chunks
 
-        std::tuple<intmax_t, intmax_t> chunk_to_be_rendered{};
-        for (intmax_t x = render_distance * -1; x <= render_distance; x++)
-        {
-            for (intmax_t y = -1 * render_distance; y <= render_distance; y++)
-            {
+        std::tuple<intmax_t, intmax_t> chunk_to_be_rendered {};
+        for (intmax_t x = render_distance * -1; x <= render_distance; x++) {
+            for (intmax_t y = -1 * render_distance; y <= render_distance; y++) {
                 chunk_to_be_rendered = std::make_tuple<intmax_t, intmax_t>(std::get<0>(player_position_chunk) + x,
-                                                                           std::get<1>(player_position_chunk) + y);
+                    std::get<1>(player_position_chunk) + y);
                 render_map_chunk(p_map, chunk_to_be_rendered);
             }
         }
@@ -115,8 +108,7 @@ class Application
         lag += elapsed;
         r.handle_events();
 
-        while (lag >= msPF)
-        {
+        while (lag >= msPF) {
             update_loop_timer.start();
             dbInfo.update(msPF, render_dimensions);
             pcS.updateControls(render_dimensions, msPF);
@@ -171,8 +163,8 @@ class Application
 
     ~Application() = default;
 
-  private:
-    static constexpr yorcvs::Vec2<float> default_render_dimensions = {240.0f, 120.0f};
+private:
+    static constexpr yorcvs::Vec2<float> default_render_dimensions = { 240.0f, 120.0f };
     static constexpr float msPF = 41.6f;
     static constexpr intmax_t default_render_distance = 1;
 
@@ -184,12 +176,12 @@ class Application
     float lag = 0.0f;
     yorcvs::Vec2<float> render_dimensions = default_render_dimensions; // how much to render
     intmax_t render_distance = default_render_distance;
-    yorcvs::ECS world{};
+    yorcvs::ECS world {};
     sol::state lua_state;
-    yorcvs::Map map{&world};
-    SpriteSystem sprS{map.ecs, &r};
-    PlayerMovementControl pcS{map.ecs, &r};
-    BehaviourSystem bhvS{map.ecs, &lua_state};
+    yorcvs::Map map { &world };
+    SpriteSystem sprS { map.ecs, &r };
+    PlayerMovementControl pcS { map.ecs, &r };
+    BehaviourSystem bhvS { map.ecs, &lua_state };
 
     DebugInfo dbInfo;
 
