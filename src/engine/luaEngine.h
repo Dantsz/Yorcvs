@@ -20,7 +20,6 @@ namespace yorcvs::lua {
  * @param name
  * @param args pairs made of a string which is the name sued by lua  and the parameter of the component
  */
-
 template <typename T, typename... Args>
 inline void register_component_to_lua(sol::state& lua_state, const std::string& name, Args&&... args)
 {
@@ -154,6 +153,7 @@ inline bool bind_runtime(sol::state& lua_state, yorcvs::ECS* ecs)
         &offensiveStatsComponent::agility, "dexterity", &offensiveStatsComponent::dexterity, "piercing",
         &offensiveStatsComponent::piercing, "intellect", &offensiveStatsComponent::intellect);
     register_component_to_lua<playerMovementControlledComponent>(lua_state, "playerMovementControl");
+    register_component_to_lua<behaviourComponent>(lua_state, "behaviourComponent", &behaviourComponent::code_path, "code_path");
     return true;
 }
 
