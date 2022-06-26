@@ -67,7 +67,7 @@ namespace yorcvs
 		void draw_text(const std::string& message, const std::string& path, const yorcvs::Rect<float>& dstRect, unsigned char r, unsigned char g,
 			unsigned char b, unsigned char a, size_t charSize, size_t lineLength)
 		{
-			static_cast<Window_Implementation*>(this)->draw_text(message, path, r, g, b, a, charSize, lineLength);
+            static_cast<Window_Implementation*>(this)->draw_text(message, path, dstRect, r, g, b, a, charSize, lineLength);
 		}
 		/**
 		* @brief Draws a rectangle to the screen

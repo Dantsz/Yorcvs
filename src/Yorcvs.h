@@ -25,10 +25,7 @@
 
 #include "engine/window/windowsdl2.h"
 #include "nlohmann/json.hpp"
-#include <SDL_render.h>
-#include <chrono>
-#include <deque>
-#include <tuple>
+
 
 #include "sol/sol.hpp"
 #include "ui/debuginfo.h"
