@@ -96,21 +96,9 @@ class DebugInfo
                 }
             }
         }
-        frame_time = elapsed;
-        avg_frame_time *= frame_time_samples;
-        frame_time_samples += 1.0f;
-        avg_frame_time += elapsed;
-        avg_frame_time /= frame_time_samples;
         if (!playerMoveSystem->entityList->entitiesID.empty())
         {
             (*lua_state)["playerID"] = playerMoveSystem->entityList->entitiesID[0];
-        }
-        if (showDebugWindow)
-        {
-            if (elapsed > maxFrameTime)
-            {
-                maxFrameTime = elapsed;
-            }
         }
     }
 
@@ -292,12 +280,6 @@ class DebugInfo
     {
         render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
                         hitbox_color[3]);
-        ImGui::Begin("DebugWindow");
-        ImGui::Text("frameTime: %f", frame_time);
-        ImGui::Text("maxFramTime: %f", maxFrameTime);
-        ImGui::Text("avgFrameTime: %f", avg_frame_time);
-        ImGui::Text("ecsEntities: %zu", appECS->get_active_entities_number());
-        ImGui::End();
 
         if (!playerMoveSystem->entityList->entitiesID.empty())
         {
@@ -521,7 +503,6 @@ class DebugInfo
 
     void reset()
     {
-        maxFrameTime = 0.0f;
     }
 
     void add_log(const std::string &message)
@@ -599,11 +580,7 @@ class DebugInfo
     yorcvs::ECS *appECS{};
     yorcvs::Map *map{};
     sol::state *lua_state{};
-    // debug window
-    float frame_time = 0.0f;
-    float maxFrameTime = 0.0f;
-    float frame_time_samples = 0.0f;
-    float avg_frame_time = 0.0f;
+
 
     // performance
     static constexpr size_t update_time_maximum_samples = 200;
