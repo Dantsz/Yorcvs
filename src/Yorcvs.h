@@ -220,6 +220,14 @@ class DebugInfo
         overall = 6,
         update_time_tracked
     };
+    //samples , max , min , avg
+    enum update_time_sample_tuple_element : size_t{
+        samples = 0,
+        max = 1,
+        min = 2,
+        avg =3,
+        update_time_sample_tuple_elements
+    };
 
     template <update_time_item item> void record_update_time(float value)
     {
@@ -232,18 +240,18 @@ class DebugInfo
         queue.push_back(value);
 
         // compute statistics
-        std::get<3>(statistics) *= std::get<0>(statistics);
-        std::get<0>(statistics) += 1.0f;
-        if (std::get<1>(statistics) < value)
+        std::get<update_time_sample_tuple_element::avg>(statistics) *= std::get<0>(statistics);
+        std::get<update_time_sample_tuple_element::samples>(statistics) += 1.0f;
+        if (std::get<update_time_sample_tuple_element::max>(statistics) < value)
         {
-            std::get<1>(statistics) = value;
+            std::get<update_time_sample_tuple_element::max>(statistics) = value;
         }
-        if (std::get<2>(statistics) > value)
+        if (std::get<update_time_sample_tuple_element::min>(statistics) > value)
         {
-            std::get<2>(statistics) = value;
+            std::get<update_time_sample_tuple_element::min>(statistics) = value;
         }
-        std::get<3>(statistics) += value;
-        std::get<3>(statistics) /= std::get<0>(statistics);
+        std::get<update_time_sample_tuple_element::avg>(statistics) += value;
+        std::get<update_time_sample_tuple_element::avg>(statistics) /= std::get<0>(statistics);
     }
 
   private:
@@ -503,6 +511,19 @@ class DebugInfo
 
     void reset()
     {
+        //clear graphs
+        for(auto& [parameter_name,queue] : update_time_history)
+        {
+           queue.clear();
+        }
+        //clear statistics
+        for(auto& tup : update_time_statistics)
+        {
+           std::get<update_time_sample_tuple_element::samples>(tup) = 0.0f;
+           std::get<update_time_sample_tuple_element::max>(tup) = 0.0f;
+           std::get<update_time_sample_tuple_element::min>(tup) = std::numeric_limits<float>::max();
+           std::get<update_time_sample_tuple_element::avg>(tup) = 0.0f;
+        }
     }
 
     void add_log(const std::string &message)
