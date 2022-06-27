@@ -74,13 +74,15 @@ public:
 
         yorcvs::log("creating texture manager");
         assetm = std::make_unique<yorcvs::AssetManager<SDL_Texture>>(
-            [&](const std::string& path) {
+            [&](const std::string& path) -> SDL_Texture* {
                 SDL_Surface* surf = nullptr;
                 SDL_RWops* rwop = SDL_RWFromFile(path.c_str(), "rb");
-
+                if (rwop == nullptr) {
+                    return nullptr;
+                }
                 surf = IMG_Load_RW(rwop, 1);
                 if (surf == nullptr) {
-                    yorcvs::log(IMG_GetError(), yorcvs::MSGSEVERITY::ERROR);
+                    return nullptr;
                 }
                 SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
 
@@ -131,7 +133,12 @@ public:
                 static_cast<int>(srcRect.h) };
             SDL_FRect dest = { static_cast<float>(dstRect.x - offset.x), static_cast<float>(dstRect.y - offset.y),
                 static_cast<float>(dstRect.w), static_cast<float>(dstRect.h) };
-            SDL_RenderCopyExF(renderer, assetm->load_from_file(path).get(), &sourceR, &dest, angle, nullptr,
+            SDL_Texture* texture_ptr = assetm->load_from_file(path).get();
+            if (texture_ptr == nullptr) {
+                yorcvs::log("Texture : " + path + " is not a valid texture!", yorcvs::MSGSEVERITY::ERROR);
+                return;
+            }
+            SDL_RenderCopyExF(renderer, texture_ptr, &sourceR, &dest, angle, nullptr,
                 SDL_FLIP_NONE);
         }
     }
@@ -145,7 +152,11 @@ public:
                 static_cast<int>(srcRect.h) };
             SDL_FRect dest = { static_cast<float>(dstRectPos.x - offset.x), static_cast<float>(dstRectPos.y - offset.y),
                 static_cast<float>(dstRectSize.x), static_cast<float>(dstRectSize.y) };
-            SDL_RenderCopyExF(renderer, assetm->load_from_file(path).get(), &sourceR, &dest, angle, nullptr,
+            SDL_Texture* texture_ptr = assetm->load_from_file(path).get();
+            if (texture_ptr == nullptr) {
+                return;
+            }
+            SDL_RenderCopyExF(renderer, texture_ptr, &sourceR, &dest, angle, nullptr,
                 SDL_FLIP_NONE);
         }
     }
