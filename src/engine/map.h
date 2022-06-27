@@ -139,7 +139,7 @@ public:
      * @return return false on failure
      */
     template <typename T>
-    bool deserialize_component_from_json(
+    [[nodiscard]] bool deserialize_component_from_json(
         const size_t entity_id, json::json& json_entity_obj, const std::string& component_name, [[maybe_unused]] std::function<void(T&)> transform = [](T&) {})
     {
         if (json_entity_obj.contains(component_name)) {
