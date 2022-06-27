@@ -305,7 +305,18 @@ private:
             ImGui::Text("Spirit : (%f)", defstats.spirit);
         }
     }
+    void show_entity_interaction_window(size_t sender, size_t target)
+    {
+        ImGui::Text("%s", std::to_string(target).c_str());
+        show_entity_stats(target);
 
+        if (ImGui::Button("go to") && appECS->has_components<positionComponent>(target) && appECS->has_components<positionComponent>(target)) {
+            appECS->get_component<positionComponent>(sender) = appECS->get_component<positionComponent>(target);
+        }
+        if (ImGui::Button("teleport here") && appECS->has_components<positionComponent>(target) && appECS->has_components<positionComponent>(target)) {
+            appECS->get_component<positionComponent>(target) = appECS->get_component<positionComponent>(sender);
+        }
+    }
     void show_console_window()
     {
         ImGui::ShowDemoWindow();
@@ -372,17 +383,7 @@ private:
                 ImGui::OpenPopup("Entity");
             }
             if (ImGui::BeginPopup("Entity")) {
-                ImGui::Text("%s", std::to_string(i).c_str());
-                show_entity_stats(i);
-
-                const size_t player_id = get_first_player_id();
-
-                if (ImGui::Button("go to") && appECS->has_components<positionComponent>(i) && appECS->has_components<positionComponent>(i)) {
-                    appECS->get_component<positionComponent>(player_id) = appECS->get_component<positionComponent>(i);
-                }
-                if (ImGui::Button("teleport here") && appECS->has_components<positionComponent>(i) && appECS->has_components<positionComponent>(i)) {
-                    appECS->get_component<positionComponent>(i) = appECS->get_component<positionComponent>(player_id);
-                }
+                show_entity_interaction_window(get_first_player_id(), i);
                 ImGui::EndPopup();
             }
             ImGui::SameLine();
