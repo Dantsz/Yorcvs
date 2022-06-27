@@ -191,27 +191,50 @@ public:
             yorcvs::log("Failed to load entity data " + path + " !");
             return;
         }
-        deserialize_component_from_json<identificationComponent>(entity_id, entityJSON, "identification");
-        deserialize_component_from_json<hitboxComponent>(entity_id, entityJSON, "hitbox");
-        deserialize_component_from_json<healthComponent>(entity_id, entityJSON, "health");
-        deserialize_component_from_json<staminaComponent>(entity_id, entityJSON, "stamina");
-        deserialize_component_from_json<offensiveStatsComponent>(entity_id, entityJSON, "offsensive_stats");
-        deserialize_component_from_json<defensiveStatsComponent>(entity_id, entityJSON, "defensive_stats");
-        deserialize_component_from_json<spriteComponent>(entity_id, entityJSON, "sprite", [&](spriteComponent& /*spr*/) {
+        if (!deserialize_component_from_json<identificationComponent>(entity_id, entityJSON, "identification")) {
+            yorcvs::log("identificationComponent (" + path + ") is not valid");
+            return;
+        }
+        if (!deserialize_component_from_json<hitboxComponent>(entity_id, entityJSON, "hitbox")) {
+            yorcvs::log("hitboxComponent (" + path + ") is not valid");
+            return;
+        }
+        if (!deserialize_component_from_json<healthComponent>(entity_id, entityJSON, "health")) {
+            yorcvs::log("healthComponent (" + path + ") is not valid");
+            return;
+        }
+        if (!deserialize_component_from_json<staminaComponent>(entity_id, entityJSON, "stamina")) {
+            yorcvs::log("staminaComponent (" + path + ") is not valid");
+            return;
+        }
+        if (!deserialize_component_from_json<offensiveStatsComponent>(entity_id, entityJSON, "offsensive_stats")) {
+            yorcvs::log("offensiveStatsComponent (" + path + ") is not valid");
+            return;
+        }
+        if (!deserialize_component_from_json<defensiveStatsComponent>(entity_id, entityJSON, "defensive_stats")) {
+            yorcvs::log("defensiveStatsComponent (" + path + ") is not valid");
+            return;
+        }
+        if (!deserialize_component_from_json<spriteComponent>(entity_id, entityJSON, "sprite", [&](spriteComponent& /*spr*/) {
                 const std::string sprite_path = directory_path + std::string(entityJSON["sprite"]["spriteName"]);
-                entityJSON["sprite"]["spriteName"] = sprite_path;
-                yorcvs::components::deserialize(ecs->get_component<spriteComponent>(entity_id), entityJSON["sprite"]);
+                ecs->get_component<spriteComponent>(entity_id).texture_path = sprite_path;
                 if (entityJSON["sprite"].contains("animations"))
                 {
                     if (!ecs->has_components<animationComponent>(entity_id))
                     {
                         ecs->add_component<animationComponent>(entity_id, {});
                     }
-                    yorcvs::components::deserialize(ecs->get_component<animationComponent>(entity_id),
-                        entityJSON["sprite"]["animations"]);
-
+                    if(!yorcvs::components::deserialize(ecs->get_component<animationComponent>(entity_id),
+                        entityJSON["sprite"]["animations"]))
+                    {
+                      yorcvs::log("animationComponent is not valid");
+                      return;
+                    }
                     AnimationSystem::set_animation(ecs, entity_id, "idleL");
-                } });
+                } })) {
+            yorcvs::log("spriteComponent (" + path + ") is not valid");
+            return;
+        }
         // These components should not be serialized as the position and velocity is relative to the map!!!
         if (!ecs->has_components<positionComponent>(entity_id)) {
             ecs->add_component<positionComponent>(entity_id, {});
