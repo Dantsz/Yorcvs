@@ -2,6 +2,7 @@
 #include "../../common/ecs.h"
 #include "../../engine/window/windowsdl2.h"
 #include "../components.h"
+#include "animation.h"
 /**
  * @brief Handles player input
  *
