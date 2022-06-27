@@ -494,7 +494,7 @@ private:
     {
         tmx::Tileset const* tile_set = nullptr;
         for (const auto& tileset : map.getTilesets()) {
-            if (tileset.hasTile(UID)) {
+            if (tileset.hasTile(static_cast<uint32_t>(UID))) {
                 tile_set = &tileset;
             }
         }
@@ -520,7 +520,7 @@ private:
     {
         tmx::Tileset const* tile_set = nullptr;
         for (const auto& tileset : map.getTilesets()) {
-            if (tileset.hasTile(tile_UID)) {
+            if (tileset.hasTile(static_cast<uint32_t>(tile_UID))) {
                 tile_set = &tileset;
             }
         }

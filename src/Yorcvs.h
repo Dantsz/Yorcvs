@@ -36,7 +36,7 @@ namespace yorcvs {
 class Application {
 public:
     Application()
-        : dbInfo(&r, &map, &pcS, &map.collisionS, &map.healthS, &lua_state)
+        : dbInfo(&r, &map, &pcS, &map.collisionS, &map.healthS, &map.combat_system, &lua_state)
     {
         lua_state.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
         yorcvs::lua::bind_runtime(lua_state, &world);

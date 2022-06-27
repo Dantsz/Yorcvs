@@ -14,13 +14,14 @@ public:
     DebugInfo() = delete;
 
     DebugInfo(yorcvs::sdl2_window* parentW, yorcvs::Map* map_object, PlayerMovementControl* pms, CollisionSystem* cols,
-        HealthSystem* healthS, sol::state* lua)
+        HealthSystem* healthS, CombatSystem* combat_sys, sol::state* lua)
         : parentWindow(parentW)
         , appECS(map_object->ecs)
         , map(map_object)
         , lua_state(lua)
         , playerMoveSystem(pms)
         , colSystem(cols)
+        , combat_system(combat_sys)
     {
 
         attach(parentW, map_object, pms, cols, healthS, lua);
@@ -316,6 +317,9 @@ private:
         if (ImGui::Button("teleport here") && appECS->has_components<positionComponent>(target) && appECS->has_components<positionComponent>(target)) {
             appECS->get_component<positionComponent>(target) = appECS->get_component<positionComponent>(sender);
         }
+        if (appECS->has_components<offensiveStatsComponent>(sender) && appECS->has_components<healthComponent>(target) && ImGui::Button("attack")) {
+            combat_system->attack(sender, target);
+        }
     }
     void show_console_window()
     {
@@ -364,7 +368,6 @@ private:
             ImGui::End();
             return;
         }
-
         ImGui::TableSetupColumn("ID");
         ImGui::TableSetupColumn("Name");
         ImGui::TableSetupColumn("Signature");
@@ -531,6 +534,7 @@ private:
 
     CollisionSystem* colSystem {};
     HealthSystem* healthSys {};
+    CombatSystem* combat_system {};
 
     // controls
     bool showDebugWindow = false;
