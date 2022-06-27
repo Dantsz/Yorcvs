@@ -4,6 +4,11 @@ namespace yorcvs {
 template <typename Window_Implementation>
 class window {
 public:
+    window() = default;
+    window(const window& other) = delete;
+    window(window&& other) = delete;
+    window& operator=(const window& other) = delete;
+    window& operator=(window&& other) = delete;
     virtual ~window() = default;
     /**
      * @brief Clears the screen

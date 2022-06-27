@@ -101,6 +101,10 @@ public:
             }
         });
     }
+    sdl2_window(const sdl2_window& other) = delete;
+    sdl2_window(sdl2_window&& other) = delete;
+    sdl2_window& operator=(const sdl2_window& other) = delete;
+    sdl2_window& operator=(sdl2_window&& other) = delete;
     ~sdl2_window() override
     {
         ImGuiSDL::Deinitialize();
