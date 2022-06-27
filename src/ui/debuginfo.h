@@ -350,6 +350,7 @@ private:
         const ImGuiTableFlags flags1 = ImGuiTableFlags_BordersV | ImGuiTableFlags_SortMulti | ImGuiTableFlags_Resizable;
         ImGui::Begin("Debug");
         if (!(ImGui::CollapsingHeader("Entities") && ImGui::BeginTable("table1", collumn_count, flags1))) {
+            ImGui::End();
             return;
         }
 
