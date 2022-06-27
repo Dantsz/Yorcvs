@@ -181,7 +181,11 @@ public:
 
         std::ifstream entityIN(path);
         std::string entityDATA { (std::istreambuf_iterator<char>(entityIN)), (std::istreambuf_iterator<char>()) };
-        auto entityJSON = json::json::parse(entityDATA);
+        auto entityJSON = json::json::parse(entityDATA, nullptr, false); // don't throw exception
+        if (entityJSON.is_discarded()) {
+            yorcvs::log("Failed to load entity data " + path + " !");
+            return;
+        }
         deserialize_component_from_json<identificationComponent>(entity_id, entityJSON, "identification");
         deserialize_component_from_json<hitboxComponent>(entity_id, entityJSON, "hitbox");
         deserialize_component_from_json<healthComponent>(entity_id, entityJSON, "health");
