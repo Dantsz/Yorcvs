@@ -30,8 +30,8 @@ public:
         : ecs(world)
         , init_ecs(*world)
         , collisionS(world)
-        , healthS(world)
-        , sprintS(world)
+        , health_system(world)
+        , sprint_system(world)
         , velocityS(world)
         , animS(world)
         , combat_system(world)
@@ -553,8 +553,8 @@ public:
     yorcvs::Vec2<float> tilesSize;
 
     std::vector<size_t> entities {}; // not a vector of Entities because the map is not responsible for their lifetimes( they can be destroyed by other stuff)
-    HealthSystem healthS;
-    StaminaSystem sprintS;
+    HealthSystem health_system;
+    StaminaSystem sprint_system;
 
     std::string map_file_path;
     std::unordered_map<std::tuple<intmax_t, intmax_t>, std::vector<yorcvs::Tile>> tiles_chunks {};

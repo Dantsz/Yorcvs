@@ -36,12 +36,12 @@ namespace yorcvs {
 class Application {
 public:
     Application()
-        : dbInfo(&r, &map, &pcS, &map.collisionS, &map.healthS, &map.combat_system, &lua_state)
+        : dbInfo(&r, &map, &pcS, &map.collisionS, &map.health_system, &map.combat_system, &lua_state)
     {
         lua_state.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
         yorcvs::lua::bind_runtime(lua_state, &world);
 
-        yorcvs::lua::register_system_to_lua(lua_state, "Health_system", map.healthS);
+        yorcvs::lua::register_system_to_lua(lua_state, "Health_system", map.health_system);
         yorcvs::lua::register_system_to_lua(lua_state, "Collision_system", map.collisionS);
         yorcvs::lua::register_system_to_lua(lua_state, "Animation_system", map.animS);
         yorcvs::lua::register_system_to_lua(lua_state, "Combat_system", map.combat_system, "attack",
@@ -134,12 +134,12 @@ public:
                 update_timer.get_ticks<float, std::chrono::nanoseconds>());
 
             update_timer.start();
-            map.healthS.update(msPF);
+            map.health_system.update(msPF);
             dbInfo.record_update_time<DebugInfo::update_time_item::health>(
                 update_timer.get_ticks<float, std::chrono::nanoseconds>());
 
             update_timer.start();
-            map.sprintS.update(msPF);
+            map.sprint_system.update(msPF);
             dbInfo.record_update_time<DebugInfo::update_time_item::stamina>(
                 update_timer.get_ticks<float, std::chrono::nanoseconds>());
 

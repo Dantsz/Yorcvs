@@ -38,12 +38,12 @@ public:
         if (time_accumulator >= ui_controls_update_time) {
             if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_LCTRL)) {
                 if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_E)) {
-                    show_debug_window = !show_debug_window;
+                    debug_window_opened = !debug_window_opened;
                     time_accumulator = 0;
                 }
                 if (parentWindow->is_key_pressed(Events::Key::YORCVS_KEY_TILDE)) {
                     player_move_system->controls_enable = !player_move_system->controls_enable;
-                    showConsole = !showConsole;
+                    console_opened = !console_opened;
                     time_accumulator = 0;
                 }
                 if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_I)) {
@@ -134,11 +134,11 @@ public:
     void render(yorcvs::Vec2<float>& render_dimensions)
     {
 
-        if (show_debug_window) {
+        if (debug_window_opened) {
             show_performance_window();
             show_debug_window(render_dimensions);
         }
-        if (showConsole) {
+        if (console_opened) {
             show_console_window();
             show_entities_table();
         }
@@ -336,9 +336,9 @@ private:
         ImGui::EndChild();
         ImGui::Separator();
         bool reclaim_focus = false;
-        if (ImGui::InputText("##", &console_text, input_text_flags, &DebugInfo::TextEditCallbackStub, (void*)this) && !console_text.empty()) {
+        if (ImGui::InputText("##", &console_text, input_text_flags, &DebugInfo::text_edit_callback_stub, (void*)this) && !console_text.empty()) {
             console_logs.push_back(console_text);
-            HistoryPos = -1;
+            history_pos = -1;
             console_previous_commands.push_back(console_text);
             auto rez = lua_state->safe_script(console_text,
                 [](lua_State*, sol::protected_function_result pfr) { return pfr; });
@@ -457,38 +457,38 @@ private:
     {
         console_logs.clear();
         console_previous_commands.clear();
-        HistoryPos = -1;
+        history_pos = -1;
     }
-    static int TextEditCallbackStub(ImGuiInputTextCallbackData* data)
+    static int text_edit_callback_stub(ImGuiInputTextCallbackData* data)
     {
         auto* console = static_cast<DebugInfo*>(data->UserData);
-        return console->TextEditCallback(data);
+        return console->text_edit_callback(data);
     }
 
-    int TextEditCallback(ImGuiInputTextCallbackData* data)
+    int text_edit_callback(ImGuiInputTextCallbackData* data)
     {
         // AddLog("cursor: %d, selection: %d-%d", data->CursorPos, data->SelectionStart, data->SelectionEnd);
         switch (data->EventFlag) {
         case ImGuiInputTextFlags_CallbackHistory: {
             // Example of HISTORY
-            const int prev_history_pos = HistoryPos;
+            const int prev_history_pos = history_pos;
             if (data->EventKey == ImGuiKey_UpArrow) {
-                if (HistoryPos == -1) {
-                    HistoryPos = static_cast<int>(console_previous_commands.size()) - 1;
-                } else if (HistoryPos > 0) {
-                    HistoryPos--;
+                if (history_pos == -1) {
+                    history_pos = static_cast<int>(console_previous_commands.size()) - 1;
+                } else if (history_pos > 0) {
+                    history_pos--;
                 }
             } else if (data->EventKey == ImGuiKey_DownArrow) {
-                if (HistoryPos != -1) {
-                    if (++HistoryPos >= static_cast<int>(console_previous_commands.size())) {
-                        HistoryPos = -1;
+                if (history_pos != -1) {
+                    if (++history_pos >= static_cast<int>(console_previous_commands.size())) {
+                        history_pos = -1;
                     }
                 }
             }
 
             // A better implementation would preserve the data on the current input line along with cursor position.
-            if (prev_history_pos != HistoryPos) {
-                const char* history_str = (HistoryPos >= 0) ? console_previous_commands[HistoryPos].c_str() : "";
+            if (prev_history_pos != history_pos) {
+                const char* history_str = (history_pos >= 0) ? console_previous_commands[history_pos].c_str() : "";
                 data->DeleteChars(0, data->BufTextLen);
                 data->InsertChars(0, history_str);
             }
@@ -537,10 +537,10 @@ private:
     CombatSystem* combat_system {};
 
     // controls
-    bool show_debug_window = false;
-    bool showConsole = false;
+    bool debug_window_opened = false;
+    bool console_opened = false;
     float time_accumulator = 0;
-    int HistoryPos = 0;
+    int history_pos = 0;
 
     static constexpr yorcvs::Vec2<float> health_full_bar_dimension = { 32.0f, 4.0f };
     const std::vector<uint8_t> health_bar_full_color = { 255, 0, 0, 255 };
@@ -549,10 +549,10 @@ private:
     static constexpr float health_bar_x_offset = 16.0f;
     const std::vector<uint8_t> hitbox_color = { 255, 0, 0, 100 };
 
-    static constexpr size_t textR = 255;
-    static constexpr size_t textG = 255;
-    static constexpr size_t textB = 255;
-    static constexpr size_t textA = 255;
+    static constexpr size_t text_R = 255;
+    static constexpr size_t text_G = 255;
+    static constexpr size_t text_B = 255;
+    static constexpr size_t text_A = 255;
     static constexpr size_t text_char_size = 100;
     static constexpr size_t text_line_length = 10000;
 
