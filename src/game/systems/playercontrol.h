@@ -22,14 +22,10 @@ public:
 
     void updateControls(const yorcvs::Vec2<float>& render_size, float dt)
     {
-        if (controls_enable) {
-            w_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_W);
-            a_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_A);
-            s_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_S);
-            d_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_D);
-            q_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_Q);
-            cur_time += dt;
-            for (const auto& ID : entityList->entitiesID) {
+
+        cur_time += dt;
+        for (const auto& ID : entityList->entitiesID) {
+            if (controls_enable) {
                 dir = yorcvs::Vec2<float>(static_cast<float>(d_pressed) + static_cast<float>(a_pressed) * -1.0f,
                     static_cast<float>(w_pressed) * -1.0f + static_cast<float>(s_pressed));
                 dir.normalize(); // now moving at 1000 units per second
@@ -48,12 +44,15 @@ public:
                     cur_time = 0.0f;
                 }
                 world->get_component<velocityComponent>(ID).vel = dir;
-                window->set_drawing_offset(world->get_component<positionComponent>(ID).position + dir - (render_size - world->get_component<spriteComponent>(ID).size) / 2);
+
+                w_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_W);
+                a_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_A);
+                s_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_S);
+                d_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_D);
+                q_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_Q);
                 if (a_pressed) {
                     AnimationSystem::set_animation(world, ID, "walkingL");
-                } else if (d_pressed) {
-                    AnimationSystem::set_animation(world, ID, "walkingR");
-                } else if (s_pressed || w_pressed) {
+                } else if (d_pressed || s_pressed || w_pressed) {
                     AnimationSystem::set_animation(world, ID, "walkingR");
                 } else if (world->get_component<velocityComponent>(ID).facing.x) {
                     AnimationSystem::set_animation(world, ID, "idleL");
@@ -61,6 +60,7 @@ public:
                     AnimationSystem::set_animation(world, ID, "idleR");
                 }
             }
+            window->set_drawing_offset(world->get_component<positionComponent>(ID).position + dir - (render_size - world->get_component<spriteComponent>(ID).size) / 2);
         }
     }
 
