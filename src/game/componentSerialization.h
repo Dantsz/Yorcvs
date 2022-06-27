@@ -185,11 +185,20 @@ template <typename T> json::json serialize(const T &comp)
  *
  * @tparam T
  * @param dst destination
- *
+ * @return returns fals on failure
  */
-template <typename T> void deserialize(T &dst, const json::json &j)
+template <typename T> bool deserialize(T &dst, const json::json &j)
 {
+    try{
     dst = j;
+    }
+    catch(std::exception&)
+    {
+        yorcvs::log("failed to deserialize component");
+        return false;
+    }
+
+    return true;
 }
 
 
