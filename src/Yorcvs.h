@@ -36,14 +36,14 @@ namespace yorcvs {
 class Application {
 public:
     Application()
-        : dbInfo(&r, &map, &pcS, &map.collisionS, &map.health_system, &map.combat_system, &lua_state)
+        : dbInfo(&r, &map, &pcS, &map.collision_system, &map.health_system, &map.combat_system, &lua_state)
     {
         lua_state.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
         yorcvs::lua::bind_runtime(lua_state, &world);
 
         yorcvs::lua::register_system_to_lua(lua_state, "Health_system", map.health_system);
-        yorcvs::lua::register_system_to_lua(lua_state, "Collision_system", map.collisionS);
-        yorcvs::lua::register_system_to_lua(lua_state, "Animation_system", map.animS);
+        yorcvs::lua::register_system_to_lua(lua_state, "Collision_system", map.collision_system);
+        yorcvs::lua::register_system_to_lua(lua_state, "Animation_system", map.animation_system);
         yorcvs::lua::register_system_to_lua(lua_state, "Combat_system", map.combat_system, "attack",
             &CombatSystem::attack);
         lua_state["test_map"] = &map;
@@ -119,17 +119,17 @@ public:
                 update_timer.get_ticks<float, std::chrono::nanoseconds>());
 
             update_timer.start();
-            map.collisionS.update(msPF);
+            map.collision_system.update(msPF);
             dbInfo.record_update_time<DebugInfo::update_time_item::collision>(
                 update_timer.get_ticks<float, std::chrono::nanoseconds>());
 
             update_timer.start();
-            map.velocityS.update(msPF);
+            map.velocity_system.update(msPF);
             dbInfo.record_update_time<DebugInfo::update_time_item::velocity>(
                 update_timer.get_ticks<float, std::chrono::nanoseconds>());
 
             update_timer.start();
-            map.animS.update(msPF);
+            map.animation_system.update(msPF);
             dbInfo.record_update_time<DebugInfo::update_time_item::animation>(
                 update_timer.get_ticks<float, std::chrono::nanoseconds>());
 

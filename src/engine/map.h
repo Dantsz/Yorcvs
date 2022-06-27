@@ -29,11 +29,11 @@ public:
     explicit Map(yorcvs::ECS* world)
         : ecs(world)
         , init_ecs(*world)
-        , collisionS(world)
+        , collision_system(world)
         , health_system(world)
         , sprint_system(world)
-        , velocityS(world)
-        , animS(world)
+        , velocity_system(world)
+        , animation_system(world)
         , combat_system(world)
     {
     }
@@ -549,7 +549,6 @@ public:
     // class to initialize the ecs before systems are constructed
     ecs_Initializer init_ecs;
 
-    CollisionSystem collisionS;
     yorcvs::Vec2<float> tilesSize;
 
     std::vector<size_t> entities {}; // not a vector of Entities because the map is not responsible for their lifetimes( they can be destroyed by other stuff)
@@ -560,9 +559,10 @@ public:
     std::unordered_map<std::tuple<intmax_t, intmax_t>, std::vector<yorcvs::Tile>> tiles_chunks {};
 
     yorcvs::Vec2<float> spawn_coord;
-    VelocitySystem velocityS;
-    AnimationSystem animS;
+    VelocitySystem velocity_system;
+    AnimationSystem animation_system;
     CombatSystem combat_system;
+    CollisionSystem collision_system;
     std::vector<yorcvs::Entity> ysorted_tiles {};
 };
 }
