@@ -19,8 +19,8 @@ public:
         , appECS(map_object->ecs)
         , map(map_object)
         , lua_state(lua)
-        , playerMoveSystem(pms)
-        , colSystem(cols)
+        , player_move_system(pms)
+        , colission_system(cols)
         , combat_system(combat_sys)
     {
 
@@ -38,11 +38,11 @@ public:
         if (time_accumulator >= ui_controls_update_time) {
             if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_LCTRL)) {
                 if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_E)) {
-                    showDebugWindow = !showDebugWindow;
+                    show_debug_window = !show_debug_window;
                     time_accumulator = 0;
                 }
                 if (parentWindow->is_key_pressed(Events::Key::YORCVS_KEY_TILDE)) {
-                    playerMoveSystem->controls_enable = !playerMoveSystem->controls_enable;
+                    player_move_system->controls_enable = !player_move_system->controls_enable;
                     showConsole = !showConsole;
                     time_accumulator = 0;
                 }
@@ -58,7 +58,7 @@ public:
                 if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_C)) {
                     yorcvs::log("Saving player...");
                     std::ofstream out("assets/testPlayer.json");
-                    out << map->save_character(playerMoveSystem->entityList->entitiesID[0]);
+                    out << map->save_character(player_move_system->entityList->entitiesID[0]);
                     yorcvs::log("Done.");
                     time_accumulator = 0;
                 }
@@ -67,8 +67,8 @@ public:
                 }
             }
         }
-        if (!playerMoveSystem->entityList->entitiesID.empty()) {
-            (*lua_state)["playerID"] = playerMoveSystem->entityList->entitiesID[0];
+        if (!player_move_system->entityList->entitiesID.empty()) {
+            (*lua_state)["playerID"] = player_move_system->entityList->entitiesID[0];
         }
     }
 
@@ -79,7 +79,7 @@ public:
         window.set_render_scale(window.get_window_size() / render_dimensions);
 
         yorcvs::Rect<float> rect {};
-        for (const auto& ID : colSystem->entityList->entitiesID) {
+        for (const auto& ID : colission_system->entityList->entitiesID) {
             rect.x = appECS->get_component<positionComponent>(ID).position.x + appECS->get_component<hitboxComponent>(ID).hitbox.x;
             rect.y = appECS->get_component<positionComponent>(ID).position.y + appECS->get_component<hitboxComponent>(ID).hitbox.y;
             rect.w = appECS->get_component<hitboxComponent>(ID).hitbox.w;
@@ -134,7 +134,7 @@ public:
     void render(yorcvs::Vec2<float>& render_dimensions)
     {
 
-        if (showDebugWindow) {
+        if (show_debug_window) {
             show_performance_window();
             show_debug_window(render_dimensions);
         }
@@ -152,9 +152,9 @@ public:
         parentWindow = parentW;
         map = map_object;
         appECS = map->ecs;
-        playerMoveSystem = pms;
-        colSystem = cols;
-        healthSys = healthS;
+        player_move_system = pms;
+        colission_system = cols;
+        health_system = healthS;
     }
     void attach_lua()
     {
@@ -238,8 +238,8 @@ private:
         render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
             hitbox_color[3]);
 
-        if (!playerMoveSystem->entityList->entitiesID.empty()) {
-            const size_t ID = playerMoveSystem->entityList->entitiesID[0];
+        if (!player_move_system->entityList->entitiesID.empty()) {
+            const size_t ID = player_move_system->entityList->entitiesID[0];
             ImGui::Begin("Player");
             show_entity_stats(ID, "Player : ");
             ImGui::End();
@@ -499,8 +499,8 @@ private:
 
     size_t get_first_player_id()
     {
-        if (!playerMoveSystem->entityList->entitiesID.empty()) {
-            return playerMoveSystem->entityList->entitiesID[0];
+        if (!player_move_system->entityList->entitiesID.empty()) {
+            return player_move_system->entityList->entitiesID[0];
         }
         const size_t invalidID = appECS->create_entity_ID();
         appECS->destroy_entity(invalidID);
@@ -530,14 +530,14 @@ private:
     std::string console_text;
     std::vector<std::string> console_logs;
     std::vector<std::string> console_previous_commands;
-    PlayerMovementControl* playerMoveSystem {};
+    PlayerMovementControl* player_move_system {};
 
-    CollisionSystem* colSystem {};
-    HealthSystem* healthSys {};
+    CollisionSystem* colission_system {};
+    HealthSystem* health_system {};
     CombatSystem* combat_system {};
 
     // controls
-    bool showDebugWindow = false;
+    bool show_debug_window = false;
     bool showConsole = false;
     float time_accumulator = 0;
     int HistoryPos = 0;
