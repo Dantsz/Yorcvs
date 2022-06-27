@@ -136,7 +136,7 @@ public:
      * @param json_entity_obj
      * @param component_name
      * @param transform function to be applied to the component after it has been added
-     * @return return false on failure
+     * @return return false on parsing failure
      */
     template <typename T>
     [[nodiscard]] bool deserialize_component_from_json(
@@ -152,9 +152,8 @@ public:
                 ecs->add_component<T>(entity_id, comp);
             }
             transform(ecs->get_component<T>(entity_id));
-            return true;
         }
-        return false;
+        return true;
     }
     /**
      * @brief serializes the component and adds it to the json to the as an object with the name <component_name>

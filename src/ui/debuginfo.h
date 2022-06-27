@@ -71,8 +71,8 @@ public:
         }
     }
 
-    void render_hitboxes(yorcvs::sdl2_window& window, const yorcvs::Vec2<float>& render_dimensions, const size_t r,
-        const size_t g, const size_t b, const size_t a)
+    void render_hitboxes(yorcvs::sdl2_window& window, const yorcvs::Vec2<float>& render_dimensions, const uint8_t r,
+        const uint8_t g, const uint8_t b, const uint8_t a)
     {
         yorcvs::Vec2<float> old_rs = window.get_render_scale();
         window.set_render_scale(window.get_window_size() / render_dimensions);
