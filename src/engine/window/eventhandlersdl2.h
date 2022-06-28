@@ -33,6 +33,9 @@ public:
         case SDL_QUIT:
             type = yorcvs::Events::Type::WINDOW_QUIT;
             break;
+        case SDL_MOUSEBUTTONDOWN:
+            type = yorcvs::Events::Type::MOUSE_CLICKED;
+            break;
         case SDL_WINDOWEVENT:
             switch (e->window.event) {
             case SDL_WINDOWEVENT_RESTORED:
