@@ -154,6 +154,7 @@ public:
         ImGui::Render();
         ImGuiSDL::Render(ImGui::GetDrawData());
         r.present();
+        dbInfo.end_frame();
     }
 
     [[nodiscard]] bool is_active() const

@@ -23,7 +23,6 @@ public:
         , colission_system(cols)
         , combat_system(combat_sys)
     {
-
         attach(parentW, map_object, pms, cols, healthS, lua);
     }
     ~DebugInfo() = default;
@@ -115,6 +114,11 @@ public:
         player_move_system = pms;
         colission_system = cols;
         health_system = healthS;
+        parentW->add_callback([&mouse_is_pressed = mouse_is_pressed](const yorcvs::event& event) {
+            if (event.get_type() == yorcvs::Events::Type::MOUSE_CLICKED) {
+                mouse_is_pressed = true;
+            }
+        });
     }
     void attach_lua()
     {
@@ -163,6 +167,10 @@ public:
         }
         std::get<update_time_sample_tuple_element::avg>(statistics) += value;
         std::get<update_time_sample_tuple_element::avg>(statistics) /= std::get<0>(statistics);
+    }
+    void end_frame()
+    {
+        mouse_is_pressed = false;
     }
 
 private:
@@ -548,6 +556,7 @@ private:
     // controls
     bool debug_window_opened = false;
     bool console_opened = false;
+    bool mouse_is_pressed = false;
     float time_accumulator = 0;
     int history_pos = 0;
 
