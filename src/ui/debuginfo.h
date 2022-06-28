@@ -85,48 +85,8 @@ public:
             rect.w = appECS->get_component<hitboxComponent>(ID).hitbox.w;
             rect.h = appECS->get_component<hitboxComponent>(ID).hitbox.h;
             window.draw_rect(rect, r, g, b, a);
-            if (appECS->has_components<healthComponent>(ID)) {
-                /// draw health bar
-                yorcvs::Rect<float> healthBarRect {};
-                if (appECS->has_components<spriteComponent>(
-                        ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
-                {
-                    healthBarRect.y = rect.y - appECS->get_component<spriteComponent>(ID).size.y / 2;
-                } else {
-                    healthBarRect.y = rect.y - rect.h;
-                }
-                healthBarRect.x = rect.x - health_bar_x_offset + rect.w / 2;
-                healthBarRect.w = health_full_bar_dimension.x;
-                healthBarRect.h = health_full_bar_dimension.y;
-                if (appECS->has_components<staminaComponent>(ID)) {
-                    healthBarRect.y -= health_full_bar_dimension.y * 2;
-                }
-                window.draw_rect(healthBarRect, health_bar_empty_color[0], health_bar_empty_color[1],
-                    health_bar_empty_color[2], health_bar_empty_color[3]);
-                healthBarRect.w = (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).max_HP) * health_bar_base_width;
-                window.draw_rect(healthBarRect, health_bar_full_color[0], health_bar_full_color[1],
-                    health_bar_full_color[2], health_bar_full_color[3]);
-            }
-            if (appECS->has_components<staminaComponent>(ID)) {
-                yorcvs::Rect<float> staminaBarRect {};
-                if (appECS->has_components<spriteComponent>(
-                        ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
-                {
-                    staminaBarRect.y = rect.y - appECS->get_component<spriteComponent>(ID).size.y / 2;
-                } else {
-                    staminaBarRect.y = rect.y - rect.h;
-                }
-
-                staminaBarRect.x = rect.x - health_bar_x_offset + rect.w / 2;
-
-                staminaBarRect.w = health_full_bar_dimension.x;
-                staminaBarRect.h = health_full_bar_dimension.y;
-                window.draw_rect(staminaBarRect, stamina_bar_empty_color[0], stamina_bar_empty_color[1],
-                    stamina_bar_empty_color[2], stamina_bar_empty_color[3]);
-                staminaBarRect.w = (appECS->get_component<staminaComponent>(ID).stamina / appECS->get_component<staminaComponent>(ID).max_stamina) * health_bar_base_width;
-                window.draw_rect(staminaBarRect, stamina_bar_full_color[0], stamina_bar_full_color[1],
-                    stamina_bar_full_color[2], stamina_bar_full_color[3]);
-            }
+            draw_entity_health_bar(window, ID, rect);
+            draw_entity_stamina_bar(window, ID, rect);
         }
         window.set_render_scale(old_rs);
     }
@@ -506,6 +466,55 @@ private:
         appECS->destroy_entity(invalidID);
         return invalidID;
     }
+    void draw_entity_health_bar(yorcvs::sdl2_window& window, size_t ID, const yorcvs::Rect<float>& offset_rect)
+    {
+        if (appECS->has_components<healthComponent>(ID)) {
+            /// draw health bar
+            yorcvs::Rect<float> healthBarRect {};
+            if (appECS->has_components<spriteComponent>(
+                    ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
+            {
+                healthBarRect.y = offset_rect.y - appECS->get_component<spriteComponent>(ID).size.y / 2;
+            } else {
+                healthBarRect.y = offset_rect.y - offset_rect.h;
+            }
+            healthBarRect.x = offset_rect.x - health_bar_x_offset + offset_rect.w / 2;
+            healthBarRect.w = health_full_bar_dimension.x;
+            healthBarRect.h = health_full_bar_dimension.y;
+            if (appECS->has_components<staminaComponent>(ID)) {
+                healthBarRect.y -= health_full_bar_dimension.y * 2;
+            }
+            window.draw_rect(healthBarRect, health_bar_empty_color[0], health_bar_empty_color[1],
+                health_bar_empty_color[2], health_bar_empty_color[3]);
+            healthBarRect.w = (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).max_HP) * health_bar_base_width;
+            window.draw_rect(healthBarRect, health_bar_full_color[0], health_bar_full_color[1],
+                health_bar_full_color[2], health_bar_full_color[3]);
+        }
+    }
+    void draw_entity_stamina_bar(yorcvs::sdl2_window& window, size_t ID, const yorcvs::Rect<float>& offset_rect)
+    {
+        if (appECS->has_components<staminaComponent>(ID)) {
+            yorcvs::Rect<float> staminaBarRect {};
+            if (appECS->has_components<spriteComponent>(
+                    ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
+            {
+                staminaBarRect.y = offset_rect.y - appECS->get_component<spriteComponent>(ID).size.y / 2;
+            } else {
+                staminaBarRect.y = offset_rect.y - offset_rect.h;
+            }
+
+            staminaBarRect.x = offset_rect.x - health_bar_x_offset + offset_rect.w / 2;
+
+            staminaBarRect.w = health_full_bar_dimension.x;
+            staminaBarRect.h = health_full_bar_dimension.y;
+            window.draw_rect(staminaBarRect, stamina_bar_empty_color[0], stamina_bar_empty_color[1],
+                stamina_bar_empty_color[2], stamina_bar_empty_color[3]);
+            staminaBarRect.w = (appECS->get_component<staminaComponent>(ID).stamina / appECS->get_component<staminaComponent>(ID).max_stamina) * health_bar_base_width;
+            window.draw_rect(staminaBarRect, stamina_bar_full_color[0], stamina_bar_full_color[1],
+                stamina_bar_full_color[2], stamina_bar_full_color[3]);
+        }
+    }
+
     std::vector<size_t> callbacks;
     yorcvs::sdl2_window* parentWindow {};
 
