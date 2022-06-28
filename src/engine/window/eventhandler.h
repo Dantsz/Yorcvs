@@ -23,6 +23,7 @@ namespace Events {
     enum Type {
         UNKNOWN,
         KEYBOARD_PRESSED,
+        MOUSE_CLICKED,
         TEXT_INPUT,
         WINDOW_MINIMIZED,
         WINDOW_RESTORED,
