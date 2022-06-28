@@ -36,7 +36,7 @@ namespace yorcvs {
 class Application {
 public:
     Application()
-        : dbInfo(&r, &map, &pcS, &map.collision_system, &map.health_system, &map.combat_system, &lua_state)
+        : debug_info_widgets(&app_window, &map, &player_control, &map.collision_system, &map.health_system, &map.combat_system, &lua_state)
     {
         lua_state.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
         yorcvs::lua::bind_runtime(lua_state, &world);
@@ -53,7 +53,7 @@ public:
             local pl = test_map:load_entity_from_path(world:create_entity(),"assets/player.json")
             world:add_playerMovementControl(pl)
             )");
-        r.add_callback([&app_active = active](const yorcvs::event& e) {
+        app_window.add_callback([&app_active = active](const yorcvs::event& e) {
             if (e.get_type() == yorcvs::Events::Type::WINDOW_QUIT) {
                 app_active = false;
             }
@@ -70,17 +70,17 @@ public:
         if (p_map.tiles_chunks.find(chunk) != p_map.tiles_chunks.end()) {
             const auto& tiles = p_map.tiles_chunks.at(chunk);
             for (const auto& tile : tiles) {
-                r.draw_texture(tile.texture_path, { tile.coords.x, tile.coords.y, p_map.tilesSize.x, p_map.tilesSize.y },
+                app_window.draw_texture(tile.texture_path, { tile.coords.x, tile.coords.y, p_map.tilesSize.x, p_map.tilesSize.y },
                     tile.srcRect);
             }
         }
     }
     void render_map_tiles(yorcvs::Map& p_map)
     {
-        yorcvs::Vec2<float> render_scale = r.get_render_scale();
-        r.set_render_scale(r.get_window_size() / render_dimensions);
+        yorcvs::Vec2<float> render_scale = app_window.get_render_scale();
+        app_window.set_render_scale(app_window.get_window_size() / render_dimensions);
         // get player position
-        const size_t entity_ID = pcS.entityList->entitiesID[0];
+        const size_t entity_ID = player_control.entityList->entitiesID[0];
         const yorcvs::Vec2<float> player_position = world.get_component<positionComponent>(entity_ID).position;
         const std::tuple<intmax_t, intmax_t> player_position_chunk = std::tuple<intmax_t, intmax_t>(
             std::floor(player_position.x / (32.0f * 16.0f)), std::floor(player_position.y / (32.0f * 16.0f)));
@@ -95,7 +95,7 @@ public:
             }
         }
 
-        r.set_render_scale(render_scale);
+        app_window.set_render_scale(render_scale);
     }
     void run()
     {
@@ -106,55 +106,55 @@ public:
         counter.start();
 
         lag += elapsed;
-        r.handle_events();
+        app_window.handle_events();
 
         while (lag >= msPF) {
             update_loop_timer.start();
-            dbInfo.update(msPF, render_dimensions);
-            pcS.updateControls(render_dimensions, msPF);
+            debug_info_widgets.update(msPF, render_dimensions);
+            player_control.updateControls(render_dimensions, msPF);
 
             update_timer.start();
-            bhvS.update(msPF);
-            dbInfo.record_update_time<DebugInfo::update_time_item::behaviour>(
+            behaviour_system.update(msPF);
+            debug_info_widgets.record_update_time<DebugInfo::update_time_item::behaviour>(
                 update_timer.get_ticks<float, std::chrono::nanoseconds>());
 
             update_timer.start();
             map.collision_system.update(msPF);
-            dbInfo.record_update_time<DebugInfo::update_time_item::collision>(
+            debug_info_widgets.record_update_time<DebugInfo::update_time_item::collision>(
                 update_timer.get_ticks<float, std::chrono::nanoseconds>());
 
             update_timer.start();
             map.velocity_system.update(msPF);
-            dbInfo.record_update_time<DebugInfo::update_time_item::velocity>(
+            debug_info_widgets.record_update_time<DebugInfo::update_time_item::velocity>(
                 update_timer.get_ticks<float, std::chrono::nanoseconds>());
 
             update_timer.start();
             map.animation_system.update(msPF);
-            dbInfo.record_update_time<DebugInfo::update_time_item::animation>(
+            debug_info_widgets.record_update_time<DebugInfo::update_time_item::animation>(
                 update_timer.get_ticks<float, std::chrono::nanoseconds>());
 
             update_timer.start();
             map.health_system.update(msPF);
-            dbInfo.record_update_time<DebugInfo::update_time_item::health>(
+            debug_info_widgets.record_update_time<DebugInfo::update_time_item::health>(
                 update_timer.get_ticks<float, std::chrono::nanoseconds>());
 
             update_timer.start();
             map.sprint_system.update(msPF);
-            dbInfo.record_update_time<DebugInfo::update_time_item::stamina>(
+            debug_info_widgets.record_update_time<DebugInfo::update_time_item::stamina>(
                 update_timer.get_ticks<float, std::chrono::nanoseconds>());
 
             lag -= msPF;
-            dbInfo.record_update_time<DebugInfo::update_time_item::overall>(
+            debug_info_widgets.record_update_time<DebugInfo::update_time_item::overall>(
                 update_loop_timer.get_ticks<float, std::chrono::nanoseconds>());
         }
-        r.clear();
+        app_window.clear();
         render_map_tiles(map);
-        sprS.renderSprites(render_dimensions);
-        dbInfo.render(render_dimensions);
+        sprite_system.renderSprites(render_dimensions);
+        debug_info_widgets.render(render_dimensions);
         ImGui::Render();
         ImGuiSDL::Render(ImGui::GetDrawData());
-        r.present();
-        dbInfo.end_frame();
+        app_window.present();
+        debug_info_widgets.end_frame();
     }
 
     [[nodiscard]] bool is_active() const
@@ -169,7 +169,7 @@ private:
     static constexpr float msPF = 41.6f;
     static constexpr intmax_t default_render_distance = 1;
 
-    yorcvs::sdl2_window r;
+    yorcvs::sdl2_window app_window;
     yorcvs::Timer counter;
     yorcvs::Timer update_timer;
     yorcvs::Timer update_loop_timer;
@@ -180,11 +180,11 @@ private:
     yorcvs::ECS world {};
     sol::state lua_state;
     yorcvs::Map map { &world };
-    SpriteSystem sprS { map.ecs, &r };
-    PlayerMovementControl pcS { map.ecs, &r };
-    BehaviourSystem bhvS { map.ecs, &lua_state };
+    SpriteSystem sprite_system { map.ecs, &app_window };
+    PlayerMovementControl player_control { map.ecs, &app_window };
+    BehaviourSystem behaviour_system { map.ecs, &lua_state };
 
-    DebugInfo dbInfo;
+    DebugInfo debug_info_widgets;
 
     bool active = true;
 };
