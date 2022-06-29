@@ -206,7 +206,10 @@ public:
     {
         offset = newOffset;
     }
-
+    yorcvs::Vec2<float> get_drawing_offset()
+    {
+        return offset;
+    }
     yorcvs::Vec2<float> get_window_size()
     {
         int width = 0;
