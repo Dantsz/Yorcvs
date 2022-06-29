@@ -257,6 +257,11 @@ public:
         return Vec2<T>(w, h);
     }
 
+    constexpr bool contains(const yorcvs::Vec2<T>& point)
+    {
+        return (point.x >= x) && (point.x <= x + w) && (point.y >= y) && (point.y <= y + h);
+    }
+
     T x, y;
     T w, h;
 };

@@ -9,6 +9,9 @@ enable_testing()
 project(ECSTest)
 
 set(test_dir ${CMAKE_SOURCE_DIR})
+set(yorcvs_include_path ${CMAKE_SOURCE_DIR}../../../src)
+message(STATUS "Yorcvs source: " ${yorcvs_include_path})
+
 include(FetchContent)
 
 FetchContent_Declare(libtmxlite
@@ -71,7 +74,6 @@ FetchContent_Declare(imgui
 FetchContent_GetProperties(imgui)
 if (NOT imgui_POPULATED)
    FetchContent_Populate(imgui)
-  
   message(STATUS "imgui :" ${imgui_SOURCE_DIR})
   add_library(imgui STATIC ${imgui_SOURCE_DIR}/imgui.cpp ${imgui_SOURCE_DIR}/imgui_demo.cpp ${imgui_SOURCE_DIR}/imgui_draw.cpp ${imgui_SOURCE_DIR}/imgui_tables.cpp ${imgui_SOURCE_DIR}/imgui_widgets.cpp ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl.cpp ${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp)
   target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
@@ -117,6 +119,10 @@ add_test(ECSsystems ECSsystems)
 
 add_executable(ECSmainclassCopyMove src/ECSmainclassCopyMove.cpp)
 add_test(ECSmainclassCopyMove ECSmainclassCopyMove)
+
+add_executable(TypesTestRectContains src/TypesTestRectContains.cpp)
+add_test(NAME TypesTestRectContains COMMAND TypesTestRectContains WORKING_DIRECTORY ${test_dir} )
+target_include_directories(TypesTestRectContains PUBLIC ${yorcvs_include_path})
 
 add_executable(UtilitiesTestSpiral src/UtilitiesTestSpiral.cpp)
 add_test(NAME UtilitiesTestSpiral COMMAND UtilitiesTestSpiral WORKING_DIRECTORY ${test_dir} )
