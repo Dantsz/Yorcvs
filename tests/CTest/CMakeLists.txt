@@ -9,7 +9,7 @@ enable_testing()
 project(ECSTest)
 
 set(test_dir ${CMAKE_SOURCE_DIR})
-set(yorcvs_include_path ${CMAKE_SOURCE_DIR}../../../src)
+get_filename_component(yorcvs_include_path ../../src ABSOLUTE)
 message(STATUS "Yorcvs source: " ${yorcvs_include_path})
 
 include(FetchContent)
@@ -121,8 +121,9 @@ add_executable(ECSmainclassCopyMove src/ECSmainclassCopyMove.cpp)
 add_test(ECSmainclassCopyMove ECSmainclassCopyMove)
 
 add_executable(TypesTestRectContains src/TypesTestRectContains.cpp)
-add_test(NAME TypesTestRectContains COMMAND TypesTestRectContains WORKING_DIRECTORY ${test_dir} )
 target_include_directories(TypesTestRectContains PUBLIC ${yorcvs_include_path})
+add_test(NAME TypesTestRectContains COMMAND TypesTestRectContains WORKING_DIRECTORY ${test_dir} )
+
 
 add_executable(UtilitiesTestSpiral src/UtilitiesTestSpiral.cpp)
 add_test(NAME UtilitiesTestSpiral COMMAND UtilitiesTestSpiral WORKING_DIRECTORY ${test_dir} )
