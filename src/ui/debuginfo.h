@@ -8,11 +8,29 @@
 #include "imgui.h"
 #include "imgui_sdl.h"
 #include "misc/cpp/imgui_stdlib.h"
+#include <optional>
 namespace yorcvs {
 class DebugInfo {
 public:
+    enum update_time_item : size_t {
+        collision = 0,
+        health = 1,
+        stamina = 2,
+        velocity = 3,
+        animation = 4,
+        behaviour = 5,
+        overall = 6,
+        update_time_tracked
+    };
+    // samples , max , min , avg
+    enum update_time_sample_tuple_element : size_t {
+        samples = 0,
+        max = 1,
+        min = 2,
+        avg = 3,
+        update_time_sample_tuple_elements
+    };
     DebugInfo() = delete;
-
     DebugInfo(yorcvs::sdl2_window* parentW, yorcvs::Map* map_object, PlayerMovementControl* pms, CollisionSystem* cols,
         HealthSystem* healthS, CombatSystem* combat_sys, sol::state* lua)
         : parentWindow(parentW)
@@ -86,6 +104,13 @@ public:
             window.draw_rect(rect, r, g, b, a);
             draw_entity_health_bar(window, ID, rect);
             draw_entity_stamina_bar(window, ID, rect);
+            if (mouse_is_pressed) {
+                static int bile = 0;
+                bile++;
+                if (rect.contains(window.get_pointer_position() / window.get_render_scale() + window.get_drawing_offset())) {
+                    select_target = ID;
+                }
+            }
         }
         window.set_render_scale(old_rs);
     }
@@ -96,13 +121,17 @@ public:
         if (debug_window_opened) {
             show_performance_window();
             show_debug_window(render_dimensions);
+            if (select_target.has_value() && appECS->is_valid_entity(select_target.value())) {
+                ImGui::Begin("Target");
+                show_entity_interaction_window(get_first_player_id(), select_target.value());
+                ImGui::End();
+            } else {
+                select_target.reset();
+            }
         }
         if (console_opened) {
             show_console_window();
             show_entities_table();
-        }
-        for (const auto& extra_widget : widget_list) {
-            extra_widget();
         }
     }
 
@@ -129,26 +158,6 @@ public:
         lua_state->script("function log(message) internal_log(tostring(message)) end");
         (*lua_state)["print"] = (*lua_state)["log"];
     }
-
-    enum update_time_item : size_t {
-        collision = 0,
-        health = 1,
-        stamina = 2,
-        velocity = 3,
-        animation = 4,
-        behaviour = 5,
-        overall = 6,
-        update_time_tracked
-    };
-    // samples , max , min , avg
-    enum update_time_sample_tuple_element : size_t {
-        samples = 0,
-        max = 1,
-        min = 2,
-        avg = 3,
-        update_time_sample_tuple_elements
-    };
-
     template <update_time_item item>
     void record_update_time(float value)
     {
@@ -294,7 +303,6 @@ private:
     }
     void show_console_window()
     {
-        ImGui::ShowDemoWindow();
         ImGui::Begin("Console");
         ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackHistory;
 
@@ -550,8 +558,7 @@ private:
     std::string console_text;
     std::vector<std::string> console_logs;
     std::vector<std::string> console_previous_commands;
-
-    std::vector<std::function<void()>> widget_list;
+    std::optional<size_t> select_target {};
 
     PlayerMovementControl* player_move_system {};
 

@@ -83,6 +83,10 @@ public:
 
         while (SDL_PollEvent(&sdl_event) == 1) {
             ImGui_ImplSDL2_ProcessEvent(&sdl_event);
+            ImGuiIO& io = ImGui::GetIO();
+            if (io.WantCaptureMouse) {
+                continue;
+            }
             i_event.update_type(&sdl_event);
             if (i_event.get_type() == yorcvs::Events::Type::KEYBOARD_PRESSED && impl_to_key.contains(sdl_event.key.keysym.scancode)) {
                 i_event.key = impl_to_key.at(sdl_event.key.keysym.scancode);
