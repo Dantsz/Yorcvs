@@ -101,6 +101,9 @@ public:
             show_console_window();
             show_entities_table();
         }
+        for (const auto& extra_widget : widget_list) {
+            extra_widget();
+        }
     }
 
     void attach(yorcvs::sdl2_window* parentW, yorcvs::Map* map_object, PlayerMovementControl* pms,
@@ -547,6 +550,9 @@ private:
     std::string console_text;
     std::vector<std::string> console_logs;
     std::vector<std::string> console_previous_commands;
+
+    std::vector<std::function<void()>> widget_list;
+
     PlayerMovementControl* player_move_system {};
 
     CollisionSystem* colission_system {};
