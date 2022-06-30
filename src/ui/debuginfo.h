@@ -536,7 +536,16 @@ private:
             staminaBarRect.w = std::max((appECS->get_component<staminaComponent>(ID).stamina / appECS->get_component<staminaComponent>(ID).max_stamina) * health_bar_base_width, 0.0f);
             window.draw_rect(staminaBarRect, stamina_bar_full_color[0], stamina_bar_full_color[1],
                 stamina_bar_full_color[2], stamina_bar_full_color[3]);
+            draw_status_bar(window, staminaBarRect, (appECS->get_component<staminaComponent>(ID).stamina / appECS->get_component<staminaComponent>(ID).max_stamina) * health_bar_base_width,
+                stamina_bar_full_color[0], stamina_bar_full_color[1],
+                stamina_bar_full_color[2], stamina_bar_full_color[3]);
         }
+    }
+    void draw_status_bar(yorcvs::sdl2_window& window, yorcvs::Rect<float> rect, float value, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+    {
+        window.draw_rect(rect, r, g, b, a);
+        rect.w = std::max(value * rect.w, 0.0f);
+        window.draw_rect(rect, r, g, b, a);
     }
 
     std::vector<size_t> callbacks;
