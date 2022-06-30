@@ -148,11 +148,13 @@ public:
     {
         if (id > lowestUnallocatedID) {
             yorcvs::log("Invalid id for deletion : id doesn't exist", yorcvs::MSGSEVERITY::ERROR);
+            return;
         }
         // if the id appears in the delted entities
         if (std::binary_search(freedIndices.begin(), freedIndices.end(), id)) {
             yorcvs::log("Invalid id deletion : id " + std::to_string(id) + " is not a valid entity",
                 yorcvs::MSGSEVERITY::ERROR);
+            return;
         }
 
         entitySignatures[id].clear();

@@ -29,12 +29,12 @@ public:
     explicit Map(yorcvs::ECS* world)
         : ecs(world)
         , init_ecs(*world)
-        , collision_system(world)
         , health_system(world)
         , sprint_system(world)
         , velocity_system(world)
         , animation_system(world)
         , combat_system(world)
+        , collision_system(world)
     {
     }
     /**
@@ -117,7 +117,7 @@ public:
      * @brief Removes all entitites and tiles loaded by this map
      *
      */
-    void clear()
+    void clear() noexcept
     {
         for (const auto& entity : entities) {
             if (ecs->is_valid_entity(entity)) {

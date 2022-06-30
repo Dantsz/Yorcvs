@@ -120,6 +120,10 @@ add_test(ECSsystems ECSsystems)
 add_executable(ECSmainclassCopyMove src/ECSmainclassCopyMove.cpp)
 add_test(ECSmainclassCopyMove ECSmainclassCopyMove)
 
+add_executable(ECSTestEntityDestruction src/ECSTestEntityDestruction.cpp)
+target_include_directories(ECSTestEntityDestruction PUBLIC ${yorcvs_include_path})
+add_test(ECSTestEntityDestruction ECSTestEntityDestruction)
+
 add_executable(TypesTestRectContains src/TypesTestRectContains.cpp)
 target_include_directories(TypesTestRectContains PUBLIC ${yorcvs_include_path})
 add_test(NAME TypesTestRectContains COMMAND TypesTestRectContains WORKING_DIRECTORY ${test_dir} )
