@@ -125,6 +125,7 @@ public:
             show_debug_window(render_dimensions);
             if (select_target.has_value() && appECS->is_valid_entity(select_target.value()) && select_target_opened) {
                 ImGui::SetNextWindowPos({ target_window_position.x, target_window_position.y });
+                ImGui::SetNextWindowSize({ target_window_size.x, target_window_size.y });
                 ImGui::Begin("Target", &select_target_opened);
                 show_entity_interaction_window(get_first_player_id(), select_target.value());
                 ImGui::End();
@@ -292,8 +293,6 @@ private:
     }
     void show_entity_interaction_window(size_t sender, size_t target)
     {
-        ImGui::Text("%s", std::to_string(target).c_str());
-        show_entity_stats(target);
 
         if (ImGui::Button("go to") && appECS->has_components<positionComponent>(target) && appECS->has_components<positionComponent>(target)) {
             appECS->get_component<positionComponent>(sender) = appECS->get_component<positionComponent>(target);
@@ -369,6 +368,8 @@ private:
                 ImGui::OpenPopup("Entity");
             }
             if (ImGui::BeginPopup("Entity")) {
+                ImGui::Text("%s", std::to_string(get_first_player_id()).c_str());
+                show_entity_stats(get_first_player_id());
                 show_entity_interaction_window(get_first_player_id(), i);
                 ImGui::EndPopup();
             }
@@ -563,9 +564,10 @@ private:
     std::vector<std::string> console_logs;
     std::vector<std::string> console_previous_commands;
     std::optional<size_t> select_target {};
+
     bool select_target_opened = false;
     yorcvs::Vec2<float> target_window_position {};
-
+    static constexpr yorcvs::Vec2<float> target_window_size { 150, 100 };
     PlayerMovementControl* player_move_system {};
 
     CollisionSystem* colission_system {};
