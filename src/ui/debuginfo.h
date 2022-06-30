@@ -109,6 +109,8 @@ public:
                 bile++;
                 if (rect.contains(window.get_pointer_position() / window.get_render_scale() + window.get_drawing_offset())) {
                     select_target = ID;
+                    target_window_position = window.get_pointer_position();
+                    select_target_opened = true;
                 }
             }
         }
@@ -121,8 +123,9 @@ public:
         if (debug_window_opened) {
             show_performance_window();
             show_debug_window(render_dimensions);
-            if (select_target.has_value() && appECS->is_valid_entity(select_target.value())) {
-                ImGui::Begin("Target");
+            if (select_target.has_value() && appECS->is_valid_entity(select_target.value()) && select_target_opened) {
+                ImGui::SetNextWindowPos({ target_window_position.x, target_window_position.y });
+                ImGui::Begin("Target", &select_target_opened);
                 show_entity_interaction_window(get_first_player_id(), select_target.value());
                 ImGui::End();
             } else {
@@ -131,6 +134,7 @@ public:
         }
         if (console_opened) {
             show_console_window();
+            ImGui::ShowDemoWindow();
             show_entities_table();
         }
     }
@@ -559,6 +563,8 @@ private:
     std::vector<std::string> console_logs;
     std::vector<std::string> console_previous_commands;
     std::optional<size_t> select_target {};
+    bool select_target_opened = false;
+    yorcvs::Vec2<float> target_window_position {};
 
     PlayerMovementControl* player_move_system {};
 
