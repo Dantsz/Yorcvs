@@ -493,7 +493,7 @@ private:
     void draw_entity_health_bar(yorcvs::sdl2_window& window, size_t ID, const yorcvs::Rect<float>& offset_rect)
     {
         if (appECS->has_components<healthComponent>(ID)) {
-            /// draw health bar
+            // draw health bar
             yorcvs::Rect<float> healthBarRect {};
             if (appECS->has_components<spriteComponent>(
                     ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
@@ -510,7 +510,7 @@ private:
             }
             window.draw_rect(healthBarRect, health_bar_empty_color[0], health_bar_empty_color[1],
                 health_bar_empty_color[2], health_bar_empty_color[3]);
-            healthBarRect.w = (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).max_HP) * health_bar_base_width;
+            healthBarRect.w = std::max((appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).max_HP) * health_bar_base_width, 0.0f);
             window.draw_rect(healthBarRect, health_bar_full_color[0], health_bar_full_color[1],
                 health_bar_full_color[2], health_bar_full_color[3]);
         }
@@ -533,7 +533,7 @@ private:
             staminaBarRect.h = health_full_bar_dimension.y;
             window.draw_rect(staminaBarRect, stamina_bar_empty_color[0], stamina_bar_empty_color[1],
                 stamina_bar_empty_color[2], stamina_bar_empty_color[3]);
-            staminaBarRect.w = (appECS->get_component<staminaComponent>(ID).stamina / appECS->get_component<staminaComponent>(ID).max_stamina) * health_bar_base_width;
+            staminaBarRect.w = std::max((appECS->get_component<staminaComponent>(ID).stamina / appECS->get_component<staminaComponent>(ID).max_stamina) * health_bar_base_width, 0.0f);
             window.draw_rect(staminaBarRect, stamina_bar_full_color[0], stamina_bar_full_color[1],
                 stamina_bar_full_color[2], stamina_bar_full_color[3]);
         }
