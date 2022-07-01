@@ -508,11 +508,8 @@ private:
             if (appECS->has_components<staminaComponent>(ID)) {
                 healthBarRect.y -= health_full_bar_dimension.y * 2;
             }
-            window.draw_rect(healthBarRect, health_bar_empty_color[0], health_bar_empty_color[1],
-                health_bar_empty_color[2], health_bar_empty_color[3]);
-            healthBarRect.w = std::max((appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).max_HP) * health_bar_base_width, 0.0f);
-            window.draw_rect(healthBarRect, health_bar_full_color[0], health_bar_full_color[1],
-                health_bar_full_color[2], health_bar_full_color[3]);
+            draw_status_bar(window, healthBarRect, (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).max_HP),
+                health_bar_full_color, health_bar_empty_color);
         }
     }
     void draw_entity_stamina_bar(yorcvs::sdl2_window& window, size_t ID, const yorcvs::Rect<float>& offset_rect)
@@ -531,16 +528,15 @@ private:
 
             staminaBarRect.w = health_full_bar_dimension.x;
             staminaBarRect.h = health_full_bar_dimension.y;
-            draw_status_bar(window, staminaBarRect, (appECS->get_component<staminaComponent>(ID).stamina / appECS->get_component<staminaComponent>(ID).max_stamina) * health_bar_base_width,
-                stamina_bar_full_color[0], stamina_bar_full_color[1],
-                stamina_bar_full_color[2], stamina_bar_full_color[3]);
+            draw_status_bar(window, staminaBarRect, (appECS->get_component<staminaComponent>(ID).stamina / appECS->get_component<staminaComponent>(ID).max_stamina),
+                stamina_bar_full_color, stamina_bar_empty_color);
         }
     }
-    static void draw_status_bar(yorcvs::sdl2_window& window, yorcvs::Rect<float> rect, float value, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+    static void draw_status_bar(yorcvs::sdl2_window& window, yorcvs::Rect<float> rect, float value, std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> full_color, std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> empty_color)
     {
-        window.draw_rect(rect, r, g, b, a);
+        window.draw_rect(rect, std::get<0>(empty_color), std::get<1>(empty_color), std::get<2>(empty_color), std::get<3>(empty_color));
         rect.w = std::max(value * rect.w, 0.0f);
-        window.draw_rect(rect, r, g, b, a);
+        window.draw_rect(rect, std::get<0>(full_color), std::get<1>(full_color), std::get<2>(full_color), std::get<3>(full_color));
     }
 
     std::vector<size_t> callbacks;
@@ -586,9 +582,9 @@ private:
     int history_pos = 0;
 
     static constexpr yorcvs::Vec2<float> health_full_bar_dimension = { 32.0f, 4.0f };
-    const std::vector<uint8_t> health_bar_full_color = { 255, 0, 0, 255 };
-    const std::vector<uint8_t> health_bar_empty_color = { 100, 0, 0, 255 };
-    static constexpr float health_bar_base_width = 32.0f;
+
+    const std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> health_bar_full_color { 255, 0, 0, 255 };
+    const std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> health_bar_empty_color { 100, 0, 0, 255 };
     static constexpr float health_bar_x_offset = 16.0f;
     const std::vector<uint8_t> hitbox_color = { 255, 0, 0, 100 };
 
@@ -599,9 +595,8 @@ private:
     static constexpr size_t text_char_size = 100;
     static constexpr size_t text_line_length = 10000;
 
-    const std::vector<uint8_t> stamina_bar_full_color = { 0, 255, 0, 100 };
-    const std::vector<uint8_t> stamina_bar_empty_color = { 0, 100, 0, 100 };
-
+    const std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> stamina_bar_full_color { 0, 255, 0, 100 };
+    const std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> stamina_bar_empty_color { 0, 100, 0, 100 };
     static constexpr float ui_controls_update_time = 250.0f;
     static constexpr float zoom_power = 0.1f;
 };
