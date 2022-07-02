@@ -126,7 +126,9 @@ public:
             if (select_target.has_value() && appECS->is_valid_entity(select_target.value()) && select_target_opened) {
                 ImGui::SetNextWindowPos({ target_window_position.x, target_window_position.y });
                 ImGui::SetNextWindowSize({ target_window_size.x, target_window_size.y });
-                ImGui::Begin("Target", &select_target_opened);
+                ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+                ImGui::SetNextWindowBgAlpha(target_window_alpha);
+                ImGui::Begin("Target", &select_target_opened, window_flags);
                 show_entity_interaction_window(get_first_player_id(), select_target.value());
                 ImGui::End();
             } else {
@@ -594,6 +596,8 @@ private:
     static constexpr size_t text_A = 255;
     static constexpr size_t text_char_size = 100;
     static constexpr size_t text_line_length = 10000;
+
+    static constexpr float target_window_alpha = 0.5f;
 
     const std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> stamina_bar_full_color { 0, 255, 0, 100 };
     const std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> stamina_bar_empty_color { 0, 100, 0, 100 };
