@@ -94,7 +94,7 @@ public:
     {
         yorcvs::Vec2<float> old_rs = window.get_render_scale();
         window.set_render_scale(window.get_window_size() / render_dimensions);
-
+        bool clicked_any_entity = false;
         yorcvs::Rect<float> rect {};
         for (const auto& ID : colission_system->entityList->entitiesID) {
             rect.x = appECS->get_component<positionComponent>(ID).position.x + appECS->get_component<hitboxComponent>(ID).hitbox.x;
@@ -111,8 +111,12 @@ public:
                     select_target = ID;
                     target_window_position = window.get_pointer_position();
                     select_target_opened = true;
+                    clicked_any_entity = true;
                 }
             }
+        }
+        if (mouse_is_pressed && !clicked_any_entity) {
+            select_target.reset();
         }
         window.set_render_scale(old_rs);
     }
