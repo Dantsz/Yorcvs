@@ -7,6 +7,18 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 
 option(YORCVS_EMSCRIPTEN_PRELOAD_ASSETS_FOLDER "Whether to include the assets folder in the emscripten build or not"  OFF)
+function(SET_DEFAULT_YORCVS_USE_VCPKG)
+    if(WIN32)
+        set(DEFAULT_YORCVS_USE_VCPKG TRUE PARENT_SCOPE)
+    elseif(UNIX)
+        set(DEFAULT_YORCVS_USE_VCPKG FALSE PARENT_SCOPE)
+    else()
+        set(DEFAULT_YORCVS_USE_VCPKG FALSE PARENT_SCOPE)
+    endif()
+endfunction()
+SET_DEFAULT_YORCVS_USE_VCPKG()
+option(YORCVS_USE_VCPKG "Use the name of the libraries as they are in vcpkg"  DEFAULT_YORCVS_USE_VCPKG)
+
 
 include(FetchContent)
 include(ExternalData)
@@ -72,16 +84,16 @@ if(EMSCRIPTEN)
 else() 
 
 #link SDL
-message(STATUS "LINKING SDL2")
-if(WIN32)
-  #set SDL for windows
+if(DEFAULT_YORCVS_USE_VCPKG)
+  message(STATUS "Linking SDL2 from vcpkg")
+  #set SDL for vcpkg
   find_package(SDL2 CONFIG REQUIRED)
   find_package(SDL2-image CONFIG REQUIRED)
   find_package(SDL2-ttf CONFIG REQUIRED)
   target_link_libraries(${PROJECT_NAME} SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf)
   set(SDL2lib SDL2::SDL2)
 else()
-  SET(LUA_CMAKE_BUILD_SHARED ON CACHE BOOL "Build as shared library" FORCE)
+  message(STATUS "LINKING SDL2")
   #download findSDL2 and use it
   FetchContent_Declare(amifindSDL2 GIT_REPOSITORY https://github.com/aminosbh/sdl2-cmake-modules.git GIT_TAG "master")
   FetchContent_GetProperties(amifindSDL2)
@@ -126,6 +138,10 @@ if(NOT libtmxlite_POPULATED)
 endif()
 target_link_libraries(${PROJECT_NAME}  tmxlite)
 
+#build lua as shared for windows
+if(WIN32)
+SET(LUA_CMAKE_BUILD_SHARED ON CACHE BOOL "Build as shared library" FORCE)
+endif()
 #INSTALL LUA Interpreter
 FetchContent_Declare(lua
  GIT_REPOSITORY https://github.com/Dantsz/lua-cmake.git
