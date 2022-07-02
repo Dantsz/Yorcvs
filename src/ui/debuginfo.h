@@ -129,6 +129,9 @@ public:
                 ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
                 ImGui::SetNextWindowBgAlpha(target_window_alpha);
                 ImGui::Begin("Target", &select_target_opened, window_flags);
+                if (appECS->has_components<identificationComponent>(select_target.value())) {
+                    ImGui::Text("Name: %s", appECS->get_component<identificationComponent>(select_target.value()).name.c_str());
+                }
                 show_entity_interaction_window(get_first_player_id(), select_target.value());
                 ImGui::End();
             } else {
