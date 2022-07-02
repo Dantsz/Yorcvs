@@ -18,16 +18,18 @@ public:
     void update(const float dt)
     {
         cur_time += dt;
+        for (size_t i = 0; i < entityList->entitiesID.size(); i++) // enchanced for doesn't work here because it can invalidate iterators
+        {
+            const size_t ID = entityList->entitiesID[i];
+            if (world->get_component<healthComponent>(ID).HP < 0.0f) {
+                world->get_component<healthComponent>(ID).is_dead = true;
+                world->destroy_entity(ID);
+                i--;
+                continue;
+            }
+        }
         if (cur_time >= update_time) {
-            for (size_t i = 0; i < entityList->entitiesID.size(); i++) // enchanced for doesn't work here because it can invalidate iterators
-            {
-                const size_t ID = entityList->entitiesID[i];
-                if (world->get_component<healthComponent>(ID).HP < 0.0f) {
-                    world->get_component<healthComponent>(ID).is_dead = true;
-                    world->destroy_entity(ID);
-                    i--;
-                    continue;
-                }
+            for (const auto& ID : entityList->entitiesID) {
                 world->get_component<healthComponent>(ID).HP += world->get_component<healthComponent>(ID).health_regen;
                 if (world->get_component<healthComponent>(ID).HP > world->get_component<healthComponent>(ID).max_HP) {
                     world->get_component<healthComponent>(ID).HP = world->get_component<healthComponent>(ID).max_HP;

@@ -117,6 +117,11 @@ public:
             player_control.updateControls(render_dimensions, msPF);
 
             update_timer.start();
+            map.health_system.update(msPF);
+            debug_info_widgets.record_update_time<DebugInfo::update_time_item::health>(
+                update_timer.get_ticks<float, std::chrono::nanoseconds>());
+
+            update_timer.start();
             behaviour_system.update(msPF);
             debug_info_widgets.record_update_time<DebugInfo::update_time_item::behaviour>(
                 update_timer.get_ticks<float, std::chrono::nanoseconds>());
@@ -134,11 +139,6 @@ public:
             update_timer.start();
             map.animation_system.update(msPF);
             debug_info_widgets.record_update_time<DebugInfo::update_time_item::animation>(
-                update_timer.get_ticks<float, std::chrono::nanoseconds>());
-
-            update_timer.start();
-            map.health_system.update(msPF);
-            debug_info_widgets.record_update_time<DebugInfo::update_time_item::health>(
                 update_timer.get_ticks<float, std::chrono::nanoseconds>());
 
             update_timer.start();

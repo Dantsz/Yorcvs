@@ -193,7 +193,7 @@ public:
 private:
     static float get_update_time_sample(void* data, int index)
     {
-        std::deque<float>* queue = static_cast<std::deque<float>*>(data);
+        auto* queue = static_cast<std::deque<float>*>(data);
         return (*queue)[index];
     }
     void show_performance_window()
