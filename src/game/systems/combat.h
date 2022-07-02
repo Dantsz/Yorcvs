@@ -14,7 +14,7 @@ public:
         world->register_system(*this);
         world->add_criteria_for_iteration<CombatSystem, healthComponent, offensiveStatsComponent, defensiveStatsComponent>();
     }
-    void attack(size_t source, size_t target)
+    void attack(size_t source, size_t target) const
     {
         // TODO: implement attacking
         float damage = world->get_component<offensiveStatsComponent>(source).strength;
