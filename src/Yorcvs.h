@@ -81,6 +81,7 @@ public:
         app_window.set_render_scale(app_window.get_window_size() / render_dimensions);
         // get player position
         if (player_control.entityList->entitiesID.empty()) {
+            app_window.set_render_scale(render_scale); // set renderscale back
             return;
         }
         const size_t entity_ID = player_control.entityList->entitiesID[0];
