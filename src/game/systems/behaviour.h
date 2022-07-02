@@ -27,7 +27,7 @@ public:
             [&](std::string* str) { delete str; }); // creates an asset manager that manages lua programs from path
     }
 
-    void run_behaviour(const size_t ID)
+    void run_behaviour(const size_t ID) const
     {
         (*lua_state)["entityID"] = ID;
         const std::string& script_path = world->get_component<behaviourComponent>(ID).code_path;

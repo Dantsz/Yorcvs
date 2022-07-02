@@ -94,7 +94,7 @@ public:
     {
         yorcvs::Vec2<float> old_rs = window.get_render_scale();
         window.set_render_scale(window.get_window_size() / render_dimensions);
-
+        bool clicked_any_entity = false;
         yorcvs::Rect<float> rect {};
         for (const auto& ID : colission_system->entityList->entitiesID) {
             rect.x = appECS->get_component<positionComponent>(ID).position.x + appECS->get_component<hitboxComponent>(ID).hitbox.x;
@@ -111,8 +111,12 @@ public:
                     select_target = ID;
                     target_window_position = window.get_pointer_position();
                     select_target_opened = true;
+                    clicked_any_entity = true;
                 }
             }
+        }
+        if (mouse_is_pressed && !clicked_any_entity) {
+            select_target.reset();
         }
         window.set_render_scale(old_rs);
     }
@@ -126,7 +130,12 @@ public:
             if (select_target.has_value() && appECS->is_valid_entity(select_target.value()) && select_target_opened) {
                 ImGui::SetNextWindowPos({ target_window_position.x, target_window_position.y });
                 ImGui::SetNextWindowSize({ target_window_size.x, target_window_size.y });
-                ImGui::Begin("Target", &select_target_opened);
+                ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+                ImGui::SetNextWindowBgAlpha(target_window_alpha);
+                ImGui::Begin("Target", &select_target_opened, window_flags);
+                if (appECS->has_components<identificationComponent>(select_target.value())) {
+                    ImGui::Text("Name: %s", appECS->get_component<identificationComponent>(select_target.value()).name.c_str());
+                }
                 show_entity_interaction_window(get_first_player_id(), select_target.value());
                 ImGui::End();
             } else {
@@ -594,6 +603,8 @@ private:
     static constexpr size_t text_A = 255;
     static constexpr size_t text_char_size = 100;
     static constexpr size_t text_line_length = 10000;
+
+    static constexpr float target_window_alpha = 0.5f;
 
     const std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> stamina_bar_full_color { 0, 255, 0, 100 };
     const std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> stamina_bar_empty_color { 0, 100, 0, 100 };
