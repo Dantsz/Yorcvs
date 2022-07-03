@@ -23,6 +23,7 @@ function(SET_DEFAULT_YORCVS_USE_VCPKG)
         set(DEFAULT_YORCVS_USE_VCPKG FALSE PARENT_SCOPE)
     endif()
 endfunction()
+
 SET_DEFAULT_YORCVS_USE_VCPKG()
 option(YORCVS_USE_VCPKG "Use the name of the libraries as they are in vcpkg"  DEFAULT_YORCVS_USE_VCPKG)
 
@@ -32,46 +33,46 @@ include(ExternalData)
 
 
 message(STATUS "BUILDING YORCVS ON " ${CMAKE_SYSTEM_NAME})
-set(YorcvsALLFILES  "src/Yorcvs.cpp"
-                    "src/Yorcvs.h"
-                    
-                    "src/ui/debuginfo.h"
+set(YorcvsCORESFILES    "src/common/assetmanager.h"
+                        "src/common/types.h"
+                        "src/common/ecs.h"
 
-                    "src/game/components.h"
-                    "src/game/systems.h"
-
-                    "src/game/systems/animation.h"
-                    "src/game/systems/behaviour.h"
-                    "src/game/systems/collision.h"
-                    "src/game/systems/combat.h"
-                    "src/game/systems/health.h"
-                    "src/game/systems/playercontrol.h"
-                    "src/game/systems/spritesystem.h"
-                    "src/game/systems/staminasystem.h"
-                    "src/game/systems/velocity.h"
-                   
-                  
-                    "src/common/assetmanager.h"
-                    "src/common/types.h"
-                    "src/common/ecs.h"
-
-                    "src/common/utilities.h"
-                    "src/common/utilities/timer.h"
-                    "src/common/utilities/ulamspiral.h"
-                    "src/common/utilities/log.h"
+                        "src/common/utilities.h"
+                        "src/common/utilities/timer.h"
+                        "src/common/utilities/ulamspiral.h"
+                        "src/common/utilities/log.h"
 
 
-                    "src/engine/luaEngine.h"
-                    "src/engine/map.h"
+                        "src/engine/luaEngine.h"
+                        "src/engine/map.h")
+set(YorcvsGAMEFILES     "src/game/components.h"
+                        "src/game/systems.h"
 
-                    "src/engine/window/window.h"
-                    "src/engine/window/eventhandler.h"
-                    "src/engine/window/windowsdl2"
-                    "src/engine/window/eventhandlersdl2.h"
+                        "src/game/systems/animation.h"
+                        "src/game/systems/behaviour.h"
+                        "src/game/systems/collision.h"
+                        "src/game/systems/combat.h"
+                        "src/game/systems/health.h"
+                        "src/game/systems/playercontrol.h"
+                        "src/game/systems/spritesystem.h"
+                        "src/game/systems/staminasystem.h"
+                        "src/game/systems/velocity.h"
+)
+set(YorcvsUIFILES "src/ui/debuginfo.h")
+set(YORCVSENGINEFILES   "src/engine/window/window.h"
+                        "src/engine/window/eventhandler.h"
+                        "src/engine/window/windowsdl2"
+                        "src/engine/window/eventhandlersdl2.h")
+
+set(YorcvsALLFILES  "src/Yorcvs.h"
+                    ${YorcvsCORESFILES}
+                    ${YorcvsGAMEFILES}
+                    ${YorcvsUIFILES}
+                    ${YORCVSENGINEFILES}
                     )
 
 
-add_executable(Yorcvs ${YorcvsALLFILES})
+add_executable(Yorcvs "src/Yorcvs.cpp" ${YorcvsALLFILES})
 
 #COMPILE FLAGS
 target_compile_options(Yorcvs PRIVATE
@@ -197,5 +198,4 @@ if (NOT imguiSDL2_POPULATED)
   target_link_libraries(imgui-SDL2  imgui)
   target_include_directories(imgui-SDL2 PUBLIC ${imgui_SOURCE_DIR})
   target_link_libraries(${PROJECT_NAME} imgui-SDL2)
-  
 endif()
