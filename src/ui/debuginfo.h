@@ -175,17 +175,12 @@ public:
     {
         mouse_is_pressed = false;
     }
-    bool is_debug_window_open()
+    bool is_debug_window_open() const
     {
         return debug_window_opened;
     }
 
 private:
-    static float get_update_time_sample(void* data, int index)
-    {
-        auto* queue = static_cast<std::deque<float>*>(data);
-        return (*queue)[index];
-    }
     void show_debug_window(yorcvs::Vec2<float>& render_dimensions)
     {
         render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],

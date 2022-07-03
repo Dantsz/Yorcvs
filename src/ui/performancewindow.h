@@ -7,9 +7,7 @@ class Performance_Window {
 public:
     Performance_Window()
     {
-        for (auto& statistic : update_time_statistics) {
-            std::get<2>(statistic) = std::numeric_limits<float>::max();
-        }
+        reset();
     }
     enum update_time_item : size_t {
         collision = 0,
@@ -51,6 +49,11 @@ public:
         std::get<update_time_sample_tuple_element::avg>(statistics) += value;
         std::get<update_time_sample_tuple_element::avg>(statistics) /= std::get<0>(statistics);
     }
+    template <update_time_item... T>
+    void record_update_time(const std::array<float, update_time_item::update_time_tracked>& added_parameters)
+    {
+        (record_update_time<T>(added_parameters[T]), ...);
+    }
     void reset()
     {
         // clear graphs
@@ -82,10 +85,10 @@ private:
         const auto [samples, max, min, avg] = update_time_statistics.at(index);
         if (ImGui::CollapsingHeader(label.c_str())) {
             ImGui::PlotLines("", get_update_time_sample, (void*)(&queue), static_cast<int>(queue.size()));
-            ImGui::Text("Current: %f", queue.back());
-            ImGui::Text("Max: %f", max);
-            ImGui::Text("Avg: %f", avg);
-            ImGui::Text("Min: %f", min);
+            ImGui::Text("Current: %f ns", queue.back());
+            ImGui::Text("Max: %f ns", max);
+            ImGui::Text("Avg: %f ns", avg);
+            ImGui::Text("Min: %f ns", min);
         }
     }
     void show_performance_window()
