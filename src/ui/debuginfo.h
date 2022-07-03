@@ -125,7 +125,6 @@ public:
     {
 
         if (debug_window_opened) {
-            show_performance_window();
             show_debug_window(render_dimensions);
             if (select_target.has_value() && appECS->is_valid_entity(select_target.value()) && select_target_opened) {
                 ImGui::SetNextWindowPos({ target_window_position.x, target_window_position.y });
@@ -172,31 +171,13 @@ public:
         lua_state->script("function log(message) internal_log(tostring(message)) end");
         (*lua_state)["print"] = (*lua_state)["log"];
     }
-    template <update_time_item item>
-    void record_update_time(float value)
-    {
-        std::deque<float>& queue = std::get<1>(update_time_history[static_cast<size_t>(item)]);
-        auto& statistics = update_time_statistics[static_cast<size_t>(item)];
-        if (queue.size() == update_time_maximum_samples) {
-            queue.pop_front();
-        }
-        queue.push_back(value);
-
-        // compute statistics
-        std::get<update_time_sample_tuple_element::avg>(statistics) *= std::get<0>(statistics);
-        std::get<update_time_sample_tuple_element::samples>(statistics) += 1.0f;
-        if (std::get<update_time_sample_tuple_element::max>(statistics) < value) {
-            std::get<update_time_sample_tuple_element::max>(statistics) = value;
-        }
-        if (std::get<update_time_sample_tuple_element::min>(statistics) > value) {
-            std::get<update_time_sample_tuple_element::min>(statistics) = value;
-        }
-        std::get<update_time_sample_tuple_element::avg>(statistics) += value;
-        std::get<update_time_sample_tuple_element::avg>(statistics) /= std::get<0>(statistics);
-    }
     void end_frame()
     {
         mouse_is_pressed = false;
+    }
+    bool is_debug_window_open()
+    {
+        return debug_window_opened;
     }
 
 private:
@@ -205,28 +186,6 @@ private:
         auto* queue = static_cast<std::deque<float>*>(data);
         return (*queue)[index];
     }
-    void show_performance_window()
-    {
-        ImGui::Begin("Performance");
-        for (size_t i = 0; i < update_time_item::update_time_tracked; i++) {
-            show_performance_parameter(i);
-        }
-        ImGui::End();
-    }
-
-    void show_performance_parameter(size_t index)
-    {
-        const auto& [label, queue] = update_time_history.at(index);
-        const auto [samples, max, min, avg] = update_time_statistics.at(index);
-        if (ImGui::CollapsingHeader(label.c_str())) {
-            ImGui::PlotLines("", get_update_time_sample, (void*)(&queue), static_cast<int>(queue.size()));
-            ImGui::Text("Current: %f", queue.back());
-            ImGui::Text("Max: %f", max);
-            ImGui::Text("Avg: %f", avg);
-            ImGui::Text("Min: %f", min);
-        }
-    }
-
     void show_debug_window(yorcvs::Vec2<float>& render_dimensions)
     {
         render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
@@ -429,17 +388,6 @@ private:
 
     void reset()
     {
-        // clear graphs
-        for (auto& [parameter_name, queue] : update_time_history) {
-            queue.clear();
-        }
-        // clear statistics
-        for (auto& tup : update_time_statistics) {
-            std::get<update_time_sample_tuple_element::samples>(tup) = 0.0f;
-            std::get<update_time_sample_tuple_element::max>(tup) = 0.0f;
-            std::get<update_time_sample_tuple_element::min>(tup) = std::numeric_limits<float>::max();
-            std::get<update_time_sample_tuple_element::avg>(tup) = 0.0f;
-        }
     }
 
     void add_log(const std::string& message)
@@ -555,19 +503,6 @@ private:
     yorcvs::Map* map {};
     sol::state* lua_state {};
 
-    // performance
-    static constexpr size_t update_time_maximum_samples = 25;
-    std::array<std::tuple<std::string, std::deque<float>>, update_time_item::update_time_tracked> update_time_history {
-        { { "collision", {} },
-            { "health", {} },
-            { "stamina", {} },
-            { "velocity", {} },
-            { "animation", {} },
-            { "behaviour", {} },
-            { "overall", {} } }
-    };
-    std::array<std::tuple<float, float, float, float>, update_time_item::update_time_tracked>
-        update_time_statistics {}; // samples , max , min , avg
     // console
     std::string console_text;
     std::vector<std::string> console_logs;
