@@ -52,7 +52,12 @@ public:
     template <update_time_item... T>
     void record_update_time(const std::array<float, update_time_item::update_time_tracked>& added_parameters)
     {
-        (record_update_time<T>(added_parameters[T]), ...);
+        static size_t update_counter {};
+        update_counter++;
+        if (update_counter >= updates_per_sample) {
+            (record_update_time<T>(added_parameters[T]), ...);
+            update_counter = 0;
+        }
     }
     void reset()
     {
@@ -84,6 +89,10 @@ private:
         const auto& [label, queue] = update_time_history.at(index);
         const auto [samples, max, min, avg] = update_time_statistics.at(index);
         if (ImGui::CollapsingHeader(label.c_str())) {
+            if (queue.empty()) // if there's no history don't show anythingz
+            {
+                return;
+            }
             ImGui::PlotLines("", get_update_time_sample, (void*)(&queue), static_cast<int>(queue.size()));
             ImGui::Text("Current: %f ns", queue.back());
             ImGui::Text("Max: %f ns", max);
@@ -112,4 +121,5 @@ private:
     };
     std::array<std::tuple<float, float, float, float>, update_time_item::update_time_tracked>
         update_time_statistics {}; // samples , max , min , avg
+    const static size_t updates_per_sample = 9; // how many samples to be skipped before another one is counted
 };
