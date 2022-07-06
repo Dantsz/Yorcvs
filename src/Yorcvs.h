@@ -143,7 +143,7 @@ public:
             tracked_parameters[Performance_Window::update_time_item::stamina] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
 
             lag -= msPF;
-            tracked_parameters[Performance_Window::update_time_item::overall] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
+            tracked_parameters[Performance_Window::update_time_item::overall] = update_loop_timer.get_ticks<float, std::chrono::nanoseconds>();
             performance_window.record_update_time<Performance_Window::update_time_item::health,
                 Performance_Window::update_time_item::behaviour,
                 Performance_Window::update_time_item::collision,
