@@ -99,7 +99,6 @@ public:
     EntityManager(EntityManager&& other) noexcept
         : freedIndices(std::move(other.freedIndices))
         , entitySignatures(std::move(other.entitySignatures))
-        , lowestUnallocatedID(other.lowestUnallocatedID)
     {
     }
     EntityManager& operator=(const EntityManager& other)
@@ -109,14 +108,12 @@ public:
         }
         this->entitySignatures = other.entitySignatures;
         this->freedIndices = other.freedIndices;
-        this->lowestUnallocatedID = other.lowestUnallocatedID;
         return *this;
     }
     EntityManager& operator=(EntityManager&& other) noexcept
     {
         this->entitySignatures = std::move(other.entitySignatures);
         this->freedIndices = std::move(other.freedIndices);
-        this->lowestUnallocatedID = other.lowestUnallocatedID;
         return *this;
     }
 
@@ -129,7 +126,7 @@ public:
     { // if there isn't any in the the queue,create a new one and a new entry in the signature list
         if (freedIndices.empty()) {
             entitySignatures.emplace_back();
-            return lowestUnallocatedID++;
+            return entitySignatures.size() - 1;
         }
         // take the id from   the front of the queue
         const size_t id = freedIndices.back();
@@ -144,9 +141,9 @@ public:
      *
      * @param id id of the entity
      */
-    void delete_entity(const size_t id)
+    void delete_entity(const size_t id) noexcept
     {
-        if (id > lowestUnallocatedID) {
+        if (id > entitySignatures.size()) {
             yorcvs::log("Invalid id for deletion : id doesn't exist", yorcvs::MSGSEVERITY::ERROR);
             return;
         }
@@ -177,7 +174,7 @@ public:
         {
             return false;
         }
-        if (id > lowestUnallocatedID) // the entity was never created
+        if (id > entitySignatures.size()) // the entity was never created
         {
             return false;
         }
@@ -192,7 +189,7 @@ public:
      */
     void set_signature(const size_t id, const std::vector<bool>& signature)
     {
-        if (id > lowestUnallocatedID) {
+        if (id > entitySignatures.size()) {
             yorcvs::log("Cannot set id signature  : id doesn't exist", yorcvs::MSGSEVERITY::ERROR);
             return;
         }
@@ -213,7 +210,7 @@ public:
      */
     std::vector<bool>& get_signature(const size_t id)
     {
-        if (id > lowestUnallocatedID) {
+        if (id > entitySignatures.size()) {
             yorcvs::log("Cannot fetch entity signature : id : " + std::to_string(id) + "doesn't exist",
                 yorcvs::MSGSEVERITY::ERROR);
         }
@@ -232,9 +229,6 @@ public:
     // stores the signature of an entity with the id as
     // vector<bool> spooky
     std::vector<std::vector<bool>> entitySignatures;
-
-    // the lowest unallocated id that has not been interacted with
-    size_t lowestUnallocatedID = 0;
 };
 
 /**
@@ -474,7 +468,7 @@ public:
      *
      * @param entityID
      */
-    void on_entity_destroyed(const size_t entityID)
+    void on_entity_destroyed(const size_t entityID) noexcept
     {
         for (auto const& i : componentContainers) {
             if (i.second->entity_has_component.size() <= entityID) {
@@ -632,7 +626,7 @@ public:
      *
      * @param entityID
      */
-    void on_entity_destroy(const size_t entityID)
+    void on_entity_destroy(const size_t entityID) noexcept
     {
         for (auto const& it : type_to_system) {
             it.second->entitiesID.erase(
@@ -784,7 +778,7 @@ public:
      *
      * @param id ID of the entity
      */
-    void destroy_entity(const size_t id)
+    void destroy_entity(const size_t id) noexcept
     {
         entitymanager->delete_entity(id);
         componentmanager->on_entity_destroyed(id);
@@ -1184,7 +1178,7 @@ public:
      */
     [[nodiscard]] size_t get_active_entities_number() const
     {
-        return entitymanager->lowestUnallocatedID - entitymanager->freedIndices.size();
+        return entitymanager->entitySignatures.size() - entitymanager->freedIndices.size();
     }
     /**
      * @brief Gets the size of the array that holds entity data , the same thing as the maximum number of entitites
@@ -1193,7 +1187,7 @@ public:
      */
     [[nodiscard]] size_t get_entity_list_size()
     {
-        return entitymanager->lowestUnallocatedID;
+        return entitymanager->entitySignatures.size();
     }
     /**
      * @brief Get a list of names corresponding to registered components
@@ -1229,7 +1223,7 @@ private:
         // add matching entities to it
         // couldn't find a better place to put it
 
-        for (size_t entity = 0; entity < entitymanager->lowestUnallocatedID; entity++) {
+        for (size_t entity = 0; entity < entitymanager->entitySignatures.size(); entity++) {
             if (systemmanager->compare_entity_to_system(entitymanager->entitySignatures[entity],
                     systemmanager->get_system_signature<T>())) {
                 // TODO : MAKE A METHOD TO SYSTEM , method needs to be virtual /Onwntitierase/insert

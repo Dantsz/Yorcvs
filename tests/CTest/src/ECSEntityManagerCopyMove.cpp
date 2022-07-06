@@ -3,10 +3,10 @@
 
 int main()
 {
-    yorcvs::EntityManager mngr1{};
+    yorcvs::EntityManager mngr1 {};
     mngr1.addEntity();
     yorcvs::EntityManager MNGR2 = mngr1;
-    assert(MNGR2.lowestUnallocatedID == 1);
+    assert(MNGR2.entitySignatures.size() == 1);
 
     return 0;
 }
