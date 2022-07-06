@@ -3,6 +3,7 @@
 #include <array>
 #include <deque>
 #include <string>
+
 class Performance_Window {
 public:
     Performance_Window()
@@ -27,6 +28,12 @@ public:
         avg = 3,
         update_time_sample_tuple_elements
     };
+    enum history_plotting : int {
+        line,
+        histogram,
+        plotting_elements
+    };
+
     template <update_time_item item>
     void record_update_time(float value)
     {
@@ -93,16 +100,33 @@ private:
             {
                 return;
             }
-            ImGui::PlotLines("", get_update_time_sample, (void*)(&queue), static_cast<int>(queue.size()));
+            // percent of time taken by parameter
             ImGui::Text("Current: %f ns", queue.back());
+            if (!update_time_history.empty()) {
+                ImGui::SameLine();
+                ImGui::Text("(%f percent of total time)", queue.back() / std::get<1>(update_time_history[update_time_item::overall]).back() * 100.0f);
+            }
             ImGui::Text("Max: %f ns", max);
             ImGui::Text("Avg: %f ns", avg);
             ImGui::Text("Min: %f ns", min);
+            switch (plotting) {
+            case history_plotting::line:
+                ImGui::PlotLines("", get_update_time_sample, (void*)(&queue), static_cast<int>(queue.size()));
+                break;
+            case history_plotting::histogram:
+                ImGui::PlotHistogram("", get_update_time_sample, (void*)(&queue), static_cast<int>(queue.size()));
+                break;
+            default:
+                break;
+            }
         }
     }
     void show_performance_window()
     {
         ImGui::Begin("Performance");
+        const std::array<const char*, plotting_elements> combo_items { "line", "histogram" };
+        ImGui::Combo("Plotting", &plotting, combo_items.data(), static_cast<int>(combo_items.size()));
+        ImGui::Separator();
         for (size_t i = 0; i < update_time_item::update_time_tracked; i++) {
             show_performance_parameter(i);
         }
@@ -119,7 +143,7 @@ private:
             { "behaviour", {} },
             { "overall", {} } }
     };
-    std::array<std::tuple<float, float, float, float>, update_time_item::update_time_tracked>
-        update_time_statistics {}; // samples , max , min , avg
+    std::array<std::tuple<float, float, float, float>, update_time_item::update_time_tracked> update_time_statistics {}; // samples , max , min , avg
     const static size_t updates_per_sample = 9; // how many samples to be skipped before another one is counted
+    int plotting = history_plotting::line; // if lines or rectangles to be displayed
 };
