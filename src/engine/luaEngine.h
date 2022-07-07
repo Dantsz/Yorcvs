@@ -23,8 +23,13 @@ namespace yorcvs::lua {
 template <typename T, typename... Args>
 inline void register_component_to_lua(sol::state& lua_state, const std::string& name, Args&&... args)
 {
-    std::vector<std::string>& component_names = lua_state["impl"]["component_names"];
     yorcvs::ECS* ecs = lua_state["world"];
+    const auto index = ecs->get_component_ID<T>();
+    if (!index.has_value()) {
+        yorcvs::log("Cannot register the component " + name + " as it's not registered by the ECS", yorcvs::MSGSEVERITY::ERROR);
+    }
+    std::vector<std::string>& component_names = lua_state["impl"]["component_names"];
+
     sol::usertype<T> new_type = lua_state.new_usertype<T>(name, std::forward<Args>(args)...);
     lua_state["ECS"]["create_" + name] = []() { return T(); };
     lua_state["ECS"]["add_" + name] = &yorcvs::ECS::add_default_component<T>;
@@ -32,11 +37,11 @@ inline void register_component_to_lua(sol::state& lua_state, const std::string& 
     lua_state["ECS"]["has_" + name] = &yorcvs::ECS::has_components<T>;
     lua_state["ECS"]["remove_" + name] = &yorcvs::ECS::remove_component<T>;
     lua_state["ECS"]["component_ID" + name] = &yorcvs::ECS::get_component_ID<T>;
-    const size_t index = ecs->get_component_ID<T>();
-    if (component_names.size() < index) {
-        component_names.resize(index + 1, "null");
+
+    if (component_names.size() < index.value()) {
+        component_names.resize(index.value() + 1, "null");
     }
-    component_names.insert(component_names.begin() + index, name);
+    component_names.insert(component_names.begin() + index.value(), name);
 }
 /**
  * @brief Exposes a system to lua
