@@ -128,6 +128,10 @@ add_executable(ECSTestSystemUnregistering src/ECSTestSystemUnregistering.cpp)
 target_include_directories(ECSTestSystemUnregistering PUBLIC ${yorcvs_include_path})
 add_test(ECSTestSystemUnregistering ECSTestSystemUnregistering)
 
+add_executable(ECSTestAddingComponentToEntityWithComponentBehavior src/ECSTestAddingComponentToEntityWithComponentBehavior.cpp)
+target_include_directories(ECSTestAddingComponentToEntityWithComponentBehavior PUBLIC ${yorcvs_include_path})
+add_test(ECSTestAddingComponentToEntityWithComponentBehavior ECSTestAddingComponentToEntityWithComponentBehavior)
+
 add_executable(TypesTestRectContains src/TypesTestRectContains.cpp)
 target_include_directories(TypesTestRectContains PUBLIC ${yorcvs_include_path})
 add_test(NAME TypesTestRectContains COMMAND TypesTestRectContains WORKING_DIRECTORY ${test_dir} )

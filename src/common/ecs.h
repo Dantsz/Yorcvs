@@ -223,7 +223,7 @@ public:
     virtual void add_component(size_t entityID) = 0;
     virtual void on_entity_destroyed(size_t entityID) noexcept = 0;
     virtual void copy_entity_component(size_t dstID, size_t srcID) = 0;
-
+    [[nodiscard]] virtual size_t get_allocated_components() const = 0;
     // lookup the component of a entity
     // lookup the entity to component, it's now done through 2 vectors
     std::vector<bool> entity_has_component {};
@@ -244,6 +244,7 @@ public:
         // if the entity does have this type of component throw exception
         if (entity_has_component.size() > entityID && entity_has_component[entityID] == 1) {
             yorcvs::log("Trying to add an component to an entity which already has it", yorcvs::MSGSEVERITY::ERROR);
+            return;
         }
         // if there isn't any free space,create one
         if (freeIndex.empty()) {
@@ -344,6 +345,11 @@ public:
     void copy_entity_component(const size_t dstID, const size_t srcID) override
     {
         components[entity_to_component[dstID]] = components[entity_to_component[srcID]];
+    }
+
+    [[nodiscard]] size_t get_allocated_components() const override
+    {
+        return components.size() - freeIndex.size();
     }
 
 private:
