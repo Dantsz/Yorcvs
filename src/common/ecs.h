@@ -832,6 +832,10 @@ public:
      */
     std::vector<bool> get_entity_signature(const size_t entityID)
     {
+        if (!is_valid_entity(entityID)) {
+            yorcvs::log("Cannot retrieve the signature of the entity " + std::to_string(entityID) + " as the entity is not valid", yorcvs::MSGSEVERITY::ERROR);
+            return {};
+        }
         return entitymanager->get_signature(entityID);
     }
     /**
