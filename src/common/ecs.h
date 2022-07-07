@@ -670,7 +670,7 @@ public:
      * @param entityID
      * @param signature
      */
-    void on_entity_signature_change(const size_t entityID, std::vector<bool>& signature)
+    void on_entity_signature_change(const size_t entityID, const std::vector<bool>& signature)
     {
         for (auto const& it : type_to_system) {
             auto const& type = it.first;
@@ -828,7 +828,7 @@ public:
      * @brief Get the Entity Signature
      *
      * @param entityID Entity ID
-     * @return std::vector<bool> List of all components, 1 if they have the component  or 0 otherwise
+     * @return std::vector<bool> List of all components, 1 if they have the component  or 0 otherwise, if the entity is not valid the empty is vector
      */
     std::vector<bool> get_entity_signature(const size_t entityID)
     {
@@ -1218,13 +1218,19 @@ public:
      *
      * @param dstEntityID destination
      * @param srcEntityID source
+     * @return IF ANY OF THE ENTITIES IS INVALID return false, return true otherwise
      */
-    void copy_components_to_from_entity(const size_t dstEntityID, const size_t srcEntityID)
+    bool copy_components_to_from_entity(const size_t dstEntityID, const size_t srcEntityID)
     {
+        if (!is_valid_entity(dstEntityID) && !is_valid_entity(srcEntityID)) {
+            yorcvs::log("Cannot copy components destination or source are invalid", yorcvs::MSGSEVERITY::ERROR);
+            return false;
+        }
         componentmanager->copy_component_data_to_from_entity(dstEntityID, srcEntityID);
-        std::vector<bool> newSignature = get_entity_signature(srcEntityID);
+        const std::vector<bool> newSignature = get_entity_signature(srcEntityID);
         systemmanager->on_entity_signature_change(dstEntityID, newSignature);
         entitymanager->set_signature(dstEntityID, newSignature);
+        return true;
     }
     // NOTE: DEBUG FUNCTIONS
     /**
