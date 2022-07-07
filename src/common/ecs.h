@@ -607,6 +607,7 @@ public:
         // if the system is not found  //throw
         if (type_to_system.find(systemType) == type_to_system.end()) {
             yorcvs::log("Unable to set the signature: system does not exist.", yorcvs::MSGSEVERITY::ERROR);
+            return;
         }
         type_to_signature[systemType] = signature;
     }
