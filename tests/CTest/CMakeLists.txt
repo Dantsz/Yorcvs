@@ -124,6 +124,10 @@ add_executable(ECSTestEntityDestruction src/ECSTestEntityDestruction.cpp)
 target_include_directories(ECSTestEntityDestruction PUBLIC ${yorcvs_include_path})
 add_test(ECSTestEntityDestruction ECSTestEntityDestruction)
 
+add_executable(ECSTestSystemUnregistering src/ECSTestSystemUnregistering.cpp)
+target_include_directories(ECSTestSystemUnregistering PUBLIC ${yorcvs_include_path})
+add_test(ECSTestSystemUnregistering ECSTestSystemUnregistering)
+
 add_executable(TypesTestRectContains src/TypesTestRectContains.cpp)
 target_include_directories(TypesTestRectContains PUBLIC ${yorcvs_include_path})
 add_test(NAME TypesTestRectContains COMMAND TypesTestRectContains WORKING_DIRECTORY ${test_dir} )

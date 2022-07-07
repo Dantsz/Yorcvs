@@ -567,6 +567,28 @@ public:
         return true;
     }
     /**
+     * @brief unregister_component
+     * @return true if an entry was removed from the list
+     */
+    template <typename T>
+    bool unregister_system()
+    {
+        const char* system_name = typeid(T).name();
+        if (type_to_system.find(system_name) != type_to_system.end()) {
+            // the system exists
+            type_to_system.at(system_name)->entitiesID.clear(); // clear the entities the system holds
+            type_to_system.erase(system_name);
+            type_to_signature.erase(system_name);
+            return true;
+
+        } else {
+            // the system is not in the manager
+            yorcvs::log(std::string("System ") + system_name + " not registered! ", yorcvs::MSGSEVERITY::ERROR);
+            return false;
+        }
+    }
+
+    /**
      * @brief Sets the signature of the system with type T
      *
      * @tparam T
@@ -1010,6 +1032,15 @@ public:
         if (systemmanager->register_system<T>(sys)) {
             on_system_signature_change<T>();
         }
+    }
+    /**
+     * @brief Deletes the system data present in the ECS
+     * @return ture if the data was deleted, false if it didn't found what to delete
+     */
+    template <typename T>
+    bool unregister_system()
+    {
+        return systemmanager->unregister_system<T>();
     }
     /**
      * @brief Checks if a system is registered
