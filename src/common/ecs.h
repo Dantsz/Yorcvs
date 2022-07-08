@@ -41,8 +41,6 @@ typename std::vector<T>::iterator insert_sorted(std::vector<T>& vec, T const& it
 namespace yorcvs {
 
 class ECS; // forward declaration
-// max number of components
-constexpr size_t maxComponentID = std::numeric_limits<size_t>::max();
 
 /**
  * @brief Contains a list of entities matching parents signature
