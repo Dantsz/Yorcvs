@@ -1027,11 +1027,30 @@ public:
      *
      * @tparam T the type of component
      * @param entityID ID of the entity
-     * @return T& the component
+     * @return T& the component, IF the entity doesn't have the component or is invalid, the programs aborts
      */
     template <typename T>
     T& get_component(const size_t entityID)
     {
+        if (!is_valid_entity(entityID) || !has_components<T>(entityID)) {
+            yorcvs::log("ENTITY DOESN'T HAVE COMPONENT OR IS INVALID", yorcvs::MSGSEVERITY::ERROR);
+            std::abort();
+        }
+        return componentmanager->get_component<T>(entityID);
+    }
+    /**
+     * @brief Returns a reference the component of the entity
+     *
+     * @tparam T the type of component
+     * @param entityID ID of the entity
+     * @return T& the component
+     */
+    template <typename T>
+    std::optional<std::reference_wrapper<T>> get_component_checked(const size_t entityID)
+    {
+        if (!is_valid_entity(entityID) || !has_components<T>(entityID)) {
+            return {};
+        }
         return componentmanager->get_component<T>(entityID);
     }
 

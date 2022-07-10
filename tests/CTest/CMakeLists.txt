@@ -136,6 +136,11 @@ add_executable(ECSTestAddingComponentToEntityWithComponentBehavior src/ECSTestAd
 target_include_directories(ECSTestAddingComponentToEntityWithComponentBehavior PUBLIC ${yorcvs_include_path})
 add_test(ECSTestAddingComponentToEntityWithComponentBehavior ECSTestAddingComponentToEntityWithComponentBehavior)
 
+add_executable(ECSTestAddEntityChecked src/ECSTestAddEntityChecked.cpp)
+target_include_directories(ECSTestAddEntityChecked PUBLIC ${yorcvs_include_path})
+add_test(ECSTestAddEntityChecked ECSTestAddEntityChecked)
+
+
 add_executable(TypesTestRectContains src/TypesTestRectContains.cpp)
 target_include_directories(TypesTestRectContains PUBLIC ${yorcvs_include_path})
 add_test(NAME TypesTestRectContains COMMAND TypesTestRectContains WORKING_DIRECTORY ${test_dir} )
