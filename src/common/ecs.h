@@ -12,11 +12,11 @@
 #include "utilities.h"
 #include <algorithm>
 #include <memory>
+#include <optional>
 #include <queue>
 #include <string>
 #include <unordered_map>
 #include <vector>
-
 /*The ECS is heaviley inspired by AUSTIN MORLAN's implementation , but it has a bit more functionality and ease of use.
   It's a bit more 'loose'. It's minimal and doesn't have very specific function so it may be interchangeable with other
   ECS.
@@ -63,30 +63,6 @@ concept systemT = requires(systemt sys)
     { sys.entityList->entitiesID[0] };
     { sys.entityList->entitiesID.size() };
 };
-
-/**
- * @brief Base class for all components container
- *
- */
-class VContainer {
-public:
-    virtual ~VContainer() = default;
-    VContainer() = default;
-    VContainer(VContainer& other) = default;
-    VContainer(VContainer&& other) = default;
-    VContainer& operator=(VContainer& other) = delete;
-    VContainer& operator=(VContainer&& other) = delete;
-
-    virtual void add_component(size_t entityID) = 0;
-    virtual void on_entity_destroyed(size_t entityID) noexcept = 0;
-    virtual void copy_entity_component(size_t dstID, size_t srcID) = 0;
-
-    // lookup the component of a entity
-    // lookup the entity to component, it's now done through 2 vectors
-    std::vector<bool> entity_has_component {};
-    std::vector<size_t> entity_to_component {};
-};
-
 /**
  * @brief Manages entity ids
  *
@@ -232,6 +208,29 @@ public:
 };
 
 /**
+ * @brief Base class for all components container
+ *
+ */
+class VContainer {
+public:
+    virtual ~VContainer() = default;
+    VContainer() = default;
+    VContainer(VContainer& other) = default;
+    VContainer(VContainer&& other) = default;
+    VContainer& operator=(VContainer& other) = delete;
+    VContainer& operator=(VContainer&& other) = delete;
+
+    virtual void add_component(size_t entityID) = 0;
+    virtual void on_entity_destroyed(size_t entityID) noexcept = 0;
+    virtual void copy_entity_component(size_t dstID, size_t srcID) = 0;
+    [[nodiscard]] virtual size_t get_allocated_components() const = 0;
+    // lookup the component of a entity
+    // lookup the entity to component, it's now done through 2 vectors
+    std::vector<bool> entity_has_component {};
+    std::vector<size_t> entity_to_component {};
+};
+
+/**
  * @brief Stores a type of component
  *
  * @tparam T Type of compoent stored
@@ -245,6 +244,7 @@ public:
         // if the entity does have this type of component throw exception
         if (entity_has_component.size() > entityID && entity_has_component[entityID] == 1) {
             yorcvs::log("Trying to add an component to an entity which already has it", yorcvs::MSGSEVERITY::ERROR);
+            return;
         }
         // if there isn't any free space,create one
         if (freeIndex.empty()) {
@@ -345,6 +345,11 @@ public:
     void copy_entity_component(const size_t dstID, const size_t srcID) override
     {
         components[entity_to_component[dstID]] = components[entity_to_component[srcID]];
+    }
+
+    [[nodiscard]] size_t get_allocated_components() const override
+    {
+        return components.size() - freeIndex.size();
     }
 
 private:
@@ -453,12 +458,13 @@ public:
      * @return size_t
      */
     template <typename T>
-    [[nodiscard]] size_t get_component_ID()
+    [[nodiscard]] std::optional<size_t> get_component_ID()
     {
         const char* component_name = typeid(T).name();
         if (component_type.find(component_name) == component_type.end()) {
             yorcvs::log("Cannot fetch component id" + std::string(component_name) + " : invalid component",
                 yorcvs::MSGSEVERITY::ERROR);
+            return {};
         }
         return component_type[component_name];
     }
@@ -568,6 +574,28 @@ public:
         return true;
     }
     /**
+     * @brief unregister_component
+     * @return true if an entry was removed from the list
+     */
+    template <typename T>
+    bool unregister_system()
+    {
+        const char* system_name = typeid(T).name();
+        if (type_to_system.find(system_name) != type_to_system.end()) {
+            // the system exists
+            type_to_system.at(system_name)->entitiesID.clear(); // clear the entities the system holds
+            type_to_system.erase(system_name);
+            type_to_signature.erase(system_name);
+            return true;
+
+        } else {
+            // the system is not in the manager
+            yorcvs::log(std::string("System ") + system_name + " not registered! ", yorcvs::MSGSEVERITY::ERROR);
+            return false;
+        }
+    }
+
+    /**
      * @brief Sets the signature of the system with type T
      *
      * @tparam T
@@ -580,6 +608,7 @@ public:
         // if the system is not found  //throw
         if (type_to_system.find(systemType) == type_to_system.end()) {
             yorcvs::log("Unable to set the signature: system does not exist.", yorcvs::MSGSEVERITY::ERROR);
+            return;
         }
         type_to_signature[systemType] = signature;
     }
@@ -812,7 +841,7 @@ public:
      * @return size_t
      */
     template <typename T>
-    size_t get_component_ID()
+    std::optional<size_t> get_component_ID()
     {
         return componentmanager->get_component_ID<T>();
     }
@@ -868,13 +897,16 @@ public:
         componentmanager->add_component<T>(entityID, component);
         // modify the signature to match the new addition
         std::vector<bool> e_signature = entitymanager->get_signature(entityID);
-        const size_t component_type = componentmanager->get_component_ID<T>();
+        const std::optional<size_t> component_type = componentmanager->get_component_ID<T>();
+        if (!component_type.has_value()) {
+            return;
+        }
         // while the vector of signature doesn't have elements until the current component add 0 to the signature
         while (e_signature.size() <= component_type) {
             e_signature.push_back(false);
         }
         // add the new signature
-        e_signature[component_type] = true;
+        e_signature[component_type.value()] = true;
         entitymanager->set_signature(entityID, e_signature);
         systemmanager->on_entity_signature_change(entityID, e_signature);
     }
@@ -927,8 +959,11 @@ public:
     void remove_component(const size_t entityID)
     {
         std::vector<bool>& e_signature = entitymanager->get_signature(entityID);
-        const size_t component_type = componentmanager->get_component_ID<T>();
-        e_signature[component_type] = false;
+        const std::optional<size_t> component_type = componentmanager->get_component_ID<T>();
+        if (!component_type.has_value()) {
+            return;
+        }
+        e_signature[component_type.value()] = false;
         systemmanager->on_entity_signature_change(entityID, e_signature);
         componentmanager->remove_component<T>(entityID);
     }
@@ -1013,6 +1048,15 @@ public:
         }
     }
     /**
+     * @brief Deletes the system data present in the ECS
+     * @return ture if the data was deleted, false if it didn't found what to delete
+     */
+    template <typename T>
+    bool unregister_system()
+    {
+        return systemmanager->unregister_system<T>();
+    }
+    /**
      * @brief Checks if a system is registered
      *
      * @tparam T The system
@@ -1087,13 +1131,17 @@ public:
         // get the current signature of sys
         std::vector<bool> signature = get_system_signature<sys>();
         // get the id of the component
-        size_t componentID = get_component_ID<comp>();
+        const std::optional<size_t> componentID = get_component_ID<comp>();
+        if (!componentID.has_value()) {
+            yorcvs::log(std::string("Could not add component ") + typeid(comp).name() + " to ieration for " + std::string(typeid(sys).name()), yorcvs::MSGSEVERITY::ERROR);
+            return;
+        }
         // modify the signature to fit the new component
         while (signature.size() <= componentID) {
             signature.push_back(false);
         }
         // mark the component as being a part of the system
-        signature[componentID] = true;
+        signature[componentID.value()] = true;
         // set the new signature
         set_system_signature<sys>(signature);
 
@@ -1146,12 +1194,16 @@ public:
     [[nodiscard]] size_t get_entities_with_component() const
     {
         // get component index
-        const size_t cIndex = componentmanager->get_component_ID<T>();
+        const std::optional<size_t> cIndex = componentmanager->get_component_ID<T>();
+        if (!cIndex.has_value()) {
+            yorcvs::log(std::string("Component ") + typeid(T).name() + " is not valid");
+            return 0;
+        }
         size_t entities = 0;
         // unused entites have an emtpy signature so a false pozitive should happen
         for (const auto& i : entitymanager->entitySignatures) {
             if (i.size() > cIndex) {
-                entities += static_cast<size_t>(i[cIndex]);
+                entities += static_cast<size_t>(i[cIndex.value()]);
             }
         }
         return entities;
