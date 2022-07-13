@@ -59,7 +59,8 @@ set(YorcvsGAMEFILES     "src/game/components.h"
                         "src/game/systems/velocity.h"
 )
 set(YorcvsUIFILES "src/ui/debuginfo.h"
-                  "src/ui/performancewindow.h")
+                  "src/ui/performancewindow.h"
+                  "src/ui/assetmanagerviewer.h")
 set(YORCVSENGINEFILES   "src/engine/window/window.h"
                         "src/engine/window/eventhandler.h"
                         "src/engine/window/windowsdl2"

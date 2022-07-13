@@ -3,7 +3,7 @@
 #include <array>
 #include <deque>
 #include <string>
-
+namespace yorcvs::ui {
 class Performance_Window {
 public:
     Performance_Window()
@@ -147,3 +147,4 @@ private:
     const static size_t updates_per_sample = 9; // how many samples to be skipped before another one is counted
     int plotting = history_plotting::line; // if lines or rectangles to be displayed
 };
+}
