@@ -9,7 +9,9 @@
 #include "imgui_sdl.h"
 #include "misc/cpp/imgui_stdlib.h"
 #include <optional>
+
 namespace yorcvs {
+class Application;
 class DebugInfo {
 public:
     enum update_time_item : size_t {
@@ -31,12 +33,13 @@ public:
         update_time_sample_tuple_elements
     };
     DebugInfo() = delete;
-    DebugInfo(yorcvs::sdl2_window* parentW, yorcvs::Map* map_object, PlayerMovementControl* pms, CollisionSystem* cols,
+    DebugInfo(yorcvs::Application* parentAPP, yorcvs::sdl2_window* parentW, yorcvs::Map* map_object, PlayerMovementControl* pms, CollisionSystem* cols,
         HealthSystem* healthS, CombatSystem* combat_sys, sol::state* lua)
         : parentWindow(parentW)
         , appECS(map_object->ecs)
         , map(map_object)
         , lua_state(lua)
+        , parent_app(parentAPP)
         , player_move_system(pms)
         , colission_system(cols)
         , combat_system(combat_sys)
@@ -144,7 +147,9 @@ public:
         if (console_opened) {
             show_console_window();
             ImGui::ShowDemoWindow();
+            ImGui::Begin("Debug");
             show_entities_table();
+            ImGui::End();
         }
     }
 
@@ -175,7 +180,7 @@ public:
     {
         mouse_is_pressed = false;
     }
-    bool is_debug_window_open() const
+    [[nodiscard]] bool is_debug_window_open() const
     {
         return debug_window_opened;
     }
@@ -308,9 +313,7 @@ private:
     {
         const int collumn_count = 5;
         const ImGuiTableFlags flags1 = ImGuiTableFlags_BordersV | ImGuiTableFlags_SortMulti | ImGuiTableFlags_Resizable;
-        ImGui::Begin("Debug");
         if (!(ImGui::CollapsingHeader("Entities") && ImGui::BeginTable("table1", collumn_count, flags1))) {
-            ImGui::End();
             return;
         }
         ImGui::TableSetupColumn("ID");
@@ -377,8 +380,6 @@ private:
             ImGui::PopID();
         }
         ImGui::EndTable();
-
-        ImGui::End();
     }
 
     void reset()
@@ -497,7 +498,7 @@ private:
     yorcvs::ECS* appECS {};
     yorcvs::Map* map {};
     sol::state* lua_state {};
-
+    yorcvs::Application* parent_app;
     // console
     std::string console_text;
     std::vector<std::string> console_logs;
