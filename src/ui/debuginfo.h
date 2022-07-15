@@ -5,33 +5,15 @@
 #include "../engine/window/windowsdl2.h"
 #include "../game/components.h"
 #include "../game/systems.h"
+#include "assetmanagerviewer.h"
 #include "imgui.h"
 #include "imgui_sdl.h"
 #include "misc/cpp/imgui_stdlib.h"
 #include <optional>
-
 namespace yorcvs {
 class Application;
 class DebugInfo {
 public:
-    enum update_time_item : size_t {
-        collision = 0,
-        health = 1,
-        stamina = 2,
-        velocity = 3,
-        animation = 4,
-        behaviour = 5,
-        overall = 6,
-        update_time_tracked
-    };
-    // samples , max , min , avg
-    enum update_time_sample_tuple_element : size_t {
-        samples = 0,
-        max = 1,
-        min = 2,
-        avg = 3,
-        update_time_sample_tuple_elements
-    };
     DebugInfo() = delete;
     DebugInfo(yorcvs::Application* parentAPP, yorcvs::sdl2_window* parentW, yorcvs::Map* map_object, PlayerMovementControl* pms, CollisionSystem* cols,
         HealthSystem* healthS, CombatSystem* combat_sys, sol::state* lua)
@@ -147,7 +129,7 @@ public:
         if (console_opened) {
             show_console_window();
             ImGui::ShowDemoWindow();
-            ImGui::Begin("Debug");
+            ImGui::Begin("Monitor");
             show_entities_table();
             ImGui::End();
         }
