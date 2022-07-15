@@ -79,6 +79,10 @@ public:
     {
         return assetMap;
     }
+    const std::unordered_map<std::string, std::shared_ptr<assetType>>& get_assetmap() const
+    {
+        return assetMap;
+    }
 
 private:
     /**

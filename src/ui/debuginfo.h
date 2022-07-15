@@ -131,6 +131,15 @@ public:
             ImGui::ShowDemoWindow();
             ImGui::Begin("Monitor");
             show_entities_table();
+            if (ImGui::CollapsingHeader("Loaded Textures")) {
+                ui::draw_asset_manager_tree<SDL_Texture>(
+                    *parentWindow->assetm, [&](const std::string& tex_name) {
+                        constexpr ImVec2 texture_size = { 1000, 1000 };
+                        ImGui::Image(parentWindow->assetm->load_from_file(tex_name).get(), texture_size);
+                    },
+                    "Textures");
+            }
+
             ImGui::End();
         }
     }
