@@ -41,8 +41,6 @@ typename std::vector<T>::iterator insert_sorted(std::vector<T>& vec, T const& it
 namespace yorcvs {
 
 class ECS; // forward declaration
-// max number of components
-constexpr size_t maxComponentID = std::numeric_limits<size_t>::max();
 
 /**
  * @brief Contains a list of entities matching parents signature
@@ -670,7 +668,7 @@ public:
      * @param entityID
      * @param signature
      */
-    void on_entity_signature_change(const size_t entityID, std::vector<bool>& signature)
+    void on_entity_signature_change(const size_t entityID, const std::vector<bool>& signature)
     {
         for (auto const& it : type_to_system) {
             auto const& type = it.first;
@@ -828,10 +826,14 @@ public:
      * @brief Get the Entity Signature
      *
      * @param entityID Entity ID
-     * @return std::vector<bool> List of all components, 1 if they have the component  or 0 otherwise
+     * @return std::vector<bool> List of all components, 1 if they have the component  or 0 otherwise, if the entity is not valid the empty is vector
      */
     std::vector<bool> get_entity_signature(const size_t entityID)
     {
+        if (!is_valid_entity(entityID)) {
+            yorcvs::log("Cannot retrieve the signature of the entity " + std::to_string(entityID) + " as the entity is not valid", yorcvs::MSGSEVERITY::ERROR);
+            return {};
+        }
         return entitymanager->get_signature(entityID);
     }
     /**
@@ -1025,11 +1027,30 @@ public:
      *
      * @tparam T the type of component
      * @param entityID ID of the entity
-     * @return T& the component
+     * @return T& the component, IF the entity doesn't have the component or is invalid, the programs aborts
      */
     template <typename T>
     T& get_component(const size_t entityID)
     {
+        if (!is_valid_entity(entityID) || !has_components<T>(entityID)) {
+            yorcvs::log("ENTITY DOESN'T HAVE COMPONENT OR IS INVALID", yorcvs::MSGSEVERITY::ERROR);
+            std::abort();
+        }
+        return componentmanager->get_component<T>(entityID);
+    }
+    /**
+     * @brief Returns a reference the component of the entity
+     *
+     * @tparam T the type of component
+     * @param entityID ID of the entity
+     * @return T& the component
+     */
+    template <typename T>
+    std::optional<std::reference_wrapper<T>> get_component_checked(const size_t entityID)
+    {
+        if (!is_valid_entity(entityID) || !has_components<T>(entityID)) {
+            return {};
+        }
         return componentmanager->get_component<T>(entityID);
     }
 
@@ -1214,13 +1235,19 @@ public:
      *
      * @param dstEntityID destination
      * @param srcEntityID source
+     * @return IF ANY OF THE ENTITIES IS INVALID return false, return true otherwise
      */
-    void copy_components_to_from_entity(const size_t dstEntityID, const size_t srcEntityID)
+    bool copy_components_to_from_entity(const size_t dstEntityID, const size_t srcEntityID)
     {
+        if (!is_valid_entity(dstEntityID) && !is_valid_entity(srcEntityID)) {
+            yorcvs::log("Cannot copy components destination or source are invalid", yorcvs::MSGSEVERITY::ERROR);
+            return false;
+        }
         componentmanager->copy_component_data_to_from_entity(dstEntityID, srcEntityID);
-        std::vector<bool> newSignature = get_entity_signature(srcEntityID);
+        const std::vector<bool> newSignature = get_entity_signature(srcEntityID);
         systemmanager->on_entity_signature_change(dstEntityID, newSignature);
         entitymanager->set_signature(dstEntityID, newSignature);
+        return true;
     }
     // NOTE: DEBUG FUNCTIONS
     /**
