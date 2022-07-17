@@ -5,6 +5,7 @@
 #include "../engine/window/windowsdl2.h"
 #include "../game/components.h"
 #include "../game/systems.h"
+#include "animationeditor.h"
 #include "assetmanagerviewer.h"
 #include "imgui.h"
 #include "imgui_sdl.h"
@@ -186,7 +187,9 @@ private:
             const size_t ID = player_move_system->entityList->entitiesID[0];
             ImGui::Begin("Player");
             show_entity_stats(ID, "Player : ");
-            ImGui::End();
+            if (appECS->has_components<animationComponent>(ID)) {
+                ui::show_animation_editor(appECS, ID, appECS->get_component<animationComponent>(ID));
+            }
         }
     }
     void show_entity_stats(size_t ID, [[maybe_unused]] std::string pre_name = "Entity : ")

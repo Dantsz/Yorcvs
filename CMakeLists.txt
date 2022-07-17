@@ -46,6 +46,7 @@ set(YorcvsCORESFILES    "src/common/assetmanager.h"
                         "src/engine/luaEngine.h"
                         "src/engine/map.h")
 set(YorcvsGAMEFILES     "src/game/components.h"
+                        "src/game/componentSerialization.h"
                         "src/game/systems.h"
 
                         "src/game/systems/animation.h"
@@ -60,7 +61,8 @@ set(YorcvsGAMEFILES     "src/game/components.h"
 )
 set(YorcvsUIFILES "src/ui/debuginfo.h"
                   "src/ui/performancewindow.h"
-                  "src/ui/assetmanagerviewer.h")
+                  "src/ui/assetmanagerviewer.h"
+                  "src/ui/animationeditor.h")
 set(YORCVSENGINEFILES   "src/engine/window/window.h"
                         "src/engine/window/eventhandler.h"
                         "src/engine/window/windowsdl2"
