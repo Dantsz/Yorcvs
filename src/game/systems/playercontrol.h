@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "../../common/ecs.h"
 #include "../../engine/window/windowsdl2.h"
 #include "../components.h"
@@ -43,7 +43,20 @@ public:
                     cur_time = 0.0f;
                 }
                 world->get_component<velocityComponent>(ID).vel = dir;
-                AnimationSystem::set_animation(world, ID, select_facing_animation(a_pressed, d_pressed, w_pressed, s_pressed, world->get_component<velocityComponent>(ID).facing.x));
+
+                auto& player_state = world->get_component<playerMovementControlledComponent>(ID);
+                if (a_pressed) {
+                    player_state.current_state = playerMovementControlledComponent::PLAYER_MOVING_L;
+                } else if (d_pressed || s_pressed || w_pressed) {
+                    player_state.current_state = playerMovementControlledComponent::PLAYER_MOVING_R;
+                } else if (player_state.current_state == playerMovementControlledComponent::PLAYER_MOVING_R) {
+                    player_state.current_state = playerMovementControlledComponent::PLAYER_IDLE_R;
+                } else if (player_state.current_state == playerMovementControlledComponent::PLAYER_MOVING_L) {
+                    player_state.current_state = playerMovementControlledComponent::PLAYER_IDLE_L;
+                }
+
+                const char* new_animation = select_animation(player_state);
+                AnimationSystem::set_animation(world, ID, new_animation);
             }
             window->set_drawing_offset(world->get_component<positionComponent>(ID).position + dir - (render_size - world->get_component<spriteComponent>(ID).size) / 2);
         }
@@ -60,18 +73,27 @@ private:
         // normalizing means moving at 1000 units per second
         return yorcvs::Vec2<float>(move_right + move_left * -1.0f, move_up * -1.0f + move_down).normalize() * player_default_speed; // move 30 units per second
     }
-    static const char* select_facing_animation(bool a_pressed, bool d_pressed, bool w_pressed, bool s_pressed, bool facing)
+    static const char* select_animation(playerMovementControlledComponent& player_state)
     {
-        if (a_pressed) {
-            return "walkingL";
-        }
-        if (d_pressed || s_pressed || w_pressed) {
-            return "walkingR";
-        }
-        if (facing) {
+        switch (player_state.current_state) {
+        case playerMovementControlledComponent::PLAYER_IDLE_R:
+            return "idleR";
+        case playerMovementControlledComponent::PLAYER_IDLE_L:
             return "idleL";
+        case playerMovementControlledComponent::PLAYER_MOVING_R:
+            return "walkingR";
+        case playerMovementControlledComponent::PLAYER_MOVING_L:
+            return "walkingL";
+        case playerMovementControlledComponent::PLAYER_USE_R:
+            return "hold_R";
+        case playerMovementControlledComponent::PLAYER_USE_L:
+            return "hold_L";
+        case playerMovementControlledComponent::PLAYER_ATTACK_R:
+            return "attack_R";
+        case playerMovementControlledComponent::PLAYER_ATTACK_L:
+            return "attack_L";
         }
-        return "idleR";
+        return "";
     }
     float cur_time {};
     yorcvs::ECS* world;

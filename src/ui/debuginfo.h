@@ -188,7 +188,7 @@ private:
             ImGui::Begin("Player");
             show_entity_stats(ID, "Player : ");
             if (appECS->has_components<animationComponent>(ID)) {
-                ui::show_animation_editor(appECS, ID, appECS->get_component<animationComponent>(ID));
+                ui::show_current_animator_selector(appECS, ID);
             }
         }
     }
@@ -264,6 +264,11 @@ private:
         }
         if (appECS->has_components<offensiveStatsComponent>(sender) && appECS->has_components<healthComponent>(target) && ImGui::Button("attack")) {
             combat_system->attack(sender, target);
+            const auto sender_state = appECS->get_component_checked<playerMovementControlledComponent>(sender);
+            const auto sender_vel = appECS->get_component_checked<velocityComponent>(sender);
+            if (sender_state.has_value() && sender_vel.has_value()) {
+                sender_state->get().current_state = (sender_vel->get().facing.x <= 0.0f) ? playerMovementControlledComponent::PLAYER_ATTACK_R : playerMovementControlledComponent::PLAYER_ATTACK_L;
+            }
         }
     }
     void show_console_window()

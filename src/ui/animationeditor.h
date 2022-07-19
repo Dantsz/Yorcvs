@@ -4,10 +4,11 @@
 #include "../game/systems.h"
 namespace yorcvs::ui {
 
-void show_animation_editor(yorcvs::ECS* appECS, size_t ID, animationComponent& anim_comp)
+void show_current_animator_selector(yorcvs::ECS* appECS, size_t ID)
 {
+    const animationComponent& anim_comp = appECS->get_component<animationComponent>(ID);
     static std::string current_item {};
-    if (ImGui::BeginCombo("Test", anim_comp.cur_animation.c_str())) {
+    if (ImGui::BeginCombo("Animation", anim_comp.cur_animation.c_str())) {
         for (const auto& [animation_name, animation] : anim_comp.animations) {
             bool is_selected = (current_item == animation_name);
             if (ImGui::Selectable(animation_name.c_str(), is_selected)) {
@@ -22,4 +23,5 @@ void show_animation_editor(yorcvs::ECS* appECS, size_t ID, animationComponent& a
     }
     ImGui::End();
 }
+
 }
