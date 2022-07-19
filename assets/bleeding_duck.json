@@ -108,5 +108,12 @@
                 ]
             }
         ]
+    },
+    "defensive_stats":
+    {
+        "defense":0,
+        "block":0,
+        "dodge":0,
+        "spirit":0
     }
 }

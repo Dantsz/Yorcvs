@@ -14,11 +14,37 @@ public:
         world->register_system(*this);
         world->add_criteria_for_iteration<CombatSystem, healthComponent, offensiveStatsComponent, defensiveStatsComponent>();
     }
-    void attack(size_t source, size_t target) const
+    /**
+     * @brief attack
+     * @param source
+     * @param target
+     * @return the amount of damaged dealt
+     */
+    [[nodiscard]] float attack(size_t source, size_t target) const
     {
-        // TODO: implement attacking
-        float damage = world->get_component<offensiveStatsComponent>(source).strength;
+        const auto& source_stats = world->get_component<offensiveStatsComponent>(source);
+        const auto& target_stats = world->get_component<defensiveStatsComponent>(target);
+
+        // add strength bonus
+        float damage = calculate_strength_bonus(source_stats.strength);
+        // check if critical
+        const float agility_roll = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        if (agility_roll < calculate_agility_bonus(source_stats.agility)) {
+            damage *= crititcal_multiplier;
+        }
+        // check if dodged
+        const float dodge_roll = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        if (dodge_roll < calculate_dodge_chance(target_stats.dodge)) {
+            return 0.0f;
+        }
+        // check if blocked
+        const float block_roll = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        if (block_roll < calculate_block_chance(target_stats.block)) {
+            damage /= block_multiplier;
+        }
+
         world->get_component<healthComponent>(target).HP -= damage;
+        return damage;
     }
     /**
      * @brief Calculates the percentage of the damage reduced by the armor stat
@@ -39,7 +65,7 @@ public:
      * @brief Calculates the block value from the block stat
      *
      * @param block block stat
-     * @return constexpr float the block values, a number between 0.0 and 1.0 representing the chance the character block the attack
+     * @return constexpr float the block values, a number between 0.0 and 1.0 representing the chance the character block the attack, blocked attacks deal a quarter damage
      */
     static constexpr float calculate_block_chance(float block)
     {
@@ -89,4 +115,6 @@ public:
     }
     std::shared_ptr<yorcvs::EntitySystemList> entityList = nullptr;
     yorcvs::ECS* world = nullptr;
+    static constexpr float crititcal_multiplier = 2.0f;
+    static constexpr float block_multiplier = 4.0f;
 };

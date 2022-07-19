@@ -262,8 +262,10 @@ private:
         if (ImGui::Button("teleport here") && appECS->has_components<positionComponent>(target) && appECS->has_components<positionComponent>(target)) {
             appECS->get_component<positionComponent>(target) = appECS->get_component<positionComponent>(sender);
         }
-        if (appECS->has_components<offensiveStatsComponent>(sender) && appECS->has_components<healthComponent>(target) && ImGui::Button("attack")) {
-            combat_system->attack(sender, target);
+
+        if (appECS->has_components<offensiveStatsComponent>(sender) && appECS->has_components<healthComponent>(target) && appECS->has_components<defensiveStatsComponent>(target) && ImGui::Button("attack")) {
+            const auto damage = combat_system->attack(sender, target);
+            yorcvs::log(std::to_string(sender) + " dealt " + std::to_string(damage) + " to " + std::to_string(target));
             const auto sender_state = appECS->get_component_checked<playerMovementControlledComponent>(sender);
             const auto sender_vel = appECS->get_component_checked<velocityComponent>(sender);
             if (sender_state.has_value() && sender_vel.has_value()) {

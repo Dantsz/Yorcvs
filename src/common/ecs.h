@@ -1301,7 +1301,6 @@ private:
         const char* systemType = typeid(T).name();
         // add matching entities to it
         // couldn't find a better place to put it
-
         for (size_t entity = 0; entity < entitymanager->entitySignatures.size(); entity++) {
             if (systemmanager->compare_entity_to_system(entitymanager->entitySignatures[entity],
                     systemmanager->get_system_signature<T>())) {
