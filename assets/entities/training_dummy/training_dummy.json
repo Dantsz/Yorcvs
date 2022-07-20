@@ -1,0 +1,79 @@
+{
+    "identification":
+    {
+        "name": "Training dummy"
+    },
+    "health":
+    {
+        "current": 1000.0,
+        "max": 1000.0,
+        "regen" : 0.0
+    },
+
+    "hitbox": {
+        "x": 8,
+        "y": 0,
+        "w": 16,
+        "h": 24
+    },
+    
+    "sprite": {
+        "offset": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "size": {
+            "x": 32.0,
+            "y": 32.0
+        },
+        "srcRect": {
+            "x": 0,
+            "y": 0,
+            "w": 64,
+            "h": 64
+        },
+        "spriteName": "training_dummy.png",
+        "animations": [
+            {
+                "name": "idleR",
+                "speed": 50,
+                "frames": [
+                    {
+                        "x": 0,
+                        "y": 0,
+                        "w": 64,
+                        "h": 64
+                    }
+                ]
+            },
+            {
+                "name": "idle_broken",
+                "speed": 50,
+                "frames": [
+                    {
+                        "x": 64,
+                        "y": 0,
+                        "w": 64,
+                        "h": 64
+                    }
+                ]
+            }        
+        ]
+    },
+    "defensive_stats":
+    {
+        "defense":0,
+        "block":0,
+        "dodge":0,
+        "spirit":0
+    },
+    "offsensive_stats":
+    {
+        "strength":0,
+        "agility":0,
+        "dexterity":0,
+        "piercing":0,
+        "intellect":0
+    }
+
+}

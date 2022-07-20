@@ -152,6 +152,9 @@ public:
         for (const auto& ID : entityList->entitiesID) {
             const animationComponent::Animation* cur_animation = &world->get_component<animationComponent>(ID)
                                                                       .animations[world->get_component<animationComponent>(ID).cur_animation];
+            if (cur_animation->frames.empty()) {
+                continue;
+            }
             world->get_component<animationComponent>(ID).cur_elapsed += elapsed;
             if (world->get_component<animationComponent>(ID).cur_elapsed > cur_animation->speed) {
                 world->get_component<animationComponent>(ID).cur_elapsed = 0;

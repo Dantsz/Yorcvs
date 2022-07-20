@@ -230,7 +230,7 @@ public:
                       yorcvs::log("animationComponent is not valid");
                       return;
                     }
-                    AnimationSystem::set_animation(ecs, entity_id, "idleL");
+                    AnimationSystem::set_animation(ecs, entity_id, "idleR");
                 } })) {
             yorcvs::log("spriteComponent (" + path + ") is not valid");
             return;

@@ -335,8 +335,8 @@ private:
                 ImGui::OpenPopup("Entity");
             }
             if (ImGui::BeginPopup("Entity")) {
-                ImGui::Text("%s", std::to_string(get_first_player_id()).c_str());
-                show_entity_stats(get_first_player_id());
+                ImGui::Text("%s", std::to_string(i).c_str());
+                show_entity_stats(i);
                 show_entity_interaction_window(get_first_player_id(), i);
                 ImGui::EndPopup();
             }

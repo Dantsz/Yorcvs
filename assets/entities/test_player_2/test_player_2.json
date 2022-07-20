@@ -131,8 +131,8 @@
     },
     "offsensive_stats":
     {
-        "strength":1,
-        "agility":0,
+        "strength":10,
+        "agility":1000,
         "dexterity":0,
         "piercing":0,
         "intellect":0

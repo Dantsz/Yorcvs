@@ -31,10 +31,8 @@ public:
     {
         (*lua_state)["entityID"] = ID;
         const std::string& script_path = world->get_component<behaviourComponent>(ID).code_path;
-
-        lua_state->safe_script(*scripts->load_from_file(script_path));
-
         world->get_component<behaviourComponent>(ID).accumulated = 0.0f;
+        lua_state->safe_script(*scripts->load_from_file(script_path));
     }
     void update(const float dt)
     {
