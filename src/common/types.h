@@ -25,7 +25,7 @@ public:
         , y(static_cast<T>(0))
     {
     }
-    constexpr Vec2(T px, T py)
+    constexpr Vec2(T px, T py) noexcept
         : x(px)
         , y(py)
     {
@@ -73,11 +73,11 @@ public:
         return *this;
     }
     // Multiplication
-    constexpr Vec2 operator*(const Vec2& other) const
+    constexpr Vec2 operator*(const Vec2& other) const noexcept
     {
         return Vec2(x * other.x, y * other.y);
     }
-    constexpr Vec2 operator*(const T& other) const
+    constexpr Vec2 operator*(const T& other) const noexcept
     {
         return Vec2(x * other, y * other);
     }
