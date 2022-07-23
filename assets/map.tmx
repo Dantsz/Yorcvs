@@ -189,35 +189,35 @@
    <properties>
     <property name="behaviour" type="file" value=""/>
     <property name="behaviourDT" type="float" value="1000"/>
-    <property name="entityPath" type="file" value="duck.json"/>
+    <property name="entityPath" type="file" value="entities/duck/duck.json"/>
    </properties>
   </object>
   <object id="41" name="BleedingDuck" x="11.6667" y="82">
    <properties>
     <property name="behaviour" type="file" value=""/>
     <property name="behaviourDT" type="float" value="1000"/>
-    <property name="entityPath" type="file" value="bleeding_duck.json"/>
+    <property name="entityPath" type="file" value="entities/bleeding_duck/bleeding_duck.json"/>
    </properties>
   </object>
   <object id="42" name="ChickenTest" x="80.5" y="9">
    <properties>
     <property name="behaviour" type="file" value="scripts/behavior_chicken.lua"/>
     <property name="behaviourDT" type="float" value="1000"/>
-    <property name="entityPath" type="file" value="duck.json"/>
+    <property name="entityPath" type="file" value="entities/duck/duck.json"/>
    </properties>
   </object>
   <object id="43" name="ChickenTest" x="21" y="14">
    <properties>
     <property name="behaviour" type="file" value="scripts/behavior_chicken.lua"/>
     <property name="behaviourDT" type="float" value="1000"/>
-    <property name="entityPath" type="file" value="duck.json"/>
+    <property name="entityPath" type="file" value="entities/duck/duck.json"/>
    </properties>
   </object>
   <object id="44" name="ChickenTest" x="132" y="77">
    <properties>
     <property name="behaviour" type="file" value="scripts/behavior_chicken.lua"/>
     <property name="behaviourDT" type="float" value="1000"/>
-    <property name="entityPath" type="file" value="duck.json"/>
+    <property name="entityPath" type="file" value="entities/duck/duck.json"/>
    </properties>
   </object>
   <object id="45" name="Snake" x="84.5" y="220">
