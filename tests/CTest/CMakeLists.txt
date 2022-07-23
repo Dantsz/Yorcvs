@@ -96,8 +96,9 @@ if (NOT imguiSDL2_POPULATED)
   
 endif()
 
-
-
+add_compile_definitions(TEST_MAP_FILE="../../assets/map.tmx")
+add_compile_definitions(TEST_TEMP_ENTITY_FILE="../../assets/entities/bleeding_duck/bleeding_duck.json")
+add_compile_definitions(TEST_LOAD_ENTITY_FILE="../../assets/entities/duck/duck.json")
 
 add_executable(ECSTestEntitiesAndComponents src/ECSTestEntitiesAndComponents.cpp )
 add_test(ECSTestEntitiesAndComponents ECSTestEntitiesAndComponents )

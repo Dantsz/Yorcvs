@@ -12,7 +12,7 @@ int main(int argc, char** argv)
     yorcvs::Timer timy {};
     yorcvs::ECS world {};
     timy.start();
-    yorcvs::Map map { "assets/map.tmx", &world };
+    yorcvs::Map map { TEST_MAP_FILE, &world };
 
     std::cout << "Loading map took " << timy.get_ticks() << "ms" << '\n';
     // deleting player
@@ -34,7 +34,7 @@ int main(int argc, char** argv)
     timy.start();
 
     for (size_t i = 0; i < number_of_additional_bleeding_ducks; i++) {
-        map.load_character_from_path(first_ad_duck_entity + i, "assets/bleeding_duck.json");
+        map.load_character_from_path(first_ad_duck_entity + i, TEST_TEMP_ENTITY_FILE);
         // remove the collision
         if (world.has_components<hitboxComponent>(first_ad_duck_entity + i)) {
             world.remove_component<hitboxComponent>(first_ad_duck_entity + i);
