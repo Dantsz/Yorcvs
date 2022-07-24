@@ -28,7 +28,7 @@ int main(int argc, char** argv)
     const size_t first_ad_duck_entity = world.get_active_entities_number();
     timy.start();
     for (size_t i = 0; i < number_of_additional_bleeding_ducks; i++) {
-        const size_t k = world.create_entity_ID();
+        [[maybe_unused]] const size_t k = world.create_entity_ID();
     }
     std::cout << "Creating valid entities took " << timy.get_ticks() << " ms" << '\n';
     timy.start();

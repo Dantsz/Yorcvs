@@ -4,11 +4,9 @@
 #include "../engine/map.h"
 #include "../engine/window/windowsdl2.h"
 #include "../game/components.h"
-#include "../game/systems.h"
 #include "animationeditor.h"
 #include "assetmanagerviewer.h"
 #include "imgui.h"
-#include "imgui_sdl.h"
 #include "misc/cpp/imgui_stdlib.h"
 #include <optional>
 namespace yorcvs {
@@ -269,7 +267,7 @@ private:
             const auto sender_state = appECS->get_component_checked<playerMovementControlledComponent>(sender);
             const auto sender_vel = appECS->get_component_checked<velocityComponent>(sender);
             if (sender_state.has_value() && sender_vel.has_value()) {
-                sender_state->get().current_state = (sender_vel->get().facing.x <= 0.0f) ? playerMovementControlledComponent::PLAYER_ATTACK_R : playerMovementControlledComponent::PLAYER_ATTACK_L;
+                sender_state->get().current_state = (!sender_vel->get().facing.x) ? playerMovementControlledComponent::PLAYER_ATTACK_R : playerMovementControlledComponent::PLAYER_ATTACK_L;
             }
         }
     }
