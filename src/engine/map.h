@@ -230,7 +230,7 @@ public:
                       yorcvs::log("animationComponent is not valid");
                       return;
                     }
-                    AnimationSystem::set_animation(ecs, entity_id, "idleR");
+                    AnimationSystem::set_animation_global(ecs, entity_id, "idleR");
                 } })) {
             yorcvs::log("spriteComponent (" + path + ") is not valid");
             return;
@@ -238,8 +238,8 @@ public:
         // These components should not be serialized as the position and velocity is relative to the map!!!
         if (!ecs->has_components<positionComponent>(entity_id)) {
             ecs->add_component<positionComponent>(entity_id, {});
-            // TODO: move this elsewhere
-            ecs->get_component<positionComponent>(entity_id) = { get_spawn_position() };
+            const auto spawn_position = get_spawn_position();
+            ecs->get_component<positionComponent>(entity_id).position = spawn_position;
         }
         if (!ecs->has_components<velocityComponent>(entity_id)) {
             ecs->add_component<velocityComponent>(entity_id, {});

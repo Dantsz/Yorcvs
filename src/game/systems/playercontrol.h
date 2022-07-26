@@ -56,7 +56,7 @@ public:
                 }
 
                 const char* new_animation = select_animation(player_state);
-                AnimationSystem::set_animation(world, ID, new_animation);
+                AnimationSystem::set_animation_global(world, ID, new_animation);
             }
             window->set_drawing_offset(world->get_component<positionComponent>(ID).position + dir - (render_size - world->get_component<spriteComponent>(ID).size) / 2);
         }
@@ -89,9 +89,9 @@ private:
         case playerMovementControlledComponent::PLAYER_USE_L:
             return "hold_L";
         case playerMovementControlledComponent::PLAYER_ATTACK_R:
-            return "attack_R";
+            return "attackR";
         case playerMovementControlledComponent::PLAYER_ATTACK_L:
-            return "attack_L";
+            return "attackL";
         }
         return "";
     }

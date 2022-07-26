@@ -59,18 +59,20 @@
 
             {"rectangle":{"x" : 64, "y" : 256, "w":64,"h":64}, "next_id":9,"speed":50},
             {"rectangle":{"x" : 128, "y" : 256, "w":64,"h":64}, "next_id":10,"speed":50},
-            {"rectangle":{"x" : 192, "y" : 256, "w":64,"h":64}, "next_id":8,"speed":50},
+            {"rectangle":{"x" : 192, "y" : 256, "w":64,"h":64}, "next_id":0,"speed":50},
 
             {"rectangle":{"x" : 64, "y" : 320, "w":64,"h":64}, "next_id":12,"speed":50},
             {"rectangle":{"x" : 128, "y" : 320, "w":64,"h":64}, "next_id":13,"speed":50},
-            {"rectangle":{"x" : 192, "y" : 320, "w":64,"h":64}, "next_id":11,"speed":50}
+            {"rectangle":{"x" : 192, "y" : 320, "w":64,"h":64}, "next_id":4,"speed":50}
 
             ],
             "animations":{
                 "idleR":0,
                 "idleL":4,
                 "walkingR":1,
-                "walkingL":5             
+                "walkingL":5,
+                "attackR":8,
+                "attackL":11             
             },
             "current_animation_name" : "idleR",
             "current_frame":0,

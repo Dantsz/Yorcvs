@@ -33,32 +33,19 @@
             "h": 64
         },
         "spriteName": "training_dummy.png",
-        "animations": [
-            {
-                "name": "idleR",
-                "speed": 50,
-                "frames": [
-                    {
-                        "x": 0,
-                        "y": 0,
-                        "w": 64,
-                        "h": 64
-                    }
-                ]
+        "animation": {
+            "frames":[
+                {"rectangle":{"x": 0,"y": 0,"w": 64,"h": 64}  ,"next_id":0,"speed":500},
+                {"rectangle":{"x": 64,"y": 0,"w": 64,"h": 64} ,"next_id":1,"speed":500}    
+            ],
+            "animations":{
+                "idleR":0,
+                "idle_broken":1
             },
-            {
-                "name": "idle_broken",
-                "speed": 50,
-                "frames": [
-                    {
-                        "x": 64,
-                        "y": 0,
-                        "w": 64,
-                        "h": 64
-                    }
-                ]
-            }        
-        ]
+            "current_animation_name" : "idleR",
+            "current_frame":0,
+            "current_elapsed_time":0.0
+        }
     },
     "defensive_stats":
     {

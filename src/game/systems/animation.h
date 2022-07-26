@@ -83,36 +83,15 @@ public:
     void remove_animation(yorcvs::Entity, std::string animation);
 
     void remove_animation_frame(yorcvs::Entity, std::string animation, size_t index);
-    /**
-     * @brief Set which animation to be used
-     *
-     * @param entity
-     * @param animation_name
-     */
-    //    static void set_animation(const yorcvs::Entity& entity, const std::string& animation_name)
-    //    {
-    //        if (!entity.parent->has_components<animationComponent>(entity.id)) {
-    //            yorcvs::log("Entity doesn't have  an animation component", yorcvs::MSGSEVERITY::WARNING);
-    //            return;
-    //        }
-    //        std::unordered_map<std::string, animationComponent::Animation>* entity_anims = &entity.parent->get_component<animationComponent>(entity.id).animation_name_to_start_frame_index;
-    //        const auto& anim = entity_anims->find(animation_name);
-    //        if (anim == entity_anims->end()) {
-    //            yorcvs::log("Entity " + std::to_string(entity.id) + " doesn't have an animation with the name " + animation_name,
-    //                yorcvs::MSGSEVERITY::ERROR);
-    //            return;
-    //        }
-    //        entity.parent->get_component<animationComponent>(entity.id).cur_animation = animation_name;
-    //    }
 
     /**
-     * @brief Set the animation object
+     * @brief Set which animation to be used
      *
      * @param world
      * @param entityID
      * @param animation_name
      */
-    static void set_animation(yorcvs::ECS* world, const size_t& entityID, const std::string& animation_name)
+    static void set_animation_global(yorcvs::ECS* world, size_t entityID, const std::string& animation_name)
     {
         const auto& anim_comp = world->get_component<animationComponent>(entityID);
         if (!world->has_components<animationComponent>(entityID)) {
@@ -134,6 +113,21 @@ public:
         }
         world->get_component<animationComponent>(entityID).current_animation_name = animation_name;
         world->get_component<animationComponent>(entityID).current_frame = anim->second;
+    }
+    /**
+     * @brief Set which animation to be used
+     *
+     * @param entity
+     * @param animation_name
+     */
+    static void set_animation_global(const yorcvs::Entity& entity, const std::string& animation_name)
+    {
+        yorcvs::ECS* world = entity.parent;
+        set_animation_global(world, entity.id, animation_name);
+    }
+    void set_animation(size_t entityID, const std::string& animation_name)
+    {
+        set_animation_global(this->world, entityID, animation_name);
     }
 
     void update(const float elapsed) const
