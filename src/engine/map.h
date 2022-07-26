@@ -218,14 +218,14 @@ public:
         if (!deserialize_component_from_json<spriteComponent>(entity_id, entityJSON, "sprite", [&](spriteComponent& /*spr*/) {
                 const std::string sprite_path = directory_path + std::string(entityJSON["sprite"]["spriteName"]);
                 ecs->get_component<spriteComponent>(entity_id).texture_path = sprite_path;
-                if (entityJSON["sprite"].contains("animations"))
+                if (entityJSON["sprite"].contains("animation"))
                 {
                     if (!ecs->has_components<animationComponent>(entity_id))
                     {
                         ecs->add_component<animationComponent>(entity_id, {});
                     }
                     if(!yorcvs::components::deserialize(ecs->get_component<animationComponent>(entity_id),
-                        entityJSON["sprite"]["animations"]))
+                        entityJSON["sprite"]["animation"]))
                     {
                       yorcvs::log("animationComponent is not valid");
                       return;

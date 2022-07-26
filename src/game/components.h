@@ -61,14 +61,18 @@ struct spriteComponent {
 };
 
 struct animationComponent {
-    struct Animation {
-        std::vector<yorcvs::Rect<size_t>> frames {}; // not ideal
-        float speed; // in milliseconds
-    };
-    std::unordered_map<std::string, Animation> animations; // ugly
-    std::string cur_animation; // non-owning pointer to an animation in the map
-    size_t cur_frame;
-    float cur_elapsed;
+    /**
+     *A frame of an animation
+     *The rectangle represents the area of the texture to render
+     *The size_t represents the next frame in the animation
+     *The float represents animation speed
+     */
+    using animation_frame = std::tuple<yorcvs::Rect<size_t>, size_t, float>;
+    std::vector<animation_frame> frames {};
+    std::unordered_map<std::string, size_t> animation_name_to_start_frame_index;
+    std::string current_animation_name {};
+    size_t current_frame;
+    float current_elapsed_time;
 };
 
 struct behaviourComponent {

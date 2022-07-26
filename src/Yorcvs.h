@@ -49,8 +49,8 @@ public:
             &CombatSystem::attack);
         lua_state["test_map"] = &map;
         // loading two maps one on top of each other
+        // test_map:load_content("assets/map.tmx")
         lua_state.safe_script(R"(
-            test_map:load_content("assets/map.tmx")
             local pl = test_map:load_entity_from_path(world:create_entity(),"assets/entities/test_player_2/test_player_2.json")
             world:add_playerMovementControl(pl)
             )");
