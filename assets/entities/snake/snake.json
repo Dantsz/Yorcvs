@@ -33,105 +33,28 @@
             "h": 48
         },
         "spriteName": "snake.png",
-        "animations": [
-            {
-                "name": "idleR",
-                "speed": 50,
-                "frames": [
-                    {
-                        "x": 0,
-                        "y": 0,
-                        "w": 48,
-                        "h": 48
-                    }
-                ]
+        "animation": {
+            "frames":[
+                {"rectangle":{"x": 0,"y": 0,"w": 48,"h": 48}  ,"next_id":0,"speed":500},
+                {"rectangle":{"x": 48,"y": 0,"w": 48,"h": 48} ,"next_id":2,"speed":500},
+                {"rectangle":{"x": 96,"y": 0,"w": 48,"h": 48} ,"next_id":1,"speed":500},
+                {"rectangle":{"x": 0,"y": 48,"w": 48,"h": 48} ,"next_id":3,"speed":500},
+                {"rectangle":{"x": 48,"y": 48,"w": 48,"h": 48},"next_id":5,"speed":500},
+                {"rectangle":{"x": 96,"y": 48,"w": 48,"h": 48},"next_id":4,"speed":500}
+
+            ],
+            "animations":{
+                "idleR":0,
+                "idleL":3,
+                "walkingR":1,
+                "walkingL":4             
             },
-            {
-                "name": "idleL",
-                "speed": 50,
-                "frames": [
-                    {
-                        "x": 0,
-                        "y": 48,
-                        "w": 48,
-                        "h": 48
-                    }
-                ]
-            },
-            {
-                "name": "walkingR",
-                "speed": 500,
-                "frames": [
-                    {
-                        "x": 0,
-                        "y": 0,
-                        "w": 48,
-                        "h": 48
-                    },
-                    {
-                        "x": 48,
-                        "y": 0,
-                        "w": 48,
-                        "h": 48
-                    },
-                    {
-                        "x": 96,
-                        "y": 0,
-                        "w": 48,
-                        "h": 48
-                    },
-                    {
-                        "x": 144,
-                        "y": 0,
-                        "w": 48,
-                        "h": 48
-                    },
-                    {
-                        "x": 240,
-                        "y": 0,
-                        "w": 48,
-                        "h": 48
-                    }
-                ]
-            },
-            {
-                "name": "walkingL",
-                "speed": 500,
-                "frames": [
-                    {
-                        "x": 0,
-                        "y": 48,
-                        "w": 48,
-                        "h": 48
-                    },
-                    {
-                        "x": 48,
-                        "y": 48,
-                        "w": 48,
-                        "h": 48
-                    },
-                    {
-                        "x": 96,
-                        "y": 48,
-                        "w": 48,
-                        "h": 48
-                    },
-                    {
-                        "x": 144,
-                        "y": 48,
-                        "w": 48,
-                        "h": 48
-                    },
-                    {
-                        "x": 240,
-                        "y": 48,
-                        "w": 48,
-                        "h": 48
-                    }
-                ]
-            }
-        ]
+            "current_animation_name" : "idleR",
+            "current_frame":0,
+            "current_elapsed_time":0.0
+        }
     },
+    
     "defensive_stats":
     {
         "defense":0,

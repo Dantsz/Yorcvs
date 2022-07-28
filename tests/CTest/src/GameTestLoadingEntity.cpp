@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     assert((world.get_component<spriteComponent>(duck.id).src_rect == yorcvs::Rect<size_t> { 0, 0, 16, 16 }));
     duck_check = world.has_components<animationComponent>(duck.id);
     assert(duck_check == true);
-    assert(world.get_component<animationComponent>(duck.id).animations.size() == 4);
+    assert(world.get_component<animationComponent>(duck.id).animation_name_to_start_frame_index.size() == 4);
     duck_check = world.has_components<velocityComponent>(duck.id);
     assert(duck_check == true);
     duck_check = world.has_components<hitboxComponent, spriteComponent, animationComponent, velocityComponent>(duck.id);

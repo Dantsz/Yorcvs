@@ -87,33 +87,36 @@ inline void from_json(const json::json& j, spriteComponent& comp)
 
 inline void to_json(json::json& j, const animationComponent& comp)
 {
-    for (const auto& [name, animation] : comp.animations) {
-        json::json anim;
-        anim["name"] = name;
-        anim["speed"] = animation.speed;
-        for (const auto& frame : animation.frames) {
-            json::json jframe = frame;
-            anim["frames"].push_back(jframe);
-        }
-        j.push_back(anim);
+    for (const auto& [rect, next_id, speed] : comp.frames) {
+        json::json frame {};
+        frame["rectangle"] = rect;
+        frame["next_id"] = next_id;
+        frame["speed"] = speed;
+        j["frames"].push_back(frame);
     }
+    for (const auto& [anim_name, anim_start_index] : comp.animation_name_to_start_frame_index) {
+        j["animations"][anim_name] = anim_start_index;
+    }
+    j["current_frame"] = comp.current_frame;
+    j["current_elapsed_time"] = comp.current_elapsed_time;
+    j["current_animation_name"] = comp.current_animation_name;
 }
 inline void from_json(const json::json& j, animationComponent& comp)
 {
-    comp.animations.clear();
-    comp = {};
-    for (const auto& animation : j) {
-        bool animation_succes = AnimationSystem::add_animation_to_component(comp, animation["name"], animation["speed"]);
-        if (animation_succes) {
-            for (const auto& frame : animation["frames"]) {
-                bool rez = AnimationSystem::add_frame_to_animation(comp, animation["name"],
-                    { frame["x"], frame["y"], frame["w"], frame["h"] });
-                if (!rez) {
-                    yorcvs::log("Something went wrong loading an animation frame");
-                    return;
-                }
-            }
+    comp.animation_name_to_start_frame_index.clear();
+    comp.frames.clear();
+    comp.current_animation_name = j["current_animation_name"];
+    comp.current_frame = j["current_frame"];
+    comp.current_elapsed_time = j["current_elapsed_time"];
+    for (const auto& frame : j["frames"]) {
+        comp.frames.emplace_back(frame["rectangle"], frame["next_id"], frame["speed"]);
+    }
+    const size_t no_of_frames = comp.frames.size();
+    for (const auto& animation : j["animations"].items()) {
+        if (animation.value() >= no_of_frames) {
+            continue;
         }
+        comp.animation_name_to_start_frame_index[animation.key()] = animation.value();
     }
 }
 inline void to_json(json::json& j, const offensiveStatsComponent& comp)
