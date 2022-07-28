@@ -1,7 +1,7 @@
 #pragma once
 #include "../../common/ecs.h"
 #include "../components.h"
-
+#include <random>
 /**
  * @brief Handles combat
  *
@@ -22,23 +22,26 @@ public:
      */
     [[nodiscard]] float attack(size_t source, size_t target) const
     {
+        std::random_device rand_device {};
+        std::uniform_real_distribution<float> gen { 0.0f, 1.0f };
+
         const auto& source_stats = world->get_component<offensiveStatsComponent>(source);
         const auto& target_stats = world->get_component<defensiveStatsComponent>(target);
 
         // add strength bonus
         float damage = calculate_strength_bonus(source_stats.strength);
         // check if critical
-        const float agility_roll = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        const float agility_roll = gen(rand_device);
         if (agility_roll < calculate_agility_bonus(source_stats.agility)) {
             damage *= crititcal_multiplier;
         }
         // check if dodged
-        const float dodge_roll = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        const float dodge_roll = gen(rand_device);
         if (dodge_roll < calculate_dodge_chance(target_stats.dodge)) {
             return 0.0f;
         }
         // check if blocked
-        const float block_roll = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        const float block_roll = gen(rand_device);
         if (block_roll < calculate_block_chance(target_stats.block)) {
             damage /= block_multiplier;
         }
