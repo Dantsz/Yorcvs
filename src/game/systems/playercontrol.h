@@ -40,6 +40,12 @@ public:
                     }
                 }
                 if (cur_time >= update_time) {
+                    if (world->get_component<playerMovementControlledComponent>(ID).current_state == playerMovementControlledComponent::PLAYER_ATTACK_L) {
+                        world->get_component<playerMovementControlledComponent>(ID).current_state = playerMovementControlledComponent::PLAYER_IDLE_L;
+                    }
+                    if (world->get_component<playerMovementControlledComponent>(ID).current_state == playerMovementControlledComponent::PLAYER_ATTACK_R) {
+                        world->get_component<playerMovementControlledComponent>(ID).current_state = playerMovementControlledComponent::PLAYER_IDLE_R;
+                    }
                     cur_time = 0.0f;
                 }
                 world->get_component<velocityComponent>(ID).vel = dir;
