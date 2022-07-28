@@ -80,7 +80,6 @@ public:
     }
     void handle_events()
     {
-
         while (SDL_PollEvent(&sdl_event) == 1) {
             ImGui_ImplSDL2_ProcessEvent(&sdl_event);
             ImGuiIO& io = ImGui::GetIO();

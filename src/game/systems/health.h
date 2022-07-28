@@ -7,7 +7,6 @@
  *
  */
 class HealthSystem {
-
 public:
     explicit HealthSystem(yorcvs::ECS* parent)
         : world(parent)

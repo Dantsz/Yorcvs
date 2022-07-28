@@ -107,7 +107,6 @@ public:
 
     void render(yorcvs::Vec2<float>& render_dimensions)
     {
-
         if (debug_window_opened) {
             show_debug_window(render_dimensions);
             if (select_target.has_value() && appECS->is_valid_entity(select_target.value()) && select_target_opened) {
@@ -253,7 +252,6 @@ private:
     }
     void show_entity_interaction_window(size_t sender, size_t target)
     {
-
         if (ImGui::Button("go to") && appECS->has_components<positionComponent>(target) && appECS->has_components<positionComponent>(target)) {
             appECS->get_component<positionComponent>(sender) = appECS->get_component<positionComponent>(target);
         }

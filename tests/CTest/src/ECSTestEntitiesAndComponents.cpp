@@ -1,20 +1,18 @@
 #include "../../../src/common/ecs.h"
 #include <cassert>
-struct Transform
-{
-    float x{}; 
-    float y{};
+struct Transform {
+    float x {};
+    float y {};
     int id = 0;
 };
 
 int main()
 {
-
-    yorcvs::ECS world{};
+    yorcvs::ECS world {};
     world.register_component<Transform>();
     yorcvs::Entity position(&world);
-    
-    world.add_component<Transform>(position.id,{1.0f,1.0f});
+
+    world.add_component<Transform>(position.id, { 1.0f, 1.0f });
 
     assert(world.get_entities_with_component<Transform>() == 1);
 

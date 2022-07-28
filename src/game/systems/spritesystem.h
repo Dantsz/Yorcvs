@@ -7,7 +7,6 @@
  *
  */
 class SpriteSystem {
-
 public:
     SpriteSystem(yorcvs::ECS* parent, yorcvs::sdl2_window* parentWindow)
         : world(parent)

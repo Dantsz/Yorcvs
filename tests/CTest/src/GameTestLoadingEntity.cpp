@@ -5,7 +5,6 @@
 
 int main(int argc, char** argv)
 {
-
     yorcvs::ECS world {};
     yorcvs::Map map(&world);
     yorcvs::Entity duck { &world };
