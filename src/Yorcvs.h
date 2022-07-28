@@ -42,14 +42,15 @@ public:
         lua_state.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
         yorcvs::lua::bind_runtime(lua_state, &world);
 
-        yorcvs::lua::register_system_to_lua(lua_state, "Health_system", map.health_system);
-        yorcvs::lua::register_system_to_lua(lua_state, "Collision_system", map.collision_system);
-        yorcvs::lua::register_system_to_lua(lua_state, "Animation_system", map.animation_system);
-        yorcvs::lua::register_system_to_lua(lua_state, "Combat_system", map.combat_system, "attack",
+        yorcvs::lua::register_system_to_lua(lua_state, "health_system", map.health_system);
+        yorcvs::lua::register_system_to_lua(lua_state, "collision_system", map.collision_system);
+        yorcvs::lua::register_system_to_lua(lua_state, "animation_system", map.animation_system, "set_animation", &AnimationSystem::set_animation);
+        yorcvs::lua::register_system_to_lua(lua_state, "combat_system", map.combat_system, "attack",
             &CombatSystem::attack);
         lua_state["test_map"] = &map;
         // loading two maps one on top of each other
-        lua_state.safe_script(R"(
+        // test_map:load_content("assets/map.tmx")
+        lua_state.safe_script(R"(        
             test_map:load_content("assets/map.tmx")
             local pl = test_map:load_entity_from_path(world:create_entity(),"assets/entities/test_player_2/test_player_2.json")
             world:add_playerMovementControl(pl)

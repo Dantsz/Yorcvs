@@ -70,8 +70,6 @@ inline void bind_basic_types(sol::state& lua_state)
     sol::usertype<yorcvs::Rect<float>> rect2f = lua_state.new_usertype<yorcvs::Rect<float>>(
         "rect2f", "x", &yorcvs::Rect<float>::x, "y", &yorcvs::Rect<float>::y, "w", &yorcvs::Rect<float>::w, "h",
         &yorcvs::Rect<float>::h);
-    sol::usertype<animationComponent::Animation> Animation = lua_state.new_usertype<animationComponent::Animation>(
-        "Animation", "frames", &animationComponent::Animation::frames, "speed", &animationComponent::Animation::speed);
 }
 inline void bind_map_functions(sol::state& lua_state)
 {
@@ -146,9 +144,8 @@ inline bool bind_runtime(sol::state& lua_state, yorcvs::ECS* ecs)
         &spriteComponent::size, "src_rect", &spriteComponent::src_rect,
         "texture_path", &spriteComponent::texture_path);
     register_component_to_lua<animationComponent>(
-        lua_state, "animationComponent", "animations", &animationComponent::animations, "cur_animation",
-        &animationComponent::cur_animation, "cur_frame", &animationComponent::cur_frame, "cur_elapsed",
-        &animationComponent::cur_elapsed);
+        lua_state, "animationComponent", "animations", &animationComponent::animation_name_to_start_frame_index,
+        "cur_frame", &animationComponent::current_frame, "frames", &animationComponent::frames);
     register_component_to_lua<defensiveStatsComponent>(
         lua_state, "defensiveStatsComponent", "defense", &defensiveStatsComponent::defense, "block",
         &defensiveStatsComponent::block, "dodge", &defensiveStatsComponent::dodge, "spirit",

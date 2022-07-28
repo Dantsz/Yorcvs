@@ -42,85 +42,42 @@
             "h" : 64
         },
         "spriteName" : "test_player_sheet_2.png",
-        "animations" : [
-            {
-                "name" : "idleR",
-                "speed" : 50,
-                "frames":[{"x" : 0, "y" : 0, "w":64,"h":64}]
-            },
-            {
-                "name" : "idleL",
-                "speed" : 50,
-                "frames" : [{"x" : 0, "y" : 64, "w":64,"h":64}]
-            },
-            {
-                "name": "walkingR",
-                "speed" : 75,
-                "frames":[{"x" : 0, "y" : 0, "w":64,"h":64},
-                          {"x" : 64, "y" : 0, "w":64,"h":64},
-                          {"x" : 128, "y" : 0, "w":64,"h":64},
-                          {"x" : 192, "y" : 0, "w":64,"h":64}
-                         ]
-            },
-            {
-                "name": "walkingL",
-                "speed" : 75,
-                "frames":[{"x" : 0, "y" : 64, "w":64,"h":64},
-                          {"x" : 64, "y" : 64, "w":64,"h":64},
-                          {"x" : 128, "y" : 64, "w":64,"h":64},
-                          {"x" : 192, "y" : 64, "w":64,"h":64}
-                          ]
-            },
-            {
-                "name": "hold_R",
-                "speed" : 75,
-                "frames":[{"x" : 0, "y" : 128, "w":64,"h":64}
-                         ]
-            },
-            {
-                "name": "hold_L",
-                "speed" : 75,
-                "frames":[{"x" : 0, "y" : 192, "w":64,"h":64}                          
-                          ]
-            },
-            {
-                "name": "walkingR_hold",
-                "speed" : 75,
-                "frames":[{"x" : 0, "y" : 128, "w":64,"h":64},
-                          {"x" : 64, "y" : 128, "w":64,"h":64},
-                          {"x" : 128, "y" : 128, "w":64,"h":64},
-                          {"x" : 192, "y" : 128, "w":64,"h":64}
-                         ]
-            },
-            {
-                "name": "walkingL_hold",
-                "speed" : 75,
-                "frames":[{"x" : 0, "y" : 192, "w":64,"h":64},
-                          {"x" : 64, "y" : 192, "w":64,"h":64},
-                          {"x" : 128, "y" : 192, "w":64,"h":64},
-                          {"x" : 192, "y" : 192, "w":64,"h":64}
-                          ]
-            },
-            {
-                "name": "attack_R",
-                "speed" : 75,
-                "frames":[{"x" : 0, "y" : 256, "w":64,"h":64},
-                          {"x" : 64, "y" : 256, "w":64,"h":64},
-                          {"x" : 128, "y" : 256, "w":64,"h":64},
-                          {"x" : 192, "y" : 256, "w":64,"h":64}
-                         ]
-            },
-            {
-                "name": "attack_L",
-                "speed" : 75,
-                "frames":[{"x" : 0, "y" : 320, "w":64,"h":64},
-                          {"x" : 64, "y" : 320, "w":64,"h":64},
-                          {"x" : 128, "y" : 320, "w":64,"h":64},
-                          {"x" : 192, "y" : 320, "w":64,"h":64}
-                          ]
-            }
+        "animation" :{
+            "frames":[
+            {"rectangle":{"x" : 0, "y" : 0, "w":64,"h":64},"next_id":0,"speed":50},
 
-        ]
+            {"rectangle":{"x" : 64, "y" : 0, "w":64,"h":64}, "next_id":2,"speed":50},
+            {"rectangle":{"x" : 128, "y" : 0, "w":64,"h":64}, "next_id":3,"speed":50},
+            {"rectangle":{"x" : 192, "y" : 0, "w":64,"h":64}, "next_id":1,"speed":50},
+
+
+            {"rectangle":{"x" : 0, "y" : 64, "w":64,"h":64},"next_id":4,"speed":50},
+
+            {"rectangle":{"x" : 64, "y" :  64, "w":64,"h":64}, "next_id":6,"speed":50},
+            {"rectangle":{"x" : 128, "y" : 64, "w":64,"h":64}, "next_id":7,"speed":50},
+            {"rectangle":{"x" : 192, "y" : 64, "w":64,"h":64}, "next_id":5,"speed":50},
+
+            {"rectangle":{"x" : 64, "y" : 256, "w":64,"h":64}, "next_id":9,"speed":50},
+            {"rectangle":{"x" : 128, "y" : 256, "w":64,"h":64}, "next_id":10,"speed":50},
+            {"rectangle":{"x" : 192, "y" : 256, "w":64,"h":64}, "next_id":0,"speed":50},
+
+            {"rectangle":{"x" : 64, "y" : 320, "w":64,"h":64}, "next_id":12,"speed":50},
+            {"rectangle":{"x" : 128, "y" : 320, "w":64,"h":64}, "next_id":13,"speed":50},
+            {"rectangle":{"x" : 192, "y" : 320, "w":64,"h":64}, "next_id":4,"speed":50}
+
+            ],
+            "animations":{
+                "idleR":0,
+                "idleL":4,
+                "walkingR":1,
+                "walkingL":5,
+                "attackR":8,
+                "attackL":11             
+            },
+            "current_animation_name" : "idleR",
+            "current_frame":0,
+            "current_elapsed_time":0.0
+        }
     },
     "defensive_stats":
     {

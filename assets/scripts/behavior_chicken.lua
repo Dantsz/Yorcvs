@@ -4,11 +4,11 @@ local vely = math.random() - 0.5
 world:get_velocityComponent(entityID).vel.x = velx * chicken_speed
 world:get_velocityComponent(entityID).vel.y = vely * chicken_speed
 if (world:get_velocityComponent(entityID).vel.x > 0) then
-    world:get_animationComponent(entityID).cur_animation = "walkingL"
+    animation_system:set_animation(entityID,"walkingL")
 elseif (world:get_velocityComponent(entityID).vel.x < 0) then
-    world:get_animationComponent(entityID).cur_animation = "walkingR"
+    animation_system:set_animation(entityID,"walkingR")
 elseif(world:get_velocityComponent(entityID).facing.x == true) then
-    world:get_animationComponent(entityID).cur_animation = "idleL"
+    animation_system:set_animation(entityID,"idleL")
 else
-    world:get_animationComponent(entityID).cur_animation = "idleR"
+    animation_system:set_animation(entityID,"idleR")
 end
