@@ -68,7 +68,7 @@ public:
         }
     }
     static constexpr float sprint_multiplier = 1.5f;
-    static constexpr float update_time = 1000.0f;
+    static constexpr float update_time = 500.0f;
     static constexpr float player_default_speed = 0.033f;
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     bool controls_enable = true;
