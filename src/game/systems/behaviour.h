@@ -36,7 +36,7 @@ public:
     }
     void update(const float dt)
     {
-        for (const auto ID : entityList->entitiesID) {
+        for (const auto ID : *entityList) {
             world->get_component<behaviourComponent>(ID).accumulated += dt;
 
             if (world->get_component<behaviourComponent>(ID).accumulated > world->get_component<behaviourComponent>(ID).dt) {

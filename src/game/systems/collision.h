@@ -1,11 +1,29 @@
 #pragma once
 #include "../../common/ecs.h"
 #include "../components.h"
+
+/**
+ * @brief cotains solid entities
+ */
+class solid_collision_handler {
+
+public:
+    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    yorcvs::ECS* world;
+};
+/**
+ * @brief cotains non-solid entities
+ */
+class nonsolid_collision_handler {
+public:
+    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    yorcvs::ECS* world;
+};
+
 /**
  * @brief Handles collision between entities
  *
  */
-
 class CollisionSystem {
 public:
     explicit CollisionSystem(yorcvs::ECS* parent)
@@ -25,7 +43,7 @@ public:
         yorcvs::Rect<float> rectA {};
         yorcvs::Rect<float> rectB {};
 
-        for (const auto& IDA : entityList->entitiesID) {
+        for (const auto& IDA : *entityList) {
             if (world->has_components<velocityComponent>(IDA)) {
                 rectA.x = world->get_component<positionComponent>(IDA).position.x + world->get_component<hitboxComponent>(IDA).hitbox.x;
                 rectA.y = world->get_component<positionComponent>(IDA).position.y + world->get_component<hitboxComponent>(IDA).hitbox.y;
@@ -33,7 +51,7 @@ public:
                 rectA.h = world->get_component<hitboxComponent>(IDA).hitbox.h;
                 yorcvs::Vec2<float>& rectAvel = world->get_component<velocityComponent>(IDA).vel;
                 rectAvel *= dt;
-                for (const auto& IDB : entityList->entitiesID) {
+                for (const auto& IDB : *entityList) {
                     if (!world->has_components<velocityComponent>(IDB)) {
                         rectB.x = world->get_component<positionComponent>(IDB).position.x + world->get_component<hitboxComponent>(IDB).hitbox.x;
                         rectB.y = world->get_component<positionComponent>(IDB).position.y + world->get_component<hitboxComponent>(IDB).hitbox.y;

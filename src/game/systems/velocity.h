@@ -15,7 +15,7 @@ public:
     }
     void update(float dt) const
     {
-        for (const auto& ID : entityList->entitiesID) {
+        for (const auto& ID : *entityList) {
             yorcvs::Vec2<float> posOF = world->get_component<velocityComponent>(ID).vel;
             posOF *= dt; // multiply by passed time`
             world->get_component<positionComponent>(ID).position += posOF;

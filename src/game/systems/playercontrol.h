@@ -27,7 +27,7 @@ public:
         const bool s_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_S);
         const bool d_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_D);
         const bool q_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_Q);
-        for (const auto& ID : entityList->entitiesID) {
+        for (const auto& ID : *entityList) {
             window->set_drawing_offset(world->get_component<positionComponent>(ID).position + dir - (render_size - world->get_component<spriteComponent>(ID).size) / 2);
             if (!controls_enable) {
                 continue;

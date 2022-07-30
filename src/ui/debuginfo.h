@@ -59,7 +59,7 @@ public:
                 if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_C)) {
                     yorcvs::log("Saving player...");
                     std::ofstream out("assets/testPlayer.json");
-                    out << map->save_character(player_move_system->entityList->entitiesID[0]);
+                    out << map->save_character((*player_move_system->entityList)[0]);
                     yorcvs::log("Done.");
                     time_accumulator = 0;
                 }
@@ -68,8 +68,8 @@ public:
                 }
             }
         }
-        if (!player_move_system->entityList->entitiesID.empty()) {
-            (*lua_state)["playerID"] = player_move_system->entityList->entitiesID[0];
+        if (!player_move_system->entityList->empty()) {
+            (*lua_state)["playerID"] = (*player_move_system->entityList)[0];
         }
     }
 
@@ -80,7 +80,7 @@ public:
         window.set_render_scale(window.get_window_size() / render_dimensions);
         bool clicked_any_entity = false;
         yorcvs::Rect<float> rect {};
-        for (const auto& ID : colission_system->entityList->entitiesID) {
+        for (const auto& ID : *colission_system->entityList) {
             rect.x = appECS->get_component<positionComponent>(ID).position.x + appECS->get_component<hitboxComponent>(ID).hitbox.x;
             rect.y = appECS->get_component<positionComponent>(ID).position.y + appECS->get_component<hitboxComponent>(ID).hitbox.y;
             rect.w = appECS->get_component<hitboxComponent>(ID).hitbox.w;
@@ -180,8 +180,8 @@ private:
         render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
             hitbox_color[3]);
 
-        if (!player_move_system->entityList->entitiesID.empty()) {
-            const size_t ID = player_move_system->entityList->entitiesID[0];
+        if (!player_move_system->entityList->empty()) {
+            const size_t ID = (*player_move_system->entityList)[0];
             ImGui::Begin("Player");
             show_entity_stats(ID, "Player : ");
             if (appECS->has_components<animationComponent>(ID)) {
@@ -433,8 +433,8 @@ private:
 
     size_t get_first_player_id()
     {
-        if (!player_move_system->entityList->entitiesID.empty()) {
-            return player_move_system->entityList->entitiesID[0];
+        if (!player_move_system->entityList->empty()) {
+            return (*player_move_system->entityList)[0];
         }
         const size_t invalidID = appECS->create_entity_ID();
         appECS->destroy_entity(invalidID);

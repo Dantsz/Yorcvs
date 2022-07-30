@@ -47,15 +47,23 @@ class ECS; // forward declaration
  *
  */
 class EntitySystemList {
+    friend class SystemManager;
+    friend class ECS;
+
 public:
     size_t operator[](size_t index)
     {
         return entitiesID[index];
     }
-    [[nodiscard]] size_t entities() const
+    [[nodiscard]] size_t size() const
     {
         return entitiesID.size();
     }
+    [[nodiscard]] bool empty() const
+    {
+        return entitiesID.empty();
+    }
+
     auto begin()
     {
         return entitiesID.begin();
@@ -64,6 +72,8 @@ public:
     {
         return entitiesID.end();
     }
+
+private:
     // the id of the entities the system works on
     std::vector<size_t> entitiesID;
 };
@@ -74,8 +84,8 @@ template <typename systemt>
 concept systemT = requires(systemt sys)
 {
     // std::same_as<decltype(sys.entityList), std::shared_ptr<yorcvs::EntitySystemList>>;
-    { sys.entityList->entitiesID[0] };
-    { sys.entityList->entitiesID.size() };
+    { (*sys.entityList)[0] };
+    { sys.entityList->size() };
 };
 /**
  * @brief Manages entity ids
