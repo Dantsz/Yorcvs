@@ -48,6 +48,22 @@ class ECS; // forward declaration
  */
 class EntitySystemList {
 public:
+    size_t operator[](size_t index)
+    {
+        return entitiesID[index];
+    }
+    [[nodiscard]] size_t entities() const
+    {
+        return entitiesID.size();
+    }
+    auto begin()
+    {
+        return entitiesID.begin();
+    }
+    auto end()
+    {
+        return entitiesID.end();
+    }
     // the id of the entities the system works on
     std::vector<size_t> entitiesID;
 };
