@@ -46,37 +46,7 @@ class ECS; // forward declaration
  * @brief Contains a list of entities matching parents signature
  *
  */
-class EntitySystemList {
-    friend class SystemManager;
-    friend class ECS;
-
-public:
-    size_t operator[](size_t index)
-    {
-        return entitiesID[index];
-    }
-    [[nodiscard]] size_t size() const
-    {
-        return entitiesID.size();
-    }
-    [[nodiscard]] bool empty() const
-    {
-        return entitiesID.empty();
-    }
-
-    auto begin()
-    {
-        return entitiesID.begin();
-    }
-    auto end()
-    {
-        return entitiesID.end();
-    }
-
-private:
-    // the id of the entities the system works on
-    std::vector<size_t> entitiesID;
-};
+using EntitySystemList = std::vector<size_t>;
 
 // concept for a valid system
 // must have a vector of size_t
@@ -607,7 +577,7 @@ public:
         const char* system_name = typeid(T).name();
         if (type_to_system.find(system_name) != type_to_system.end()) {
             // the system exists
-            type_to_system.at(system_name)->entitiesID.clear(); // clear the entities the system holds
+            type_to_system.at(system_name)->clear(); // clear the entities the system holds
             type_to_system.erase(system_name);
             type_to_signature.erase(system_name);
             return true;
@@ -682,9 +652,9 @@ public:
     void on_entity_destroy(const size_t entityID) noexcept
     {
         for (auto const& it : type_to_system) {
-            it.second->entitiesID.erase(
-                std::remove(it.second->entitiesID.begin(), it.second->entitiesID.end(), entityID),
-                it.second->entitiesID.end());
+            it.second->erase(
+                std::remove(it.second->begin(), it.second->end(), entityID),
+                it.second->end());
         }
     }
 
@@ -702,10 +672,10 @@ public:
             auto const& systemSignature = type_to_signature[type];
             if (compare_entity_to_system(signature, systemSignature)) {
                 // TODO : MAKE A METHOD TO SYSTEM , method needs to be virtual /Onewntitierase/insert
-                insert_sorted(system->entitiesID, entityID);
+                insert_sorted(*system, entityID);
             } else {
-                system->entitiesID.erase(std::remove(system->entitiesID.begin(), system->entitiesID.end(), entityID),
-                    system->entitiesID.end());
+                system->erase(std::remove(system->begin(), system->end(), entityID),
+                    system->end());
             }
         }
     }
@@ -1331,14 +1301,14 @@ private:
             if (systemmanager->compare_entity_to_system(entitymanager->entitySignatures[entity],
                     systemmanager->get_system_signature<T>())) {
                 // TODO : MAKE A METHOD TO SYSTEM , method needs to be virtual /Onwntitierase/insert
-                insert_sorted(systemmanager->type_to_system.at(systemType)->entitiesID, entity);
+                insert_sorted(*systemmanager->type_to_system.at(systemType), entity);
             } else {
                 // not looking good
                 systemmanager->type_to_system.at(systemType)
-                    ->entitiesID.erase(std::remove(systemmanager->type_to_system.at(systemType)->entitiesID.begin(),
-                                           systemmanager->type_to_system.at(systemType)->entitiesID.end(),
-                                           entity),
-                        systemmanager->type_to_system.at(systemType)->entitiesID.end());
+                    ->erase(std::remove(systemmanager->type_to_system.at(systemType)->begin(),
+                                systemmanager->type_to_system.at(systemType)->end(),
+                                entity),
+                        systemmanager->type_to_system.at(systemType)->end());
             }
         }
     }
