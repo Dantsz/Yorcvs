@@ -6,7 +6,6 @@
  * @brief cotains solid entities
  */
 class solid_collision_handler {
-
 public:
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS* world;
