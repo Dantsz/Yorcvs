@@ -20,7 +20,7 @@ public:
     }
     void test() const
     {
-        for (const auto& i : entityList->entitiesID) {
+        for (const auto& i : *entityList) {
             assert(parent->get_component<Transform>(i).id == 1);
         }
     }
@@ -37,7 +37,7 @@ public:
     }
     void test() const
     {
-        for (const auto& i : entityList->entitiesID) {
+        for (const auto& i : *entityList) {
             assert(parent->get_component<Transform>(i).id == 1);
             assert(parent->get_component<Size>(i).w == parent->get_component<Size>(i).h);
         }
@@ -80,12 +80,12 @@ int main()
         }
     }
     assert(world.get_entities_with_component<Transform>() == world.get_entities_with_component<Size>());
-    assert(tester.entityList->entitiesID.size() == numberOfEntities / 2);
+    assert(tester.entityList->size() == numberOfEntities / 2);
     for (size_t i = 1; i < numberOfEntities; i++) {
         if (i % 2 == 1) {
             world.remove_component<Size>(entities[i].id);
         }
     }
-    assert(secontester.entityList->entitiesID.empty());
+    assert(secontester.entityList->empty());
     return 0;
 }

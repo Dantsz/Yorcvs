@@ -72,7 +72,7 @@ public:
 
     void update(const float elapsed) const
     {
-        for (const auto& ID : entityList->entitiesID) {
+        for (const auto& ID : *entityList) {
             auto& anim_comp = world->get_component<animationComponent>(ID);
             if (anim_comp.frames.empty()) {
                 continue;

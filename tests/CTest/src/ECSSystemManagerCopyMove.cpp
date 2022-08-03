@@ -16,7 +16,7 @@ public:
     }
     [[nodiscard]] int do_work() const
     {
-        for (const auto& i : entityList->entitiesID) {
+        for (const auto& i : *entityList) {
             if (parent->has_components<testComp>(i)) {
                 std::cout << parent->get_component<testComp>(i).x << ' ' << parent->get_component<testComp>(i).y << '\n';
                 return (parent->get_component<testComp>(i).x + parent->get_component<testComp>(i).y);

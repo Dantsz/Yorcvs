@@ -51,11 +51,12 @@ template <systemT T, typename... Args>
 inline void register_system_to_lua(sol::state& lua_state, const std::string& name, T& system, Args&&... args)
 {
     const std::string system_type_name = name + "_t"; // name of the system metatable
-    sol::usertype<T> system_type = lua_state.new_usertype<T>(system_type_name, std::forward<Args>(args)...); // register the system type
+    sol::usertype<T> system_type = lua_state.new_usertype<T>(
+        system_type_name,
+        "entities", &T::entityList,
+        std::forward<Args>(args)...); // register the system type
+
     lua_state[name] = system; // set the instance of system used
-    lua_state[system_type_name]["get_entities"] = [](T& sys) {
-        return sys.entityList->entitiesID;
-    };
 }
 /**
  * @brief Gives lua acces to basic engine types like vector and rectangle
@@ -91,6 +92,10 @@ inline void bind_map_functions(sol::state& lua_state)
         return map.save_character(ID);
     };
 }
+inline void bind_system_entity_list(sol::state& lua_state)
+{
+    sol::usertype<EntitySystemList> entsl = lua_state.new_usertype<EntitySystemList>("EntitySystemList");
+}
 /**
  * @brief Gives the lua state accest to the running ECS and components
  *
@@ -102,7 +107,7 @@ inline void bind_map_functions(sol::state& lua_state)
 inline bool bind_runtime(sol::state& lua_state, yorcvs::ECS* ecs)
 {
     lua_state["impl"] = lua_state.create_table_with("component_names", std::vector<std::string> {});
-
+    lua_state["run_script"] = [&](const std::string& path) { lua_state.safe_script_file(path); };
     bind_basic_types(lua_state);
     bind_map_functions(lua_state);
     sol::usertype<yorcvs::ECS> lua_ECS = lua_state.new_usertype<yorcvs::ECS>("ECS");
@@ -127,6 +132,7 @@ inline bool bind_runtime(sol::state& lua_state, yorcvs::ECS* ecs)
         std::vector<std::string>& names = lua_state["impl"]["component_names"];
         return names.size();
     };
+    bind_system_entity_list(lua_state);
     register_component_to_lua<healthComponent>(lua_state, "healthComponent", "HP", &healthComponent::HP, "max_HP",
         &healthComponent::max_HP, "health_regen",
         &healthComponent::health_regen);
@@ -160,3 +166,8 @@ inline bool bind_runtime(sol::state& lua_state, yorcvs::ECS* ecs)
 }
 
 } // namespace yorcvs::lua
+namespace sol {
+template <>
+struct is_container<yorcvs::EntitySystemList> : std::true_type {
+};
+}

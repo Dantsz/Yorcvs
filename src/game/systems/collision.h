@@ -1,11 +1,27 @@
 #pragma once
 #include "../../common/ecs.h"
 #include "../components.h"
+
+/**
+ * @brief Cotains non-solid entities
+ * @def Non-Solid objects have velocity, this is a small optimization so the collision system will not have to check if the entity is solid or not
+ */
+class nonsolid_collision_handler {
+public:
+    explicit nonsolid_collision_handler(yorcvs::ECS* parent)
+        : world(parent)
+    {
+        world->register_system<nonsolid_collision_handler>(*this);
+        world->add_criteria_for_iteration<nonsolid_collision_handler, positionComponent, hitboxComponent, velocityComponent>();
+    }
+    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    yorcvs::ECS* world;
+};
+
 /**
  * @brief Handles collision between entities
  *
  */
-
 class CollisionSystem {
 public:
     explicit CollisionSystem(yorcvs::ECS* parent)
@@ -25,45 +41,43 @@ public:
         yorcvs::Rect<float> rectA {};
         yorcvs::Rect<float> rectB {};
 
-        for (const auto& IDA : entityList->entitiesID) {
-            if (world->has_components<velocityComponent>(IDA)) {
-                rectA.x = world->get_component<positionComponent>(IDA).position.x + world->get_component<hitboxComponent>(IDA).hitbox.x;
-                rectA.y = world->get_component<positionComponent>(IDA).position.y + world->get_component<hitboxComponent>(IDA).hitbox.y;
-                rectA.w = world->get_component<hitboxComponent>(IDA).hitbox.w;
-                rectA.h = world->get_component<hitboxComponent>(IDA).hitbox.h;
-                yorcvs::Vec2<float>& rectAvel = world->get_component<velocityComponent>(IDA).vel;
-                rectAvel *= dt;
-                for (const auto& IDB : entityList->entitiesID) {
-                    if (!world->has_components<velocityComponent>(IDB)) {
-                        rectB.x = world->get_component<positionComponent>(IDB).position.x + world->get_component<hitboxComponent>(IDB).hitbox.x;
-                        rectB.y = world->get_component<positionComponent>(IDB).position.y + world->get_component<hitboxComponent>(IDB).hitbox.y;
+        for (const auto& IDA : *non_solids.entityList) {
+            rectA.x = world->get_component<positionComponent>(IDA).position.x + world->get_component<hitboxComponent>(IDA).hitbox.x;
+            rectA.y = world->get_component<positionComponent>(IDA).position.y + world->get_component<hitboxComponent>(IDA).hitbox.y;
+            rectA.w = world->get_component<hitboxComponent>(IDA).hitbox.w;
+            rectA.h = world->get_component<hitboxComponent>(IDA).hitbox.h;
+            yorcvs::Vec2<float>& rectAvel = world->get_component<velocityComponent>(IDA).vel;
+            rectAvel *= dt;
+            for (const auto& IDB : *entityList) {
+                if (!world->has_components<velocityComponent>(IDB)) {
+                    rectB.x = world->get_component<positionComponent>(IDB).position.x + world->get_component<hitboxComponent>(IDB).hitbox.x;
+                    rectB.y = world->get_component<positionComponent>(IDB).position.y + world->get_component<hitboxComponent>(IDB).hitbox.y;
 
-                        rectB.w = world->get_component<hitboxComponent>(IDB).hitbox.w;
+                    rectB.w = world->get_component<hitboxComponent>(IDB).hitbox.w;
 
-                        rectB.h = world->get_component<hitboxComponent>(IDB).hitbox.h;
-                        if (IDA != IDB) {
-                            // left to right
-                            check_collision_left_right(rectA, rectB, rectAvel, dt);
-                            // right to left
-                            check_collision_right_left(rectA, rectB, rectAvel, dt);
-                            // up to down
-                            check_collision_up_down(rectA, rectB, rectAvel, dt);
-                            // down to up
-                            check_collision_down_up(rectA, rectB, rectAvel, dt);
+                    rectB.h = world->get_component<hitboxComponent>(IDB).hitbox.h;
+                    if (IDA != IDB) {
+                        // left to right
+                        check_collision_left_right(rectA, rectB, rectAvel, dt);
+                        // right to left
+                        check_collision_right_left(rectA, rectB, rectAvel, dt);
+                        // up to down
+                        check_collision_up_down(rectA, rectB, rectAvel, dt);
+                        // down to up
+                        check_collision_down_up(rectA, rectB, rectAvel, dt);
 
-                            // top right corner
-                            check_collision_corner_top_right(rectA, rectB, rectAvel, dt);
-                            // top left corner
-                            check_collision_corner_top_left(rectA, rectB, rectAvel, dt);
-                            // bottom right corner
-                            check_collision_corner_bottom_right(rectA, rectB, rectAvel, dt);
-                            // bottom left corner
-                            check_collision_corner_bottom_left(rectA, rectB, rectAvel, dt);
-                        }
+                        // top right corner
+                        check_collision_corner_top_right(rectA, rectB, rectAvel, dt);
+                        // top left corner
+                        check_collision_corner_top_left(rectA, rectB, rectAvel, dt);
+                        // bottom right corner
+                        check_collision_corner_bottom_right(rectA, rectB, rectAvel, dt);
+                        // bottom left corner
+                        check_collision_corner_bottom_left(rectA, rectB, rectAvel, dt);
                     }
                 }
-                rectAvel /= dt;
             }
+            rectAvel /= dt;
         }
     }
 
@@ -149,5 +163,6 @@ private:
 public:
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS* world;
+    nonsolid_collision_handler non_solids { world };
     static constexpr float fp_epsilon = .01f;
 };

@@ -46,11 +46,7 @@ class ECS; // forward declaration
  * @brief Contains a list of entities matching parents signature
  *
  */
-class EntitySystemList {
-public:
-    // the id of the entities the system works on
-    std::vector<size_t> entitiesID;
-};
+using EntitySystemList = std::vector<size_t>;
 
 // concept for a valid system
 // must have a vector of size_t
@@ -58,8 +54,8 @@ template <typename systemt>
 concept systemT = requires(systemt sys)
 {
     // std::same_as<decltype(sys.entityList), std::shared_ptr<yorcvs::EntitySystemList>>;
-    { sys.entityList->entitiesID[0] };
-    { sys.entityList->entitiesID.size() };
+    { (*sys.entityList)[0] };
+    { sys.entityList->size() };
 };
 /**
  * @brief Manages entity ids
@@ -581,7 +577,7 @@ public:
         const char* system_name = typeid(T).name();
         if (type_to_system.find(system_name) != type_to_system.end()) {
             // the system exists
-            type_to_system.at(system_name)->entitiesID.clear(); // clear the entities the system holds
+            type_to_system.at(system_name)->clear(); // clear the entities the system holds
             type_to_system.erase(system_name);
             type_to_signature.erase(system_name);
             return true;
@@ -656,9 +652,9 @@ public:
     void on_entity_destroy(const size_t entityID) noexcept
     {
         for (auto const& it : type_to_system) {
-            it.second->entitiesID.erase(
-                std::remove(it.second->entitiesID.begin(), it.second->entitiesID.end(), entityID),
-                it.second->entitiesID.end());
+            it.second->erase(
+                std::remove(it.second->begin(), it.second->end(), entityID),
+                it.second->end());
         }
     }
 
@@ -676,10 +672,10 @@ public:
             auto const& systemSignature = type_to_signature[type];
             if (compare_entity_to_system(signature, systemSignature)) {
                 // TODO : MAKE A METHOD TO SYSTEM , method needs to be virtual /Onewntitierase/insert
-                insert_sorted(system->entitiesID, entityID);
+                insert_sorted(*system, entityID);
             } else {
-                system->entitiesID.erase(std::remove(system->entitiesID.begin(), system->entitiesID.end(), entityID),
-                    system->entitiesID.end());
+                system->erase(std::remove(system->begin(), system->end(), entityID),
+                    system->end());
             }
         }
     }
@@ -924,6 +920,11 @@ public:
     {
         add_component<T>(entityID, {});
     }
+    template <typename... components_t>
+    void add_default_components(const size_t entityID)
+    {
+        (add_default_component<components_t>(entityID), ...);
+    }
     /**
      * @brief Adds multiple components to and entity
      *
@@ -1127,8 +1128,8 @@ public:
     }
 
     /**
-     * @brief  add the components to the system <sys> as a criteria for iteration , if the entity doen't have the
-     * components  specified , it will not iterate ovr them
+     * @brief Add the components to the system <sys> as a criteria for iteration , if the entity doen't have the
+     * components  specified , it will not iterate over them
      *
      *
      */
@@ -1168,12 +1169,6 @@ public:
 
         add_criteria_for_iteration<sys, comps...>();
     }
-
-    template <typename sys>
-    void set_criteria_for_iteration()
-    {
-        on_system_signature_change<sys>();
-    }
     /**
      * @brief Sets the Criteria For Iteration,removes other criteria
      *
@@ -1181,27 +1176,12 @@ public:
      * @tparam comp First component
      * @tparam comps Other components
      */
-    template <typename sys, typename comp, typename... comps>
+    template <typename sys, typename... comps>
     void set_criteria_for_iteration()
     {
-        // get the current signature of sys
-        std::vector<bool> signature = get_system_signature<sys>();
-
-        // reset criteria
-        for (auto&& i : signature) {
-            i = false;
-        }
-
-        // get the id of the component
-        size_t componentID = get_component_ID<comp>();
-        // modify the signature to fit the new component
-        while (signature.size() <= componentID) {
-            signature.push_back(false);
-        }
-        // mark the component as being a part of the system
-        signature[componentID] = true;
-        // set the new signature
+        std::vector<bool> signature {};
         set_system_signature<sys>(signature);
+        add_criteria_for_iteration<sys, comps...>();
     }
 
     /**
@@ -1305,14 +1285,14 @@ private:
             if (systemmanager->compare_entity_to_system(entitymanager->entitySignatures[entity],
                     systemmanager->get_system_signature<T>())) {
                 // TODO : MAKE A METHOD TO SYSTEM , method needs to be virtual /Onwntitierase/insert
-                insert_sorted(systemmanager->type_to_system.at(systemType)->entitiesID, entity);
+                insert_sorted(*systemmanager->type_to_system.at(systemType), entity);
             } else {
                 // not looking good
                 systemmanager->type_to_system.at(systemType)
-                    ->entitiesID.erase(std::remove(systemmanager->type_to_system.at(systemType)->entitiesID.begin(),
-                                           systemmanager->type_to_system.at(systemType)->entitiesID.end(),
-                                           entity),
-                        systemmanager->type_to_system.at(systemType)->entitiesID.end());
+                    ->erase(std::remove(systemmanager->type_to_system.at(systemType)->begin(),
+                                systemmanager->type_to_system.at(systemType)->end(),
+                                entity),
+                        systemmanager->type_to_system.at(systemType)->end());
             }
         }
     }
