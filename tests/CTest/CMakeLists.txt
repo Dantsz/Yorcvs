@@ -141,6 +141,9 @@ add_executable(ECSTestAddEntityChecked src/ECSTestAddEntityChecked.cpp)
 target_include_directories(ECSTestAddEntityChecked PUBLIC ${yorcvs_include_path})
 add_test(ECSTestAddEntityChecked ECSTestAddEntityChecked)
 
+add_executable(ECSTestSystemAddSetCriteria src/ECSTestSystemAddSetCriteria.cpp)
+target_include_directories(ECSTestSystemAddSetCriteria PUBLIC ${yorcvs_include_path})
+add_test(ECSTestSystemAddSetCriteria ECSTestSystemAddSetCriteria)
 
 add_executable(TypesTestRectContains src/TypesTestRectContains.cpp)
 target_include_directories(TypesTestRectContains PUBLIC ${yorcvs_include_path})

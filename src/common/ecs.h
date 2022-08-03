@@ -920,6 +920,11 @@ public:
     {
         add_component<T>(entityID, {});
     }
+    template <typename... components_t>
+    void add_default_components(const size_t entityID)
+    {
+        (add_default_component<components_t>(entityID), ...);
+    }
     /**
      * @brief Adds multiple components to and entity
      *
@@ -1123,8 +1128,8 @@ public:
     }
 
     /**
-     * @brief  add the components to the system <sys> as a criteria for iteration , if the entity doen't have the
-     * components  specified , it will not iterate ovr them
+     * @brief Add the components to the system <sys> as a criteria for iteration , if the entity doen't have the
+     * components  specified , it will not iterate over them
      *
      *
      */
@@ -1164,12 +1169,6 @@ public:
 
         add_criteria_for_iteration<sys, comps...>();
     }
-
-    template <typename sys>
-    void set_criteria_for_iteration()
-    {
-        on_system_signature_change<sys>();
-    }
     /**
      * @brief Sets the Criteria For Iteration,removes other criteria
      *
@@ -1177,27 +1176,12 @@ public:
      * @tparam comp First component
      * @tparam comps Other components
      */
-    template <typename sys, typename comp, typename... comps>
+    template <typename sys, typename... comps>
     void set_criteria_for_iteration()
     {
-        // get the current signature of sys
-        std::vector<bool> signature = get_system_signature<sys>();
-
-        // reset criteria
-        for (auto&& i : signature) {
-            i = false;
-        }
-
-        // get the id of the component
-        size_t componentID = get_component_ID<comp>();
-        // modify the signature to fit the new component
-        while (signature.size() <= componentID) {
-            signature.push_back(false);
-        }
-        // mark the component as being a part of the system
-        signature[componentID] = true;
-        // set the new signature
+        std::vector<bool> signature {};
         set_system_signature<sys>(signature);
+        add_criteria_for_iteration<sys, comps...>();
     }
 
     /**
