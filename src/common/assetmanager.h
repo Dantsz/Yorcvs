@@ -20,7 +20,7 @@ public:
     AssetManager() = default;
     AssetManager(const AssetManager& other) = delete;
     AssetManager(AssetManager&& other) = delete;
-    AssetManager(std::function<assetType*(const std::string& path)> pCtor, std::function<void(assetType*)> pDtor)
+    AssetManager(std::function<std::shared_ptr<assetType>(const std::string& path)> pCtor, std::function<void(assetType*)> pDtor)
         : ctor(pCtor)
         , dtor(pDtor)
     {
@@ -50,14 +50,14 @@ public:
         }
         yorcvs::log(std::string("Loading asset : ") + path);
 
-        assetType* ptr = ctor(path);
+        std::shared_ptr<assetType> ptr { nullptr, dtor };
+        ptr = ctor(path);
         if (ptr == nullptr) {
             yorcvs::log("Could not create specified resource from " + path, yorcvs::MSGSEVERITY::ERROR);
             return nullptr;
         }
-        std::shared_ptr<assetType> shrptr = std::shared_ptr<assetType>(ptr, dtor);
-        assetMap.insert({ path, shrptr });
-        return shrptr;
+        assetMap.insert({ path, ptr });
+        return ptr;
     }
     /**
      * @brief Removes unused assets from the map
@@ -89,7 +89,7 @@ private:
      * @brief function that constructs a resource from file and returns it's pointer
      *
      */
-    std::function<assetType*(const std::string& path)> ctor;
+    std::function<std::shared_ptr<assetType>(const std::string& path)> ctor;
     /**
      * @brief function that frees that memory
      *

@@ -74,7 +74,7 @@ public:
 
         yorcvs::log("creating texture manager");
         assetm = std::make_unique<yorcvs::AssetManager<SDL_Texture>>(
-            [&](const std::string& path) -> SDL_Texture* {
+            [&](const std::string& path) -> std::shared_ptr<SDL_Texture> {
                 SDL_Surface* surf = nullptr;
                 SDL_RWops* rwop = SDL_RWFromFile(path.c_str(), "rb");
                 if (rwop == nullptr) {
@@ -88,7 +88,7 @@ public:
 
                 SDL_FreeSurface(surf);
 
-                return tex;
+                return std::shared_ptr<SDL_Texture> { tex, [](SDL_Texture* p) { SDL_DestroyTexture(p); } };
             },
             [](SDL_Texture* p) { SDL_DestroyTexture(p); });
         // adding minimization

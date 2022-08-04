@@ -19,7 +19,7 @@ public:
         world->add_criteria_for_iteration<BehaviourSystem, behaviourComponent, velocityComponent>();
         scripts = std::make_unique<yorcvs::AssetManager<std::string>>(
             [&](const std::string& path) {
-                auto* program = new std::string();
+                auto program = std::make_shared<std::string>();
                 std::ifstream in { path };
                 program->assign((std::istreambuf_iterator<char>(in)), (std::istreambuf_iterator<char>()));
                 return program;
