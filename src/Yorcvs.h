@@ -12,21 +12,14 @@
 
 #include "imgui.h"
 #include "imgui_sdl.h"
-#include "misc/cpp/imgui_stdlib.h"
 
 #include "common/ecs.h"
 #include "common/types.h"
-#include "common/utilities.h"
 #include "engine/luaEngine.h"
 #include "engine/map.h"
-#include "game/componentSerialization.h"
 #include "game/components.h"
-#include "game/systems.h"
 
 #include "engine/window/windowsdl2.h"
-#include "nlohmann/json.hpp"
-
-#include "sol/sol.hpp"
 #include "ui/debuginfo.h"
 #include "ui/performancewindow.h"
 namespace yorcvs {

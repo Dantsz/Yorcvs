@@ -51,6 +51,7 @@ public:
         if (anim->first == anim_comp.current_animation_name) {
             return;
         }
+        world->get_component<animationComponent>(entityID).current_elapsed_time = 0.0f;
         world->get_component<animationComponent>(entityID).current_animation_name = animation_name;
         world->get_component<animationComponent>(entityID).current_frame = anim->second;
     }

@@ -43,10 +43,10 @@ namespace spiral {
             { -1, 0, 0, -1, 1, 0 }, { -1, 1, 1, 1, 0, 0 }, { 1, 0, 1, 1, -1, -1 }, { 1, -1, 0, -1, 0, -1 }
         };
 
-        const intmax_t square = static_cast<intmax_t>(std::floor(std::sqrt(n / 4)));
+        const auto square = static_cast<intmax_t>(std::floor(std::sqrt(n / 4)));
 
-        const intmax_t index = (static_cast<intmax_t>(n) - 4 * square * square) % (2 * square + 1);
-        const intmax_t side = (static_cast<intmax_t>(n) - 4 * square * square) / (2 * square + 1);
+        const auto index = (static_cast<intmax_t>(n) - 4 * square * square) % (2 * square + 1);
+        const auto side = (static_cast<intmax_t>(n) - 4 * square * square) / (2 * square + 1);
 
         return std::make_tuple<intmax_t, intmax_t>(c[side][0] * square + c[side][1] * index + c[side][2],
             c[side][3] * square + c[side][4] * index + c[side][5]);
