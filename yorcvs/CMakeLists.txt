@@ -1,12 +1,5 @@
 project(Yorcvs)
-if(EMSCRIPTEN)
-  set(CMAKE_EXECUTABLE_SUFFIX ".html")
-    SET(CMAKE_CXX_FLAGS "-std=c++2a -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=\"[\"\"png\"\"]\"  -s USE_SDL_TTF=2  -s ALLOW_MEMORY_GROWTH=1 -s NO_DISABLE_EXCEPTION_CATCHING -o build/Yorcvs.html" ) #commented because emscriptem requires the assets folder to be in special place and it's not necesary for compilation for CI
-  if(YORCVS_EMSCRIPTEN_PRELOAD_ASSETS_FOLDER)
-    message(STATUS "Assets folder will be preloaded")
-    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS  "--preload-file ./assets")
-  endif()
-endif() 
+
 set(YorcvsCORESFILES    "src/common/assetmanager.h"
                         "src/common/types.h"
                         "src/common/ecs.h"
