@@ -9,9 +9,9 @@ enable_testing()
 option(YORCVS_EMSCRIPTEN_PRELOAD_ASSETS_FOLDER "Whether to include the assets folder in the emscripten build or not"  OFF)
 #build lua as shared for windows
 if(WIN32)
-SET(LUA_CMAKE_BUILD_SHARED OFF CACHE BOOL "Build as shared library" FORCE)
+SET(LUA_CMAKE_BUILD_SHARED FALSE CACHE BOOL "Build as shared library" FORCE)
 else()
-SET(LUA_CMAKE_BUILD_SHARED ON CACHE BOOL "Build as shared library" FORCE)
+SET(LUA_CMAKE_BUILD_SHARED TRUE CACHE BOOL "Build as shared library" FORCE)
 endif()
 
 function(SET_DEFAULT_YORCVS_USE_VCPKG)
