@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.13)
+if(COMMAND cmake_policy)
+      cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CTEST_ARGUMENTS "-C Debug")
 enable_testing()
 
 option(YORCVS_EMSCRIPTEN_PRELOAD_ASSETS_FOLDER "Whether to include the assets folder in the emscripten build or not"  OFF)
