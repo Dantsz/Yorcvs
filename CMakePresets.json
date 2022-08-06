@@ -45,7 +45,7 @@
         "YORCVS_USE_VCPKG":
         {
           "type":"BOOL",
-          "value":"ON" 
+          "value":"TRUE" 
         }},
         "environment": {
           "CC": "clang",
@@ -66,7 +66,7 @@
         "YORCVS_USE_VCPKG":
         {
           "type":"BOOL",
-          "value":"ON" 
+          "value":"TRUE" 
         }
       },
       "environment": {
