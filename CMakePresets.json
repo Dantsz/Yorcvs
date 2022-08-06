@@ -134,7 +134,7 @@
       "configurePreset": "ninja-multi-clang"
     },
     {
-      "name": "ninja-multi-vcpkg-gcc",
+      "name": "ninja-multi-gcc",
       "configurePreset": "ninja-multi-gcc"
     }
   ],
