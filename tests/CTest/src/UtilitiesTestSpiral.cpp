@@ -8,7 +8,6 @@ std::ifstream in("testInput/spiralNumbersDiagonal.txt");
 
 int main(int argc, char** argv)
 {
-
     for (size_t i = 0; i < limit; i++) {
         size_t value = 0;
         in >> value;
