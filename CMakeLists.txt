@@ -38,6 +38,9 @@ if(DEFAULT_YORCVS_USE_VCPKG)
   find_package(SDL2-image CONFIG REQUIRED)
   find_package(SDL2-ttf CONFIG REQUIRED)
   set(SDL2lib SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf)
+elseif(EMSCRIPTEN)
+  set(CMAKE_EXECUTABLE_SUFFIX ".html")
+  SET(CMAKE_CXX_FLAGS "-std=c++2a -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=\"[\"\"png\"\"]\"  -s USE_SDL_TTF=2  -s ALLOW_MEMORY_GROWTH=1 -s NO_DISABLE_EXCEPTION_CATCHING -o build/Yorcvs.html" ) #commented because emscriptem requires the assets folder to be in special place and it's not necesary for compilation for CI
 else()
   message(STATUS "LINKING SDL2")
   #download findSDL2 and use it
@@ -126,9 +129,7 @@ endif()
 
 add_subdirectory(yorcvs)
 if(EMSCRIPTEN)
-  set(CMAKE_EXECUTABLE_SUFFIX ".html")
-    SET(CMAKE_CXX_FLAGS "-std=c++2a -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=\"[\"\"png\"\"]\"  -s USE_SDL_TTF=2  -s ALLOW_MEMORY_GROWTH=1 -s NO_DISABLE_EXCEPTION_CATCHING -o build/Yorcvs.html" ) #commented because emscriptem requires the assets folder to be in special place and it's not necesary for compilation for CI
-  if(YORCVS_EMSCRIPTEN_PRELOAD_ASSETS_FOLDER)
+    if(YORCVS_EMSCRIPTEN_PRELOAD_ASSETS_FOLDER)
     message(STATUS "Assets folder will be preloaded")
     set_target_properties(Yorcvs PROPERTIES LINK_FLAGS  "--preload-file ./assets")
   endif()
