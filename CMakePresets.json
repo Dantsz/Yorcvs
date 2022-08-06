@@ -27,7 +27,7 @@
         "YORCVS_USE_VCPKG":
         {
           "type":"BOOL",
-          "value":"ON" 
+          "value":"TRUE" 
         }
       }
     },
