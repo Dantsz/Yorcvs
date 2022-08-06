@@ -30,7 +30,7 @@ message(STATUS "USING VCPKG: ${YORCVS_USE_VCPKG}")
 include(FetchContent)
 include(ExternalData)
 #link SDL
-if(DEFAULT_YORCVS_USE_VCPKG)
+if(${YORCVS_USE_VCPKG})
   message(STATUS "Linking SDL2 from vcpkg")
   #set SDL for vcpkg
   find_package(SDL2 CONFIG REQUIRED)
