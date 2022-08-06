@@ -25,7 +25,7 @@ function(SET_DEFAULT_YORCVS_USE_VCPKG)
 endfunction()
 
 SET_DEFAULT_YORCVS_USE_VCPKG()
-set(YORCVS_USE_VCPKG ${DEFAULT_YORCVS_USE_VCPKG} CACHE BOOL "Use the name of the libraries as they are in vcpkg" FORCE)
+set(YORCVS_USE_VCPKG ${DEFAULT_YORCVS_USE_VCPKG} CACHE BOOL "Use the name of the libraries as they are in vcpkg")
 message(STATUS "USING VCPKG: ${YORCVS_USE_VCPKG}")
 include(FetchContent)
 include(ExternalData)
