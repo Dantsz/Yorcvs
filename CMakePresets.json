@@ -23,6 +23,11 @@
         "CMAKE_TOOLCHAIN_FILE": {
           "type": "FILEPATH",
           "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        },
+        "YORCVS_USE_VCPKG":
+        {
+          "type":"BOOL",
+          "value":"ON" 
         }
       }
     },
@@ -36,6 +41,11 @@
         "CMAKE_TOOLCHAIN_FILE": {
           "type": "FILEPATH",
           "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        },
+        "YORCVS_USE_VCPKG":
+        {
+          "type":"BOOL",
+          "value":"ON" 
         }},
         "environment": {
           "CC": "clang",
@@ -52,6 +62,11 @@
         "CMAKE_TOOLCHAIN_FILE": {
           "type": "FILEPATH",
           "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        },
+        "YORCVS_USE_VCPKG":
+        {
+          "type":"BOOL",
+          "value":"ON" 
         }
       },
       "environment": {
