@@ -84,22 +84,22 @@ add_test(NAME ECStestentityduplicate COMMAND ECStestentityduplicate  WORKING_DIR
 
 add_executable(YorcvsLoadMap src/YorcvsLoadMap.cpp)
 add_test(NAME YorcvsLoadMap  COMMAND YorcvsLoadMap WORKING_DIRECTORY ${test_dir})
-target_link_libraries(YorcvsLoadMap PRIVATE lua::header nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main  SDL2::SDL2_image SDL2::SDL2_ttf lua::lib imgui imgui-SDL2)
+target_link_libraries(YorcvsLoadMap PRIVATE lua::header nlohmann_json::nlohmann_json tmxlite  ${SDL2lib} lua::lib imgui imgui-SDL2)
 target_include_directories(YorcvsLoadMap PUBLIC ${YorcvsIncludeDIRS} ${sol2_SOURCE_DIR}/include ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends  ${imguisdl2_SOURCE_DIR})
 
 add_executable(YorcvsLoadCharacter src/YorcvsLoadCharacter.cpp)
 add_test(NAME YorcvsLoadCharacter  COMMAND YorcvsLoadCharacter WORKING_DIRECTORY ${test_dir})
-target_link_libraries(YorcvsLoadCharacter PRIVATE  lua::header nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main  SDL2::SDL2_image SDL2::SDL2_ttf lua::lib imgui imgui-SDL2)
+target_link_libraries(YorcvsLoadCharacter PRIVATE  lua::header nlohmann_json::nlohmann_json tmxlite  ${SDL2lib} lua::lib imgui imgui-SDL2)
 target_include_directories(YorcvsLoadCharacter PUBLIC ${YorcvsIncludeDIRS} ${sol2_SOURCE_DIR}/include ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends  ${imguisdl2_SOURCE_DIR})
 
 add_executable(WorldTestnegativeHealthRegen src/WorldTestnegativeHealthRegen.cpp)
 add_test(NAME WorldTestnegativeHealthRegen COMMAND WorldTestnegativeHealthRegen WORKING_DIRECTORY ${test_dir})
-target_link_libraries(WorldTestnegativeHealthRegen PRIVATE lua::header nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main  SDL2::SDL2_image SDL2::SDL2_ttf lua::lib imgui imgui-SDL2)
+target_link_libraries(WorldTestnegativeHealthRegen PRIVATE lua::header nlohmann_json::nlohmann_json tmxlite  ${SDL2lib} lua::lib imgui imgui-SDL2)
 target_include_directories(WorldTestnegativeHealthRegen PUBLIC  ${YorcvsIncludeDIRS} ${sol2_SOURCE_DIR}/include ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends  ${imguisdl2_SOURCE_DIR})
 
 add_executable(GameTestLoadingEntity src/GameTestLoadingEntity.cpp)
 add_test(NAME GameTestLoadingEntity COMMAND GameTestLoadingEntity WORKING_DIRECTORY ${test_dir} )
-target_link_libraries(GameTestLoadingEntity PRIVATE lua::header nlohmann_json::nlohmann_json tmxlite  SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf lua::lib imgui imgui-SDL2)
+target_link_libraries(GameTestLoadingEntity PRIVATE lua::header nlohmann_json::nlohmann_json tmxlite  ${SDL2lib} lua::lib imgui imgui-SDL2)
 target_include_directories(GameTestLoadingEntity PUBLIC  ${YorcvsIncludeDIRS} ${sol2_SOURCE_DIR}/include  ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends  ${imguisdl2_SOURCE_DIR})
 
 
