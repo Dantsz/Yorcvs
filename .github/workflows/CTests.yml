@@ -64,9 +64,9 @@ jobs:
         compiler: [gcc, clang]
         include:
           - compiler: gcc
-            config: 'ninja-multi-vcpkg-gcc'
+            config: 'ninja-multi-gcc'
           - compiler: clang
-            config: 'ninja-multi-vcpkg-clang'
+            config: 'ninja-multi-clang'
     steps:
     - uses: actions/checkout@v2
     - uses: seanmiddleditch/gha-setup-ninja@master
@@ -78,9 +78,13 @@ jobs:
       run: sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
     - name: install clang
       run: sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
-    - uses: lukka/run-vcpkg@v10
-      with:
-        vcpkgGitCommitId: '5568f110b509a9fd90711978a7cb76bae75bb092'
+    #dependencies
+    - name: install sdl2
+      run: sudo apt-get install libsdl2-dev
+    - name: install sdl2-image
+      run: sudo apt-get install libsdl2-image-dev
+    - name: install sdl2-ttf
+      run: sudo apt-get install libsdl2-ttf-dev
     - name: build
       uses: lukka/run-cmake@v10
       with:
