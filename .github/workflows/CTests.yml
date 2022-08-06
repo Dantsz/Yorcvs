@@ -34,7 +34,7 @@ jobs:
           configurePreset: 'ninja-multi-vcpkg'
           buildPreset: 'ninja-multi-vcpkg'
     - name: run tests
-      run: ctest --test-dir tests/CTest/builds/ninja-multi-vcpkg -C Debug
+      run: ctest --test-dir builds/${{matrix.config}}tests/CTest/Debug -C Debug
 #  macos:
 #    name: mac-${{matrix.os}}
 #    runs-on: ${{matrix.os}}
@@ -92,4 +92,4 @@ jobs:
           configurePreset: ${{matrix.config}}
           buildPreset:  ${{matrix.config}}
     - name: run tests
-      run: ctest --output-on-failure --test-dir tests/CTest/builds/${{matrix.config}} -C Debug
+      run: ctest --output-on-failure --test-dir builds/${{matrix.config}}tests/CTest/Debug -C Debug

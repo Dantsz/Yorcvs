@@ -8,7 +8,6 @@ set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -fsanitize-undefined-trap-
 set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fsanitize-undefined-trap-on-error -fno-omit-frame-pointer -fsanitize=address,undefined,leak")
 endif()
 
-
 add_compile_definitions(TEST_MAP_FILE="../../assets/map.tmx")
 add_compile_definitions(TEST_TEMP_ENTITY_FILE="../../assets/entities/bleeding_duck/bleeding_duck.json")
 add_compile_definitions(TEST_LOAD_ENTITY_FILE="../../assets/entities/duck/duck.json")
