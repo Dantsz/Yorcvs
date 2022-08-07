@@ -35,7 +35,7 @@
 #build files
 build*/
 
-Dependencies/*
+
 build/
 builds/
 .vscode/

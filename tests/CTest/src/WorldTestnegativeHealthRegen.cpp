@@ -1,6 +1,6 @@
 
-#include "../../../src/Yorcvs.h"
-#include "../../../src/common/utilities.h"
+#include "Yorcvs.h"
+#include "common/utilities.h"
 
 #include <cassert>
 #include <iostream>

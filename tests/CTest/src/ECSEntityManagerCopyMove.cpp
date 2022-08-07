@@ -1,4 +1,4 @@
-#include "../../../src/common/ecs.h"
+#include "common/ecs.h"
 #include <cassert>
 
 int main()
