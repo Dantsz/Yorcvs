@@ -52,5 +52,5 @@ $<$<CXX_COMPILER_ID:MSVC>:/W4 /Zi /DEBUG /bigobj>
 $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -std=c++2a>
 $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wno-c++98-compat-pedantic -Wno-c++98-compat>
 )
-target_include_directories(${PROJECT_NAME} PUBLIC nlohmann_json::nlohmann_json ${sol2_SOURCE_DIR}/include ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends ${imguisdl2_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC nlohmann_json::nlohmann_json ${sol2_SOURCE_DIR}/include ${IMGUI_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} lua::header ${SDL2lib} nlohmann_json::nlohmann_json tmxlite lua::lib imgui imgui-SDL2)
