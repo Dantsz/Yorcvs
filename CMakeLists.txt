@@ -28,7 +28,7 @@ function(SET_DEFAULT_YORCVS_USE_VCPKG)
 endfunction()
 SET_DEFAULT_YORCVS_USE_VCPKG()
 set(YORCVS_USE_VCPKG ${DEFAULT_YORCVS_USE_VCPKG} CACHE BOOL "Use the name of the libraries as they are in vcpkg")
-set(YORCVS_BUILD_TESTS TRUE CACHE BOOL "Configure unit tests")
+option(YORCVS_BUILD_TESTS "Configure unit tests" TRUE)
 
 include(DependencyConfig.cmake)
 add_subdirectory(yorcvs)
