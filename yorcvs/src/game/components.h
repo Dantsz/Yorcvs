@@ -44,15 +44,21 @@ public:
 
 struct healthComponent {
     float HP;
-    float max_HP;
-    float health_regen; // per tick
     bool is_dead; // no health regen if dead
 };
+struct healthStatsComponent {
+    float max_HP;
+    float health_regen; // per tick
+};
+
 struct staminaComponent {
     float stamina;
+};
+struct staminaStatsComponent {
     float max_stamina;
     float stamina_regen;
 };
+
 struct spriteComponent {
     yorcvs::Vec2<float> offset; // position offset
     yorcvs::Vec2<float> size; // size of sprite

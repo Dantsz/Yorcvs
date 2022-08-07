@@ -409,28 +409,6 @@ private:
     }
     [[nodiscard]] bool object_handle_property_int(const size_t entity, const tmx::Property& property) const
     {
-        // NOTE HANDLES HP
-        if (property.getName() == "HP") {
-            if (!ecs->has_components<healthComponent>(entity)) {
-                ecs->add_component<healthComponent>(entity, {});
-            }
-            ecs->get_component<healthComponent>(entity).HP = property.getFloatValue();
-            return true;
-        }
-        if (property.getName() == "HP_max") {
-            if (!ecs->has_components<healthComponent>(entity)) {
-                ecs->add_component<healthComponent>(entity, {});
-            }
-            ecs->get_component<healthComponent>(entity).max_HP = property.getFloatValue();
-            return true;
-        }
-        if (property.getName() == "HP_regen") {
-            if (!ecs->has_components<healthComponent>(entity)) {
-                ecs->add_component<healthComponent>(entity, {});
-            }
-            ecs->get_component<healthComponent>(entity).health_regen = property.getFloatValue();
-            return true;
-        }
         return false;
     }
     bool object_handle_property_object(size_t entity, const tmx::Property& property);
