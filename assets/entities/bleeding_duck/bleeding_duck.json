@@ -6,7 +6,9 @@
     },
     "health":
     {
-        "current": 1.0,
+        "current": 1.0
+    },
+    "health_stats":{
         "max": 5.0,
         "regen" : -0.1
     },

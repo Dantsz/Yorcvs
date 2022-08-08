@@ -11,7 +11,7 @@ public:
         : world(parent)
     {
         world->register_system(*this);
-        world->add_criteria_for_iteration<StaminaSystem, staminaComponent>();
+        world->add_criteria_for_iteration<StaminaSystem, staminaComponent, staminaStatsComponent>();
     }
 
     void update(const float dt)
@@ -19,9 +19,9 @@ public:
         cur_time += dt;
         if (cur_time >= update_time) {
             for (const auto& ID : *entityList) {
-                world->get_component<staminaComponent>(ID).stamina += world->get_component<staminaComponent>(ID).stamina_regen;
-                if (world->get_component<staminaComponent>(ID).stamina > world->get_component<staminaComponent>(ID).max_stamina) {
-                    world->get_component<staminaComponent>(ID).stamina = world->get_component<staminaComponent>(ID).max_stamina;
+                world->get_component<staminaComponent>(ID).stamina += world->get_component<staminaStatsComponent>(ID).stamina_regen;
+                if (world->get_component<staminaComponent>(ID).stamina > world->get_component<staminaStatsComponent>(ID).max_stamina) {
+                    world->get_component<staminaComponent>(ID).stamina = world->get_component<staminaStatsComponent>(ID).max_stamina;
                 }
             }
             cur_time = 0.0f;

@@ -42,21 +42,35 @@ inline void from_json(const json::json& j, identificationComponent& p)
 }
 inline void to_json(json::json& j, const healthComponent& comp)
 {
-    j = json::json { { "current", comp.HP }, { "max", comp.max_HP }, { "regen", comp.health_regen } };
+    j = json::json { { "current", comp.HP } }; //,
 }
 inline void from_json(const json::json& j, healthComponent& comp)
 {
     j.at("current").get_to(comp.HP);
+}
+inline void to_json(json::json& j, const healthStatsComponent& comp)
+{
+    j = { { "max", comp.max_HP }, { "regen", comp.health_regen } };
+}
+inline void from_json(const json::json& j, healthStatsComponent& comp)
+{
     j.at("max").get_to(comp.max_HP);
     j.at("regen").get_to(comp.health_regen);
 }
 inline void to_json(json::json& j, const staminaComponent& comp)
 {
-    j = json::json { { "current", comp.stamina }, { "max", comp.max_stamina }, { "regen", comp.stamina_regen } };
+    j = json::json { { "current", comp.stamina } };
 }
 inline void from_json(const json::json& j, staminaComponent& comp)
 {
     j.at("current").get_to(comp.stamina);
+}
+inline void to_json(json::json& j, const staminaStatsComponent& comp)
+{
+    j = json::json { { "max", comp.max_stamina }, { "regen", comp.stamina_regen } };
+}
+inline void from_json(const json::json& j, staminaStatsComponent& comp)
+{
     j.at("max").get_to(comp.max_stamina);
     j.at("regen").get_to(comp.stamina_regen);
 }

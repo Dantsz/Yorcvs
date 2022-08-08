@@ -225,13 +225,15 @@ private:
             ImGui::Text("Velocity: (%f,%f)", appECS->get_component<velocityComponent>(ID).vel.x,
                 appECS->get_component<velocityComponent>(ID).vel.y);
         }
-        if (appECS->has_components<healthComponent>(ID)) {
+        if (appECS->has_components<healthComponent, healthStatsComponent>(ID)) {
             auto& playerHealthC = appECS->get_component<healthComponent>(ID);
-            ImGui::Text("Health: (%f/%f)", playerHealthC.HP, playerHealthC.max_HP);
+            auto& playerHealthStatsC = appECS->get_component<healthStatsComponent>(ID);
+            ImGui::Text("Health: (%f/%f)", playerHealthC.HP, playerHealthStatsC.max_HP);
         }
-        if (appECS->has_components<staminaComponent>(ID)) {
+        if (appECS->has_components<staminaComponent, staminaStatsComponent>(ID)) {
             auto& playerStaminaC = appECS->get_component<staminaComponent>(ID);
-            ImGui::Text("Stamina: (%f/%f)", playerStaminaC.stamina, playerStaminaC.max_stamina);
+            auto& playerStamStatC = appECS->get_component<staminaStatsComponent>(ID);
+            ImGui::Text("Stamina: (%f/%f)", playerStaminaC.stamina, playerStamStatC.max_stamina);
         }
 
         if (appECS->has_components<offensiveStatsComponent>(ID)) {
@@ -442,7 +444,7 @@ private:
     }
     void draw_entity_health_bar(yorcvs::sdl2_window& window, size_t ID, const yorcvs::Rect<float>& offset_rect)
     {
-        if (appECS->has_components<healthComponent>(ID)) {
+        if (appECS->has_components<healthComponent, healthStatsComponent>(ID)) {
             // draw health bar
             yorcvs::Rect<float> healthBarRect {};
             if (appECS->has_components<spriteComponent>(
@@ -458,13 +460,13 @@ private:
             if (appECS->has_components<staminaComponent>(ID)) {
                 healthBarRect.y -= health_full_bar_dimension.y * 2;
             }
-            draw_status_bar(window, healthBarRect, (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthComponent>(ID).max_HP),
+            draw_status_bar(window, healthBarRect, (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthStatsComponent>(ID).max_HP),
                 health_bar_full_color, health_bar_empty_color);
         }
     }
     void draw_entity_stamina_bar(yorcvs::sdl2_window& window, size_t ID, const yorcvs::Rect<float>& offset_rect)
     {
-        if (appECS->has_components<staminaComponent>(ID)) {
+        if (appECS->has_components<staminaComponent, staminaStatsComponent>(ID)) {
             yorcvs::Rect<float> staminaBarRect {};
             if (appECS->has_components<spriteComponent>(
                     ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
@@ -478,7 +480,7 @@ private:
 
             staminaBarRect.w = health_full_bar_dimension.x;
             staminaBarRect.h = health_full_bar_dimension.y;
-            draw_status_bar(window, staminaBarRect, (appECS->get_component<staminaComponent>(ID).stamina / appECS->get_component<staminaComponent>(ID).max_stamina),
+            draw_status_bar(window, staminaBarRect, (appECS->get_component<staminaComponent>(ID).stamina / appECS->get_component<staminaStatsComponent>(ID).max_stamina),
                 stamina_bar_full_color, stamina_bar_empty_color);
         }
     }

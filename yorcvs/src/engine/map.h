@@ -203,7 +203,15 @@ public:
             yorcvs::log("healthComponent (" + path + ") is not valid");
             return;
         }
+        if (!deserialize_component_from_json<healthStatsComponent>(entity_id, entityJSON, "health_stats")) {
+            yorcvs::log("healthComponent (" + path + ") is not valid");
+            return;
+        }
         if (!deserialize_component_from_json<staminaComponent>(entity_id, entityJSON, "stamina")) {
+            yorcvs::log("staminaComponent (" + path + ") is not valid");
+            return;
+        }
+        if (!deserialize_component_from_json<staminaStatsComponent>(entity_id, entityJSON, "stamina_stats")) {
             yorcvs::log("staminaComponent (" + path + ") is not valid");
             return;
         }
@@ -263,7 +271,9 @@ public:
 
         serialize_component_to_json<identificationComponent>(entity, "name", j);
         serialize_component_to_json<healthComponent>(entity, "health", j);
+        serialize_component_to_json<healthStatsComponent>(entity, "health_stats", j);
         serialize_component_to_json<staminaComponent>(entity, "stamina", j);
+        serialize_component_to_json<staminaStatsComponent>(entity, "stamina_stats", j);
         serialize_component_to_json<hitboxComponent>(entity, "hitbox", j);
         serialize_component_to_json<spriteComponent>(entity, "sprite", j,
             [&](json::json& /*json_object*/, const spriteComponent&) { // if sprite is serialized, also serialize sprites
@@ -409,28 +419,6 @@ private:
     }
     [[nodiscard]] bool object_handle_property_int(const size_t entity, const tmx::Property& property) const
     {
-        // NOTE HANDLES HP
-        if (property.getName() == "HP") {
-            if (!ecs->has_components<healthComponent>(entity)) {
-                ecs->add_component<healthComponent>(entity, {});
-            }
-            ecs->get_component<healthComponent>(entity).HP = property.getFloatValue();
-            return true;
-        }
-        if (property.getName() == "HP_max") {
-            if (!ecs->has_components<healthComponent>(entity)) {
-                ecs->add_component<healthComponent>(entity, {});
-            }
-            ecs->get_component<healthComponent>(entity).max_HP = property.getFloatValue();
-            return true;
-        }
-        if (property.getName() == "HP_regen") {
-            if (!ecs->has_components<healthComponent>(entity)) {
-                ecs->add_component<healthComponent>(entity, {});
-            }
-            ecs->get_component<healthComponent>(entity).health_regen = property.getFloatValue();
-            return true;
-        }
         return false;
     }
     bool object_handle_property_object(size_t entity, const tmx::Property& property);
@@ -543,7 +531,7 @@ public:
                 staminaComponent>();
             world.register_component<playerMovementControlledComponent, behaviourComponent>();
             world.register_component<spriteComponent, animationComponent>();
-            world.register_component<offensiveStatsComponent, defensiveStatsComponent>();
+            world.register_component<healthStatsComponent, staminaStatsComponent, offensiveStatsComponent, defensiveStatsComponent>();
         }
     };
     // class to initialize the ecs before systems are constructed

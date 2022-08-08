@@ -12,7 +12,7 @@ public:
         : world(parent)
     {
         world->register_system<HealthSystem>(*this);
-        world->add_criteria_for_iteration<HealthSystem, healthComponent>();
+        world->add_criteria_for_iteration<HealthSystem, healthComponent, healthStatsComponent>();
     }
     void update(const float dt)
     {
@@ -29,9 +29,9 @@ public:
         }
         if (cur_time >= update_time) {
             for (const auto& ID : *entityList) {
-                world->get_component<healthComponent>(ID).HP += world->get_component<healthComponent>(ID).health_regen;
-                if (world->get_component<healthComponent>(ID).HP > world->get_component<healthComponent>(ID).max_HP) {
-                    world->get_component<healthComponent>(ID).HP = world->get_component<healthComponent>(ID).max_HP;
+                world->get_component<healthComponent>(ID).HP += world->get_component<healthStatsComponent>(ID).health_regen;
+                if (world->get_component<healthComponent>(ID).HP > world->get_component<healthStatsComponent>(ID).max_HP) {
+                    world->get_component<healthComponent>(ID).HP = world->get_component<healthStatsComponent>(ID).max_HP;
                 }
             }
             cur_time = 0.0f;
