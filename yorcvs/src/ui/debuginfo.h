@@ -27,7 +27,10 @@ public:
     {
         attach(parentW, map_object, pms, cols, healthS, lua);
     }
-    ~DebugInfo() = default;
+    ~DebugInfo()
+    {
+        parentWindow->unregister_callback(clicked_callback_id);
+    }
     DebugInfo(const DebugInfo& other) = delete;
     DebugInfo(DebugInfo&& other) = delete;
     DebugInfo operator=(const DebugInfo& other) = delete;
@@ -151,7 +154,7 @@ public:
         player_move_system = pms;
         colission_system = cols;
         health_system = healthS;
-        [[maybe_unused]] const auto clicked_id = parentW->add_callback_on_event(yorcvs::Events::Type::MOUSE_CLICKED, [&mouse_is_pressed = mouse_is_pressed](const yorcvs::event& event) { mouse_is_pressed = true; });
+        clicked_callback_id = parentW->add_callback_on_event(yorcvs::Events::Type::MOUSE_CLICKED, [&mouse_is_pressed = mouse_is_pressed](const yorcvs::event&) { mouse_is_pressed = true; });
     }
     void attach_lua()
     {
@@ -485,7 +488,7 @@ private:
         window.draw_rect(rect, std::get<0>(full_color), std::get<1>(full_color), std::get<2>(full_color), std::get<3>(full_color));
     }
 
-    std::vector<size_t> callbacks;
+    size_t clicked_callback_id;
     yorcvs::sdl2_window* parentWindow {};
 
     yorcvs::ECS* appECS {};
