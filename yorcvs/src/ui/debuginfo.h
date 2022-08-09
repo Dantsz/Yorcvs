@@ -89,8 +89,6 @@ public:
             draw_entity_health_bar(window, ID, rect);
             draw_entity_stamina_bar(window, ID, rect);
             if (mouse_is_pressed) {
-                static int bile = 0;
-                bile++;
                 if (rect.contains(window.get_pointer_position() / window.get_render_scale() + window.get_drawing_offset())) {
                     select_target = ID;
                     target_window_position = window.get_pointer_position();
