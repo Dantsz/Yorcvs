@@ -81,8 +81,8 @@ public:
         }
         const size_t entity_ID = (*player_control.entityList)[0];
         const yorcvs::Vec2<float> player_position = world.get_component<positionComponent>(entity_ID).position;
-        const std::tuple<intmax_t, intmax_t> player_position_chunk = std::tuple<intmax_t, intmax_t>(
-            std::floor(player_position.x / (32.0f * 16.0f)), std::floor(player_position.y / (32.0f * 16.0f)));
+        const std::tuple<intmax_t, intmax_t> player_position_chunk = std::make_tuple(
+            static_cast<intmax_t>(std::floor(player_position.x / (32.0f * 16.0f))), static_cast<intmax_t>(std::floor(player_position.y / (32.0f * 16.0f))));
         // render chunks
 
         std::tuple<intmax_t, intmax_t> chunk_to_be_rendered {};

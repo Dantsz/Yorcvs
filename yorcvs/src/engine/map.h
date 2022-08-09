@@ -346,7 +346,7 @@ private:
                         }
                     }
 
-                    /// add object
+                    // add object
                     ysorted_tiles.emplace_back(ecs);
                     const size_t entity = ysorted_tiles[ysorted_tiles.size() - 1].id;
                     ecs->add_component<positionComponent>(
@@ -417,7 +417,7 @@ private:
         }
         return false;
     }
-    [[nodiscard]] bool object_handle_property_int(const size_t entity, const tmx::Property& property) const
+    [[nodiscard]] bool object_handle_property_int([[maybe_unused]] const size_t entity, [[maybe_unused]] const tmx::Property& property) const
     {
         return false;
     }
