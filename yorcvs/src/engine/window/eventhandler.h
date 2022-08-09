@@ -20,14 +20,15 @@ namespace Events {
         YORCVS_KEY_ENTER,
         YORCVS_KEY_TILDE
     };
-    enum Type {
+    enum Type : size_t {
         UNKNOWN,
         KEYBOARD_PRESSED,
         MOUSE_CLICKED,
         TEXT_INPUT,
         WINDOW_MINIMIZED,
         WINDOW_RESTORED,
-        WINDOW_QUIT
+        WINDOW_QUIT,
+        TYPES
     };
 }
 class event {
@@ -51,9 +52,19 @@ public:
     {
         static_cast<event_manager_implementation&>(*this).handle_events();
     }
-    void add_callback(const std::function<void(const yorcvs::event&)>& n_callback)
+    /**
+     * @brief add_callback_on_event Registers a callback to be called when the event of type happens
+     * @param type the type of the event that needs to occur for the callback to be called
+     * @param callback the callback function
+     * @return ID of the callback function for unregistering
+     */
+    [[nodiscard]] size_t add_callback_on_event(yorcvs::Events::Type type, const std::function<void(const yorcvs::event&)>& callback)
     {
-        static_cast<event_manager_implementation&>(*this).add_callback(n_callback);
+        return static_cast<event_manager_implementation&>(*this).add_callback_on_event(type, callback);
+    }
+    void unregister_callback(size_t callback_ID)
+    {
+        return static_cast<event_manager_implementation&>(*this).unregister_callback(callback_ID);
     }
     bool is_key_pressed(yorcvs::Events::Key key)
     {
