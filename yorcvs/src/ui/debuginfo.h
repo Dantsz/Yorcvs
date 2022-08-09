@@ -151,11 +151,7 @@ public:
         player_move_system = pms;
         colission_system = cols;
         health_system = healthS;
-        parentW->add_callback([&mouse_is_pressed = mouse_is_pressed](const yorcvs::event& event) {
-            if (event.get_type() == yorcvs::Events::Type::MOUSE_CLICKED) {
-                mouse_is_pressed = true;
-            }
-        });
+        [[maybe_unused]] const auto clicked_id = parentW->add_callback_on_event(yorcvs::Events::Type::MOUSE_CLICKED, [&mouse_is_pressed = mouse_is_pressed](const yorcvs::event& event) { mouse_is_pressed = true; });
     }
     void attach_lua()
     {

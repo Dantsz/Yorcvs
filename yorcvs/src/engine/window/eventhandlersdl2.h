@@ -7,6 +7,7 @@
 #include <SDL_mouse.h>
 #include <SDL_scancode.h>
 #include <SDL_video.h>
+#include <array>
 #include <functional>
 #include <unordered_map>
 namespace yorcvs {
@@ -90,15 +91,12 @@ public:
             if (i_event.get_type() == yorcvs::Events::Type::KEYBOARD_PRESSED && impl_to_key.contains(sdl_event.key.keysym.scancode)) {
                 i_event.key = impl_to_key.at(sdl_event.key.keysym.scancode);
             }
-            for (const auto& f : callbacks) {
+            for (const auto& [ID, f] : callbacks[i_event.get_type()]) {
                 f(static_cast<yorcvs::event&>(*(&i_event)));
             }
         }
     }
-    void add_callback(const std::function<void(const yorcvs::event&)>& n_callback)
-    {
-        callbacks.push_back(n_callback);
-    }
+
     bool is_key_pressed(yorcvs::Events::Key key)
     {
         keys = SDL_GetKeyboardState(nullptr);
@@ -112,11 +110,31 @@ public:
         SDL_GetMouseState(&x, &y);
         return yorcvs::Vec2<float> { static_cast<float>(x), static_cast<float>(y) };
     }
+    [[nodiscard]] size_t add_callback_on_event(yorcvs::Events::Type type, const std::function<void(const yorcvs::event&)>& callback)
+    {
+        callbacks[type].insert({ unassigned_callback_id, callback });
+        return unassigned_callback_id++;
+    }
+    void unregister_callback(size_t callback_ID)
+    {
+        for (auto& callback_container : callbacks) {
+            const auto it = callback_container.find(callback_ID);
+            if (it != callback_container.end()) {
+                callback_container.erase(it);
+                return;
+            }
+        }
+    }
 
 private:
     SDL_Event sdl_event {};
     yorcvs::event_sdl2 i_event {};
-    std::vector<std::function<void(const yorcvs::event&)>> callbacks {};
+
+    size_t unassigned_callback_id = 0;
+    /**
+     * @brief Holds callbacks to be called when a type of event happens
+     */
+    std::array<std::unordered_map<size_t, std::function<void(const yorcvs::event&)>>, yorcvs::Events::Type::TYPES> callbacks {};
     std::unordered_map<yorcvs::Events::Key, SDL_Scancode> key_to_impl {};
     std::unordered_map<SDL_Scancode, yorcvs::Events::Key> impl_to_key {};
     unsigned char const* keys {};

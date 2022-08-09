@@ -48,11 +48,7 @@ public:
             local pl = test_map:load_entity_from_path(world:create_entity(),"assets/entities/test_player_2/test_player_2.json")
             world:add_playerMovementControl(pl)
             )");
-        app_window.add_callback([&app_active = active](const yorcvs::event& e) {
-            if (e.get_type() == yorcvs::Events::Type::WINDOW_QUIT) {
-                app_active = false;
-            }
-        });
+        const auto callback_id = app_window.add_callback_on_event(yorcvs::Events::Type::WINDOW_QUIT, [&app_active = active](const yorcvs::event& e) { app_active = false; });
         counter.start();
     }
     Application(const Application& other) = delete;
