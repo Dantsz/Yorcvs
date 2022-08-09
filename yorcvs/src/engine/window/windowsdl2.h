@@ -92,14 +92,8 @@ public:
             },
             [](SDL_Texture* p) { SDL_DestroyTexture(p); });
         // adding minimization
-        add_callback([&isMinimized = this->isMinimized](const yorcvs::event& e) {
-            if (e.get_type() == yorcvs::Events::Type::WINDOW_MINIMIZED) {
-                isMinimized = true;
-            }
-            if (e.get_type() == yorcvs::Events::Type::WINDOW_RESTORED) {
-                isMinimized = false;
-            }
-        });
+        [[maybe_unused]] const auto minimized_id = add_callback_on_event(yorcvs::Events::Type::WINDOW_MINIMIZED, [&isMinimized = this->isMinimized](const yorcvs::event&) { isMinimized = true; });
+        [[maybe_unused]] const auto restored_id = add_callback_on_event(yorcvs::Events::Type::WINDOW_RESTORED, [&isMinimized = this->isMinimized](const yorcvs::event&) { isMinimized = false; });
     }
     sdl2_window(const sdl2_window& other) = delete;
     sdl2_window(sdl2_window&& other) = delete;
