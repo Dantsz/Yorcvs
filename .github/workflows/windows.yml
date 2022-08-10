@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: lukka/run-vcpkg@v10
       with:
-        vcpkgGitCommitId: '89295c9fe22e97ca9e380a6c771ccf2ff09dca95'
+        vcpkgGitCommitId: 'ba4aea932f843ae0c37f571dcb86e91871cee103'
     - name: build
       uses: lukka/run-cmake@v10
       with:
