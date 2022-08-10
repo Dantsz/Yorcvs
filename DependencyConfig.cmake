@@ -7,8 +7,8 @@ if(${YORCVS_USE_VCPKG})
   #set SDL for vcpkg
   find_package(SDL2 CONFIG REQUIRED)
   find_package(SDL2-image CONFIG REQUIRED)
-  find_package(SDL2-ttf CONFIG REQUIRED)
-  set(SDL2lib SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf)
+  find_package(SDL2_ttf CONFIG REQUIRED)
+  set(SDL2lib SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image $<IF:$<TARGET_EXISTS:SDL2_ttf::SDL2_ttf>,SDL2_ttf::SDL2_ttf,SDL2_ttf::SDL2_ttf-static>)
 elseif(EMSCRIPTEN)
   set(CMAKE_EXECUTABLE_SUFFIX ".html")
   SET(CMAKE_CXX_FLAGS "-std=c++2a -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=\"[\"\"png\"\"]\"  -s USE_SDL_TTF=2  -s ALLOW_MEMORY_GROWTH=1 -s NO_DISABLE_EXCEPTION_CATCHING -o build/Yorcvs.html" ) #commented because emscriptem requires the assets folder to be in special place and it's not necesary for compilation for CI
