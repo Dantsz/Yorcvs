@@ -27,10 +27,8 @@ public:
     {
         attach(parentW, map_object, pms, cols, healthS, lua);
     }
-    ~DebugInfo()
-    {
-        parentWindow->unregister_callback(clicked_callback_id);
-    }
+    ~DebugInfo() = default;
+
     DebugInfo(const DebugInfo& other) = delete;
     DebugInfo(DebugInfo&& other) = delete;
     DebugInfo operator=(const DebugInfo& other) = delete;
@@ -91,18 +89,8 @@ public:
             window.draw_rect(rect, r, g, b, a);
             draw_entity_health_bar(window, ID, rect);
             draw_entity_stamina_bar(window, ID, rect);
-            if (mouse_is_pressed) {
-                if (rect.contains(window.get_pointer_position() / window.get_render_scale() + window.get_drawing_offset())) {
-                    select_target = ID;
-                    target_window_position = window.get_pointer_position();
-                    select_target_opened = true;
-                    clicked_any_entity = true;
-                }
-            }
         }
-        if (mouse_is_pressed && !clicked_any_entity) {
-            select_target.reset();
-        }
+
         window.set_render_scale(old_rs);
     }
 
@@ -110,20 +98,6 @@ public:
     {
         if (debug_window_opened) {
             show_debug_window(render_dimensions);
-            if (select_target.has_value() && appECS->is_valid_entity(select_target.value()) && select_target_opened) {
-                ImGui::SetNextWindowPos({ target_window_position.x, target_window_position.y });
-                ImGui::SetNextWindowSize({ target_window_size.x, target_window_size.y });
-                ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
-                ImGui::SetNextWindowBgAlpha(target_window_alpha);
-                ImGui::Begin("Target", &select_target_opened, window_flags);
-                if (appECS->has_components<identificationComponent>(select_target.value())) {
-                    ImGui::Text("Name: %s", appECS->get_component<identificationComponent>(select_target.value()).name.c_str());
-                }
-                show_entity_interaction_window(get_first_player_id(), select_target.value());
-                ImGui::End();
-            } else {
-                select_target.reset();
-            }
         }
         if (console_opened) {
             show_console_window();
@@ -154,7 +128,6 @@ public:
         player_move_system = pms;
         colission_system = cols;
         health_system = healthS;
-        clicked_callback_id = parentW->add_callback_on_event(yorcvs::Events::Type::MOUSE_CLICKED, [&mouse_is_pressed = mouse_is_pressed](const yorcvs::event&) { mouse_is_pressed = true; });
     }
     void attach_lua()
     {
@@ -164,7 +137,6 @@ public:
     }
     void end_frame()
     {
-        mouse_is_pressed = false;
     }
     [[nodiscard]] bool is_debug_window_open() const
     {
@@ -488,7 +460,6 @@ private:
         window.draw_rect(rect, std::get<0>(full_color), std::get<1>(full_color), std::get<2>(full_color), std::get<3>(full_color));
     }
 
-    size_t clicked_callback_id;
     yorcvs::sdl2_window* parentWindow {};
 
     yorcvs::ECS* appECS {};
@@ -500,10 +471,6 @@ private:
     std::vector<std::string> console_logs;
     std::vector<std::string> console_previous_commands;
     std::optional<size_t> select_target {};
-
-    bool select_target_opened = false;
-    yorcvs::Vec2<float> target_window_position {};
-    static constexpr yorcvs::Vec2<float> target_window_size { 150, 100 };
     PlayerMovementControl* player_move_system {};
 
     CollisionSystem* colission_system {};
@@ -513,7 +480,6 @@ private:
     // controls
     bool debug_window_opened = false;
     bool console_opened = false;
-    bool mouse_is_pressed = false;
     float time_accumulator = 0;
     int history_pos = 0;
 
@@ -530,8 +496,6 @@ private:
     static constexpr size_t text_A = 255;
     static constexpr size_t text_char_size = 100;
     static constexpr size_t text_line_length = 10000;
-
-    static constexpr float target_window_alpha = 0.5f;
 
     const std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> stamina_bar_full_color { 0, 255, 0, 100 };
     const std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> stamina_bar_empty_color { 0, 100, 0, 100 };
