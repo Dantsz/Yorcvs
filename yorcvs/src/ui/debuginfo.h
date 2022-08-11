@@ -79,7 +79,6 @@ public:
     {
         yorcvs::Vec2<float> old_rs = window.get_render_scale();
         window.set_render_scale(window.get_window_size() / render_dimensions);
-        bool clicked_any_entity = false;
         yorcvs::Rect<float> rect {};
         for (const auto& ID : *colission_system->entityList) {
             rect.x = appECS->get_component<positionComponent>(ID).position.x + appECS->get_component<hitboxComponent>(ID).hitbox.x;
