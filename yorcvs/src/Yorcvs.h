@@ -21,6 +21,7 @@
 
 #include "engine/window/windowsdl2.h"
 #include "ui/debuginfo.h"
+#include "ui/entityinteraction.h"
 #include "ui/performancewindow.h"
 namespace yorcvs {
 /**
@@ -31,6 +32,7 @@ class Application {
 public:
     Application()
         : debug_info_widgets(this, &app_window, &map, &player_control, &map.collision_system, &map.health_system, &map.combat_system, &lua_state)
+        , entity_interaction_widget(app_window, app_window, world, map.collision_system, map.combat_system, player_control)
     {
         lua_state.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
         yorcvs::lua::bind_runtime(lua_state, &world);
@@ -146,6 +148,7 @@ public:
         render_map_tiles(map);
         sprite_system.renderSprites(render_dimensions);
         debug_info_widgets.render(render_dimensions);
+        entity_interaction_widget.render(render_dimensions);
         if (debug_info_widgets.is_debug_window_open()) {
             performance_window.render();
         }
@@ -186,7 +189,7 @@ private:
     std::array<float, yorcvs::ui::Performance_Window::update_time_item::update_time_tracked> tracked_parameters;
 
     DebugInfo debug_info_widgets;
-
+    EntityInteractionWidget<yorcvs::eventhandler_sdl2, yorcvs::sdl2_window> entity_interaction_widget;
     bool active = true;
 };
 } // namespace yorcvs
