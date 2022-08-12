@@ -6,6 +6,7 @@
 #include "../game/components.h"
 #include "animationeditor.h"
 #include "assetmanagerviewer.h"
+#include "entityinteraction.h"
 #include "imgui.h"
 #include "misc/cpp/imgui_stdlib.h"
 #include <optional>
@@ -220,25 +221,6 @@ private:
             ImGui::Text("Spirit : (%f)", defstats.spirit);
         }
     }
-    void show_entity_interaction_window(size_t sender, size_t target)
-    {
-        if (ImGui::Button("go to") && appECS->has_components<positionComponent>(target) && appECS->has_components<positionComponent>(target)) {
-            appECS->get_component<positionComponent>(sender) = appECS->get_component<positionComponent>(target);
-        }
-        if (ImGui::Button("teleport here") && appECS->has_components<positionComponent>(target) && appECS->has_components<positionComponent>(target)) {
-            appECS->get_component<positionComponent>(target) = appECS->get_component<positionComponent>(sender);
-        }
-
-        if (appECS->has_components<offensiveStatsComponent>(sender) && appECS->has_components<healthComponent>(target) && appECS->has_components<defensiveStatsComponent>(target) && ImGui::Button("attack")) {
-            const auto damage = combat_system->attack(sender, target);
-            yorcvs::log(std::to_string(sender) + " dealt " + std::to_string(damage) + " to " + std::to_string(target));
-            const auto sender_state = appECS->get_component_checked<playerMovementControlledComponent>(sender);
-            const auto sender_vel = appECS->get_component_checked<velocityComponent>(sender);
-            if (sender_state.has_value() && sender_vel.has_value()) {
-                sender_state->get().current_state = (!sender_vel->get().facing.x) ? playerMovementControlledComponent::PLAYER_ATTACK_R : playerMovementControlledComponent::PLAYER_ATTACK_L;
-            }
-        }
-    }
     void show_console_window()
     {
         ImGui::Begin("Console");
@@ -303,7 +285,7 @@ private:
             if (ImGui::BeginPopup("Entity")) {
                 ImGui::Text("%s", std::to_string(i).c_str());
                 show_entity_stats(i);
-                show_entity_interaction_window(get_first_player_id(), i);
+                yorcvs::ui::show_entity_interaction_window(appECS, combat_system, get_first_player_id(), i);
                 ImGui::EndPopup();
             }
             ImGui::SameLine();

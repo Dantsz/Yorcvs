@@ -6,6 +6,27 @@
 #include "../game/systems/combat.h"
 #include "../game/systems/playercontrol.h"
 #include "imgui.h"
+namespace yorcvs::ui {
+static void show_entity_interaction_window(yorcvs::ECS* world, CombatSystem* combat_system, size_t sender, size_t target)
+{
+    if (ImGui::Button("go to") && world->has_components<positionComponent>(target) && world->has_components<positionComponent>(target)) {
+        world->get_component<positionComponent>(sender) = world->get_component<positionComponent>(target);
+    }
+    if (ImGui::Button("teleport here") && world->has_components<positionComponent>(target) && world->has_components<positionComponent>(target)) {
+        world->get_component<positionComponent>(target) = world->get_component<positionComponent>(sender);
+    }
+
+    if (world->has_components<offensiveStatsComponent>(sender) && world->has_components<healthComponent>(target) && world->has_components<defensiveStatsComponent>(target) && ImGui::Button("attack")) {
+        const auto damage = combat_system->attack(sender, target);
+        yorcvs::log(std::to_string(sender) + " dealt " + std::to_string(damage) + " to " + std::to_string(target));
+        const auto sender_state = world->get_component_checked<playerMovementControlledComponent>(sender);
+        const auto sender_vel = world->get_component_checked<velocityComponent>(sender);
+        if (sender_state.has_value() && sender_vel.has_value()) {
+            sender_state->get().current_state = (!sender_vel->get().facing.x) ? playerMovementControlledComponent::PLAYER_ATTACK_R : playerMovementControlledComponent::PLAYER_ATTACK_L;
+        }
+    }
+}
+}
 template <typename eventhandler_impl, typename window_impl>
 class EntityInteractionWidget {
 public:
@@ -58,7 +79,7 @@ public:
             if (world->has_components<identificationComponent>(targetID.value())) {
                 ImGui::Text("Name: %s", world->get_component<identificationComponent>(targetID.value()).name.c_str());
             }
-            show_entity_interaction_window(get_first_player_id(), targetID.value());
+            yorcvs::ui::show_entity_interaction_window(world, combat_system, get_first_player_id(), targetID.value());
             ImGui::End();
         } else {
             targetID.reset();
@@ -72,25 +93,6 @@ public:
         const size_t invalidID = world->create_entity_ID();
         world->destroy_entity(invalidID);
         return invalidID;
-    }
-    void show_entity_interaction_window(size_t sender, size_t target)
-    {
-        if (ImGui::Button("go to") && world->has_components<positionComponent>(target) && world->has_components<positionComponent>(target)) {
-            world->get_component<positionComponent>(sender) = world->get_component<positionComponent>(target);
-        }
-        if (ImGui::Button("teleport here") && world->has_components<positionComponent>(target) && world->has_components<positionComponent>(target)) {
-            world->get_component<positionComponent>(target) = world->get_component<positionComponent>(sender);
-        }
-
-        if (world->has_components<offensiveStatsComponent>(sender) && world->has_components<healthComponent>(target) && world->has_components<defensiveStatsComponent>(target) && ImGui::Button("attack")) {
-            const auto damage = combat_system->attack(sender, target);
-            yorcvs::log(std::to_string(sender) + " dealt " + std::to_string(damage) + " to " + std::to_string(target));
-            const auto sender_state = world->get_component_checked<playerMovementControlledComponent>(sender);
-            const auto sender_vel = world->get_component_checked<velocityComponent>(sender);
-            if (sender_state.has_value() && sender_vel.has_value()) {
-                sender_state->get().current_state = (!sender_vel->get().facing.x) ? playerMovementControlledComponent::PLAYER_ATTACK_R : playerMovementControlledComponent::PLAYER_ATTACK_L;
-            }
-        }
     }
 
 private:
