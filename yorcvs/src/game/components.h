@@ -40,6 +40,7 @@ public:
         PLAYER_ATTACK_L
     };
     player_state current_state { PLAYER_IDLE_R };
+    float update_time {};
 };
 
 struct healthComponent {

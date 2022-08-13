@@ -20,15 +20,16 @@ public:
 
     void updateControls(const yorcvs::Vec2<float>& render_size, float dt)
     {
-        cur_time += dt;
-        const bool update = cur_time >= update_time;
+
         const bool w_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_W);
         const bool a_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_A);
         const bool s_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_S);
         const bool d_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_D);
         const bool q_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_Q);
-
         for (const auto& ID : *entityList) {
+            float& cur_time = world->get_component<playerMovementControlledComponent>(ID).update_time;
+            cur_time += dt;
+            const bool update = cur_time >= update_time;
             const bool has_sprint_stamina = world->has_components<staminaComponent, staminaStatsComponent>(ID);
             window->set_drawing_offset(world->get_component<positionComponent>(ID).position + dir - (render_size - world->get_component<spriteComponent>(ID).size) / 2);
             if (!controls_enable) {
@@ -65,9 +66,9 @@ public:
 
             const char* new_animation = select_animation(player_state);
             AnimationSystem::set_animation_global(world, ID, new_animation);
-        }
-        if (update) {
-            cur_time = 0.0f;
+            if (update) {
+                cur_time = 0.0f;
+            }
         }
     }
     static constexpr float sprint_multiplier = 1.5f;
@@ -104,7 +105,7 @@ private:
         }
         return "";
     }
-    float cur_time {};
+
     yorcvs::ECS* world;
     yorcvs::sdl2_window* window;
     yorcvs::Vec2<float> dir;

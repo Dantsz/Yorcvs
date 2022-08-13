@@ -23,6 +23,7 @@ static void show_entity_interaction_window(yorcvs::ECS* world, CombatSystem* com
         const auto sender_vel = world->get_component_checked<velocityComponent>(sender);
         if (sender_state.has_value() && sender_vel.has_value()) {
             sender_state->get().current_state = (!sender_vel->get().facing.x) ? playerMovementControlledComponent::PLAYER_ATTACK_R : playerMovementControlledComponent::PLAYER_ATTACK_L;
+            sender_state->get().update_time = 0.0f;
         }
     }
 }
