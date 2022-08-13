@@ -103,14 +103,20 @@ public:
      *
      * @param scale The scale x and y
      */
-    void set_render_scale(const yorcvs::Vec2<float>& scale);
+    void set_render_scale(const yorcvs::Vec2<float>& scale)
+    {
+        return static_cast<Window_Implementation*>(this)->set_render_scale(scale);
+    }
 
     /**
      * @brief Get the render scale
      *
      * @return yorcvs::Vec2<float> Render scale
      */
-    yorcvs::Vec2<float> get_render_scale();
+    yorcvs::Vec2<float> get_render_scale()
+    {
+        return static_cast<Window_Implementation*>(this)->get_render_scale();
+    }
 
     /**
      * @brief Set the  the offset at which the drawing will happen
@@ -124,7 +130,15 @@ public:
      *
      * @return yorcvs::Vec2<float> the offset
      */
-    yorcvs::Vec2<float> get_drawing_offset();
+    yorcvs::Vec2<float> get_drawing_offset()
+    {
+        return static_cast<Window_Implementation*>(this)->get_drawing_offset();
+    }
+
+    yorcvs::Vec2<float> get_window_size()
+    {
+        return static_cast<Window_Implementation*>(this)->get_window_size();
+    }
 
 private:
 };

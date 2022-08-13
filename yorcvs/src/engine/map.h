@@ -269,7 +269,7 @@ public:
     {
         json::json j;
 
-        serialize_component_to_json<identificationComponent>(entity, "name", j);
+        serialize_component_to_json<identificationComponent>(entity, "identification", j);
         serialize_component_to_json<healthComponent>(entity, "health", j);
         serialize_component_to_json<healthStatsComponent>(entity, "health_stats", j);
         serialize_component_to_json<staminaComponent>(entity, "stamina", j);
