@@ -20,7 +20,6 @@ public:
 
     void updateControls(const yorcvs::Vec2<float>& render_size, float dt)
     {
-
         const bool w_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_W);
         const bool a_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_A);
         const bool s_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_S);
