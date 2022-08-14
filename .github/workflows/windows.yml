@@ -28,3 +28,11 @@ jobs:
       with:
           configurePreset: 'ninja-multi-vcpkg'
           buildPreset: 'ninja-multi-vcpkg'
+    - uses: actions/upload-artifact@v3
+      with:
+        name: my-artifact
+        path: |
+          builds/${{matrix.config}}/yorcvs
+          !builds/${{matrix.config}}/yorcvs/*.pdb
+          !builds/${{matrix.config}}/yorcvs/*.ilk
+          !builds/${{matrix.config}}/yorcvs/CMakeFiles
