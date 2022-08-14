@@ -69,6 +69,9 @@ public:
     }
     void render([[maybe_unused]] yorcvs::Vec2<float>& render_dim)
     {
+        if (player_move_system->entityList->empty()) {
+            return;
+        }
         render_dimensions = render_dim;
         if (targetID.has_value() && world->is_valid_entity(targetID.value()) && select_target_opened) {
             ImGui::SetNextWindowPos({ target_window_position.x, target_window_position.y });
@@ -79,20 +82,25 @@ public:
             if (world->has_components<identificationComponent>(targetID.value())) {
                 ImGui::Text("Name: %s", world->get_component<identificationComponent>(targetID.value()).name.c_str());
             }
-            yorcvs::ui::show_entity_interaction_window(world, combat_system, get_first_player_id(), targetID.value());
+            yorcvs::ui::show_entity_interaction_window(world, combat_system, get_last_player_id().value(), targetID.value());
             ImGui::End();
         } else {
             targetID.reset();
         }
     }
-    size_t get_first_player_id()
+    [[nodiscard]] std::optional<size_t> get_first_player_id() const
     {
-        if (!player_move_system->entityList->empty()) {
-            return (*player_move_system->entityList)[0];
+        if (player_move_system->entityList->empty()) {
+            return {};
         }
-        const size_t invalidID = world->create_entity_ID();
-        world->destroy_entity(invalidID);
-        return invalidID;
+        return (*player_move_system->entityList)[0];
+    }
+    [[nodiscard]] std::optional<size_t> get_last_player_id() const
+    {
+        if (player_move_system->entityList->empty()) {
+            return {};
+        }
+        return (*player_move_system->entityList)[player_move_system->entityList->size() - 1];
     }
 
 private:
