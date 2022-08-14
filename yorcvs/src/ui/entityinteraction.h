@@ -7,15 +7,14 @@
 #include "../game/systems/playercontrol.h"
 #include "imgui.h"
 namespace yorcvs::ui {
-static void show_entity_interaction_window(yorcvs::ECS* world, CombatSystem* combat_system, size_t sender, size_t target)
+static inline void show_entity_interaction_window(yorcvs::ECS* world, CombatSystem* combat_system, size_t sender, size_t target)
 {
     if (ImGui::Button("go to") && world->has_components<positionComponent>(target) && world->has_components<positionComponent>(target)) {
-        world->get_component<positionComponent>(sender) = world->get_component<positionComponent>(target);
+        world->get_component<positionComponent>(sender).position = world->get_component<positionComponent>(target).position;
     }
     if (ImGui::Button("teleport here") && world->has_components<positionComponent>(target) && world->has_components<positionComponent>(target)) {
-        world->get_component<positionComponent>(target) = world->get_component<positionComponent>(sender);
+        world->get_component<positionComponent>(target).position = world->get_component<positionComponent>(sender).position;
     }
-
     if (world->has_components<offensiveStatsComponent>(sender) && world->has_components<healthComponent>(target) && world->has_components<defensiveStatsComponent>(target) && ImGui::Button("attack")) {
         const auto damage = combat_system->attack(sender, target);
         yorcvs::log(std::to_string(sender) + " dealt " + std::to_string(damage) + " to " + std::to_string(target));
