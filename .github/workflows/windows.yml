@@ -32,7 +32,7 @@ jobs:
       with:
         name: my-artifact
         path: |
-          builds/${{matrix.config}}/yorcvs
-          !builds/${{matrix.config}}/yorcvs/*.pdb
-          !builds/${{matrix.config}}/yorcvs/*.ilk
-          !builds/${{matrix.config}}/yorcvs/CMakeFiles
+          ${{ github.workspace }}/builds/${{matrix.config}}/yorcvs
+          !${{ github.workspace }}/builds/${{matrix.config}}/yorcvs/*.pdb
+          !${{ github.workspace }}/builds/${{matrix.config}}/yorcvs/*.ilk
+          !${{ github.workspace }}/builds/${{matrix.config}}/yorcvs/CMakeFiles
