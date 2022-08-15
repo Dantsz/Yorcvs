@@ -223,25 +223,16 @@ public:
             yorcvs::log("defensiveStatsComponent (" + path + ") is not valid");
             return;
         }
-        if (!deserialize_component_from_json<spriteComponent>(entity_id, entityJSON, "sprite", [&](spriteComponent& /*spr*/) {
-                const std::string sprite_path = directory_path + std::string(entityJSON["sprite"]["spriteName"]);
-                ecs->get_component<spriteComponent>(entity_id).texture_path = sprite_path;
-                if (entityJSON["sprite"].contains("animation"))
-                {
-                    if (!ecs->has_components<animationComponent>(entity_id))
-                    {
-                        ecs->add_component<animationComponent>(entity_id, {});
-                    }
-                    if(!yorcvs::components::deserialize(ecs->get_component<animationComponent>(entity_id),
-                        entityJSON["sprite"]["animation"]))
-                    {
-                      yorcvs::log("animationComponent is not valid");
-                      return;
-                    }
-                    AnimationSystem::set_animation_global(ecs, entity_id, "idleR");
-                } })) {
+        if (!deserialize_component_from_json<spriteComponent>(entity_id, entityJSON, "sprite")) {
             yorcvs::log("spriteComponent (" + path + ") is not valid");
             return;
+        }
+        if (!deserialize_component_from_json<animationComponent>(entity_id, entityJSON, "animation")) {
+            yorcvs::log("AnimationComponent (" + path + ") is not valid");
+            return;
+        } else {
+            const std::string sprite_path = directory_path + ecs->get_component<spriteComponent>(entity_id).texture_path;
+            ecs->get_component<spriteComponent>(entity_id).texture_path = sprite_path;
         }
         // These components should not be serialized as the position and velocity is relative to the map!!!
         if (!ecs->has_components<positionComponent>(entity_id)) {

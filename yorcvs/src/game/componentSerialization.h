@@ -213,7 +213,7 @@ template <typename T>
 {
     try {
         dst = j;
-    } catch (std::exception&) {
+    } catch (...) {
         yorcvs::log("failed to deserialize component");
         return false;
     }
