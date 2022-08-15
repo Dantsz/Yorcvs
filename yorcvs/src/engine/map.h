@@ -266,10 +266,8 @@ public:
         serialize_component_to_json<staminaComponent>(entity, "stamina", j);
         serialize_component_to_json<staminaStatsComponent>(entity, "stamina_stats", j);
         serialize_component_to_json<hitboxComponent>(entity, "hitbox", j);
-        serialize_component_to_json<spriteComponent>(entity, "sprite", j,
-            [&](json::json& /*json_object*/, const spriteComponent&) { // if sprite is serialized, also serialize sprites
-                serialize_component_to_json<animationComponent>(entity, "animations", j["sprite"]);
-            });
+        serialize_component_to_json<spriteComponent>(entity, "sprite", j);
+        serialize_component_to_json<animationComponent>(entity, "animations", j);
         serialize_component_to_json<defensiveStatsComponent>(entity, "defensive_stats", j);
         serialize_component_to_json<offensiveStatsComponent>(entity, "offsensive_stats", j);
         return j.dump(4);
