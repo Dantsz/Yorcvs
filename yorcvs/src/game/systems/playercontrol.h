@@ -20,52 +20,54 @@ public:
 
     void updateControls(const yorcvs::Vec2<float>& render_size, float dt)
     {
-        cur_time += dt;
-        const bool update = cur_time >= update_time;
         const bool w_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_W);
         const bool a_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_A);
         const bool s_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_S);
         const bool d_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_D);
         const bool q_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_Q);
+        if (entityList->empty()) {
+            return;
+        }
+        const size_t ID = entityList->at(entityList->size() - 1);
+        float& cur_time = world->get_component<playerMovementControlledComponent>(ID).update_time;
+        cur_time += dt;
+        const bool update = cur_time >= update_time;
+        const bool has_sprint_stamina = world->has_components<staminaComponent, staminaStatsComponent>(ID);
+        window->set_drawing_offset(world->get_component<positionComponent>(ID).position + dir - (render_size - world->get_component<spriteComponent>(ID).size) / 2);
+        if (!controls_enable) {
+            return;
+        }
 
-        for (const auto& ID : *entityList) {
-            const bool has_sprint_stamina = world->has_components<staminaComponent, staminaStatsComponent>(ID);
-            window->set_drawing_offset(world->get_component<positionComponent>(ID).position + dir - (render_size - world->get_component<spriteComponent>(ID).size) / 2);
-            if (!controls_enable) {
-                continue;
-            }
+        dir = compute_movement_direction(static_cast<float>(d_pressed), static_cast<float>(a_pressed), static_cast<float>(w_pressed), static_cast<float>(s_pressed));
 
-            dir = compute_movement_direction(static_cast<float>(d_pressed), static_cast<float>(a_pressed), static_cast<float>(w_pressed), static_cast<float>(s_pressed));
-
-            if (q_pressed && (!has_sprint_stamina || (has_sprint_stamina && world->get_component<staminaComponent>(ID).stamina - world->get_component<staminaStatsComponent>(ID).stamina_regen > 0))) {
-                dir *= PlayerMovementControl::sprint_multiplier;
-                if (update) {
-                    world->get_component<staminaComponent>(ID).stamina -= 2 * world->get_component<staminaStatsComponent>(ID).stamina_regen;
-                }
-            }
-            world->get_component<velocityComponent>(ID).vel = dir;
-
-            auto& player_state = world->get_component<playerMovementControlledComponent>(ID);
+        if (q_pressed && (!has_sprint_stamina || (has_sprint_stamina && world->get_component<staminaComponent>(ID).stamina - world->get_component<staminaStatsComponent>(ID).stamina_regen > 0))) {
+            dir *= PlayerMovementControl::sprint_multiplier;
             if (update) {
-                if (player_state.current_state == playerMovementControlledComponent::PLAYER_ATTACK_L) {
-                    player_state.current_state = playerMovementControlledComponent::PLAYER_IDLE_L;
-                }
-                if (player_state.current_state == playerMovementControlledComponent::PLAYER_ATTACK_R) {
-                    player_state.current_state = playerMovementControlledComponent::PLAYER_IDLE_R;
-                }
-            } else if (a_pressed) {
-                player_state.current_state = playerMovementControlledComponent::PLAYER_MOVING_L;
-            } else if (d_pressed || s_pressed || w_pressed) {
-                player_state.current_state = playerMovementControlledComponent::PLAYER_MOVING_R;
-            } else if (player_state.current_state == playerMovementControlledComponent::PLAYER_MOVING_R) {
-                player_state.current_state = playerMovementControlledComponent::PLAYER_IDLE_R;
-            } else if (player_state.current_state == playerMovementControlledComponent::PLAYER_MOVING_L) {
+                world->get_component<staminaComponent>(ID).stamina -= 2 * world->get_component<staminaStatsComponent>(ID).stamina_regen;
+            }
+        }
+        world->get_component<velocityComponent>(ID).vel = dir;
+
+        auto& player_state = world->get_component<playerMovementControlledComponent>(ID);
+        if (update) {
+            if (player_state.current_state == playerMovementControlledComponent::PLAYER_ATTACK_L) {
                 player_state.current_state = playerMovementControlledComponent::PLAYER_IDLE_L;
             }
-
-            const char* new_animation = select_animation(player_state);
-            AnimationSystem::set_animation_global(world, ID, new_animation);
+            if (player_state.current_state == playerMovementControlledComponent::PLAYER_ATTACK_R) {
+                player_state.current_state = playerMovementControlledComponent::PLAYER_IDLE_R;
+            }
+        } else if (a_pressed) {
+            player_state.current_state = playerMovementControlledComponent::PLAYER_MOVING_L;
+        } else if (d_pressed || s_pressed || w_pressed) {
+            player_state.current_state = playerMovementControlledComponent::PLAYER_MOVING_R;
+        } else if (player_state.current_state == playerMovementControlledComponent::PLAYER_MOVING_R) {
+            player_state.current_state = playerMovementControlledComponent::PLAYER_IDLE_R;
+        } else if (player_state.current_state == playerMovementControlledComponent::PLAYER_MOVING_L) {
+            player_state.current_state = playerMovementControlledComponent::PLAYER_IDLE_L;
         }
+
+        const char* new_animation = select_animation(player_state);
+        AnimationSystem::set_animation_global(world, ID, new_animation);
         if (update) {
             cur_time = 0.0f;
         }
@@ -104,7 +106,7 @@ private:
         }
         return "";
     }
-    float cur_time {};
+
     yorcvs::ECS* world;
     yorcvs::sdl2_window* window;
     yorcvs::Vec2<float> dir;
