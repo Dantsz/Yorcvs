@@ -11,7 +11,8 @@ set(YorcvsCORESFILES    "src/common/assetmanager.h"
 
 
                         "src/engine/luaEngine.h"
-                        "src/engine/map.h")
+                        "src/engine/map.h"
+                        )
 set(YorcvsGAMEFILES     "src/game/components.h"
                         "src/game/componentSerialization.h"
                         "src/game/systems.h"
@@ -25,6 +26,7 @@ set(YorcvsGAMEFILES     "src/game/components.h"
                         "src/game/systems/spritesystem.h"
                         "src/game/systems/staminasystem.h"
                         "src/game/systems/velocity.h"
+                        "src/engine/entity_loader.h"
 )
 set(YorcvsUIFILES "src/ui/debuginfo.h"
                   "src/ui/performancewindow.h"
