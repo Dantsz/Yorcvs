@@ -1,18 +1,18 @@
 #pragma once
-#include "nlohmann/json.hpp"
-#include "tmxlite/Layer.hpp"
-#include "tmxlite/Map.hpp"
-#include <filesystem>
-
 #include "../common/ecs.h"
 #include "../common/utilities.h"
 #include "../game/componentSerialization.h"
 #include "../game/systems.h"
+#include "entity_loader.h"
+#include "nlohmann/json.hpp"
+#include "tmxlite/Layer.hpp"
+#include "tmxlite/Map.hpp"
 #include "tmxlite/Object.hpp"
 #include "tmxlite/ObjectGroup.hpp"
 #include "tmxlite/Property.hpp"
 #include "tmxlite/TileLayer.hpp"
 #include "tmxlite/Tileset.hpp"
+#include <filesystem>
 namespace json = nlohmann;
 namespace yorcvs {
 struct Tile {
@@ -24,10 +24,11 @@ struct Tile {
  * @brief Loads tmx map data into the ecs
  *
  */
-class Map {
+class Map : public Entity_Loader<healthComponent> {
 public:
     explicit Map(yorcvs::ECS* world)
-        : ecs(world)
+        : Entity_Loader(world)
+        , ecs(world)
         , init_ecs(*world)
         , health_system(world)
         , sprint_system(world)
@@ -127,150 +128,6 @@ public:
         entities.clear();
         ysorted_tiles.clear();
         tiles_chunks.clear();
-    }
-    /**
-     * @brief Checks if the passed json object contains an compoennt of the specified name, tests if the entity has the component, if it doesn't it's default constructed, and deserealizez the data to it
-     *
-     * @tparam T
-     * @param entity_id
-     * @param json_entity_obj
-     * @param component_name
-     * @param transform function to be applied to the component after it has been added
-     * @return return false on parsing failure
-     */
-    template <typename T>
-    [[nodiscard]] bool deserialize_component_from_json(
-        const size_t entity_id, json::json& json_entity_obj, const std::string& component_name, [[maybe_unused]] std::function<void(T&)> transform = [](T&) {})
-    {
-        if (json_entity_obj.contains(component_name)) {
-            T comp {};
-            if (!yorcvs::components::deserialize(comp,
-                    json_entity_obj[component_name])) {
-                return false;
-            }
-            if (!ecs->has_components<T>(entity_id)) {
-                ecs->add_component<T>(entity_id, comp);
-            }
-            transform(ecs->get_component<T>(entity_id));
-        }
-        return true;
-    }
-    /**
-     * @brief serializes the component and adds it to the json to the as an object with the name <component_name>
-     *
-     * @tparam T
-     * @param entity_id
-     * @param component_name
-     * @param json_obj
-     * @param transform transform json before serialization
-     */
-    template <typename T>
-    void serialize_component_to_json(
-        const size_t entity_id, const std::string& component_name, json::json& json_obj, [[maybe_unused]] std::function<void(json::json&, const T&)> transform = [](json::json&, const T&) {}) const
-    {
-        if (ecs->has_components<T>(entity_id)) {
-            transform(json_obj, ecs->get_component<T>(entity_id));
-            json_obj[component_name] = yorcvs::components::serialize(ecs->get_component<T>(entity_id));
-        }
-    }
-    /**
-     * @brief Loads json entity data into the entity
-     *
-     * @param entity_id id of the entity
-     * @param path path to the json file
-     */
-    void load_character_from_path(const size_t entity_id, const std::string& path)
-    {
-        std::filesystem::path file = path;
-        const std::string directory_path = file.remove_filename().generic_string();
-
-        std::ifstream entityIN(path);
-        std::string entityDATA { (std::istreambuf_iterator<char>(entityIN)), (std::istreambuf_iterator<char>()) };
-        auto entityJSON = json::json::parse(entityDATA, nullptr, false); // don't throw exception
-        if (entityJSON.is_discarded()) {
-            yorcvs::log("Failed to load entity data " + path + " !");
-            return;
-        }
-        if (!deserialize_component_from_json<identificationComponent>(entity_id, entityJSON, "identification")) {
-            yorcvs::log("identificationComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<hitboxComponent>(entity_id, entityJSON, "hitbox")) {
-            yorcvs::log("hitboxComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<healthComponent>(entity_id, entityJSON, "health")) {
-            yorcvs::log("healthComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<healthStatsComponent>(entity_id, entityJSON, "health_stats")) {
-            yorcvs::log("healthComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<staminaComponent>(entity_id, entityJSON, "stamina")) {
-            yorcvs::log("staminaComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<staminaStatsComponent>(entity_id, entityJSON, "stamina_stats")) {
-            yorcvs::log("staminaComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<offensiveStatsComponent>(entity_id, entityJSON, "offsensive_stats")) {
-            yorcvs::log("offensiveStatsComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<defensiveStatsComponent>(entity_id, entityJSON, "defensive_stats")) {
-            yorcvs::log("defensiveStatsComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<spriteComponent>(entity_id, entityJSON, "sprite")) {
-            yorcvs::log("spriteComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<animationComponent>(entity_id, entityJSON, "animation")) {
-            yorcvs::log("AnimationComponent (" + path + ") is not valid");
-            return;
-        } else {
-            const std::string sprite_path = directory_path + ecs->get_component<spriteComponent>(entity_id).texture_path;
-            ecs->get_component<spriteComponent>(entity_id).texture_path = sprite_path;
-        }
-        // These components should not be serialized as the position and velocity is relative to the map!!!
-        if (!ecs->has_components<positionComponent>(entity_id)) {
-            ecs->add_component<positionComponent>(entity_id, {});
-            const auto spawn_position = get_spawn_position();
-            ecs->get_component<positionComponent>(entity_id).position = spawn_position;
-        }
-        if (!ecs->has_components<velocityComponent>(entity_id)) {
-            ecs->add_component<velocityComponent>(entity_id, {});
-        }
-        ecs->get_component<velocityComponent>(entity_id) = { { 0.0f, 0.0f }, { false, false } };
-    }
-    void load_character_from_path(yorcvs::Entity& entity, const std::string& path)
-    {
-        load_character_from_path(entity.id, path);
-    }
-
-    /**
-     * @brief Serializes an entities components and returns the string reprezentation
-     *
-     * @param entity
-     * @return std::string
-     */
-    [[nodiscard]] std::string save_character(const size_t entity) const
-    {
-        json::json j;
-
-        serialize_component_to_json<identificationComponent>(entity, "identification", j);
-        serialize_component_to_json<healthComponent>(entity, "health", j);
-        serialize_component_to_json<healthStatsComponent>(entity, "health_stats", j);
-        serialize_component_to_json<staminaComponent>(entity, "stamina", j);
-        serialize_component_to_json<staminaStatsComponent>(entity, "stamina_stats", j);
-        serialize_component_to_json<hitboxComponent>(entity, "hitbox", j);
-        serialize_component_to_json<spriteComponent>(entity, "sprite", j);
-        serialize_component_to_json<animationComponent>(entity, "animations", j);
-        serialize_component_to_json<defensiveStatsComponent>(entity, "defensive_stats", j);
-        serialize_component_to_json<offensiveStatsComponent>(entity, "offsensive_stats", j);
-        return j.dump(4);
     }
 
 private:
@@ -465,7 +322,19 @@ private:
     {
         return spawn_coord;
     }
-
+    void OnCharacterDeserialized(size_t entity_id) override
+    {
+        // These components should not be serialized as the position and velocity is relative to the map!!!
+        if (!world->has_components<positionComponent>(entity_id)) {
+            world->add_component<positionComponent>(entity_id, {});
+            const auto spawn_position = get_spawn_position();
+            world->get_component<positionComponent>(entity_id).position = spawn_position;
+        }
+        if (!world->has_components<velocityComponent>(entity_id)) {
+            world->add_component<velocityComponent>(entity_id, {});
+        }
+        world->get_component<velocityComponent>(entity_id) = { { 0.0f, 0.0f }, { false, false } };
+    }
     // NOTE: this can be a free function
     static yorcvs::Rect<size_t> get_src_rect_from_uid(const tmx::Map& map, const size_t UID)
     {
