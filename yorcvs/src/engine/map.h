@@ -24,10 +24,10 @@ struct Tile {
  * @brief Loads tmx map data into the ecs
  *
  */
-class Map : public Entity_Loader<healthComponent> {
+class Map : public Entity_Loader<identificationComponent, healthComponent, healthStatsComponent, staminaComponent, staminaStatsComponent, hitboxComponent, spriteComponent, animationComponent, defensiveStatsComponent, offensiveStatsComponent> {
 public:
     explicit Map(yorcvs::ECS* world)
-        : Entity_Loader(world)
+        : Entity_Loader(world, { "identification", "health", "health_stats", "stamina", "stamina_stats", "hitbox", "sprite", "animation", "defensive_stats", "offsensive_stats" })
         , ecs(world)
         , init_ecs(*world)
         , health_system(world)
@@ -322,8 +322,14 @@ private:
     {
         return spawn_coord;
     }
-    void OnCharacterDeserialized(size_t entity_id) override
+    void OnCharacterDeserialized(size_t entity_id, const std::string& path) override
     {
+        std::filesystem::path file = path;
+        const std::string directory_path = file.remove_filename().generic_string();
+        if (world->has_components<spriteComponent>(entity_id)) {
+            const std::string sprite_path = directory_path + world->get_component<spriteComponent>(entity_id).texture_path;
+            world->get_component<spriteComponent>(entity_id).texture_path = sprite_path;
+        }
         // These components should not be serialized as the position and velocity is relative to the map!!!
         if (!world->has_components<positionComponent>(entity_id)) {
             world->add_component<positionComponent>(entity_id, {});

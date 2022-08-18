@@ -1,13 +1,23 @@
 #include "../common/ecs.h"
 #include "../game/componentSerialization.h"
+#include <array>
 #include <filesystem>
+#include <tuple>
+#include <unordered_map>
 #pragma once
 
 template <typename... Components>
 class Entity_Loader {
 public:
-    Entity_Loader(yorcvs::ECS* world)
+    /**
+     * @brief Entity_Loader
+     * @param world
+     * @param json_names names for each component as they appear in the json file
+     */
+    constexpr Entity_Loader(yorcvs::ECS* world, std::array<std::string, sizeof...(Components)> json_names)
         : world { world }
+        , json_names { std::move(json_names) }
+
     {
     }
     /**
@@ -18,60 +28,9 @@ public:
      */
     void load_character_from_path(size_t entity_id, const std::string& path)
     {
-        std::filesystem::path file = path;
-        const std::string directory_path = file.remove_filename().generic_string();
 
-        std::ifstream entityIN(path);
-        std::string entityDATA { (std::istreambuf_iterator<char>(entityIN)), (std::istreambuf_iterator<char>()) };
-        auto entityJSON = json::json::parse(entityDATA, nullptr, false); // don't throw exception
-        if (entityJSON.is_discarded()) {
-            yorcvs::log("Failed to load entity data " + path + " !");
-            return;
-        }
-        if (!deserialize_component_from_json<identificationComponent>(entity_id, entityJSON, "identification")) {
-            yorcvs::log("identificationComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<hitboxComponent>(entity_id, entityJSON, "hitbox")) {
-            yorcvs::log("hitboxComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<healthComponent>(entity_id, entityJSON, "health")) {
-            yorcvs::log("healthComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<healthStatsComponent>(entity_id, entityJSON, "health_stats")) {
-            yorcvs::log("healthComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<staminaComponent>(entity_id, entityJSON, "stamina")) {
-            yorcvs::log("staminaComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<staminaStatsComponent>(entity_id, entityJSON, "stamina_stats")) {
-            yorcvs::log("staminaComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<offensiveStatsComponent>(entity_id, entityJSON, "offsensive_stats")) {
-            yorcvs::log("offensiveStatsComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<defensiveStatsComponent>(entity_id, entityJSON, "defensive_stats")) {
-            yorcvs::log("defensiveStatsComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<spriteComponent>(entity_id, entityJSON, "sprite")) {
-            yorcvs::log("spriteComponent (" + path + ") is not valid");
-            return;
-        }
-        if (!deserialize_component_from_json<animationComponent>(entity_id, entityJSON, "animation")) {
-            yorcvs::log("AnimationComponent (" + path + ") is not valid");
-            return;
-        } else {
-            const std::string sprite_path = directory_path + world->get_component<spriteComponent>(entity_id).texture_path;
-            world->get_component<spriteComponent>(entity_id).texture_path = sprite_path;
-        }
-        OnCharacterDeserialized(entity_id);
+        deserialize_selected_components(entity_id, path, std::make_index_sequence<sizeof...(Components)>());
+        OnCharacterDeserialized(entity_id, path);
     }
     /**
      * @brief Serializes an entities components and returns the string reprezentation
@@ -115,6 +74,7 @@ protected:
             T comp {};
             if (!yorcvs::components::deserialize(comp,
                     json_entity_obj[component_name])) {
+                yorcvs::log(component_name + "could not be serialized! ", yorcvs::MSGSEVERITY::ERROR);
                 return false;
             }
             if (!world->has_components<T>(entity_id)) {
@@ -141,6 +101,23 @@ protected:
             json_obj[component_name] = yorcvs::components::serialize(world->get_component<T>(entity_id));
         }
     }
-    virtual void OnCharacterDeserialized([[maybe_unused]] size_t entity_id) {};
+    template <size_t... I>
+    void deserialize_selected_components(size_t entity_id, const std::string& path, [[maybe_unused]] std::index_sequence<I...>)
+    {
+        std::ifstream entityIN(path);
+        std::string entityDATA { (std::istreambuf_iterator<char>(entityIN)), (std::istreambuf_iterator<char>()) };
+        auto entityJSON = json::json::parse(entityDATA, nullptr, false); // don't throw exception
+        if (entityJSON.is_discarded()) {
+            yorcvs::log("Failed to load entity data " + path + " !");
+            return;
+        }
+        if (!(deserialize_component_from_json<Components>(entity_id, entityJSON, std::get<I>(json_names)) && ...)) {
+            yorcvs::log("Entity" + path + " could not be serialized!");
+            return;
+        }
+    }
+
+    virtual void OnCharacterDeserialized([[maybe_unused]] size_t entity_id, [[maybe_unused]] const std::string& path) {};
     yorcvs::ECS* world;
+    std::array<std::string, sizeof...(Components)> json_names {};
 };

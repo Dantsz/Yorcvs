@@ -8,7 +8,7 @@ int main(int argc, char** argv)
     yorcvs::ECS world {};
     yorcvs::Map map(&world);
     yorcvs::Entity duck { &world };
-    map.load_character_from_path(duck, TEST_TEMP_ENTITY_FILE);
+    map.load_character_from_path(duck.id, TEST_TEMP_ENTITY_FILE);
     bool duck_check = world.has_components<healthComponent>(duck.id);
     assert(duck_check == true);
     duck_check = world.has_components<hitboxComponent>(duck.id);
