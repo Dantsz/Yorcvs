@@ -76,7 +76,7 @@ inline void from_json(const json::json& j, staminaStatsComponent& comp)
 }
 inline void to_json(json::json& j, const hitboxComponent& comp)
 {
-    j = json::json { comp.hitbox };
+    j = comp.hitbox;
 }
 inline void from_json(const json::json& j, hitboxComponent& comp)
 {

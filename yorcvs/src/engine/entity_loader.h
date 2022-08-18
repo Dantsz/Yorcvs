@@ -28,7 +28,6 @@ public:
      */
     void load_character_from_path(size_t entity_id, const std::string& path)
     {
-
         deserialize_selected_components(entity_id, path, std::make_index_sequence<sizeof...(Components)>());
         OnCharacterDeserialized(entity_id, path);
     }
@@ -38,21 +37,9 @@ public:
      * @param entity
      * @return std::string
      */
-    [[nodiscard]] std::string save_character(const size_t entity) const
+    [[nodiscard]] std::string save_character(const size_t entity_id) const
     {
-        json::json j;
-
-        serialize_component_to_json<identificationComponent>(entity, "identification", j);
-        serialize_component_to_json<healthComponent>(entity, "health", j);
-        serialize_component_to_json<healthStatsComponent>(entity, "health_stats", j);
-        serialize_component_to_json<staminaComponent>(entity, "stamina", j);
-        serialize_component_to_json<staminaStatsComponent>(entity, "stamina_stats", j);
-        serialize_component_to_json<hitboxComponent>(entity, "hitbox", j);
-        serialize_component_to_json<spriteComponent>(entity, "sprite", j);
-        serialize_component_to_json<animationComponent>(entity, "animations", j);
-        serialize_component_to_json<defensiveStatsComponent>(entity, "defensive_stats", j);
-        serialize_component_to_json<offensiveStatsComponent>(entity, "offsensive_stats", j);
-        return j.dump(4);
+        return serialize_selected_components(entity_id, std::make_index_sequence<sizeof...(Components)>());
     }
 
 protected:
@@ -74,7 +61,7 @@ protected:
             T comp {};
             if (!yorcvs::components::deserialize(comp,
                     json_entity_obj[component_name])) {
-                yorcvs::log(component_name + "could not be serialized! ", yorcvs::MSGSEVERITY::ERROR);
+                yorcvs::log(component_name + " could not be serialized! ", yorcvs::MSGSEVERITY::ERROR);
                 return false;
             }
             if (!world->has_components<T>(entity_id)) {
@@ -102,7 +89,7 @@ protected:
         }
     }
     template <size_t... I>
-    void deserialize_selected_components(size_t entity_id, const std::string& path, [[maybe_unused]] std::index_sequence<I...>)
+    void deserialize_selected_components(size_t entity_id, const std::string& path, [[maybe_unused]] std::index_sequence<I...> seq)
     {
         std::ifstream entityIN(path);
         std::string entityDATA { (std::istreambuf_iterator<char>(entityIN)), (std::istreambuf_iterator<char>()) };
@@ -116,8 +103,15 @@ protected:
             return;
         }
     }
+    template <size_t... I>
+    std::string serialize_selected_components(size_t entity_id, [[maybe_unused]] std::index_sequence<I...> seq) const
+    {
+        json::json j;
+        (serialize_component_to_json<Components>(entity_id, std::get<I>(json_names), j), ...);
+        return j.dump(4);
+    }
 
     virtual void OnCharacterDeserialized([[maybe_unused]] size_t entity_id, [[maybe_unused]] const std::string& path) {};
     yorcvs::ECS* world;
-    std::array<std::string, sizeof...(Components)> json_names {};
+    const std::array<std::string, sizeof...(Components)> json_names {};
 };
