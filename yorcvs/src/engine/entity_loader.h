@@ -28,7 +28,21 @@ public:
      */
     void load_character_from_path(size_t entity_id, const std::string& path)
     {
-        deserialize_selected_components(entity_id, path, std::make_index_sequence<sizeof...(Components)>());
+        std::ifstream entityIN(path);
+        std::string entityDATA { (std::istreambuf_iterator<char>(entityIN)), (std::istreambuf_iterator<char>()) };
+        auto entityJSON = json::json::parse(entityDATA, nullptr, false); // don't throw exception
+        if (entityJSON.is_discarded()) {
+            yorcvs::log("Failed to load entity data " + path);
+            return;
+        }
+        [&]<std::size_t... I>([[maybe_unused]] std::index_sequence<I...> seq)
+        {
+            if (!(deserialize_component_from_json<Components>(entity_id, entityJSON, std::get<I>(json_names)) && ...)) {
+                yorcvs::log("Entity" + path + " could not be serialized!");
+                return;
+            }
+        }
+        (std::make_index_sequence<sizeof...(Components)>());
         OnCharacterDeserialized(entity_id, path);
     }
     /**
@@ -39,7 +53,13 @@ public:
      */
     [[nodiscard]] std::string save_character(const size_t entity_id) const
     {
-        return serialize_selected_components(entity_id, std::make_index_sequence<sizeof...(Components)>());
+        return [&]<size_t... I>([[maybe_unused]] std::index_sequence<I...> seq)
+        {
+            json::json j;
+            (serialize_component_to_json<Components>(entity_id, std::get<I>(json_names), j), ...);
+            return j.dump(4);
+        }
+        (std::make_index_sequence<sizeof...(Components)>());
     }
 
 protected:
@@ -87,28 +107,6 @@ protected:
             transform(json_obj, world->get_component<T>(entity_id));
             json_obj[component_name] = yorcvs::components::serialize(world->get_component<T>(entity_id));
         }
-    }
-    template <size_t... I>
-    void deserialize_selected_components(size_t entity_id, const std::string& path, [[maybe_unused]] std::index_sequence<I...> seq)
-    {
-        std::ifstream entityIN(path);
-        std::string entityDATA { (std::istreambuf_iterator<char>(entityIN)), (std::istreambuf_iterator<char>()) };
-        auto entityJSON = json::json::parse(entityDATA, nullptr, false); // don't throw exception
-        if (entityJSON.is_discarded()) {
-            yorcvs::log("Failed to load entity data " + path + " !");
-            return;
-        }
-        if (!(deserialize_component_from_json<Components>(entity_id, entityJSON, std::get<I>(json_names)) && ...)) {
-            yorcvs::log("Entity" + path + " could not be serialized!");
-            return;
-        }
-    }
-    template <size_t... I>
-    std::string serialize_selected_components(size_t entity_id, [[maybe_unused]] std::index_sequence<I...> seq) const
-    {
-        json::json j;
-        (serialize_component_to_json<Components>(entity_id, std::get<I>(json_names), j), ...);
-        return j.dump(4);
     }
 
     virtual void OnCharacterDeserialized([[maybe_unused]] size_t entity_id, [[maybe_unused]] const std::string& path) {};
