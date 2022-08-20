@@ -1,6 +1,6 @@
 #pragma once
+#include "../common/utilities/log.h"
 #include "components.h"
-#include "systems.h"
 #include <filesystem>
 #include <nlohmann/json.hpp>
 #include <string>

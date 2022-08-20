@@ -2,6 +2,7 @@
 #include "../game/componentSerialization.h"
 #include <array>
 #include <filesystem>
+#include <fstream>
 #include <tuple>
 #include <unordered_map>
 #pragma once
