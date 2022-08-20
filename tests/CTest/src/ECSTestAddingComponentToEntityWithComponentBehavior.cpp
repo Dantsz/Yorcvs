@@ -8,7 +8,7 @@ struct Transform {
 
 int main()
 {
-    yorcvs::ComponentManager mngr {};
+    yorcvs::component_manager mngr {};
     assert(mngr.component_type.empty());
     mngr.register_component<Transform>();
     const size_t ID = 0;

@@ -44,7 +44,7 @@ public:
             }
         }
     }
-    std::shared_ptr<yorcvs::EntitySystemList> entityList = nullptr;
+    std::shared_ptr<yorcvs::entity_system_list> entityList = nullptr;
     yorcvs::ECS* world = nullptr;
     std::unique_ptr<yorcvs::AssetManager<std::string>> scripts;
     sol::state* lua_state;

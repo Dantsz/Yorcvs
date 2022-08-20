@@ -30,5 +30,5 @@ public:
     static constexpr float update_time = 1000.0f;
     float cur_time = 0.0f;
     yorcvs::ECS* world = nullptr;
-    std::shared_ptr<yorcvs::EntitySystemList> entityList = nullptr;
+    std::shared_ptr<yorcvs::entity_system_list> entityList = nullptr;
 };

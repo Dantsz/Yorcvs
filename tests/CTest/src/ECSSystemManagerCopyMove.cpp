@@ -25,7 +25,7 @@ public:
         return 0;
     }
     yorcvs::ECS* parent {};
-    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    std::shared_ptr<yorcvs::entity_system_list> entityList;
 };
 
 int main()

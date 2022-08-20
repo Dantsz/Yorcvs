@@ -33,7 +33,7 @@ public:
         window->set_render_scale(rs);
     }
 
-    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    std::shared_ptr<yorcvs::entity_system_list> entityList;
 
     yorcvs::ECS* world;
 

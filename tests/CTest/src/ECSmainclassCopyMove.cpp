@@ -13,7 +13,7 @@ struct pointLister {
             std::cout << parent->get_component<point>(i).x << ' ' << parent->get_component<point>(i).y << '\n';
         }
     }
-    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    std::shared_ptr<yorcvs::entity_system_list> entityList;
     yorcvs::ECS* parent {};
 };
 

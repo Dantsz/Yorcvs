@@ -37,7 +37,7 @@ public:
             cur_time = 0.0f;
         }
     }
-    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    std::shared_ptr<yorcvs::entity_system_list> entityList;
     yorcvs::ECS* world;
     static constexpr float update_time = 1000.0f; // update once a second
     float cur_time = 0.0f;

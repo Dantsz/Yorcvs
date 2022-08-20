@@ -116,7 +116,7 @@ public:
         }
         return agility / (agility + slope);
     }
-    std::shared_ptr<yorcvs::EntitySystemList> entityList = nullptr;
+    std::shared_ptr<yorcvs::entity_system_list> entityList = nullptr;
     yorcvs::ECS* world = nullptr;
     static constexpr float crititcal_multiplier = 2.0f;
     static constexpr float block_multiplier = 4.0f;

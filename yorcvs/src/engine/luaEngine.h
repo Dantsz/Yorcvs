@@ -94,7 +94,7 @@ inline void bind_map_functions(sol::state& lua_state)
 }
 inline void bind_system_entity_list(sol::state& lua_state)
 {
-    sol::usertype<EntitySystemList> entsl = lua_state.new_usertype<EntitySystemList>("EntitySystemList");
+    sol::usertype<entity_system_list> entsl = lua_state.new_usertype<entity_system_list>("EntitySystemList");
 }
 /**
  * @brief Gives the lua state accest to the running ECS and components
@@ -183,6 +183,6 @@ inline bool bind_runtime(sol::state& lua_state, yorcvs::ECS* ecs)
 } // namespace yorcvs::lua
 namespace sol {
 template <>
-struct is_container<yorcvs::EntitySystemList> : std::true_type {
+struct is_container<yorcvs::entity_system_list> : std::true_type {
 };
 }

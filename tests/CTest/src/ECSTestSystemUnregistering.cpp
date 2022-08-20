@@ -25,7 +25,7 @@ public:
             assert(parent->get_component<Transform>(i).id == 1);
         }
     }
-    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    std::shared_ptr<yorcvs::entity_system_list> entityList;
     yorcvs::ECS* parent;
 };
 

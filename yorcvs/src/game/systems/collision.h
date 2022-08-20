@@ -14,7 +14,7 @@ public:
         world->register_system<nonsolid_collision_handler>(*this);
         world->add_criteria_for_iteration<nonsolid_collision_handler, position_component, hitbox_component, velocity_component>();
     }
-    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    std::shared_ptr<yorcvs::entity_system_list> entityList;
     yorcvs::ECS* world;
 };
 
@@ -161,7 +161,7 @@ private:
     }
 
 public:
-    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    std::shared_ptr<yorcvs::entity_system_list> entityList;
     yorcvs::ECS* world;
     nonsolid_collision_handler non_solids { world };
     static constexpr float fp_epsilon = .01f;

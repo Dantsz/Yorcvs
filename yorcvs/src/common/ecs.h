@@ -46,14 +46,13 @@ class ECS; // forward declaration
  * @brief Contains a list of entities matching parents signature
  *
  */
-using EntitySystemList = std::vector<size_t>;
+using entity_system_list = std::vector<size_t>;
 
 // concept for a valid system
 // must have a vector of size_t
 template <typename systemt>
 concept systemT = requires(systemt sys)
-{
-    // std::same_as<decltype(sys.entityList), std::shared_ptr<yorcvs::EntitySystemList>>;
+{   
     { (*sys.entityList)[0] };
     { sys.entityList->size() };
 };
@@ -61,17 +60,17 @@ concept systemT = requires(systemt sys)
  * @brief Manages entity ids
  *
  */
-class EntityManager {
+class entity_manager {
 public:
-    EntityManager() = default;
-    ~EntityManager() = default;
-    EntityManager(const EntityManager& other) = default;
-    EntityManager(EntityManager&& other) noexcept
+    entity_manager() = default;
+    ~entity_manager() = default;
+    entity_manager(const entity_manager& other) = default;
+    entity_manager(entity_manager&& other) noexcept
         : freedIndices(std::move(other.freedIndices))
         , entitySignatures(std::move(other.entitySignatures))
     {
     }
-    EntityManager& operator=(const EntityManager& other)
+    entity_manager& operator=(const entity_manager& other)
     {
         if (this == &other) {
             return *this;
@@ -80,7 +79,7 @@ public:
         this->freedIndices = other.freedIndices;
         return *this;
     }
-    EntityManager& operator=(EntityManager&& other) noexcept
+    entity_manager& operator=(entity_manager&& other) noexcept
     {
         this->entitySignatures = std::move(other.entitySignatures);
         this->freedIndices = std::move(other.freedIndices);
@@ -205,14 +204,14 @@ public:
  * @brief Base class for all components container
  *
  */
-class VContainer {
+class v_container {
 public:
-    virtual ~VContainer() = default;
-    VContainer() = default;
-    VContainer(VContainer& other) = default;
-    VContainer(VContainer&& other) = default;
-    VContainer& operator=(VContainer& other) = delete;
-    VContainer& operator=(VContainer&& other) = delete;
+    virtual ~v_container() = default;
+    v_container() = default;
+    v_container(v_container& other) = default;
+    v_container(v_container&& other) = default;
+    v_container& operator=(v_container& other) = delete;
+    v_container& operator=(v_container&& other) = delete;
 
     virtual void add_component(size_t entityID) = 0;
     virtual void on_entity_destroyed(size_t entityID) noexcept = 0;
@@ -230,7 +229,7 @@ public:
  * @tparam T Type of compoent stored
  */
 template <typename T>
-class ComponentContainer final : public VContainer {
+class component_container final : public v_container {
 public:
     // update a specific component
     void add_component(const size_t entityID, const T& component)
@@ -358,19 +357,19 @@ private:
  * @brief Manages containers
  *
  */
-class ComponentManager {
+class component_manager {
 public:
-    ComponentManager() = default;
-    ComponentManager(const ComponentManager& other) = default;
-    ComponentManager(ComponentManager&& other) noexcept
+    component_manager() = default;
+    component_manager(const component_manager& other) = default;
+    component_manager(component_manager&& other) noexcept
         : nrComponents(other.nrComponents)
         , component_type(std::move(other.component_type))
         , componentContainers(std::move(other.componentContainers))
     {
     }
-    ~ComponentManager() = default;
+    ~component_manager() = default;
 
-    ComponentManager& operator=(const ComponentManager& other)
+    component_manager& operator=(const component_manager& other)
     {
         if (this == &other) {
             return *this;
@@ -381,7 +380,7 @@ public:
         return *this;
     }
 
-    ComponentManager& operator=(ComponentManager&& other) noexcept
+    component_manager& operator=(component_manager&& other) noexcept
     {
         nrComponents = other.nrComponents;
         component_type = std::move(other.component_type);
@@ -403,7 +402,7 @@ public:
         if (component_type.find(componentid) == component_type.end()) { // if the type of the container is not registered ,register it
             component_type.insert({ componentid, nrComponents++ });
 
-            componentContainers.insert({ componentid, std::make_shared<ComponentContainer<T>>() });
+            componentContainers.insert({ componentid, std::make_shared<component_container<T>>() });
         } else {
             yorcvs::log("Component " + std::string(componentid) + "  already registered", yorcvs::MSGSEVERITY::ERROR);
         }
@@ -487,7 +486,7 @@ public:
      * @return std::shared_ptr<ComponentContainer<T>>
      */
     template <typename T>
-    std::shared_ptr<ComponentContainer<T>> get_container()
+    std::shared_ptr<component_container<T>> get_container()
     {
         //(apparently this is possible)
         const char* componentid = typeid(T).name();
@@ -498,9 +497,9 @@ public:
             // if the type of the container is not registered ,register it
             component_type.insert({ componentid, nrComponents++ });
 
-            componentContainers.insert({ componentid, std::make_shared<ComponentContainer<T>>() });
+            componentContainers.insert({ componentid, std::make_shared<component_container<T>>() });
         }
-        return std::static_pointer_cast<ComponentContainer<T>>(componentContainers[componentid]);
+        return std::static_pointer_cast<component_container<T>>(componentContainers[componentid]);
     }
 
     /**
@@ -531,19 +530,19 @@ public:
     std::unordered_map<const char*, size_t> component_type {};
 
     // contains
-    std::unordered_map<const char*, std::shared_ptr<yorcvs::VContainer>> componentContainers {};
+    std::unordered_map<const char*, std::shared_ptr<yorcvs::v_container>> componentContainers {};
 };
 
-class SystemManager {
+class system_manager {
 public:
-    SystemManager() = default;
-    SystemManager(const SystemManager& other) = default;
-    SystemManager(SystemManager&& other) noexcept = default;
+    system_manager() = default;
+    system_manager(const system_manager& other) = default;
+    system_manager(system_manager&& other) noexcept = default;
 
-    SystemManager& operator=(const SystemManager& other) = default;
-    SystemManager& operator=(SystemManager&& other) = default;
+    system_manager& operator=(const system_manager& other) = default;
+    system_manager& operator=(system_manager&& other) = default;
 
-    ~SystemManager() = default;
+    ~system_manager() = default;
     /**
      * @brief creates a system of type T and puts it in the map
      *
@@ -561,7 +560,7 @@ public:
             yorcvs::log("Unable to register system: system is already registered.", yorcvs::MSGSEVERITY::ERROR);
             return false;
         }
-        std::shared_ptr<EntitySystemList> systemEVec = std::make_shared<EntitySystemList>();
+        std::shared_ptr<entity_system_list> systemEVec = std::make_shared<entity_system_list>();
         type_to_system.insert({ systemType, systemEVec });
         set_signature<T>(std::vector<bool> {});
         system.entityList = systemEVec;
@@ -614,7 +613,7 @@ public:
      * @return std::shared_ptr<yorcvs::EntitySystemList> - pointer too the list of entities
      */
     template <systemT system>
-    std::shared_ptr<yorcvs::EntitySystemList> get_system_entity_list()
+    std::shared_ptr<yorcvs::entity_system_list> get_system_entity_list()
     {
         const char* systemType = typeid(system).name();
         if (type_to_system.find(systemType) == type_to_system.end()) {
@@ -729,7 +728,7 @@ public:
     // get the signature of a system based on type
     std::unordered_map<const char*, std::vector<bool>> type_to_signature {};
     // get the system based on type
-    std::unordered_map<const char*, std::shared_ptr<EntitySystemList>> type_to_system {};
+    std::unordered_map<const char*, std::shared_ptr<entity_system_list>> type_to_system {};
 };
 
 /**
@@ -745,9 +744,9 @@ public:
     ECS()
     {
         yorcvs::log("Initializing ECS", yorcvs::MSGSEVERITY::INFO);
-        componentmanager = std::make_unique<yorcvs::ComponentManager>();
-        entitymanager = std::make_unique<yorcvs::EntityManager>();
-        systemmanager = std::make_unique<yorcvs::SystemManager>();
+        componentmanager = std::make_unique<yorcvs::component_manager>();
+        entitymanager = std::make_unique<yorcvs::entity_manager>();
+        systemmanager = std::make_unique<yorcvs::system_manager>();
     }
     ECS(ECS&& other)
     noexcept
@@ -763,9 +762,9 @@ public:
             return *this;
         }
         yorcvs::log("Initializing ECS with copy assignment operator", yorcvs::MSGSEVERITY::INFO);
-        componentmanager = std::make_unique<yorcvs::ComponentManager>(*other.componentmanager);
-        entitymanager = std::make_unique<yorcvs::EntityManager>(*other.entitymanager);
-        systemmanager = std::make_unique<yorcvs::SystemManager>(*other.systemmanager);
+        componentmanager = std::make_unique<yorcvs::component_manager>(*other.componentmanager);
+        entitymanager = std::make_unique<yorcvs::entity_manager>(*other.entitymanager);
+        systemmanager = std::make_unique<yorcvs::system_manager>(*other.systemmanager);
         return *this;
     }
     ECS& operator=(ECS&& other) = delete;
@@ -1099,7 +1098,7 @@ public:
      * @return std::shared_ptr<yorcvs::EntitySystemList> - pointer too the list of entities
      */
     template <systemT system>
-    std::shared_ptr<yorcvs::EntitySystemList> get_system_entity_list()
+    std::shared_ptr<yorcvs::entity_system_list> get_system_entity_list()
     {
         return systemmanager->get_system_entity_list<system>();
     }
@@ -1263,9 +1262,9 @@ public:
     }
 
 private:
-    std::unique_ptr<yorcvs::ComponentManager> componentmanager;
-    std::unique_ptr<yorcvs::EntityManager> entitymanager;
-    std::unique_ptr<yorcvs::SystemManager> systemmanager;
+    std::unique_ptr<yorcvs::component_manager> componentmanager;
+    std::unique_ptr<yorcvs::entity_manager> entitymanager;
+    std::unique_ptr<yorcvs::system_manager> systemmanager;
     // gets maximum number of components of a certain type created
     // for example if 2 components have been created and 1 deleted
     // calling get_maximum_component_count will return 2
