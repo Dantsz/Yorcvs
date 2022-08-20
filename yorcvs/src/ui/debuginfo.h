@@ -35,7 +35,7 @@ public:
     DebugInfo operator=(const DebugInfo& other) = delete;
     DebugInfo operator=(DebugInfo&& other) = delete;
 
-    void update(const float elapsed, yorcvs::Vec2<float>& render_dimensions)
+    void update(const float elapsed, yorcvs::vec2<float>& render_dimensions)
     {
         time_accumulator += elapsed;
         if (time_accumulator >= ui_controls_update_time) {
@@ -75,12 +75,12 @@ public:
         }
     }
 
-    void render_hitboxes(yorcvs::sdl2_window& window, const yorcvs::Vec2<float>& render_dimensions, const uint8_t r,
+    void render_hitboxes(yorcvs::sdl2_window& window, const yorcvs::vec2<float>& render_dimensions, const uint8_t r,
         const uint8_t g, const uint8_t b, const uint8_t a)
     {
-        yorcvs::Vec2<float> old_rs = window.get_render_scale();
+        yorcvs::vec2<float> old_rs = window.get_render_scale();
         window.set_render_scale(window.get_window_size() / render_dimensions);
-        yorcvs::Rect<float> rect {};
+        yorcvs::rect<float> rect {};
         for (const auto& ID : *colission_system->entityList) {
             rect.x = appECS->get_component<position_component>(ID).position.x + appECS->get_component<hitbox_component>(ID).hitbox.x;
             rect.y = appECS->get_component<position_component>(ID).position.y + appECS->get_component<hitbox_component>(ID).hitbox.y;
@@ -94,7 +94,7 @@ public:
         window.set_render_scale(old_rs);
     }
 
-    void render(yorcvs::Vec2<float>& render_dimensions)
+    void render(yorcvs::vec2<float>& render_dimensions)
     {
         if (debug_window_opened) {
             show_debug_window(render_dimensions);
@@ -144,7 +144,7 @@ public:
     }
 
 private:
-    void show_debug_window(yorcvs::Vec2<float>& render_dimensions)
+    void show_debug_window(yorcvs::vec2<float>& render_dimensions)
     {
         render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
             hitbox_color[3]);
@@ -174,11 +174,11 @@ private:
             SDL_QueryTexture(parentWindow->assetm->load_from_file(comp.texture_path).get(), nullptr, nullptr,
                 &texture_size_x, &texture_size_y);
 
-            const yorcvs::Vec2<float> top_corner = {
+            const yorcvs::vec2<float> top_corner = {
                 static_cast<float>(comp.src_rect.x) / static_cast<float>(texture_size_x),
                 static_cast<float>(comp.src_rect.y) / static_cast<float>(texture_size_y)
             };
-            const yorcvs::Vec2<float> bottom_corner = {
+            const yorcvs::vec2<float> bottom_corner = {
                 static_cast<float>(comp.src_rect.x + comp.src_rect.w) / static_cast<float>(texture_size_x),
                 static_cast<float>(comp.src_rect.y + comp.src_rect.h) / static_cast<float>(texture_size_y)
             };
@@ -392,11 +392,11 @@ private:
         appECS->destroy_entity(invalidID);
         return invalidID;
     }
-    void draw_entity_health_bar(yorcvs::sdl2_window& window, size_t ID, const yorcvs::Rect<float>& offset_rect)
+    void draw_entity_health_bar(yorcvs::sdl2_window& window, size_t ID, const yorcvs::rect<float>& offset_rect)
     {
         if (appECS->has_components<health_component, health_stats_component>(ID)) {
             // draw health bar
-            yorcvs::Rect<float> healthBarRect {};
+            yorcvs::rect<float> healthBarRect {};
             if (appECS->has_components<sprite_component>(
                     ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
             {
@@ -414,10 +414,10 @@ private:
                 health_bar_full_color, health_bar_empty_color);
         }
     }
-    void draw_entity_stamina_bar(yorcvs::sdl2_window& window, size_t ID, const yorcvs::Rect<float>& offset_rect)
+    void draw_entity_stamina_bar(yorcvs::sdl2_window& window, size_t ID, const yorcvs::rect<float>& offset_rect)
     {
         if (appECS->has_components<stamina_component, stamina_stats_component>(ID)) {
-            yorcvs::Rect<float> staminaBarRect {};
+            yorcvs::rect<float> staminaBarRect {};
             if (appECS->has_components<sprite_component>(
                     ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
             {
@@ -434,7 +434,7 @@ private:
                 stamina_bar_full_color, stamina_bar_empty_color);
         }
     }
-    static void draw_status_bar(yorcvs::sdl2_window& window, yorcvs::Rect<float> rect, float value, std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> full_color, std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> empty_color)
+    static void draw_status_bar(yorcvs::sdl2_window& window, yorcvs::rect<float> rect, float value, std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> full_color, std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> empty_color)
     {
         window.draw_rect(rect, std::get<0>(empty_color), std::get<1>(empty_color), std::get<2>(empty_color), std::get<3>(empty_color));
         rect.w = std::max(value * rect.w, 0.0f);
@@ -464,7 +464,7 @@ private:
     float time_accumulator = 0;
     int history_pos = 0;
 
-    static constexpr yorcvs::Vec2<float> health_full_bar_dimension = { 32.0f, 4.0f };
+    static constexpr yorcvs::vec2<float> health_full_bar_dimension = { 32.0f, 4.0f };
 
     const std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> health_bar_full_color { 255, 0, 0, 255 };
     const std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> health_bar_empty_color { 100, 0, 0, 255 };

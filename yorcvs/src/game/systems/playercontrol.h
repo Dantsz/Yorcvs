@@ -18,7 +18,7 @@ public:
             position_component, sprite_component>();
     }
 
-    void updateControls(const yorcvs::Vec2<float>& render_size, float dt)
+    void updateControls(const yorcvs::vec2<float>& render_size, float dt)
     {
         const bool w_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_W);
         const bool a_pressed = window->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_A);
@@ -79,10 +79,10 @@ public:
     bool controls_enable = true;
 
 private:
-    static constexpr yorcvs::Vec2<float> compute_movement_direction(float move_right, float move_left, float move_up, float move_down)
+    static constexpr yorcvs::vec2<float> compute_movement_direction(float move_right, float move_left, float move_up, float move_down)
     {
         // normalizing means moving at 1000 units per second
-        return yorcvs::Vec2<float>(move_right + move_left * -1.0f, move_up * -1.0f + move_down).normalize() * player_default_speed; // move 30 units per second
+        return yorcvs::vec2<float>(move_right + move_left * -1.0f, move_up * -1.0f + move_down).normalize() * player_default_speed; // move 30 units per second
     }
     static const char* select_animation(player_movement_controlled_component& player_state)
     {
@@ -109,5 +109,5 @@ private:
 
     yorcvs::ECS* world;
     yorcvs::sdl2_window* window;
-    yorcvs::Vec2<float> dir;
+    yorcvs::vec2<float> dir;
 };

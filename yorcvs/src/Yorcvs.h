@@ -70,7 +70,7 @@ public:
     }
     void render_map_tiles(yorcvs::map& p_map)
     {
-        yorcvs::Vec2<float> render_scale = app_window.get_render_scale();
+        yorcvs::vec2<float> render_scale = app_window.get_render_scale();
         app_window.set_render_scale(app_window.get_window_size() / render_dimensions);
         // get player position
         if (player_control.entityList->empty()) {
@@ -78,7 +78,7 @@ public:
             return;
         }
         const size_t entity_ID = (*player_control.entityList)[0];
-        const yorcvs::Vec2<float> player_position = world.get_component<position_component>(entity_ID).position;
+        const yorcvs::vec2<float> player_position = world.get_component<position_component>(entity_ID).position;
         const std::tuple<intmax_t, intmax_t> player_position_chunk = std::make_tuple(
             static_cast<intmax_t>(std::floor(player_position.x / (32.0f * 16.0f))), static_cast<intmax_t>(std::floor(player_position.y / (32.0f * 16.0f))));
         // render chunks
@@ -166,7 +166,7 @@ public:
     ~Application() = default;
 
 private:
-    static constexpr yorcvs::Vec2<float> default_render_dimensions = { 240.0f, 120.0f };
+    static constexpr yorcvs::vec2<float> default_render_dimensions = { 240.0f, 120.0f };
     static constexpr float msPF = 41.6f;
     static constexpr intmax_t default_render_distance = 1;
 
@@ -176,7 +176,7 @@ private:
     yorcvs::Timer update_loop_timer;
 
     float lag = 0.0f;
-    yorcvs::Vec2<float> render_dimensions = default_render_dimensions; // how much to render
+    yorcvs::vec2<float> render_dimensions = default_render_dimensions; // how much to render
     intmax_t render_distance = default_render_distance;
     yorcvs::ECS world {};
     sol::state lua_state;

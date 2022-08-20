@@ -122,7 +122,7 @@ public:
             SDL_RenderPresent(renderer);
         }
     }
-    void draw_texture(const std::string& path, const yorcvs::Rect<float>& dstRect, const yorcvs::Rect<size_t>& srcRect,
+    void draw_texture(const std::string& path, const yorcvs::rect<float>& dstRect, const yorcvs::rect<size_t>& srcRect,
         double angle = 0.0)
     {
         if (!isMinimized) {
@@ -141,8 +141,8 @@ public:
         }
     }
 
-    void draw_texture(const std::string& path, const yorcvs::Vec2<float>& dstRectPos,
-        const yorcvs::Vec2<float>& dstRectSize, const yorcvs::Rect<size_t>& srcRect, double angle = 0.0)
+    void draw_texture(const std::string& path, const yorcvs::vec2<float>& dstRectPos,
+        const yorcvs::vec2<float>& dstRectSize, const yorcvs::rect<size_t>& srcRect, double angle = 0.0)
     {
         if (!isMinimized) {
             // NOTE: SDL_rendercopyF exists for >SDL 2.0.10
@@ -159,7 +159,7 @@ public:
         }
     }
 
-    void draw_text(const std::string& /*font_path*/, const std::string& /*message*/, const yorcvs::Rect<float>& /*dstRect*/, unsigned char /*r*/, unsigned char /*g*/,
+    void draw_text(const std::string& /*font_path*/, const std::string& /*message*/, const yorcvs::rect<float>& /*dstRect*/, unsigned char /*r*/, unsigned char /*g*/,
         unsigned char /*b*/, unsigned char /*a*/, size_t /*charSize*/, size_t /*lineLength*/)
     {
         // if (!isMinimized)
@@ -183,7 +183,7 @@ public:
         // }
     }
 
-    void draw_rect(const yorcvs::Rect<float>& rect, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+    void draw_rect(const yorcvs::rect<float>& rect, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
     {
         SDL_FRect dest = { static_cast<float>(rect.x - offset.x), static_cast<float>(rect.y - offset.y),
             static_cast<float>(rect.w), static_cast<float>(rect.h) };
@@ -196,15 +196,15 @@ public:
         SDL_RenderFillRectF(renderer, &dest);
         SDL_SetRenderDrawColor(renderer, r_old, g_old, b_old, a_old);
     }
-    void set_drawing_offset(const yorcvs::Vec2<float>& newOffset)
+    void set_drawing_offset(const yorcvs::vec2<float>& newOffset)
     {
         offset = newOffset;
     }
-    yorcvs::Vec2<float> get_drawing_offset()
+    yorcvs::vec2<float> get_drawing_offset()
     {
         return offset;
     }
-    yorcvs::Vec2<float> get_window_size()
+    yorcvs::vec2<float> get_window_size()
     {
         int width = 0;
         int height = 0;
@@ -212,28 +212,28 @@ public:
         return { static_cast<float>(width), static_cast<float>(height) };
     }
 
-    void set_viewport(const yorcvs::Rect<float>& viewport)
+    void set_viewport(const yorcvs::rect<float>& viewport)
     {
         SDL_Rect vp = { static_cast<int>(viewport.x), static_cast<int>(viewport.y), static_cast<int>(viewport.w),
             static_cast<int>(viewport.h) };
         SDL_RenderSetViewport(renderer, &vp);
     }
 
-    yorcvs::Rect<float> get_viewport()
+    yorcvs::rect<float> get_viewport()
     {
         SDL_Rect vp {};
         SDL_RenderGetViewport(renderer, &vp);
         return { static_cast<float>(vp.x), static_cast<float>(vp.y), static_cast<float>(vp.w), static_cast<float>(vp.h) };
     }
 
-    void set_render_scale(const yorcvs::Vec2<float>& scale)
+    void set_render_scale(const yorcvs::vec2<float>& scale)
     {
         SDL_RenderSetScale(renderer, scale.x, scale.y);
     }
 
-    yorcvs::Vec2<float> get_render_scale()
+    yorcvs::vec2<float> get_render_scale()
     {
-        yorcvs::Vec2<float> scale {};
+        yorcvs::vec2<float> scale {};
         SDL_RenderGetScale(renderer, &scale.x, &scale.y);
         return scale;
     }
@@ -243,6 +243,6 @@ private:
     SDL_Window* sdlWindow = nullptr;
     SDL_Renderer* renderer = nullptr;
     bool isMinimized = false;
-    yorcvs::Vec2<float> offset = { 0.0F, 0.0F };
+    yorcvs::vec2<float> offset = { 0.0F, 0.0F };
 };
 }

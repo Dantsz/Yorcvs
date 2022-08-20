@@ -16,14 +16,14 @@ struct identification_component {
  *
  */
 struct hitbox_component {
-    yorcvs::Rect<float> hitbox;
+    yorcvs::rect<float> hitbox;
 };
 struct position_component {
-    yorcvs::Vec2<float> position;
+    yorcvs::vec2<float> position;
 };
 struct velocity_component {
-    yorcvs::Vec2<float> vel;
-    yorcvs::Vec2<bool> facing; // x - true if last velocity change was right, left if false
+    yorcvs::vec2<float> vel;
+    yorcvs::vec2<bool> facing; // x - true if last velocity change was right, left if false
                                // y - true if last velocity change was down , down if up
 };
 
@@ -61,9 +61,9 @@ struct stamina_stats_component {
 };
 
 struct sprite_component {
-    yorcvs::Vec2<float> offset; // position offset
-    yorcvs::Vec2<float> size; // size of sprite
-    yorcvs::Rect<size_t> src_rect; // part of texture to render
+    yorcvs::vec2<float> offset; // position offset
+    yorcvs::vec2<float> size; // size of sprite
+    yorcvs::rect<size_t> src_rect; // part of texture to render
     std::string texture_path;
 };
 
@@ -74,7 +74,7 @@ struct animation_component {
      *The size_t represents the next frame in the animation
      *The float represents animation speed
      */
-    using animation_frame = std::tuple<yorcvs::Rect<size_t>, size_t, float>;
+    using animation_frame = std::tuple<yorcvs::rect<size_t>, size_t, float>;
     std::vector<animation_frame> frames {};
     std::unordered_map<std::string, size_t> animation_name_to_start_frame_index;
     std::string current_animation_name {};

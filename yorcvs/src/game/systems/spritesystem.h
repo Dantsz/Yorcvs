@@ -15,9 +15,9 @@ public:
         world->register_system<SpriteSystem>(*this);
         world->add_criteria_for_iteration<SpriteSystem, position_component, sprite_component>();
     }
-    void renderSprites(const yorcvs::Vec2<float>& render_dimensions) const
+    void renderSprites(const yorcvs::vec2<float>& render_dimensions) const
     {
-        yorcvs::Vec2<float> rs = window->get_render_scale();
+        yorcvs::vec2<float> rs = window->get_render_scale();
         window->set_render_scale(window->get_window_size() / render_dimensions);
         std::sort(entityList->begin(), entityList->end(), [&](size_t ID1, size_t ID2) {
             return (world->get_component<sprite_component>(ID1).offset.y + world->get_component<position_component>(ID1).position.y) < (world->get_component<sprite_component>(ID2).offset.y + world->get_component<position_component>(ID2).position.y);

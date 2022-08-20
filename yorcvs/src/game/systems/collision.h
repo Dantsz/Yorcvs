@@ -38,15 +38,15 @@ public:
      */
     void update(float dt) const // checks and resolves collisions
     {
-        yorcvs::Rect<float> rectA {};
-        yorcvs::Rect<float> rectB {};
+        yorcvs::rect<float> rectA {};
+        yorcvs::rect<float> rectB {};
 
         for (const auto& IDA : *non_solids.entityList) {
             rectA.x = world->get_component<position_component>(IDA).position.x + world->get_component<hitbox_component>(IDA).hitbox.x;
             rectA.y = world->get_component<position_component>(IDA).position.y + world->get_component<hitbox_component>(IDA).hitbox.y;
             rectA.w = world->get_component<hitbox_component>(IDA).hitbox.w;
             rectA.h = world->get_component<hitbox_component>(IDA).hitbox.h;
-            yorcvs::Vec2<float>& rectAvel = world->get_component<velocity_component>(IDA).vel;
+            yorcvs::vec2<float>& rectAvel = world->get_component<velocity_component>(IDA).vel;
             rectAvel *= dt;
             for (const auto& IDB : *entityList) {
                 if (!world->has_components<velocity_component>(IDB)) {
@@ -82,8 +82,8 @@ public:
     }
 
 private:
-    static bool check_collision_left_right(const yorcvs::Rect<float>& rectA, const yorcvs::Rect<float>& rectB,
-        yorcvs::Vec2<float>& rectAvel, float /*dt*/)
+    static bool check_collision_left_right(const yorcvs::rect<float>& rectA, const yorcvs::rect<float>& rectB,
+        yorcvs::vec2<float>& rectAvel, float /*dt*/)
     {
         if (rectA.x + rectA.w <= rectB.x && rectA.x + rectA.w + (rectAvel.x) > rectB.x && rectA.y + rectA.h > rectB.y && rectA.y - rectB.y < rectB.h) {
             rectAvel.x = (rectB.x - rectA.x - rectA.w);
@@ -91,8 +91,8 @@ private:
         }
         return false;
     }
-    static bool check_collision_right_left(const yorcvs::Rect<float>& rectA, const yorcvs::Rect<float>& rectB,
-        yorcvs::Vec2<float>& rectAvel, float /*dt*/)
+    static bool check_collision_right_left(const yorcvs::rect<float>& rectA, const yorcvs::rect<float>& rectB,
+        yorcvs::vec2<float>& rectAvel, float /*dt*/)
     {
         if (rectA.x >= rectB.x + rectB.w && rectA.x + (rectAvel.x) < rectB.x + rectB.w && rectA.y + rectA.h > rectB.y && rectA.y - rectB.y < rectB.h) {
             rectAvel.x = (rectB.x + rectB.w - rectA.x);
@@ -100,8 +100,8 @@ private:
         }
         return false;
     }
-    static bool check_collision_up_down(const yorcvs::Rect<float>& rectA, const yorcvs::Rect<float>& rectB,
-        yorcvs::Vec2<float>& rectAvel, float /*dt*/)
+    static bool check_collision_up_down(const yorcvs::rect<float>& rectA, const yorcvs::rect<float>& rectB,
+        yorcvs::vec2<float>& rectAvel, float /*dt*/)
     {
         if (rectA.y <= rectB.y && rectA.y + rectA.h + rectAvel.y > rectB.y && rectA.x - rectB.x < rectB.w && rectA.x + rectA.w > rectB.x) {
             rectAvel.y = (rectB.y - rectA.y - rectA.h);
@@ -109,8 +109,8 @@ private:
         }
         return false;
     }
-    static bool check_collision_down_up(const yorcvs::Rect<float>& rectA, const yorcvs::Rect<float>& rectB,
-        yorcvs::Vec2<float>& rectAvel, float /*dt*/)
+    static bool check_collision_down_up(const yorcvs::rect<float>& rectA, const yorcvs::rect<float>& rectB,
+        yorcvs::vec2<float>& rectAvel, float /*dt*/)
     {
         if ((rectA.y >= rectB.y + rectB.h || std::fabs(rectA.y - rectB.y - rectB.h) <= fp_epsilon) && rectA.y + rectAvel.y <= rectB.y + rectB.h && rectA.x - rectB.x < rectB.w && rectA.x + rectA.w > rectB.x) {
             rectAvel.y = (rectB.y + rectB.h - rectA.y);
@@ -119,8 +119,8 @@ private:
         return false;
     }
 
-    static bool check_collision_corner_top_right(const yorcvs::Rect<float>& rectA, const yorcvs::Rect<float>& rectB,
-        yorcvs::Vec2<float>& rectAvel, float /*dt*/)
+    static bool check_collision_corner_top_right(const yorcvs::rect<float>& rectA, const yorcvs::rect<float>& rectB,
+        yorcvs::vec2<float>& rectAvel, float /*dt*/)
     {
         if (rectA.x + (rectAvel.x) + rectA.w > rectB.x && rectA.x + (rectAvel.x) + rectA.w < (rectB.x + rectB.w) && rectA.y + rectA.h + (rectAvel.y) > rectB.y && rectA.y + rectA.h + (rectAvel.y) < rectB.y + rectB.h && rectA.x < rectB.x && rectA.y < rectB.y) {
             rectAvel.x = (rectB.x - (rectA.x + rectA.w));
@@ -129,8 +129,8 @@ private:
         }
         return false;
     }
-    static bool check_collision_corner_top_left(const yorcvs::Rect<float>& rectA, const yorcvs::Rect<float>& rectB,
-        yorcvs::Vec2<float>& rectAvel, float /*dt*/)
+    static bool check_collision_corner_top_left(const yorcvs::rect<float>& rectA, const yorcvs::rect<float>& rectB,
+        yorcvs::vec2<float>& rectAvel, float /*dt*/)
     {
         if (rectA.x + (rectAvel.x) > rectB.x && rectA.x + (rectAvel.x) < rectB.x + rectB.w && rectA.y + rectA.h + (rectAvel.y) > rectB.y && rectA.y + rectA.h + (rectAvel.y) < rectB.y + rectB.h && rectA.x >= rectB.x && rectA.x + (rectAvel.x) + rectA.w > rectB.x + rectB.w && rectA.y < rectB.y) {
             rectAvel.x = ((rectB.x + rectB.w) - rectA.x);
@@ -139,8 +139,8 @@ private:
         }
         return false;
     }
-    static bool check_collision_corner_bottom_right(const yorcvs::Rect<float>& rectA, const yorcvs::Rect<float>& rectB,
-        yorcvs::Vec2<float>& rectAvel, float /*dt*/)
+    static bool check_collision_corner_bottom_right(const yorcvs::rect<float>& rectA, const yorcvs::rect<float>& rectB,
+        yorcvs::vec2<float>& rectAvel, float /*dt*/)
     {
         if (rectA.x + (rectAvel.x) < rectB.x && rectA.x + (rectAvel.x) + rectA.w > rectB.x && rectA.x + (rectAvel.x) + rectA.w < rectB.x + rectB.w && rectA.x < rectB.x && rectA.y + (rectAvel.y) > rectB.y && rectA.y + (rectAvel.y) < rectB.y + rectB.h && rectA.y + rectA.h + (rectAvel.y) > rectB.y + rectB.h) {
             rectAvel.x = (rectB.x - (rectA.x + rectA.w));
@@ -149,8 +149,8 @@ private:
         }
         return false;
     }
-    static bool check_collision_corner_bottom_left(const yorcvs::Rect<float>& rectA, const yorcvs::Rect<float>& rectB,
-        yorcvs::Vec2<float>& rectAvel, float /*dt*/)
+    static bool check_collision_corner_bottom_left(const yorcvs::rect<float>& rectA, const yorcvs::rect<float>& rectB,
+        yorcvs::vec2<float>& rectAvel, float /*dt*/)
     {
         if (rectA.x + (rectAvel.x) > rectB.x && rectA.x + (rectAvel.x) < rectB.x + rectB.w && rectA.x + (rectAvel.x) + rectA.w > rectB.x + rectB.w && rectA.y + (rectAvel.y) > rectB.y && rectA.y + (rectAvel.y) < rectB.y + rectB.h && rectA.y + (rectAvel.y) + rectA.h > rectB.y + rectB.h) {
             rectAvel.x = ((rectB.x + rectB.w) - rectA.x);

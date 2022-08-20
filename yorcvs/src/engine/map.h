@@ -16,8 +16,8 @@
 namespace json = nlohmann;
 namespace yorcvs {
 struct Tile {
-    yorcvs::Vec2<float> coords;
-    yorcvs::Rect<size_t> srcRect;
+    yorcvs::vec2<float> coords;
+    yorcvs::rect<size_t> srcRect;
     std::string texture_path;
 };
 /**
@@ -136,7 +136,7 @@ private:
         const auto& chunks = tileLayer.getChunks();
         for (const auto& chunk : chunks) // parse chunks
         {
-            yorcvs::Vec2<float> chunk_position = { static_cast<float>(chunk.position.x),
+            yorcvs::vec2<float> chunk_position = { static_cast<float>(chunk.position.x),
                 static_cast<float>(chunk.position.y) };
             for (auto chunk_y = 0; chunk_y < chunk.size.y; chunk_y++) {
                 for (auto chunk_x = 0; chunk_x < chunk.size.x; chunk_x++) {
@@ -160,7 +160,7 @@ private:
                     } else {
                         tile.texture_path = tile_set->getImagePath();
                     }
-                    tile.coords = chunk_position * tilesSize + tilesSize * yorcvs::Vec2<float> { static_cast<float>(chunk_x), static_cast<float>(chunk_y) };
+                    tile.coords = chunk_position * tilesSize + tilesSize * yorcvs::vec2<float> { static_cast<float>(chunk_x), static_cast<float>(chunk_y) };
                     tile.srcRect = get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID);
                     tiles_chunks[std::make_tuple<intmax_t, intmax_t>(chunk.position.x / chunk.size.x,
                                      chunk.position.y / chunk.size.y)]
@@ -174,7 +174,7 @@ private:
         const auto& chunks = tileLayer.getChunks();
         for (const auto& chunk : chunks) // parse chunks
         {
-            yorcvs::Vec2<float> chunk_position = { static_cast<float>(chunk.position.x),
+            yorcvs::vec2<float> chunk_position = { static_cast<float>(chunk.position.x),
                 static_cast<float>(chunk.position.y) };
             for (auto chunk_y = 0; chunk_y < chunk.size.y; chunk_y++) {
                 for (auto chunk_x = 0; chunk_x < chunk.size.x; chunk_x++) {
@@ -197,7 +197,7 @@ private:
                     const size_t entity = ysorted_tiles[ysorted_tiles.size() - 1].id;
                     ecs->add_component<position_component>(
                         entity,
-                        { chunk_position * tilesSize + tilesSize * yorcvs::Vec2<float> { static_cast<float>(chunk_x), static_cast<float>(chunk_y) } });
+                        { chunk_position * tilesSize + tilesSize * yorcvs::vec2<float> { static_cast<float>(chunk_x), static_cast<float>(chunk_y) } });
                     ecs->add_component<sprite_component>(entity, { { 0, 0 }, { static_cast<float>(tile_set->getTileSize().x), static_cast<float>(tile_set->getTileSize().y) }, get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID), tile_set->getImagePath() });
                 }
             }
@@ -318,7 +318,7 @@ private:
             }
         }
     }
-    [[nodiscard]] yorcvs::Vec2<float> get_spawn_position() const
+    [[nodiscard]] yorcvs::vec2<float> get_spawn_position() const
     {
         return spawn_coord;
     }
@@ -342,7 +342,7 @@ private:
         world->get_component<velocity_component>(entity_id) = { { 0.0f, 0.0f }, { false, false } };
     }
     // NOTE: this can be a free function
-    static yorcvs::Rect<size_t> get_src_rect_from_uid(const tmx::Map& map, const size_t UID)
+    static yorcvs::rect<size_t> get_src_rect_from_uid(const tmx::Map& map, const size_t UID)
     {
         tmx::Tileset const* tile_set = nullptr;
         for (const auto& tileset : map.getTilesets()) {
@@ -355,7 +355,7 @@ private:
                 yorcvs::MSGSEVERITY::ERROR);
             return { 0, 0, 0, 0 };
         }
-        yorcvs::Rect<size_t> srcRect {};
+        yorcvs::rect<size_t> srcRect {};
         srcRect.x = ((UID - tile_set->getFirstGID()) % tile_set->getColumnCount()) * tile_set->getTileSize().x;
         srcRect.y = 0;
         size_t y_index = 0;
@@ -401,7 +401,7 @@ public:
     // class to initialize the ecs before systems are constructed
     ecs_Initializer init_ecs;
 
-    yorcvs::Vec2<float> tilesSize;
+    yorcvs::vec2<float> tilesSize;
 
     std::vector<size_t> entities {}; // not a vector of Entities because the map is not responsible for their lifetimes( they can be destroyed by other stuff)
     HealthSystem health_system;
@@ -410,7 +410,7 @@ public:
     std::string map_file_path;
     std::unordered_map<std::tuple<intmax_t, intmax_t>, std::vector<yorcvs::Tile>> tiles_chunks {};
 
-    yorcvs::Vec2<float> spawn_coord;
+    yorcvs::vec2<float> spawn_coord;
     VelocitySystem velocity_system;
     AnimationSystem animation_system;
     CombatSystem combat_system;

@@ -65,12 +65,12 @@ inline void register_system_to_lua(sol::state& lua_state, const std::string& nam
  */
 inline void bind_basic_types(sol::state& lua_state)
 {
-    sol::usertype<yorcvs::Vec2<float>> vec2f = lua_state.new_usertype<yorcvs::Vec2<float>>(
-        "vec2f", "x", &yorcvs::Vec2<float>::x, "y", &yorcvs::Vec2<float>::y);
-    sol::usertype<yorcvs::Vec2<bool>> vec2b = lua_state.new_usertype<yorcvs::Vec2<bool>>("vec2b", "x", &yorcvs::Vec2<bool>::x, "y", &yorcvs::Vec2<bool>::y);
-    sol::usertype<yorcvs::Rect<float>> rect2f = lua_state.new_usertype<yorcvs::Rect<float>>(
-        "rect2f", "x", &yorcvs::Rect<float>::x, "y", &yorcvs::Rect<float>::y, "w", &yorcvs::Rect<float>::w, "h",
-        &yorcvs::Rect<float>::h);
+    sol::usertype<yorcvs::vec2<float>> vec2f = lua_state.new_usertype<yorcvs::vec2<float>>(
+        "vec2f", "x", &yorcvs::vec2<float>::x, "y", &yorcvs::vec2<float>::y);
+    sol::usertype<yorcvs::vec2<bool>> vec2b = lua_state.new_usertype<yorcvs::vec2<bool>>("vec2b", "x", &yorcvs::vec2<bool>::x, "y", &yorcvs::vec2<bool>::y);
+    sol::usertype<yorcvs::rect<float>> rect2f = lua_state.new_usertype<yorcvs::rect<float>>(
+        "rect2f", "x", &yorcvs::rect<float>::x, "y", &yorcvs::rect<float>::y, "w", &yorcvs::rect<float>::w, "h",
+        &yorcvs::rect<float>::h);
 }
 inline void bind_map_functions(sol::state& lua_state)
 {

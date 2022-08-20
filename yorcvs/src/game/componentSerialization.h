@@ -8,23 +8,23 @@ namespace json = nlohmann;
 
 namespace yorcvs {
 template <typename T>
-inline void to_json(json::json& j, const yorcvs::Vec2<T>& vec)
+inline void to_json(json::json& j, const yorcvs::vec2<T>& vec)
 {
     j = json::json { { "x", vec.x }, { "y", vec.y } };
 }
 template <typename T>
-inline void from_json(const json::json& j, yorcvs::Vec2<T>& vec)
+inline void from_json(const json::json& j, yorcvs::vec2<T>& vec)
 {
     j.at("x").get_to(vec.x);
     j.at("y").get_to(vec.y);
 }
 template <typename T>
-inline void to_json(json::json& j, const yorcvs::Rect<T>& rect)
+inline void to_json(json::json& j, const yorcvs::rect<T>& rect)
 {
     j = json::json { { "x", rect.x }, { "y", rect.y }, { "w", rect.w }, { "h", rect.h } };
 }
 template <typename T>
-inline void from_json(const json::json& j, yorcvs::Rect<T>& rect)
+inline void from_json(const json::json& j, yorcvs::rect<T>& rect)
 {
     j.at("x").get_to(rect.x);
     j.at("y").get_to(rect.y);

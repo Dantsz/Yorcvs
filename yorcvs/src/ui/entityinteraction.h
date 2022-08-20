@@ -39,12 +39,12 @@ public:
         , player_move_system(&player_move_system)
         , entity_is_clicked_callback(event_handler.add_callback_on_event(yorcvs::Events::Type::MOUSE_CLICKED,
               [widget = this](const yorcvs::event&) {
-                  yorcvs::Vec2<float> old_rs = widget->window->get_render_scale();
+                  yorcvs::vec2<float> old_rs = widget->window->get_render_scale();
                   widget->window->set_render_scale(widget->window->get_window_size() / widget->render_dimensions);
                   bool clicked_any_entity = false;
                   const auto pointer_position = widget->event_handler->get_pointer_position();
                   for (const auto& ID : *(widget->collision_system->entityList)) {
-                      yorcvs::Rect<float> rect {};
+                      yorcvs::rect<float> rect {};
                       rect.x = widget->world->template get_component<position_component>(ID).position.x + widget->world->template get_component<hitbox_component>(ID).hitbox.x;
                       rect.y = widget->world->template get_component<position_component>(ID).position.y + widget->world->template get_component<hitbox_component>(ID).hitbox.y;
                       rect.w = widget->world->template get_component<hitbox_component>(ID).hitbox.w;
@@ -67,7 +67,7 @@ public:
     {
         event_handler->unregister_callback(entity_is_clicked_callback);
     }
-    void render([[maybe_unused]] yorcvs::Vec2<float>& render_dim)
+    void render([[maybe_unused]] yorcvs::vec2<float>& render_dim)
     {
         if (player_move_system->entityList->empty()) {
             return;
@@ -113,9 +113,9 @@ private:
     const size_t entity_is_clicked_callback;
 
     bool select_target_opened = false;
-    yorcvs::Vec2<float> target_window_position {};
-    yorcvs::Vec2<float> render_dimensions {};
+    yorcvs::vec2<float> target_window_position {};
+    yorcvs::vec2<float> render_dimensions {};
     std::optional<size_t> targetID = 0;
-    static constexpr yorcvs::Vec2<float> target_window_size { 150, 100 };
+    static constexpr yorcvs::vec2<float> target_window_size { 150, 100 };
     static constexpr float target_window_alpha = 0.5f;
 };
