@@ -82,10 +82,10 @@ public:
         window.set_render_scale(window.get_window_size() / render_dimensions);
         yorcvs::Rect<float> rect {};
         for (const auto& ID : *colission_system->entityList) {
-            rect.x = appECS->get_component<positionComponent>(ID).position.x + appECS->get_component<hitboxComponent>(ID).hitbox.x;
-            rect.y = appECS->get_component<positionComponent>(ID).position.y + appECS->get_component<hitboxComponent>(ID).hitbox.y;
-            rect.w = appECS->get_component<hitboxComponent>(ID).hitbox.w;
-            rect.h = appECS->get_component<hitboxComponent>(ID).hitbox.h;
+            rect.x = appECS->get_component<position_component>(ID).position.x + appECS->get_component<hitbox_component>(ID).hitbox.x;
+            rect.y = appECS->get_component<position_component>(ID).position.y + appECS->get_component<hitbox_component>(ID).hitbox.y;
+            rect.w = appECS->get_component<hitbox_component>(ID).hitbox.w;
+            rect.h = appECS->get_component<hitbox_component>(ID).hitbox.h;
             window.draw_rect(rect, r, g, b, a);
             draw_entity_health_bar(window, ID, rect);
             draw_entity_stamina_bar(window, ID, rect);
@@ -153,20 +153,20 @@ private:
             const size_t ID = (*player_move_system->entityList)[0];
             ImGui::Begin("Player");
             show_entity_stats(ID, "Player : ");
-            if (appECS->has_components<animationComponent>(ID)) {
+            if (appECS->has_components<animation_component>(ID)) {
                 ui::show_current_animator_selector(appECS, ID);
             }
         }
     }
     void show_entity_stats(size_t ID, [[maybe_unused]] std::string pre_name = "Entity : ")
     {
-        if (appECS->has_components<identificationComponent>(ID)) {
-            pre_name += appECS->get_component<identificationComponent>(ID).name + " (" + std::to_string(ID) + ")";
+        if (appECS->has_components<identification_component>(ID)) {
+            pre_name += appECS->get_component<identification_component>(ID).name + " (" + std::to_string(ID) + ")";
         }
         ImGui::Text("%s", pre_name.c_str());
-        if (appECS->has_components<spriteComponent>(ID)) {
+        if (appECS->has_components<sprite_component>(ID)) {
             static constexpr float size_multiplier = 4.0f;
-            const spriteComponent& comp = appECS->get_component<spriteComponent>(ID);
+            const sprite_component& comp = appECS->get_component<sprite_component>(ID);
 
             int texture_size_x {};
             int texture_size_y {};
@@ -186,35 +186,35 @@ private:
                 { size_multiplier * comp.size.x, size_multiplier * comp.size.y }, { top_corner.x, top_corner.y },
                 { bottom_corner.x, bottom_corner.y });
         }
-        if (appECS->has_components<positionComponent>(ID)) {
-            ImGui::Text("Position: (%f,%f)", appECS->get_component<positionComponent>(ID).position.x,
-                appECS->get_component<positionComponent>(ID).position.y);
+        if (appECS->has_components<position_component>(ID)) {
+            ImGui::Text("Position: (%f,%f)", appECS->get_component<position_component>(ID).position.x,
+                appECS->get_component<position_component>(ID).position.y);
         }
-        if (appECS->has_components<velocityComponent>(ID)) {
-            ImGui::Text("Velocity: (%f,%f)", appECS->get_component<velocityComponent>(ID).vel.x,
-                appECS->get_component<velocityComponent>(ID).vel.y);
+        if (appECS->has_components<velocity_component>(ID)) {
+            ImGui::Text("Velocity: (%f,%f)", appECS->get_component<velocity_component>(ID).vel.x,
+                appECS->get_component<velocity_component>(ID).vel.y);
         }
-        if (appECS->has_components<healthComponent, healthStatsComponent>(ID)) {
-            auto& playerHealthC = appECS->get_component<healthComponent>(ID);
-            auto& playerHealthStatsC = appECS->get_component<healthStatsComponent>(ID);
+        if (appECS->has_components<health_component, health_stats_component>(ID)) {
+            auto& playerHealthC = appECS->get_component<health_component>(ID);
+            auto& playerHealthStatsC = appECS->get_component<health_stats_component>(ID);
             ImGui::Text("Health: (%f/%f)", playerHealthC.HP, playerHealthStatsC.max_HP);
         }
-        if (appECS->has_components<staminaComponent, staminaStatsComponent>(ID)) {
-            auto& playerStaminaC = appECS->get_component<staminaComponent>(ID);
-            auto& playerStamStatC = appECS->get_component<staminaStatsComponent>(ID);
+        if (appECS->has_components<stamina_component, stamina_stats_component>(ID)) {
+            auto& playerStaminaC = appECS->get_component<stamina_component>(ID);
+            auto& playerStamStatC = appECS->get_component<stamina_stats_component>(ID);
             ImGui::Text("Stamina: (%f/%f)", playerStaminaC.stamina, playerStamStatC.max_stamina);
         }
 
-        if (appECS->has_components<offensiveStatsComponent>(ID)) {
-            auto& offStatsC = appECS->get_component<offensiveStatsComponent>(ID);
+        if (appECS->has_components<offensive_stats_component>(ID)) {
+            auto& offStatsC = appECS->get_component<offensive_stats_component>(ID);
             ImGui::Text("Strength : (%f)", offStatsC.strength);
             ImGui::Text("Agility : (%f)", offStatsC.agility);
             ImGui::Text("Dexterity : (%f)", offStatsC.dexterity);
             ImGui::Text("Piercing : (%f)", offStatsC.piercing);
             ImGui::Text("Intellect : (%f)", offStatsC.intellect);
         }
-        if (appECS->has_components<defensiveStatsComponent>(ID)) {
-            auto& defstats = appECS->get_component<defensiveStatsComponent>(ID);
+        if (appECS->has_components<defensive_stats_component>(ID)) {
+            auto& defstats = appECS->get_component<defensive_stats_component>(ID);
             ImGui::Text("Defense : (%f)", defstats.defense);
             ImGui::Text("Block : (%f)", defstats.block);
             ImGui::Text("Dodge : (%f)", defstats.dodge);
@@ -292,8 +292,8 @@ private:
             ImGui::Text("%zu", i);
 
             ImGui::TableSetColumnIndex(1);
-            if (appECS->has_components<identificationComponent>(i)) {
-                ImGui::Text("%s", appECS->get_component<identificationComponent>(i).name.c_str());
+            if (appECS->has_components<identification_component>(i)) {
+                ImGui::Text("%s", appECS->get_component<identification_component>(i).name.c_str());
             } else {
                 ImGui::Text("%s", "Unknown");
             }
@@ -307,8 +307,8 @@ private:
             ImGui::Text("%s", signature.c_str());
 
             ImGui::TableSetColumnIndex(3);
-            if (appECS->has_components<positionComponent>(i)) {
-                const auto& position = appECS->get_component<positionComponent>(i).position;
+            if (appECS->has_components<position_component>(i)) {
+                const auto& position = appECS->get_component<position_component>(i).position;
                 ImGui::Text("%f/%f", position.x, position.y);
             } else {
                 ImGui::Text("(-/-)");
@@ -394,34 +394,34 @@ private:
     }
     void draw_entity_health_bar(yorcvs::sdl2_window& window, size_t ID, const yorcvs::Rect<float>& offset_rect)
     {
-        if (appECS->has_components<healthComponent, healthStatsComponent>(ID)) {
+        if (appECS->has_components<health_component, health_stats_component>(ID)) {
             // draw health bar
             yorcvs::Rect<float> healthBarRect {};
-            if (appECS->has_components<spriteComponent>(
+            if (appECS->has_components<sprite_component>(
                     ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
             {
-                healthBarRect.y = offset_rect.y - appECS->get_component<spriteComponent>(ID).size.y / 2;
+                healthBarRect.y = offset_rect.y - appECS->get_component<sprite_component>(ID).size.y / 2;
             } else {
                 healthBarRect.y = offset_rect.y - offset_rect.h;
             }
             healthBarRect.x = offset_rect.x - health_bar_x_offset + offset_rect.w / 2;
             healthBarRect.w = health_full_bar_dimension.x;
             healthBarRect.h = health_full_bar_dimension.y;
-            if (appECS->has_components<staminaComponent>(ID)) {
+            if (appECS->has_components<stamina_component>(ID)) {
                 healthBarRect.y -= health_full_bar_dimension.y * 2;
             }
-            draw_status_bar(window, healthBarRect, (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthStatsComponent>(ID).max_HP),
+            draw_status_bar(window, healthBarRect, (appECS->get_component<health_component>(ID).HP / appECS->get_component<health_stats_component>(ID).max_HP),
                 health_bar_full_color, health_bar_empty_color);
         }
     }
     void draw_entity_stamina_bar(yorcvs::sdl2_window& window, size_t ID, const yorcvs::Rect<float>& offset_rect)
     {
-        if (appECS->has_components<staminaComponent, staminaStatsComponent>(ID)) {
+        if (appECS->has_components<stamina_component, stamina_stats_component>(ID)) {
             yorcvs::Rect<float> staminaBarRect {};
-            if (appECS->has_components<spriteComponent>(
+            if (appECS->has_components<sprite_component>(
                     ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
             {
-                staminaBarRect.y = offset_rect.y - appECS->get_component<spriteComponent>(ID).size.y / 2;
+                staminaBarRect.y = offset_rect.y - appECS->get_component<sprite_component>(ID).size.y / 2;
             } else {
                 staminaBarRect.y = offset_rect.y - offset_rect.h;
             }
@@ -430,7 +430,7 @@ private:
 
             staminaBarRect.w = health_full_bar_dimension.x;
             staminaBarRect.h = health_full_bar_dimension.y;
-            draw_status_bar(window, staminaBarRect, (appECS->get_component<staminaComponent>(ID).stamina / appECS->get_component<staminaStatsComponent>(ID).max_stamina),
+            draw_status_bar(window, staminaBarRect, (appECS->get_component<stamina_component>(ID).stamina / appECS->get_component<stamina_stats_component>(ID).max_stamina),
                 stamina_bar_full_color, stamina_bar_empty_color);
         }
     }

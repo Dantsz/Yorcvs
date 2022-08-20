@@ -133,50 +133,50 @@ inline bool bind_runtime(sol::state& lua_state, yorcvs::ECS* ecs)
         return names.size();
     };
     bind_system_entity_list(lua_state);
-    register_component_to_lua<healthComponent>(lua_state, "healthComponent",
-        "HP", &healthComponent::HP);
-    register_component_to_lua<healthStatsComponent>(lua_state, "healthStatsComponent",
-        "max_HP", &healthStatsComponent::max_HP,
-        "health_regen", &healthStatsComponent::health_regen);
-    register_component_to_lua<identificationComponent>(lua_state, "identificationComponent",
-        "name", &identificationComponent::name);
-    register_component_to_lua<hitboxComponent>(lua_state,
+    register_component_to_lua<health_component>(lua_state, "healthComponent",
+        "HP", &health_component::HP);
+    register_component_to_lua<health_stats_component>(lua_state, "healthStatsComponent",
+        "max_HP", &health_stats_component::max_HP,
+        "health_regen", &health_stats_component::health_regen);
+    register_component_to_lua<identification_component>(lua_state, "identificationComponent",
+        "name", &identification_component::name);
+    register_component_to_lua<hitbox_component>(lua_state,
         "hitboxComponent",
-        "hitbox", &hitboxComponent::hitbox);
-    register_component_to_lua<positionComponent>(lua_state, "positionComponent",
-        "position", &positionComponent::position);
-    register_component_to_lua<velocityComponent>(lua_state, "velocityComponent",
-        "vel", &velocityComponent::vel,
-        "facing", &velocityComponent::facing);
-    register_component_to_lua<staminaComponent>(lua_state, "staminaComponent",
-        "stamina", &staminaComponent::stamina);
-    register_component_to_lua<staminaStatsComponent>(lua_state, "staminaStatsComponent",
-        "max_stamina", &staminaStatsComponent::max_stamina,
-        "stamina_regen", &staminaStatsComponent::stamina_regen);
-    register_component_to_lua<spriteComponent>(lua_state, "spriteComponent",
-        "offset", &spriteComponent::offset,
-        "size", &spriteComponent::size,
-        "src_rect", &spriteComponent::src_rect,
-        "texture_path", &spriteComponent::texture_path);
-    register_component_to_lua<animationComponent>(
+        "hitbox", &hitbox_component::hitbox);
+    register_component_to_lua<position_component>(lua_state, "positionComponent",
+        "position", &position_component::position);
+    register_component_to_lua<velocity_component>(lua_state, "velocityComponent",
+        "vel", &velocity_component::vel,
+        "facing", &velocity_component::facing);
+    register_component_to_lua<stamina_component>(lua_state, "staminaComponent",
+        "stamina", &stamina_component::stamina);
+    register_component_to_lua<stamina_stats_component>(lua_state, "staminaStatsComponent",
+        "max_stamina", &stamina_stats_component::max_stamina,
+        "stamina_regen", &stamina_stats_component::stamina_regen);
+    register_component_to_lua<sprite_component>(lua_state, "spriteComponent",
+        "offset", &sprite_component::offset,
+        "size", &sprite_component::size,
+        "src_rect", &sprite_component::src_rect,
+        "texture_path", &sprite_component::texture_path);
+    register_component_to_lua<animation_component>(
         lua_state, "animationComponent",
-        "animations", &animationComponent::animation_name_to_start_frame_index,
-        "cur_frame", &animationComponent::current_frame, "frames", &animationComponent::frames);
-    register_component_to_lua<defensiveStatsComponent>(
+        "animations", &animation_component::animation_name_to_start_frame_index,
+        "cur_frame", &animation_component::current_frame, "frames", &animation_component::frames);
+    register_component_to_lua<defensive_stats_component>(
         lua_state, "defensiveStatsComponent",
-        "defense", &defensiveStatsComponent::defense,
-        "block", &defensiveStatsComponent::block,
-        "dodge", &defensiveStatsComponent::dodge,
-        "spirit", &defensiveStatsComponent::spirit);
-    register_component_to_lua<offensiveStatsComponent>(
+        "defense", &defensive_stats_component::defense,
+        "block", &defensive_stats_component::block,
+        "dodge", &defensive_stats_component::dodge,
+        "spirit", &defensive_stats_component::spirit);
+    register_component_to_lua<offensive_stats_component>(
         lua_state, "offensiveStatsComponent",
-        "strength", &offensiveStatsComponent::strength,
-        "agility", &offensiveStatsComponent::agility,
-        "dexterity", &offensiveStatsComponent::dexterity,
-        "piercing", &offensiveStatsComponent::piercing,
-        "intellect", &offensiveStatsComponent::intellect);
-    register_component_to_lua<playerMovementControlledComponent>(lua_state, "playerMovementControl");
-    register_component_to_lua<behaviourComponent>(lua_state, "behaviourComponent", &behaviourComponent::code_path, "code_path");
+        "strength", &offensive_stats_component::strength,
+        "agility", &offensive_stats_component::agility,
+        "dexterity", &offensive_stats_component::dexterity,
+        "piercing", &offensive_stats_component::piercing,
+        "intellect", &offensive_stats_component::intellect);
+    register_component_to_lua<player_movement_controlled_component>(lua_state, "playerMovementControl");
+    register_component_to_lua<behaviour_component>(lua_state, "behaviourComponent", &behaviour_component::code_path, "code_path");
     return true;
 }
 

@@ -24,7 +24,7 @@ struct Tile {
  * @brief Loads tmx map data into the ecs
  *
  */
-class Map : public Entity_Loader<identificationComponent, healthComponent, healthStatsComponent, staminaComponent, staminaStatsComponent, hitboxComponent, spriteComponent, animationComponent, defensiveStatsComponent, offensiveStatsComponent> {
+class Map : public Entity_Loader<identification_component, health_component, health_stats_component, stamina_component, stamina_stats_component, hitbox_component, sprite_component, animation_component, defensive_stats_component, offensive_stats_component> {
 public:
     explicit Map(yorcvs::ECS* world)
         : Entity_Loader(world, { "identification", "health", "health_stats", "stamina", "stamina_stats", "hitbox", "sprite", "animation", "defensive_stats", "offsensive_stats" })
@@ -195,10 +195,10 @@ private:
                     // add object
                     ysorted_tiles.emplace_back(ecs);
                     const size_t entity = ysorted_tiles[ysorted_tiles.size() - 1].id;
-                    ecs->add_component<positionComponent>(
+                    ecs->add_component<position_component>(
                         entity,
                         { chunk_position * tilesSize + tilesSize * yorcvs::Vec2<float> { static_cast<float>(chunk_x), static_cast<float>(chunk_y) } });
-                    ecs->add_component<spriteComponent>(entity, { { 0, 0 }, { static_cast<float>(tile_set->getTileSize().x), static_cast<float>(tile_set->getTileSize().y) }, get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID), tile_set->getImagePath() });
+                    ecs->add_component<sprite_component>(entity, { { 0, 0 }, { static_cast<float>(tile_set->getTileSize().x), static_cast<float>(tile_set->getTileSize().y) }, get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID), tile_set->getImagePath() });
                 }
             }
         }
@@ -213,11 +213,11 @@ private:
     {
         // Note: handles hitbox to object
         if (property.getName() == "collision" && property.getBoolValue()) {
-            ecs->add_component<hitboxComponent>(entity, { { 0, 0, object.getAABB().width, object.getAABB().height } });
+            ecs->add_component<hitbox_component>(entity, { { 0, 0, object.getAABB().width, object.getAABB().height } });
             // TILED HAS A WEIRD BEHAVIOUR THAT IF AN TILE IS INSERTED AS A OBJECT IT'S Y POSITION IS DIFFERENT
             // FROM AN RECTANGLE OBJECT AND DOESN'T LOOK LIKE IN THE EDITOR
-            if (!ecs->has_components<spriteComponent>(entity)) {
-                ecs->get_component<hitboxComponent>(entity).hitbox.y += object.getAABB().height;
+            if (!ecs->has_components<sprite_component>(entity)) {
+                ecs->get_component<hitbox_component>(entity).hitbox.y += object.getAABB().height;
             }
             return true;
         }
@@ -232,11 +232,11 @@ private:
     [[nodiscard]] bool object_handle_property_float(const size_t entity, const tmx::Property& property) const
     {
         if (property.getName() == "behaviourDT") {
-            if (!ecs->has_components<behaviourComponent>(entity)) {
-                ecs->add_component<behaviourComponent>(entity, {});
+            if (!ecs->has_components<behaviour_component>(entity)) {
+                ecs->add_component<behaviour_component>(entity, {});
             }
-            ecs->get_component<behaviourComponent>(entity).dt = property.getFloatValue();
-            ecs->get_component<behaviourComponent>(entity).accumulated = 0.0f;
+            ecs->get_component<behaviour_component>(entity).dt = property.getFloatValue();
+            ecs->get_component<behaviour_component>(entity).accumulated = 0.0f;
             return true;
         }
         return false;
@@ -252,13 +252,13 @@ private:
             return true;
         }
         if (property.getName() == "behaviour") {
-            ecs->add_component<behaviourComponent>(entity, {});
+            ecs->add_component<behaviour_component>(entity, {});
             if (filePath.empty()) {
                 yorcvs::log("Entity " + std::to_string(entity) + " has not been specified a valid behaviour, using default", yorcvs::MSGSEVERITY::ERROR);
-                ecs->get_component<behaviourComponent>(entity).code_path = directory_path + "scripts/behavior_chicken.lua";
+                ecs->get_component<behaviour_component>(entity).code_path = directory_path + "scripts/behavior_chicken.lua";
                 return true;
             }
-            ecs->get_component<behaviourComponent>(entity).code_path = directory_path + filePath;
+            ecs->get_component<behaviour_component>(entity).code_path = directory_path + filePath;
             return true;
         }
         return false;
@@ -277,13 +277,13 @@ private:
             // create entity
             entities.push_back(ecs->create_entity_ID());
             const size_t entity = entities[entities.size() - 1];
-            ecs->add_component<positionComponent>(
+            ecs->add_component<position_component>(
                 entity, { { object.getPosition().x, object.getPosition().y - object.getAABB().height } });
             if (object.getTileID() != 0 && object.visible()) {
                 const auto* tileSet = get_tileset_containing(map, object.getTileID());
                 // add sprite component
 
-                ecs->add_component<spriteComponent>(entity, { { 0, 0 }, { object.getAABB().width, object.getAABB().height }, get_src_rect_from_uid(map, object.getTileID()), tileSet->getImagePath() });
+                ecs->add_component<sprite_component>(entity, { { 0, 0 }, { object.getAABB().width, object.getAABB().height }, get_src_rect_from_uid(map, object.getTileID()), tileSet->getImagePath() });
             }
             /*
             Object properties
@@ -326,20 +326,20 @@ private:
     {
         std::filesystem::path file = path;
         const std::string directory_path = file.remove_filename().generic_string();
-        if (world->has_components<spriteComponent>(entity_id)) {
-            const std::string sprite_path = directory_path + world->get_component<spriteComponent>(entity_id).texture_path;
-            world->get_component<spriteComponent>(entity_id).texture_path = sprite_path;
+        if (world->has_components<sprite_component>(entity_id)) {
+            const std::string sprite_path = directory_path + world->get_component<sprite_component>(entity_id).texture_path;
+            world->get_component<sprite_component>(entity_id).texture_path = sprite_path;
         }
         // These components should not be serialized as the position and velocity is relative to the map!!!
-        if (!world->has_components<positionComponent>(entity_id)) {
-            world->add_component<positionComponent>(entity_id, {});
+        if (!world->has_components<position_component>(entity_id)) {
+            world->add_component<position_component>(entity_id, {});
             const auto spawn_position = get_spawn_position();
-            world->get_component<positionComponent>(entity_id).position = spawn_position;
+            world->get_component<position_component>(entity_id).position = spawn_position;
         }
-        if (!world->has_components<velocityComponent>(entity_id)) {
-            world->add_component<velocityComponent>(entity_id, {});
+        if (!world->has_components<velocity_component>(entity_id)) {
+            world->add_component<velocity_component>(entity_id, {});
         }
-        world->get_component<velocityComponent>(entity_id) = { { 0.0f, 0.0f }, { false, false } };
+        world->get_component<velocity_component>(entity_id) = { { 0.0f, 0.0f }, { false, false } };
     }
     // NOTE: this can be a free function
     static yorcvs::Rect<size_t> get_src_rect_from_uid(const tmx::Map& map, const size_t UID)
@@ -390,12 +390,12 @@ public:
         explicit ecs_Initializer(yorcvs::ECS& world)
         {
             // register components
-            world.register_component<identificationComponent>();
-            world.register_component<hitboxComponent, positionComponent, velocityComponent, healthComponent,
-                staminaComponent>();
-            world.register_component<playerMovementControlledComponent, behaviourComponent>();
-            world.register_component<spriteComponent, animationComponent>();
-            world.register_component<healthStatsComponent, staminaStatsComponent, offensiveStatsComponent, defensiveStatsComponent>();
+            world.register_component<identification_component>();
+            world.register_component<hitbox_component, position_component, velocity_component, health_component,
+                stamina_component>();
+            world.register_component<player_movement_controlled_component, behaviour_component>();
+            world.register_component<sprite_component, animation_component>();
+            world.register_component<health_stats_component, stamina_stats_component, offensive_stats_component, defensive_stats_component>();
         }
     };
     // class to initialize the ecs before systems are constructed

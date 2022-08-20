@@ -16,7 +16,7 @@ public:
         , lua_state(lua)
     {
         world->register_system<BehaviourSystem>(*this); // registers itself
-        world->add_criteria_for_iteration<BehaviourSystem, behaviourComponent, velocityComponent>();
+        world->add_criteria_for_iteration<BehaviourSystem, behaviour_component, velocity_component>();
         scripts = std::make_unique<yorcvs::AssetManager<std::string>>(
             [&](const std::string& path) {
                 auto program = std::make_shared<std::string>();
@@ -30,16 +30,16 @@ public:
     void run_behaviour(const size_t ID) const
     {
         (*lua_state)["entityID"] = ID;
-        const std::string& script_path = world->get_component<behaviourComponent>(ID).code_path;
-        world->get_component<behaviourComponent>(ID).accumulated = 0.0f;
+        const std::string& script_path = world->get_component<behaviour_component>(ID).code_path;
+        world->get_component<behaviour_component>(ID).accumulated = 0.0f;
         lua_state->safe_script(*scripts->load_from_file(script_path));
     }
     void update(const float dt)
     {
         for (const auto ID : *entityList) {
-            world->get_component<behaviourComponent>(ID).accumulated += dt;
+            world->get_component<behaviour_component>(ID).accumulated += dt;
 
-            if (world->get_component<behaviourComponent>(ID).accumulated > world->get_component<behaviourComponent>(ID).dt) {
+            if (world->get_component<behaviour_component>(ID).accumulated > world->get_component<behaviour_component>(ID).dt) {
                 run_behaviour(ID);
             }
         }

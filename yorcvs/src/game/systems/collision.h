@@ -12,7 +12,7 @@ public:
         : world(parent)
     {
         world->register_system<nonsolid_collision_handler>(*this);
-        world->add_criteria_for_iteration<nonsolid_collision_handler, positionComponent, hitboxComponent, velocityComponent>();
+        world->add_criteria_for_iteration<nonsolid_collision_handler, position_component, hitbox_component, velocity_component>();
     }
     std::shared_ptr<yorcvs::EntitySystemList> entityList;
     yorcvs::ECS* world;
@@ -29,7 +29,7 @@ public:
     {
         // is this legal? yee
         world->register_system<CollisionSystem>(*this);
-        world->add_criteria_for_iteration<CollisionSystem, positionComponent, hitboxComponent>();
+        world->add_criteria_for_iteration<CollisionSystem, position_component, hitbox_component>();
     }
     /**
      * @brief
@@ -42,20 +42,20 @@ public:
         yorcvs::Rect<float> rectB {};
 
         for (const auto& IDA : *non_solids.entityList) {
-            rectA.x = world->get_component<positionComponent>(IDA).position.x + world->get_component<hitboxComponent>(IDA).hitbox.x;
-            rectA.y = world->get_component<positionComponent>(IDA).position.y + world->get_component<hitboxComponent>(IDA).hitbox.y;
-            rectA.w = world->get_component<hitboxComponent>(IDA).hitbox.w;
-            rectA.h = world->get_component<hitboxComponent>(IDA).hitbox.h;
-            yorcvs::Vec2<float>& rectAvel = world->get_component<velocityComponent>(IDA).vel;
+            rectA.x = world->get_component<position_component>(IDA).position.x + world->get_component<hitbox_component>(IDA).hitbox.x;
+            rectA.y = world->get_component<position_component>(IDA).position.y + world->get_component<hitbox_component>(IDA).hitbox.y;
+            rectA.w = world->get_component<hitbox_component>(IDA).hitbox.w;
+            rectA.h = world->get_component<hitbox_component>(IDA).hitbox.h;
+            yorcvs::Vec2<float>& rectAvel = world->get_component<velocity_component>(IDA).vel;
             rectAvel *= dt;
             for (const auto& IDB : *entityList) {
-                if (!world->has_components<velocityComponent>(IDB)) {
-                    rectB.x = world->get_component<positionComponent>(IDB).position.x + world->get_component<hitboxComponent>(IDB).hitbox.x;
-                    rectB.y = world->get_component<positionComponent>(IDB).position.y + world->get_component<hitboxComponent>(IDB).hitbox.y;
+                if (!world->has_components<velocity_component>(IDB)) {
+                    rectB.x = world->get_component<position_component>(IDB).position.x + world->get_component<hitbox_component>(IDB).hitbox.x;
+                    rectB.y = world->get_component<position_component>(IDB).position.y + world->get_component<hitbox_component>(IDB).hitbox.y;
 
-                    rectB.w = world->get_component<hitboxComponent>(IDB).hitbox.w;
+                    rectB.w = world->get_component<hitbox_component>(IDB).hitbox.w;
 
-                    rectB.h = world->get_component<hitboxComponent>(IDB).hitbox.h;
+                    rectB.h = world->get_component<hitbox_component>(IDB).hitbox.h;
                     if (IDA != IDB) {
                         // left to right
                         check_collision_left_right(rectA, rectB, rectAvel, dt);

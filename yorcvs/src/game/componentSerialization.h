@@ -32,58 +32,58 @@ inline void from_json(const json::json& j, yorcvs::Rect<T>& rect)
     j.at("h").get_to(rect.h);
 }
 }
-inline void to_json(json::json& j, const identificationComponent& p)
+inline void to_json(json::json& j, const identification_component& p)
 {
     j = json::json { { "name", p.name } };
 }
-inline void from_json(const json::json& j, identificationComponent& p)
+inline void from_json(const json::json& j, identification_component& p)
 {
     j.at("name").get_to(p.name);
 }
-inline void to_json(json::json& j, const healthComponent& comp)
+inline void to_json(json::json& j, const health_component& comp)
 {
     j = json::json { { "current", comp.HP } }; //,
 }
-inline void from_json(const json::json& j, healthComponent& comp)
+inline void from_json(const json::json& j, health_component& comp)
 {
     j.at("current").get_to(comp.HP);
 }
-inline void to_json(json::json& j, const healthStatsComponent& comp)
+inline void to_json(json::json& j, const health_stats_component& comp)
 {
     j = { { "max", comp.max_HP }, { "regen", comp.health_regen } };
 }
-inline void from_json(const json::json& j, healthStatsComponent& comp)
+inline void from_json(const json::json& j, health_stats_component& comp)
 {
     j.at("max").get_to(comp.max_HP);
     j.at("regen").get_to(comp.health_regen);
 }
-inline void to_json(json::json& j, const staminaComponent& comp)
+inline void to_json(json::json& j, const stamina_component& comp)
 {
     j = json::json { { "current", comp.stamina } };
 }
-inline void from_json(const json::json& j, staminaComponent& comp)
+inline void from_json(const json::json& j, stamina_component& comp)
 {
     j.at("current").get_to(comp.stamina);
 }
-inline void to_json(json::json& j, const staminaStatsComponent& comp)
+inline void to_json(json::json& j, const stamina_stats_component& comp)
 {
     j = json::json { { "max", comp.max_stamina }, { "regen", comp.stamina_regen } };
 }
-inline void from_json(const json::json& j, staminaStatsComponent& comp)
+inline void from_json(const json::json& j, stamina_stats_component& comp)
 {
     j.at("max").get_to(comp.max_stamina);
     j.at("regen").get_to(comp.stamina_regen);
 }
-inline void to_json(json::json& j, const hitboxComponent& comp)
+inline void to_json(json::json& j, const hitbox_component& comp)
 {
     j = comp.hitbox;
 }
-inline void from_json(const json::json& j, hitboxComponent& comp)
+inline void from_json(const json::json& j, hitbox_component& comp)
 {
     j.get_to(comp.hitbox);
 }
 
-inline void to_json(json::json& j, const spriteComponent& comp)
+inline void to_json(json::json& j, const sprite_component& comp)
 {
     j["offset"] = comp.offset;
     j["size"] = comp.size;
@@ -91,7 +91,7 @@ inline void to_json(json::json& j, const spriteComponent& comp)
     std::filesystem::path sprite_path = comp.texture_path;
     j["spriteName"] = sprite_path.filename().string();
 }
-inline void from_json(const json::json& j, spriteComponent& comp)
+inline void from_json(const json::json& j, sprite_component& comp)
 {
     comp = { { j["offset"]["x"], j["offset"]["y"] },
         { j["size"]["x"], j["size"]["y"] },
@@ -99,7 +99,7 @@ inline void from_json(const json::json& j, spriteComponent& comp)
         j["spriteName"] };
 }
 
-inline void to_json(json::json& j, const animationComponent& comp)
+inline void to_json(json::json& j, const animation_component& comp)
 {
     for (const auto& [rect, next_id, speed] : comp.frames) {
         json::json frame {};
@@ -115,7 +115,7 @@ inline void to_json(json::json& j, const animationComponent& comp)
     j["current_elapsed_time"] = comp.current_elapsed_time;
     j["current_animation_name"] = comp.current_animation_name;
 }
-inline void from_json(const json::json& j, animationComponent& comp)
+inline void from_json(const json::json& j, animation_component& comp)
 {
     comp.animation_name_to_start_frame_index.clear();
     comp.frames.clear();
@@ -133,7 +133,7 @@ inline void from_json(const json::json& j, animationComponent& comp)
         comp.animation_name_to_start_frame_index[animation.key()] = animation.value();
     }
 }
-inline void to_json(json::json& j, const offensiveStatsComponent& comp)
+inline void to_json(json::json& j, const offensive_stats_component& comp)
 {
     j["strength"] = comp.strength;
     j["agility"] = comp.agility;
@@ -141,7 +141,7 @@ inline void to_json(json::json& j, const offensiveStatsComponent& comp)
     j["piercing"] = comp.piercing;
     j["intellect"] = comp.intellect;
 }
-inline void from_json(const json::json& j, offensiveStatsComponent& comp)
+inline void from_json(const json::json& j, offensive_stats_component& comp)
 {
     if (j.contains("strength")) {
         comp.strength = j["strength"];
@@ -160,14 +160,14 @@ inline void from_json(const json::json& j, offensiveStatsComponent& comp)
     }
 }
 
-inline void to_json(json::json& j, const defensiveStatsComponent& comp)
+inline void to_json(json::json& j, const defensive_stats_component& comp)
 {
     j["defense"] = comp.defense;
     j["dodge"] = comp.dodge;
     j["block"] = comp.block;
     j["spirit"] = comp.spirit;
 }
-inline void from_json(const json::json& j, defensiveStatsComponent& comp)
+inline void from_json(const json::json& j, defensive_stats_component& comp)
 {
     if (j.contains("defense")) {
         comp.defense = j["defense"];

@@ -10,7 +10,7 @@ int main(int argc, char** argv)
     yorcvs::Map map { TEST_MAP_FILE, &world };
     yorcvs::Entity entity { &world };
     map.load_character_from_path(entity.id, TEST_LOAD_ENTITY_FILE);
-    const auto ok = world.has_components<identificationComponent, hitboxComponent, healthComponent, spriteComponent>(entity.id);
+    const auto ok = world.has_components<identification_component, hitbox_component, health_component, sprite_component>(entity.id);
     assert(ok);
     map.load_character_from_path(entity.id, "file does not exist");
     return 0;

@@ -7,7 +7,7 @@
  * @brief Defines some identification information for entity
  *
  */
-struct identificationComponent {
+struct identification_component {
     std::string name;
 };
 
@@ -15,19 +15,19 @@ struct identificationComponent {
  * @brief Represent a hitbox (x and y represents offset from positionComponent)
  *
  */
-struct hitboxComponent {
+struct hitbox_component {
     yorcvs::Rect<float> hitbox;
 };
-struct positionComponent {
+struct position_component {
     yorcvs::Vec2<float> position;
 };
-struct velocityComponent {
+struct velocity_component {
     yorcvs::Vec2<float> vel;
     yorcvs::Vec2<bool> facing; // x - true if last velocity change was right, left if false
                                // y - true if last velocity change was down , down if up
 };
 
-struct playerMovementControlledComponent {
+struct player_movement_controlled_component {
 public:
     enum player_state : size_t {
         PLAYER_IDLE_R,
@@ -43,31 +43,31 @@ public:
     float update_time {};
 };
 
-struct healthComponent {
+struct health_component {
     float HP;
     bool is_dead; // no health regen if dead
 };
-struct healthStatsComponent {
+struct health_stats_component {
     float max_HP;
     float health_regen; // per tick
 };
 
-struct staminaComponent {
+struct stamina_component {
     float stamina;
 };
-struct staminaStatsComponent {
+struct stamina_stats_component {
     float max_stamina;
     float stamina_regen;
 };
 
-struct spriteComponent {
+struct sprite_component {
     yorcvs::Vec2<float> offset; // position offset
     yorcvs::Vec2<float> size; // size of sprite
     yorcvs::Rect<size_t> src_rect; // part of texture to render
     std::string texture_path;
 };
 
-struct animationComponent {
+struct animation_component {
     /**
      *A frame of an animation
      *The rectangle represents the area of the texture to render
@@ -82,18 +82,18 @@ struct animationComponent {
     float current_elapsed_time;
 };
 
-struct behaviourComponent {
+struct behaviour_component {
     float dt;
     float accumulated;
     std::string code_path;
 };
-struct defensiveStatsComponent {
+struct defensive_stats_component {
     float defense;
     float block;
     float dodge;
     float spirit;
 };
-struct offensiveStatsComponent {
+struct offensive_stats_component {
     float strength;
     float agility;
     float dexterity;
