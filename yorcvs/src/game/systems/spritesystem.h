@@ -6,14 +6,14 @@
  * @brief Draws the entity to the window
  *
  */
-class SpriteSystem {
+class sprite_system {
 public:
-    SpriteSystem(yorcvs::ECS* parent, yorcvs::sdl2_window* parentWindow)
+    sprite_system(yorcvs::ECS* parent, yorcvs::sdl2_window* parentWindow)
         : world(parent)
         , window(parentWindow)
     {
-        world->register_system<SpriteSystem>(*this);
-        world->add_criteria_for_iteration<SpriteSystem, position_component, sprite_component>();
+        world->register_system<sprite_system>(*this);
+        world->add_criteria_for_iteration<sprite_system, position_component, sprite_component>();
     }
     void renderSprites(const yorcvs::vec2<float>& render_dimensions) const
     {

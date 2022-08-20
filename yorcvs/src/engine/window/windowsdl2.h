@@ -73,7 +73,7 @@ public:
             yorcvs::MSGSEVERITY::INFO);
 
         yorcvs::log("creating texture manager");
-        assetm = std::make_unique<yorcvs::AssetManager<SDL_Texture>>(
+        assetm = std::make_unique<yorcvs::asset_manager<SDL_Texture>>(
             [&](const std::string& path) -> std::shared_ptr<SDL_Texture> {
                 SDL_Surface* surf = nullptr;
                 SDL_RWops* rwop = SDL_RWFromFile(path.c_str(), "rb");
@@ -237,7 +237,7 @@ public:
         SDL_RenderGetScale(renderer, &scale.x, &scale.y);
         return scale;
     }
-    std::unique_ptr<yorcvs::AssetManager<SDL_Texture>> assetm = nullptr;
+    std::unique_ptr<yorcvs::asset_manager<SDL_Texture>> assetm = nullptr;
 
 private:
     SDL_Window* sdlWindow = nullptr;

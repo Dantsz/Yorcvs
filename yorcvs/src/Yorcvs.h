@@ -28,19 +28,19 @@ namespace yorcvs {
  * @brief Main game class
  *
  */
-class Application {
+class application {
 public:
-    Application()
-        : debug_info_widgets(this, &app_window, &map, &player_control, &map.collision_system, &map.health_system, &map.combat_system, &lua_state)
-        , entity_interaction_widget(app_window, app_window, world, map.collision_system, map.combat_system, player_control)
+    application()
+        : debug_info_widgets(this, &app_window, &map, &player_control, &map.collision_sys, &map.health_system, &map.combat_sys, &lua_state)
+        , entity_interaction_widget(app_window, app_window, world, map.collision_sys, map.combat_sys, player_control)
     {
         lua_state.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
         yorcvs::lua::bind_runtime(lua_state, &world);
 
         yorcvs::lua::register_system_to_lua(lua_state, "health_system", map.health_system);
-        yorcvs::lua::register_system_to_lua(lua_state, "collision_system", map.collision_system);
-        yorcvs::lua::register_system_to_lua(lua_state, "animation_system", map.animation_system, "set_animation", &animation_system::set_animation);
-        yorcvs::lua::register_system_to_lua(lua_state, "combat_system", map.combat_system, "attack",
+        yorcvs::lua::register_system_to_lua(lua_state, "collision_system", map.collision_sys);
+        yorcvs::lua::register_system_to_lua(lua_state, "animation_system", map.animation_sys, "set_animation", &animation_system::set_animation);
+        yorcvs::lua::register_system_to_lua(lua_state, "combat_system", map.combat_sys, "attack",
             &combat_system::attack);
         lua_state["test_map"] = &map;
         // loading two maps one on top of each other
@@ -53,10 +53,10 @@ public:
         [[maybe_unused]] const auto callback_id = app_window.add_callback_on_event(yorcvs::Events::Type::WINDOW_QUIT, [&app_active = active](const yorcvs::event&) { app_active = false; });
         counter.start();
     }
-    Application(const Application& other) = delete;
-    Application(Application&& other) = delete;
-    Application& operator=(const Application& other) = delete;
-    Application& operator=(Application&& other) = delete;
+    application(const application& other) = delete;
+    application(application&& other) = delete;
+    application& operator=(const application& other) = delete;
+    application& operator=(application&& other) = delete;
 
     void render_map_chunk(yorcvs::map& p_map, const std::tuple<intmax_t, intmax_t>& chunk)
     {
@@ -115,19 +115,19 @@ public:
             tracked_parameters[yorcvs::ui::Performance_Window::update_time_item::health] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
 
             update_timer.start();
-            behaviour_system.update(msPF);
+            behaviour_sys.update(msPF);
             tracked_parameters[yorcvs::ui::Performance_Window::update_time_item::behaviour] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
 
             update_timer.start();
-            map.collision_system.update(msPF);
+            map.collision_sys.update(msPF);
             tracked_parameters[yorcvs::ui::Performance_Window::update_time_item::collision] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
 
             update_timer.start();
-            map.velocity_system.update(msPF);
+            map.velocity_sys.update(msPF);
             tracked_parameters[yorcvs::ui::Performance_Window::update_time_item::velocity] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
 
             update_timer.start();
-            map.animation_system.update(msPF);
+            map.animation_sys.update(msPF);
             tracked_parameters[yorcvs::ui::Performance_Window::update_time_item::animation] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
 
             update_timer.start();
@@ -146,7 +146,7 @@ public:
         }
         app_window.clear();
         render_map_tiles(map);
-        sprite_system.renderSprites(render_dimensions);
+        sprite_sys.renderSprites(render_dimensions);
         debug_info_widgets.render(render_dimensions);
         entity_interaction_widget.render(render_dimensions);
         if (debug_info_widgets.is_debug_window_open()) {
@@ -163,7 +163,7 @@ public:
         return active;
     }
 
-    ~Application() = default;
+    ~application() = default;
 
 private:
     static constexpr yorcvs::vec2<float> default_render_dimensions = { 240.0f, 120.0f };
@@ -171,9 +171,9 @@ private:
     static constexpr intmax_t default_render_distance = 1;
 
     yorcvs::sdl2_window app_window;
-    yorcvs::Timer counter;
-    yorcvs::Timer update_timer;
-    yorcvs::Timer update_loop_timer;
+    yorcvs::timer counter;
+    yorcvs::timer update_timer;
+    yorcvs::timer update_loop_timer;
 
     float lag = 0.0f;
     yorcvs::vec2<float> render_dimensions = default_render_dimensions; // how much to render
@@ -181,9 +181,9 @@ private:
     yorcvs::ECS world {};
     sol::state lua_state;
     yorcvs::map map { &world };
-    SpriteSystem sprite_system { map.ecs, &app_window };
+    sprite_system sprite_sys { map.ecs, &app_window };
     player_movement_control player_control { map.ecs, &app_window };
-    behaviour_system behaviour_system { map.ecs, &lua_state };
+    behaviour_system behaviour_sys { map.ecs, &lua_state };
 
     yorcvs::ui::Performance_Window performance_window;
     std::array<float, yorcvs::ui::Performance_Window::update_time_item::update_time_tracked> tracked_parameters;

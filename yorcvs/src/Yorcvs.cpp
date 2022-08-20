@@ -8,12 +8,12 @@
 [[maybe_unused]]
 static void run_emscripten([[maybe_unused]]void* app)
 {
-    static_cast<yorcvs::Application*>(app)->run();
+    static_cast<yorcvs::application*>(app)->run();
 }
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) // NOLINT
 {
-    yorcvs::Application app;
+    yorcvs::application app;
    
 #ifdef __EMSCRIPTEN__
     yorcvs::log("running EMSCRIPTEM");

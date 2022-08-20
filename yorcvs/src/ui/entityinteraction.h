@@ -34,9 +34,9 @@ public:
         : event_handler(&event_handler)
         , window(&window)
         , world(&world)
-        , collision_system(&collision_system)
-        , combat_system(&combat_system)
-        , player_move_system(&player_move_system)
+        , collision_sys(&collision_system)
+        , combat_sys(&combat_system)
+        , player_move_sys(&player_move_system)
         , entity_is_clicked_callback(event_handler.add_callback_on_event(yorcvs::Events::Type::MOUSE_CLICKED,
               [widget = this](const yorcvs::event&) {
                   yorcvs::vec2<float> old_rs = widget->window->get_render_scale();
@@ -69,7 +69,7 @@ public:
     }
     void render([[maybe_unused]] yorcvs::vec2<float>& render_dim)
     {
-        if (player_move_system->entityList->empty()) {
+        if (player_move_sys->entityList->empty()) {
             return;
         }
         render_dimensions = render_dim;
@@ -82,7 +82,7 @@ public:
             if (world->has_components<identification_component>(targetID.value())) {
                 ImGui::Text("Name: %s", world->get_component<identification_component>(targetID.value()).name.c_str());
             }
-            yorcvs::ui::show_entity_interaction_window(world, combat_system, get_last_player_id().value(), targetID.value());
+            yorcvs::ui::show_entity_interaction_window(world, combat_sys, get_last_player_id().value(), targetID.value());
             ImGui::End();
         } else {
             targetID.reset();
@@ -90,26 +90,26 @@ public:
     }
     [[nodiscard]] std::optional<size_t> get_first_player_id() const
     {
-        if (player_move_system->entityList->empty()) {
+        if (player_move_sys->entityList->empty()) {
             return {};
         }
-        return (*player_move_system->entityList)[0];
+        return (*player_move_sys->entityList)[0];
     }
     [[nodiscard]] std::optional<size_t> get_last_player_id() const
     {
-        if (player_move_system->entityList->empty()) {
+        if (player_move_sys->entityList->empty()) {
             return {};
         }
-        return (*player_move_system->entityList)[player_move_system->entityList->size() - 1];
+        return (*player_move_sys->entityList)[player_move_sys->entityList->size() - 1];
     }
 
 private:
     yorcvs::event_handler<eventhandler_impl>* const event_handler;
     yorcvs::window<window_impl>* const window;
     yorcvs::ECS* const world;
-    collision_system* collision_system;
-    combat_system* combat_system;
-    player_movement_control* player_move_system;
+    collision_system* collision_sys;
+    combat_system* combat_sys;
+    player_movement_control* player_move_sys;
     const size_t entity_is_clicked_callback;
 
     bool select_target_opened = false;

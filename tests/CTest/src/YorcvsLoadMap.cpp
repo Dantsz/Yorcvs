@@ -4,7 +4,7 @@
 #include <iostream>
 int main(int argc, char** argv)
 {
-    yorcvs::Timer timy {};
+    yorcvs::timer timy {};
     yorcvs::ECS world {};
     timy.start();
     yorcvs::map map { TEST_MAP_FILE, &world };

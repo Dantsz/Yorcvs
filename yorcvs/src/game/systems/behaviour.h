@@ -17,7 +17,7 @@ public:
     {
         world->register_system<behaviour_system>(*this); // registers itself
         world->add_criteria_for_iteration<behaviour_system, behaviour_component, velocity_component>();
-        scripts = std::make_unique<yorcvs::AssetManager<std::string>>(
+        scripts = std::make_unique<yorcvs::asset_manager<std::string>>(
             [&](const std::string& path) {
                 auto program = std::make_shared<std::string>();
                 std::ifstream in { path };
@@ -46,7 +46,7 @@ public:
     }
     std::shared_ptr<yorcvs::entity_system_list> entityList = nullptr;
     yorcvs::ECS* world = nullptr;
-    std::unique_ptr<yorcvs::AssetManager<std::string>> scripts;
+    std::unique_ptr<yorcvs::asset_manager<std::string>> scripts;
     sol::state* lua_state;
     static constexpr float velocity_trigger_treshold = 0.0f;
 };

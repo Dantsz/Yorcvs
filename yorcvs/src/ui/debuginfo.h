@@ -11,20 +11,20 @@
 #include "misc/cpp/imgui_stdlib.h"
 #include <optional>
 namespace yorcvs {
-class Application;
+class application;
 class DebugInfo {
 public:
     DebugInfo() = delete;
-    DebugInfo(yorcvs::Application* parentAPP, yorcvs::sdl2_window* parentW, yorcvs::map* map_object, player_movement_control* pms, collision_system* cols,
+    DebugInfo(yorcvs::application* parentAPP, yorcvs::sdl2_window* parentW, yorcvs::map* map_object, player_movement_control* pms, collision_system* cols,
         health_system* healthS, combat_system* combat_sys, sol::state* lua)
         : parentWindow(parentW)
         , appECS(map_object->ecs)
         , map(map_object)
         , lua_state(lua)
         , parent_app(parentAPP)
-        , player_move_system(pms)
-        , colission_system(cols)
-        , combat_system(combat_sys)
+        , player_move_sys(pms)
+        , colission_sys(cols)
+        , combat_sys(combat_sys)
     {
         attach(parentW, map_object, pms, cols, healthS, lua);
     }
@@ -45,7 +45,7 @@ public:
                     time_accumulator = 0;
                 }
                 if (parentWindow->is_key_pressed(Events::Key::YORCVS_KEY_TILDE)) {
-                    player_move_system->controls_enable = !player_move_system->controls_enable;
+                    player_move_sys->controls_enable = !player_move_sys->controls_enable;
                     console_opened = !console_opened;
                     time_accumulator = 0;
                 }
@@ -61,7 +61,7 @@ public:
                 if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_C)) {
                     yorcvs::log("Saving player...");
                     std::ofstream out("assets/testPlayer.json");
-                    out << map->save_character((*player_move_system->entityList)[0]);
+                    out << map->save_character((*player_move_sys->entityList)[0]);
                     yorcvs::log("Done.");
                     time_accumulator = 0;
                 }
@@ -70,8 +70,8 @@ public:
                 }
             }
         }
-        if (!player_move_system->entityList->empty()) {
-            (*lua_state)["playerID"] = (*player_move_system->entityList)[0];
+        if (!player_move_sys->entityList->empty()) {
+            (*lua_state)["playerID"] = (*player_move_sys->entityList)[0];
         }
     }
 
@@ -81,7 +81,7 @@ public:
         yorcvs::vec2<float> old_rs = window.get_render_scale();
         window.set_render_scale(window.get_window_size() / render_dimensions);
         yorcvs::rect<float> rect {};
-        for (const auto& ID : *colission_system->entityList) {
+        for (const auto& ID : *colission_sys->entityList) {
             rect.x = appECS->get_component<position_component>(ID).position.x + appECS->get_component<hitbox_component>(ID).hitbox.x;
             rect.y = appECS->get_component<position_component>(ID).position.y + appECS->get_component<hitbox_component>(ID).hitbox.y;
             rect.w = appECS->get_component<hitbox_component>(ID).hitbox.w;
@@ -125,9 +125,9 @@ public:
         parentWindow = parentW;
         map = map_object;
         appECS = map->ecs;
-        player_move_system = pms;
-        colission_system = cols;
-        health_system = healthS;
+        player_move_sys = pms;
+        colission_sys = cols;
+        health_sys = healthS;
     }
     void attach_lua()
     {
@@ -149,8 +149,8 @@ private:
         render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
             hitbox_color[3]);
 
-        if (!player_move_system->entityList->empty()) {
-            const size_t ID = (*player_move_system->entityList)[0];
+        if (!player_move_sys->entityList->empty()) {
+            const size_t ID = (*player_move_sys->entityList)[0];
             ImGui::Begin("Player");
             show_entity_stats(ID, "Player : ");
             if (appECS->has_components<animation_component>(ID)) {
@@ -285,7 +285,7 @@ private:
             if (ImGui::BeginPopup("Entity")) {
                 ImGui::Text("%s", std::to_string(i).c_str());
                 show_entity_stats(i);
-                yorcvs::ui::show_entity_interaction_window(appECS, combat_system, get_first_player_id(), i);
+                yorcvs::ui::show_entity_interaction_window(appECS, combat_sys, get_first_player_id(), i);
                 ImGui::EndPopup();
             }
             ImGui::SameLine();
@@ -385,8 +385,8 @@ private:
 
     size_t get_first_player_id()
     {
-        if (!player_move_system->entityList->empty()) {
-            return (*player_move_system->entityList)[0];
+        if (!player_move_sys->entityList->empty()) {
+            return (*player_move_sys->entityList)[0];
         }
         const size_t invalidID = appECS->create_entity_ID();
         appECS->destroy_entity(invalidID);
@@ -446,17 +446,17 @@ private:
     yorcvs::ECS* appECS {};
     yorcvs::map* map {};
     sol::state* lua_state {};
-    yorcvs::Application* parent_app;
+    yorcvs::application* parent_app;
     // console
     std::string console_text;
     std::vector<std::string> console_logs;
     std::vector<std::string> console_previous_commands;
     std::optional<size_t> select_target {};
-    player_movement_control* player_move_system {};
+    player_movement_control* player_move_sys {};
 
-    collision_system* colission_system {};
-    health_system* health_system {};
-    combat_system* combat_system {};
+    collision_system* colission_sys {};
+    health_system* health_sys {};
+    combat_system* combat_sys {};
 
     // controls
     bool debug_window_opened = false;

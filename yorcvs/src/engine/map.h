@@ -32,10 +32,10 @@ public:
         , init_ecs(*world)
         , health_system(world)
         , sprint_system(world)
-        , velocity_system(world)
-        , animation_system(world)
-        , combat_system(world)
-        , collision_system(world)
+        , velocity_sys(world)
+        , animation_sys(world)
+        , combat_sys(world)
+        , collision_sys(world)
     {
     }
     /**
@@ -411,10 +411,10 @@ public:
     std::unordered_map<std::tuple<intmax_t, intmax_t>, std::vector<yorcvs::tile>> tiles_chunks {};
 
     yorcvs::vec2<float> spawn_coord;
-    velocity_system velocity_system;
-    animation_system animation_system;
-    combat_system combat_system;
-    collision_system collision_system;
+    velocity_system velocity_sys;
+    animation_system animation_sys;
+    combat_system combat_sys;
+    collision_system collision_sys;
     std::vector<yorcvs::Entity> ysorted_tiles {};
 };
 }

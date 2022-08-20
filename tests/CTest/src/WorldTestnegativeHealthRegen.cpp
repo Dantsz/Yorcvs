@@ -9,7 +9,7 @@ constexpr size_t number_of_additional_bleeding_ducks = 100;
 
 int main(int argc, char** argv)
 {
-    yorcvs::Timer timy {};
+    yorcvs::timer timy {};
     yorcvs::ECS world {};
     timy.start();
     yorcvs::map map { TEST_MAP_FILE, &world };
@@ -52,9 +52,9 @@ int main(int argc, char** argv)
     timy.start();
     while (world.get_active_entities_number() != numberOfEntities - 1) {
         const auto dt = health_system::update_time;
-        map.collision_system.update(dt);
-        map.velocity_system.update(dt);
-        map.animation_system.update(dt);
+        map.collision_sys.update(dt);
+        map.velocity_sys.update(dt);
+        map.animation_sys.update(dt);
         map.health_system.update(dt);
 
         timy.stop();
