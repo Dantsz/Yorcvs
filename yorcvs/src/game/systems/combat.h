@@ -6,13 +6,13 @@
  * @brief Handles combat
  *
  */
-class CombatSystem {
+class combat_system {
 public:
-    explicit CombatSystem(yorcvs::ECS* parent)
+    explicit combat_system(yorcvs::ECS* parent)
         : world(parent)
     {
         world->register_system(*this);
-        world->add_criteria_for_iteration<CombatSystem, health_component, offensive_stats_component, defensive_stats_component>();
+        world->add_criteria_for_iteration<combat_system, health_component, offensive_stats_component, defensive_stats_component>();
     }
     /**
      * @brief attack

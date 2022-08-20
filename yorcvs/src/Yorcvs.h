@@ -39,9 +39,9 @@ public:
 
         yorcvs::lua::register_system_to_lua(lua_state, "health_system", map.health_system);
         yorcvs::lua::register_system_to_lua(lua_state, "collision_system", map.collision_system);
-        yorcvs::lua::register_system_to_lua(lua_state, "animation_system", map.animation_system, "set_animation", &AnimationSystem::set_animation);
+        yorcvs::lua::register_system_to_lua(lua_state, "animation_system", map.animation_system, "set_animation", &animation_system::set_animation);
         yorcvs::lua::register_system_to_lua(lua_state, "combat_system", map.combat_system, "attack",
-            &CombatSystem::attack);
+            &combat_system::attack);
         lua_state["test_map"] = &map;
         // loading two maps one on top of each other
         // test_map:load_content("assets/map.tmx")
@@ -182,8 +182,8 @@ private:
     sol::state lua_state;
     yorcvs::map map { &world };
     SpriteSystem sprite_system { map.ecs, &app_window };
-    PlayerMovementControl player_control { map.ecs, &app_window };
-    BehaviourSystem behaviour_system { map.ecs, &lua_state };
+    player_movement_control player_control { map.ecs, &app_window };
+    behaviour_system behaviour_system { map.ecs, &lua_state };
 
     yorcvs::ui::Performance_Window performance_window;
     std::array<float, yorcvs::ui::Performance_Window::update_time_item::update_time_tracked> tracked_parameters;

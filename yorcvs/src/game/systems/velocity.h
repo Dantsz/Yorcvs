@@ -5,13 +5,13 @@
  * @brief Handles the movement of entities
  *
  */
-class VelocitySystem {
+class velocity_system {
 public:
-    explicit VelocitySystem(yorcvs::ECS* parent)
+    explicit velocity_system(yorcvs::ECS* parent)
         : world(parent)
     {
-        world->register_system<VelocitySystem>(*this);
-        world->add_criteria_for_iteration<VelocitySystem, position_component, velocity_component>();
+        world->register_system<velocity_system>(*this);
+        world->add_criteria_for_iteration<velocity_system, position_component, velocity_component>();
     }
     void update(float dt) const
     {

@@ -5,13 +5,13 @@
  * @brief Handles stamina and stamina regeneration
  *
  */
-class StaminaSystem {
+class stamina_system {
 public:
-    explicit StaminaSystem(yorcvs::ECS* parent)
+    explicit stamina_system(yorcvs::ECS* parent)
         : world(parent)
     {
         world->register_system(*this);
-        world->add_criteria_for_iteration<StaminaSystem, stamina_component, stamina_stats_component>();
+        world->add_criteria_for_iteration<stamina_system, stamina_component, stamina_stats_component>();
     }
 
     void update(const float dt)

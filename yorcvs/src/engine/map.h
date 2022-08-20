@@ -404,17 +404,17 @@ public:
     yorcvs::vec2<float> tilesSize;
 
     std::vector<size_t> entities {}; // not a vector of Entities because the map is not responsible for their lifetimes( they can be destroyed by other stuff)
-    HealthSystem health_system;
-    StaminaSystem sprint_system;
+    health_system health_system;
+    stamina_system sprint_system;
 
     std::string map_file_path;
     std::unordered_map<std::tuple<intmax_t, intmax_t>, std::vector<yorcvs::tile>> tiles_chunks {};
 
     yorcvs::vec2<float> spawn_coord;
-    VelocitySystem velocity_system;
-    AnimationSystem animation_system;
-    CombatSystem combat_system;
-    CollisionSystem collision_system;
+    velocity_system velocity_system;
+    animation_system animation_system;
+    combat_system combat_system;
+    collision_system collision_system;
     std::vector<yorcvs::Entity> ysorted_tiles {};
 };
 }

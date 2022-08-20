@@ -7,7 +7,7 @@
 #include "../game/systems/playercontrol.h"
 #include "imgui.h"
 namespace yorcvs::ui {
-static inline void show_entity_interaction_window(yorcvs::ECS* world, CombatSystem* combat_system, size_t sender, size_t target)
+static inline void show_entity_interaction_window(yorcvs::ECS* world, combat_system* combat_system, size_t sender, size_t target)
 {
     if (ImGui::Button("go to") && world->has_components<position_component>(target) && world->has_components<position_component>(target)) {
         world->get_component<position_component>(sender).position = world->get_component<position_component>(target).position;
@@ -30,7 +30,7 @@ static inline void show_entity_interaction_window(yorcvs::ECS* world, CombatSyst
 template <typename eventhandler_impl, typename window_impl>
 class EntityInteractionWidget {
 public:
-    EntityInteractionWidget(yorcvs::event_handler<eventhandler_impl>& event_handler, yorcvs::window<window_impl>& window, yorcvs::ECS& world, CollisionSystem& collision_system, CombatSystem& combat_system, PlayerMovementControl& player_move_system)
+    EntityInteractionWidget(yorcvs::event_handler<eventhandler_impl>& event_handler, yorcvs::window<window_impl>& window, yorcvs::ECS& world, collision_system& collision_system, combat_system& combat_system, player_movement_control& player_move_system)
         : event_handler(&event_handler)
         , window(&window)
         , world(&world)
@@ -107,9 +107,9 @@ private:
     yorcvs::event_handler<eventhandler_impl>* const event_handler;
     yorcvs::window<window_impl>* const window;
     yorcvs::ECS* const world;
-    CollisionSystem* collision_system;
-    CombatSystem* combat_system;
-    PlayerMovementControl* player_move_system;
+    collision_system* collision_system;
+    combat_system* combat_system;
+    player_movement_control* player_move_system;
     const size_t entity_is_clicked_callback;
 
     bool select_target_opened = false;

@@ -15,8 +15,8 @@ class Application;
 class DebugInfo {
 public:
     DebugInfo() = delete;
-    DebugInfo(yorcvs::Application* parentAPP, yorcvs::sdl2_window* parentW, yorcvs::map* map_object, PlayerMovementControl* pms, CollisionSystem* cols,
-        HealthSystem* healthS, CombatSystem* combat_sys, sol::state* lua)
+    DebugInfo(yorcvs::Application* parentAPP, yorcvs::sdl2_window* parentW, yorcvs::map* map_object, player_movement_control* pms, collision_system* cols,
+        health_system* healthS, combat_system* combat_sys, sol::state* lua)
         : parentWindow(parentW)
         , appECS(map_object->ecs)
         , map(map_object)
@@ -117,8 +117,8 @@ public:
         }
     }
 
-    void attach(yorcvs::sdl2_window* parentW, yorcvs::map* map_object, PlayerMovementControl* pms,
-        CollisionSystem* cols, HealthSystem* healthS, sol::state* lua)
+    void attach(yorcvs::sdl2_window* parentW, yorcvs::map* map_object, player_movement_control* pms,
+        collision_system* cols, health_system* healthS, sol::state* lua)
     {
         lua_state = lua;
         attach_lua();
@@ -452,11 +452,11 @@ private:
     std::vector<std::string> console_logs;
     std::vector<std::string> console_previous_commands;
     std::optional<size_t> select_target {};
-    PlayerMovementControl* player_move_system {};
+    player_movement_control* player_move_system {};
 
-    CollisionSystem* colission_system {};
-    HealthSystem* health_system {};
-    CombatSystem* combat_system {};
+    collision_system* colission_system {};
+    health_system* health_system {};
+    combat_system* combat_system {};
 
     // controls
     bool debug_window_opened = false;

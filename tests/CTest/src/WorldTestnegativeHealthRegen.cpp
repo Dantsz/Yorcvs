@@ -51,7 +51,7 @@ int main(int argc, char** argv)
     float samples = 0.0f;
     timy.start();
     while (world.get_active_entities_number() != numberOfEntities - 1) {
-        const auto dt = HealthSystem::update_time;
+        const auto dt = health_system::update_time;
         map.collision_system.update(dt);
         map.velocity_system.update(dt);
         map.animation_system.update(dt);

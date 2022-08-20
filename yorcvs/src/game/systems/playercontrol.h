@@ -7,14 +7,14 @@
  * @brief Handles player input
  *
  */
-class PlayerMovementControl {
+class player_movement_control {
 public:
-    PlayerMovementControl(yorcvs::ECS* parent, yorcvs::sdl2_window* parent_window)
+    player_movement_control(yorcvs::ECS* parent, yorcvs::sdl2_window* parent_window)
         : world(parent)
         , window(parent_window)
     {
-        world->register_system<PlayerMovementControl>(*this);
-        world->add_criteria_for_iteration<PlayerMovementControl, player_movement_controlled_component, velocity_component,
+        world->register_system<player_movement_control>(*this);
+        world->add_criteria_for_iteration<player_movement_control, player_movement_controlled_component, velocity_component,
             position_component, sprite_component>();
     }
 
@@ -41,7 +41,7 @@ public:
         dir = compute_movement_direction(static_cast<float>(d_pressed), static_cast<float>(a_pressed), static_cast<float>(w_pressed), static_cast<float>(s_pressed));
 
         if (q_pressed && (!has_sprint_stamina || (has_sprint_stamina && world->get_component<stamina_component>(ID).stamina - world->get_component<stamina_stats_component>(ID).stamina_regen > 0))) {
-            dir *= PlayerMovementControl::sprint_multiplier;
+            dir *= player_movement_control::sprint_multiplier;
             if (update) {
                 world->get_component<stamina_component>(ID).stamina -= 2 * world->get_component<stamina_stats_component>(ID).stamina_regen;
             }
@@ -67,7 +67,7 @@ public:
         }
 
         const char* new_animation = select_animation(player_state);
-        AnimationSystem::set_animation_global(world, ID, new_animation);
+        animation_system::set_animation_global(world, ID, new_animation);
         if (update) {
             cur_time = 0.0f;
         }

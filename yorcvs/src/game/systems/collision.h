@@ -22,14 +22,14 @@ public:
  * @brief Handles collision between entities
  *
  */
-class CollisionSystem {
+class collision_system {
 public:
-    explicit CollisionSystem(yorcvs::ECS* parent)
+    explicit collision_system(yorcvs::ECS* parent)
         : world(parent)
     {
         // is this legal? yee
-        world->register_system<CollisionSystem>(*this);
-        world->add_criteria_for_iteration<CollisionSystem, position_component, hitbox_component>();
+        world->register_system<collision_system>(*this);
+        world->add_criteria_for_iteration<collision_system, position_component, hitbox_component>();
     }
     /**
      * @brief

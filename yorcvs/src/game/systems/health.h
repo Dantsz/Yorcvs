@@ -6,13 +6,13 @@
  * negative
  *
  */
-class HealthSystem {
+class health_system {
 public:
-    explicit HealthSystem(yorcvs::ECS* parent)
+    explicit health_system(yorcvs::ECS* parent)
         : world(parent)
     {
-        world->register_system<HealthSystem>(*this);
-        world->add_criteria_for_iteration<HealthSystem, health_component, health_stats_component>();
+        world->register_system<health_system>(*this);
+        world->add_criteria_for_iteration<health_system, health_component, health_stats_component>();
     }
     void update(const float dt)
     {

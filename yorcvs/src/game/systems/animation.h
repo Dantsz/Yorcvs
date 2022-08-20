@@ -6,13 +6,13 @@
  * @brief Handles Animation
  *
  */
-class AnimationSystem {
+class animation_system {
 public:
-    explicit AnimationSystem(yorcvs::ECS* parent)
+    explicit animation_system(yorcvs::ECS* parent)
         : world(parent)
     {
-        world->register_system<AnimationSystem>(*this);
-        world->add_criteria_for_iteration<AnimationSystem, animation_component, sprite_component>();
+        world->register_system<animation_system>(*this);
+        world->add_criteria_for_iteration<animation_system, animation_component, sprite_component>();
     }
 
     /**

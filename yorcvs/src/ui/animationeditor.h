@@ -14,7 +14,7 @@ void show_current_animator_selector([[maybe_unused]] yorcvs::ECS* appECS, [[mayb
             bool is_selected = (current_item == animation_name);
             if (ImGui::Selectable(animation_name.c_str(), is_selected)) {
                 current_item = animation_name;
-                AnimationSystem::set_animation_global(appECS, ID, animation_name);
+                animation_system::set_animation_global(appECS, ID, animation_name);
             }
             if (is_selected) {
                 ImGui::SetItemDefaultFocus();
