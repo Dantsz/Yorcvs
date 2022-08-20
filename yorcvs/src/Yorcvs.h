@@ -31,13 +31,13 @@ namespace yorcvs {
 class application {
 public:
     application()
-        : debug_info_widgets(this, &app_window, &map, &player_control, &map.collision_sys, &map.health_system, &map.combat_sys, &lua_state)
+        : debug_info_widgets(this, &app_window, &map, &player_control, &map.collision_sys, &map.health_sys, &map.combat_sys, &lua_state)
         , entity_interaction_widget(app_window, app_window, world, map.collision_sys, map.combat_sys, player_control)
     {
         lua_state.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
         yorcvs::lua::bind_runtime(lua_state, &world);
 
-        yorcvs::lua::register_system_to_lua(lua_state, "health_system", map.health_system);
+        yorcvs::lua::register_system_to_lua(lua_state, "health_system", map.health_sys);
         yorcvs::lua::register_system_to_lua(lua_state, "collision_system", map.collision_sys);
         yorcvs::lua::register_system_to_lua(lua_state, "animation_system", map.animation_sys, "set_animation", &animation_system::set_animation);
         yorcvs::lua::register_system_to_lua(lua_state, "combat_system", map.combat_sys, "attack",
@@ -111,7 +111,7 @@ public:
             player_control.updateControls(render_dimensions, msPF);
 
             update_timer.start();
-            map.health_system.update(msPF);
+            map.health_sys.update(msPF);
             tracked_parameters[yorcvs::ui::Performance_Window::update_time_item::health] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
 
             update_timer.start();
@@ -131,7 +131,7 @@ public:
             tracked_parameters[yorcvs::ui::Performance_Window::update_time_item::animation] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
 
             update_timer.start();
-            map.sprint_system.update(msPF);
+            map.sprint_sys.update(msPF);
             tracked_parameters[yorcvs::ui::Performance_Window::update_time_item::stamina] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
 
             lag -= msPF;

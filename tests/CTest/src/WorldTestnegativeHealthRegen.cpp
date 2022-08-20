@@ -55,7 +55,7 @@ int main(int argc, char** argv)
         map.collision_sys.update(dt);
         map.velocity_sys.update(dt);
         map.animation_sys.update(dt);
-        map.health_system.update(dt);
+        map.health_sys.update(dt);
 
         timy.stop();
         update_time += timy.get_ticks();
