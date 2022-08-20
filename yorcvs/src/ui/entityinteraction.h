@@ -43,7 +43,7 @@ public:
                   widget->window->set_render_scale(widget->window->get_window_size() / widget->render_dimensions);
                   bool clicked_any_entity = false;
                   const auto pointer_position = widget->event_handler->get_pointer_position();
-                  for (const auto& ID : *(widget->collision_system->entityList)) {
+                  for (const auto& ID : *(widget->collision_sys->entityList)) {
                       yorcvs::rect<float> rect {};
                       rect.x = widget->world->template get_component<position_component>(ID).position.x + widget->world->template get_component<hitbox_component>(ID).hitbox.x;
                       rect.y = widget->world->template get_component<position_component>(ID).position.y + widget->world->template get_component<hitbox_component>(ID).hitbox.y;
