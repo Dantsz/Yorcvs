@@ -24,9 +24,9 @@ struct Tile {
  * @brief Loads tmx map data into the ecs
  *
  */
-class Map : public Entity_Loader<identification_component, health_component, health_stats_component, stamina_component, stamina_stats_component, hitbox_component, sprite_component, animation_component, defensive_stats_component, offensive_stats_component> {
+class map : public Entity_Loader<identification_component, health_component, health_stats_component, stamina_component, stamina_stats_component, hitbox_component, sprite_component, animation_component, defensive_stats_component, offensive_stats_component> {
 public:
-    explicit Map(yorcvs::ECS* world)
+    explicit map(yorcvs::ECS* world)
         : Entity_Loader(world, { "identification", "health", "health_stats", "stamina", "stamina_stats", "hitbox", "sprite", "animation", "defensive_stats", "offsensive_stats" })
         , ecs(world)
         , init_ecs(*world)
@@ -44,19 +44,19 @@ public:
      * @param path path to map file
      * @param world the ecs in which data shoudl be added
      */
-    Map(const std::string& path, yorcvs::ECS* world)
-        : Map(world)
+    map(const std::string& path, yorcvs::ECS* world)
+        : map(world)
     {
         load(world, path);
     }
-    Map(const Map& other) = delete;
-    Map(Map&& other) = delete;
-    ~Map()
+    map(const map& other) = delete;
+    map(map&& other) = delete;
+    ~map()
     {
         clear();
     }
-    Map& operator=(const Map& other) = delete;
-    Map& operator=(Map&& other) = delete;
+    map& operator=(const map& other) = delete;
+    map& operator=(map&& other) = delete;
     /**
      * @brief Loads data from path into the ecs
      *

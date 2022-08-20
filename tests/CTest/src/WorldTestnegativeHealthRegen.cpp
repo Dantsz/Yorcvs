@@ -12,7 +12,7 @@ int main(int argc, char** argv)
     yorcvs::Timer timy {};
     yorcvs::ECS world {};
     timy.start();
-    yorcvs::Map map { TEST_MAP_FILE, &world };
+    yorcvs::map map { TEST_MAP_FILE, &world };
 
     std::cout << "Loading map took " << timy.get_ticks() << "ms" << '\n';
     // deleting player

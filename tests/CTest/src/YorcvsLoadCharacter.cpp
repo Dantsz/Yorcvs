@@ -7,7 +7,7 @@ int main(int argc, char** argv)
     yorcvs::Timer timy {};
     yorcvs::ECS world {};
     timy.start();
-    yorcvs::Map map { TEST_MAP_FILE, &world };
+    yorcvs::map map { TEST_MAP_FILE, &world };
     yorcvs::Entity entity { &world };
     map.load_character_from_path(entity.id, TEST_LOAD_ENTITY_FILE);
     const auto ok = world.has_components<identification_component, hitbox_component, health_component, sprite_component>(entity.id);

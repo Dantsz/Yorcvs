@@ -58,7 +58,7 @@ public:
     Application& operator=(const Application& other) = delete;
     Application& operator=(Application&& other) = delete;
 
-    void render_map_chunk(yorcvs::Map& p_map, const std::tuple<intmax_t, intmax_t>& chunk)
+    void render_map_chunk(yorcvs::map& p_map, const std::tuple<intmax_t, intmax_t>& chunk)
     {
         if (p_map.tiles_chunks.find(chunk) != p_map.tiles_chunks.end()) {
             const auto& tiles = p_map.tiles_chunks.at(chunk);
@@ -68,7 +68,7 @@ public:
             }
         }
     }
-    void render_map_tiles(yorcvs::Map& p_map)
+    void render_map_tiles(yorcvs::map& p_map)
     {
         yorcvs::Vec2<float> render_scale = app_window.get_render_scale();
         app_window.set_render_scale(app_window.get_window_size() / render_dimensions);
@@ -180,7 +180,7 @@ private:
     intmax_t render_distance = default_render_distance;
     yorcvs::ECS world {};
     sol::state lua_state;
-    yorcvs::Map map { &world };
+    yorcvs::map map { &world };
     SpriteSystem sprite_system { map.ecs, &app_window };
     PlayerMovementControl player_control { map.ecs, &app_window };
     BehaviourSystem behaviour_system { map.ecs, &lua_state };

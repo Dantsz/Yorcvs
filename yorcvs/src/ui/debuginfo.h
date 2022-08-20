@@ -15,7 +15,7 @@ class Application;
 class DebugInfo {
 public:
     DebugInfo() = delete;
-    DebugInfo(yorcvs::Application* parentAPP, yorcvs::sdl2_window* parentW, yorcvs::Map* map_object, PlayerMovementControl* pms, CollisionSystem* cols,
+    DebugInfo(yorcvs::Application* parentAPP, yorcvs::sdl2_window* parentW, yorcvs::map* map_object, PlayerMovementControl* pms, CollisionSystem* cols,
         HealthSystem* healthS, CombatSystem* combat_sys, sol::state* lua)
         : parentWindow(parentW)
         , appECS(map_object->ecs)
@@ -117,7 +117,7 @@ public:
         }
     }
 
-    void attach(yorcvs::sdl2_window* parentW, yorcvs::Map* map_object, PlayerMovementControl* pms,
+    void attach(yorcvs::sdl2_window* parentW, yorcvs::map* map_object, PlayerMovementControl* pms,
         CollisionSystem* cols, HealthSystem* healthS, sol::state* lua)
     {
         lua_state = lua;
@@ -444,7 +444,7 @@ private:
     yorcvs::sdl2_window* parentWindow {};
 
     yorcvs::ECS* appECS {};
-    yorcvs::Map* map {};
+    yorcvs::map* map {};
     sol::state* lua_state {};
     yorcvs::Application* parent_app;
     // console
