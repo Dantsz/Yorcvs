@@ -1,5 +1,5 @@
 #include "../common/ecs.h"
-#include "../game/componentSerialization.h"
+#include "../game/component_serialization.h"
 #include <array>
 #include <filesystem>
 #include <fstream>

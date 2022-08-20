@@ -1,7 +1,7 @@
 #pragma once
 #include "../common/ecs.h"
 #include "../common/utilities.h"
-#include "../game/componentSerialization.h"
+#include "../game/component_serialization.h"
 #include "../game/systems.h"
 #include "entity_loader.h"
 #include "nlohmann/json.hpp"
