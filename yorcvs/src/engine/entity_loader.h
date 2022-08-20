@@ -8,14 +8,14 @@
 #pragma once
 
 template <typename... Components>
-class Entity_Loader {
+class entity_loader {
 public:
     /**
      * @brief Entity_Loader
      * @param world
      * @param json_names names for each component as they appear in the json file
      */
-    constexpr Entity_Loader(yorcvs::ECS* world, std::array<std::string, sizeof...(Components)> json_names)
+    constexpr entity_loader(yorcvs::ECS* world, std::array<std::string, sizeof...(Components)> json_names)
         : world { world }
         , json_names { std::move(json_names) }
 

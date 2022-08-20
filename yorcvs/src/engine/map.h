@@ -15,7 +15,7 @@
 #include <filesystem>
 namespace json = nlohmann;
 namespace yorcvs {
-struct Tile {
+struct tile {
     yorcvs::vec2<float> coords;
     yorcvs::rect<size_t> srcRect;
     std::string texture_path;
@@ -24,10 +24,10 @@ struct Tile {
  * @brief Loads tmx map data into the ecs
  *
  */
-class map : public Entity_Loader<identification_component, health_component, health_stats_component, stamina_component, stamina_stats_component, hitbox_component, sprite_component, animation_component, defensive_stats_component, offensive_stats_component> {
+class map : public entity_loader<identification_component, health_component, health_stats_component, stamina_component, stamina_stats_component, hitbox_component, sprite_component, animation_component, defensive_stats_component, offensive_stats_component> {
 public:
     explicit map(yorcvs::ECS* world)
-        : Entity_Loader(world, { "identification", "health", "health_stats", "stamina", "stamina_stats", "hitbox", "sprite", "animation", "defensive_stats", "offsensive_stats" })
+        : entity_loader(world, { "identification", "health", "health_stats", "stamina", "stamina_stats", "hitbox", "sprite", "animation", "defensive_stats", "offsensive_stats" })
         , ecs(world)
         , init_ecs(*world)
         , health_system(world)
@@ -154,7 +154,7 @@ private:
                         }
                     }
                     // put the tile in the vector
-                    yorcvs::Tile tile {};
+                    yorcvs::tile tile {};
                     if (tile_set == nullptr) {
                         yorcvs::log("No tileset in map " + map.getWorkingDirectory() + "  contains tile: " + std::to_string(chunk.tiles[tileIndex].ID), yorcvs::MSGSEVERITY::ERROR);
                     } else {
@@ -408,7 +408,7 @@ public:
     StaminaSystem sprint_system;
 
     std::string map_file_path;
-    std::unordered_map<std::tuple<intmax_t, intmax_t>, std::vector<yorcvs::Tile>> tiles_chunks {};
+    std::unordered_map<std::tuple<intmax_t, intmax_t>, std::vector<yorcvs::tile>> tiles_chunks {};
 
     yorcvs::vec2<float> spawn_coord;
     VelocitySystem velocity_system;
