@@ -1,104 +1,210 @@
 {
-    "identification":
-    {
-      "name" : "Danctz"
+    "animation": {
+        "animations": {
+            "attackL": 11,
+            "attackR": 8,
+            "idleL": 4,
+            "idleR": 0,
+            "walkingL": 5,
+            "walkingR": 1
+        },
+        "current_animation_name": "idleR",
+        "current_elapsed_time": 0.0,
+        "current_frame": 0,
+        "frames": [
+            {
+                "next_id": 0,
+                "rectangle": {
+                    "h": 64,
+                    "w": 64,
+                    "x": 0,
+                    "y": 0
+                },
+                "speed": 50.0
+            },
+            {
+                "next_id": 2,
+                "rectangle": {
+                    "h": 64,
+                    "w": 64,
+                    "x": 64,
+                    "y": 0
+                },
+                "speed": 50.0
+            },
+            {
+                "next_id": 3,
+                "rectangle": {
+                    "h": 64,
+                    "w": 64,
+                    "x": 128,
+                    "y": 0
+                },
+                "speed": 50.0
+            },
+            {
+                "next_id": 1,
+                "rectangle": {
+                    "h": 64,
+                    "w": 64,
+                    "x": 192,
+                    "y": 0
+                },
+                "speed": 50.0
+            },
+            {
+                "next_id": 4,
+                "rectangle": {
+                    "h": 64,
+                    "w": 64,
+                    "x": 0,
+                    "y": 64
+                },
+                "speed": 50.0
+            },
+            {
+                "next_id": 6,
+                "rectangle": {
+                    "h": 64,
+                    "w": 64,
+                    "x": 64,
+                    "y": 64
+                },
+                "speed": 50.0
+            },
+            {
+                "next_id": 7,
+                "rectangle": {
+                    "h": 64,
+                    "w": 64,
+                    "x": 128,
+                    "y": 64
+                },
+                "speed": 50.0
+            },
+            {
+                "next_id": 5,
+                "rectangle": {
+                    "h": 64,
+                    "w": 64,
+                    "x": 192,
+                    "y": 64
+                },
+                "speed": 50.0
+            },
+            {
+                "next_id": 9,
+                "rectangle": {
+                    "h": 64,
+                    "w": 64,
+                    "x": 64,
+                    "y": 256
+                },
+                "speed": 50.0
+            },
+            {
+                "next_id": 10,
+                "rectangle": {
+                    "h": 64,
+                    "w": 64,
+                    "x": 128,
+                    "y": 256
+                },
+                "speed": 50.0
+            },
+            {
+                "next_id": 0,
+                "rectangle": {
+                    "h": 64,
+                    "w": 64,
+                    "x": 192,
+                    "y": 256
+                },
+                "speed": 50.0
+            },
+            {
+                "next_id": 12,
+                "rectangle": {
+                    "h": 64,
+                    "w": 64,
+                    "x": 64,
+                    "y": 320
+                },
+                "speed": 50.0
+            },
+            {
+                "next_id": 13,
+                "rectangle": {
+                    "h": 64,
+                    "w": 64,
+                    "x": 128,
+                    "y": 320
+                },
+                "speed": 50.0
+            },
+            {
+                "next_id": 4,
+                "rectangle": {
+                    "h": 64,
+                    "w": 64,
+                    "x": 192,
+                    "y": 320
+                },
+                "speed": 50.0
+            }
+        ]
     },
-    "health":
-    {
+    "defensive_stats": {
+        "block": 0.0,
+        "defense": 0.0,
+        "dodge": 0.0,
+        "spirit": 0.0
+    },
+    "health": {
         "current": 1.0
     },
-    "health_stats":
-    {
+    "health_stats": {
         "max": 5.0,
-        "regen" : 0.1
+        "regen": 0.10000000149011612
     },
-    "stamina" : 
-    {
-    "current" : 1.0
+    "hitbox": {
+        "h": 12.0,
+        "w": 6.0,
+        "x": 13.0,
+        "y": 6.0
     },
-    "stamina_stats":{
+    "identification": {
+        "name": "Danctz"
+    },
+    "offsensive_stats": {
+        "agility": 1000.0,
+        "dexterity": 0.0,
+        "intellect": 0.0,
+        "piercing": 0.0,
+        "strength": 10.0
+    },
+    "sprite": {
+        "offset": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "size": {
+            "x": 32.0,
+            "y": 32.0
+        },
+        "spriteName": "test_player_sheet_2.png",
+        "srcRect": {
+            "h": 64,
+            "w": 64,
+            "x": 0,
+            "y": 0
+        }
+    },
+    "stamina": {
+        "current": 1.0
+    },
+    "stamina_stats": {
         "max": 5.0,
-        "regen" : 0.1   
-    },
-    "hitbox" :
-    {
-        "x" : 13,
-        "y" : 6,
-        "w" : 6,
-        "h" : 12
-    },
-    "sprite" :
-    {
-        "offset":
-        {
-            "x" : 0.0,
-            "y" : 0.0
-        },
-        "size":
-        {
-            "x" : 32.0,
-            "y" : 32.0
-        },
-        "srcRect":
-        {
-            "x" : 0,
-            "y" : 0,
-            "w" : 64,  
-            "h" : 64
-        },
-        "spriteName" : "test_player_sheet_2.png"
-    },
-    "animation" :{
-        "frames":[
-        {"rectangle":{"x" : 0, "y" : 0, "w":64,"h":64},"next_id":0,"speed":50},
-
-        {"rectangle":{"x" : 64, "y" : 0, "w":64,"h":64}, "next_id":2,"speed":50},
-        {"rectangle":{"x" : 128, "y" : 0, "w":64,"h":64}, "next_id":3,"speed":50},
-        {"rectangle":{"x" : 192, "y" : 0, "w":64,"h":64}, "next_id":1,"speed":50},
-
-
-        {"rectangle":{"x" : 0, "y" : 64, "w":64,"h":64},"next_id":4,"speed":50},
-
-        {"rectangle":{"x" : 64, "y" :  64, "w":64,"h":64}, "next_id":6,"speed":50},
-        {"rectangle":{"x" : 128, "y" : 64, "w":64,"h":64}, "next_id":7,"speed":50},
-        {"rectangle":{"x" : 192, "y" : 64, "w":64,"h":64}, "next_id":5,"speed":50},
-
-        {"rectangle":{"x" : 64, "y" : 256, "w":64,"h":64}, "next_id":9,"speed":50},
-        {"rectangle":{"x" : 128, "y" : 256, "w":64,"h":64}, "next_id":10,"speed":50},
-        {"rectangle":{"x" : 192, "y" : 256, "w":64,"h":64}, "next_id":0,"speed":50},
-
-        {"rectangle":{"x" : 64, "y" : 320, "w":64,"h":64}, "next_id":12,"speed":50},
-        {"rectangle":{"x" : 128, "y" : 320, "w":64,"h":64}, "next_id":13,"speed":50},
-        {"rectangle":{"x" : 192, "y" : 320, "w":64,"h":64}, "next_id":4,"speed":50}
-
-        ],
-        "animations":{
-            "idleR":0,
-            "idleL":4,
-            "walkingR":1,
-            "walkingL":5,
-            "attackR":8,
-            "attackL":11
-        },
-        "current_animation_name" : "idleR",
-        "current_frame":0,
-        "current_elapsed_time":0.0
-    },
-    "defensive_stats":
-    {
-        "defense":0,
-        "block":0,
-        "dodge":0,
-        "spirit":0
-    },
-    "offsensive_stats":
-    {
-        "strength":10,
-        "agility":1000,
-        "dexterity":0,
-        "piercing":0,
-        "intellect":0
+        "regen": 0.10000000149011612
     }
-    
-
 }
