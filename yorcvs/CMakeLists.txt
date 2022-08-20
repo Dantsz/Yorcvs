@@ -26,6 +26,7 @@ set(YorcvsGAMEFILES     "src/game/components.h"
                         "src/game/systems/spritesystem.h"
                         "src/game/systems/staminasystem.h"
                         "src/game/systems/velocity.h"
+                        "src/game/systems/inventory.h"
                         "src/engine/entity_loader.h"
 )
 set(YorcvsUIFILES "src/ui/debuginfo.h"

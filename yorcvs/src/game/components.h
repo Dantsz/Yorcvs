@@ -1,5 +1,6 @@
 #pragma once
 #include "../common/types.h"
+#include <array>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -99,4 +100,11 @@ struct offensiveStatsComponent {
     float dexterity;
     float piercing;
     float intellect;
+};
+struct itemComponent {
+    size_t holder_id;
+};
+struct inventoryComponent {
+    static constexpr size_t inventory_size = 16;
+    std::array<size_t, inventory_size> items;
 };
