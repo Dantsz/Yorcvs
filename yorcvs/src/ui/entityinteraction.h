@@ -28,9 +28,9 @@ static inline void show_entity_interaction_window(yorcvs::ECS* world, combat_sys
 }
 }
 template <typename eventhandler_impl, typename window_impl>
-class EntityInteractionWidget {
+class entity_interaction_widget {
 public:
-    EntityInteractionWidget(yorcvs::event_handler<eventhandler_impl>& event_handler, yorcvs::window<window_impl>& window, yorcvs::ECS& world, collision_system& collision_system, combat_system& combat_system, player_movement_control& player_move_system)
+    entity_interaction_widget(yorcvs::event_handler<eventhandler_impl>& event_handler, yorcvs::window<window_impl>& window, yorcvs::ECS& world, collision_system& collision_system, combat_system& combat_system, player_movement_control& player_move_system)
         : event_handler(&event_handler)
         , window(&window)
         , world(&world)
@@ -63,7 +63,7 @@ public:
               }))
     {
     }
-    ~EntityInteractionWidget()
+    ~entity_interaction_widget()
     {
         event_handler->unregister_callback(entity_is_clicked_callback);
     }

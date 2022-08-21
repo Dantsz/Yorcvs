@@ -112,37 +112,37 @@ public:
 
             update_timer.start();
             map.health_sys.update(msPF);
-            tracked_parameters[yorcvs::ui::Performance_Window::update_time_item::health] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
+            tracked_parameters[yorcvs::ui::performance_window::update_time_item::health] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
 
             update_timer.start();
             behaviour_sys.update(msPF);
-            tracked_parameters[yorcvs::ui::Performance_Window::update_time_item::behaviour] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
+            tracked_parameters[yorcvs::ui::performance_window::update_time_item::behaviour] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
 
             update_timer.start();
             map.collision_sys.update(msPF);
-            tracked_parameters[yorcvs::ui::Performance_Window::update_time_item::collision] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
+            tracked_parameters[yorcvs::ui::performance_window::update_time_item::collision] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
 
             update_timer.start();
             map.velocity_sys.update(msPF);
-            tracked_parameters[yorcvs::ui::Performance_Window::update_time_item::velocity] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
+            tracked_parameters[yorcvs::ui::performance_window::update_time_item::velocity] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
 
             update_timer.start();
             map.animation_sys.update(msPF);
-            tracked_parameters[yorcvs::ui::Performance_Window::update_time_item::animation] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
+            tracked_parameters[yorcvs::ui::performance_window::update_time_item::animation] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
 
             update_timer.start();
             map.sprint_sys.update(msPF);
-            tracked_parameters[yorcvs::ui::Performance_Window::update_time_item::stamina] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
+            tracked_parameters[yorcvs::ui::performance_window::update_time_item::stamina] = update_timer.get_ticks<float, std::chrono::nanoseconds>();
 
             lag -= msPF;
-            tracked_parameters[yorcvs::ui::Performance_Window::update_time_item::overall] = update_loop_timer.get_ticks<float, std::chrono::nanoseconds>();
-            performance_window.record_update_time<yorcvs::ui::Performance_Window::update_time_item::health,
-                yorcvs::ui::Performance_Window::update_time_item::behaviour,
-                yorcvs::ui::Performance_Window::update_time_item::collision,
-                yorcvs::ui::Performance_Window::update_time_item::velocity,
-                yorcvs::ui::Performance_Window::update_time_item::animation,
-                yorcvs::ui::Performance_Window::update_time_item::stamina,
-                yorcvs::ui::Performance_Window::update_time_item::overall>(tracked_parameters);
+            tracked_parameters[yorcvs::ui::performance_window::update_time_item::overall] = update_loop_timer.get_ticks<float, std::chrono::nanoseconds>();
+            performance_window.record_update_time<yorcvs::ui::performance_window::update_time_item::health,
+                yorcvs::ui::performance_window::update_time_item::behaviour,
+                yorcvs::ui::performance_window::update_time_item::collision,
+                yorcvs::ui::performance_window::update_time_item::velocity,
+                yorcvs::ui::performance_window::update_time_item::animation,
+                yorcvs::ui::performance_window::update_time_item::stamina,
+                yorcvs::ui::performance_window::update_time_item::overall>(tracked_parameters);
         }
         app_window.clear();
         render_map_tiles(map);
@@ -185,11 +185,11 @@ private:
     player_movement_control player_control { map.ecs, &app_window };
     behaviour_system behaviour_sys { map.ecs, &lua_state };
 
-    yorcvs::ui::Performance_Window performance_window;
-    std::array<float, yorcvs::ui::Performance_Window::update_time_item::update_time_tracked> tracked_parameters;
+    yorcvs::ui::performance_window performance_window;
+    std::array<float, yorcvs::ui::performance_window::update_time_item::update_time_tracked> tracked_parameters;
 
-    DebugInfo debug_info_widgets;
-    EntityInteractionWidget<yorcvs::eventhandler_sdl2, yorcvs::sdl2_window> entity_interaction_widget;
+    debug_info debug_info_widgets;
+    entity_interaction_widget<yorcvs::eventhandler_sdl2, yorcvs::sdl2_window> entity_interaction_widget;
     bool active = true;
 };
 } // namespace yorcvs

@@ -12,10 +12,10 @@
 #include <optional>
 namespace yorcvs {
 class application;
-class DebugInfo {
+class debug_info {
 public:
-    DebugInfo() = delete;
-    DebugInfo(yorcvs::application* parentAPP, yorcvs::sdl2_window* parentW, yorcvs::map* map_object, player_movement_control* pms, collision_system* cols,
+    debug_info() = delete;
+    debug_info(yorcvs::application* parentAPP, yorcvs::sdl2_window* parentW, yorcvs::map* map_object, player_movement_control* pms, collision_system* cols,
         health_system* healthS, combat_system* combat_sys, sol::state* lua)
         : parentWindow(parentW)
         , appECS(map_object->ecs)
@@ -28,12 +28,12 @@ public:
     {
         attach(parentW, map_object, pms, cols, healthS, lua);
     }
-    ~DebugInfo() = default;
+    ~debug_info() = default;
 
-    DebugInfo(const DebugInfo& other) = delete;
-    DebugInfo(DebugInfo&& other) = delete;
-    DebugInfo operator=(const DebugInfo& other) = delete;
-    DebugInfo operator=(DebugInfo&& other) = delete;
+    debug_info(const debug_info& other) = delete;
+    debug_info(debug_info&& other) = delete;
+    debug_info operator=(const debug_info& other) = delete;
+    debug_info operator=(debug_info&& other) = delete;
 
     void update(const float elapsed, yorcvs::vec2<float>& render_dimensions)
     {
@@ -131,7 +131,7 @@ public:
     }
     void attach_lua()
     {
-        lua_state->set_function("internal_log", &DebugInfo::add_log, this);
+        lua_state->set_function("internal_log", &debug_info::add_log, this);
         lua_state->script("function log(message) internal_log(tostring(message)) end");
         (*lua_state)["print"] = (*lua_state)["log"];
     }
@@ -235,7 +235,7 @@ private:
         ImGui::EndChild();
         ImGui::Separator();
         bool reclaim_focus = false;
-        if (ImGui::InputText("##", &console_text, input_text_flags, &DebugInfo::text_edit_callback_stub, (void*)this) && !console_text.empty()) {
+        if (ImGui::InputText("##", &console_text, input_text_flags, &debug_info::text_edit_callback_stub, (void*)this) && !console_text.empty()) {
             console_logs.push_back(console_text);
             history_pos = -1;
             console_previous_commands.push_back(console_text);
@@ -347,7 +347,7 @@ private:
     }
     static int text_edit_callback_stub(ImGuiInputTextCallbackData* data)
     {
-        auto* console = static_cast<DebugInfo*>(data->UserData);
+        auto* console = static_cast<debug_info*>(data->UserData);
         return console->text_edit_callback(data);
     }
 
