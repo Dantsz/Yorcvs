@@ -1,4 +1,5 @@
 #pragma once
+#include "../common/ecs.h"
 #include "../common/utilities/log.h"
 #include "components.h"
 #include <filesystem>
@@ -194,7 +195,7 @@ namespace yorcvs::components {
  * @return json::json
  */
 template <typename T>
-json::json serialize(const T& comp)
+json::json serialize([[maybe_unused]] yorcvs::ECS* world, const T& comp)
 {
     json::json j = comp;
     return j;
@@ -209,7 +210,7 @@ json::json serialize(const T& comp)
  * @return returns fals on failure
  */
 template <typename T>
-[[nodiscard]] bool deserialize(T& dst, const json::json& j)
+[[nodiscard]] bool deserialize([[maybe_unused]] yorcvs::ECS* world, T& dst, const json::json& j)
 {
     try {
         dst = j;

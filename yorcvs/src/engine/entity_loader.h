@@ -80,7 +80,7 @@ protected:
     {
         if (json_entity_obj.contains(component_name)) {
             T comp {};
-            if (!yorcvs::components::deserialize(comp,
+            if (!yorcvs::components::deserialize(world, comp,
                     json_entity_obj[component_name])) {
                 yorcvs::log(component_name + " could not be serialized! ", yorcvs::MSGSEVERITY::ERROR);
                 return false;
@@ -106,7 +106,7 @@ protected:
     {
         if (world->has_components<T>(entity_id)) {
             transform(json_obj, world->get_component<T>(entity_id));
-            json_obj[component_name] = yorcvs::components::serialize(world->get_component<T>(entity_id));
+            json_obj[component_name] = yorcvs::components::serialize(world, world->get_component<T>(entity_id));
         }
     }
 
