@@ -1302,16 +1302,16 @@ private:
  * @brief RAII wrapper for ids
  *
  */
-class Entity {
+class entity {
 public:
-    explicit Entity(ECS* ecs)
+    explicit entity(ECS* ecs)
         : parent(ecs)
     {
         id = parent->create_entity_ID();
         yorcvs::log("Created entity with id: " + std::to_string(id), yorcvs::MSGSEVERITY::INFO);
     }
 
-    Entity(const Entity& other)
+    entity(const entity& other)
         : parent(other.parent)
     {
         id = parent->create_entity_ID();
@@ -1319,13 +1319,13 @@ public:
         yorcvs::log("The copy constructor for an Entity " + std::to_string(id) + " has been called: this might be an unecesary expensive option",
             yorcvs::MSGSEVERITY::WARNING);
     }
-    Entity(Entity&& other) noexcept
+    entity(entity&& other) noexcept
         : id(other.id)
         , parent(other.parent)
     {
         other.parent = nullptr;
     }
-    Entity& operator=(const Entity& other)
+    entity& operator=(const entity& other)
     {
         if (this == &other) {
             return *this;
@@ -1337,7 +1337,7 @@ public:
         return *this;
     }
 
-    Entity& operator=(Entity&& other) noexcept
+    entity& operator=(entity&& other) noexcept
     {
         parent = other.parent;
         id = other.id;
@@ -1345,7 +1345,7 @@ public:
         return *this;
     }
 
-    ~Entity() noexcept
+    ~entity() noexcept
     {
         if (parent != nullptr) {
             parent->destroy_entity(id);

@@ -23,7 +23,7 @@ int main()
     ecs.register_component<point>();
     pointLister lister;
     ecs.register_system(lister);
-    yorcvs::Entity origin { &ecs };
+    yorcvs::entity origin { &ecs };
     ecs.add_component<point>(origin.id, { 0, 0 });
     lister.parent = &ecs;
     lister.list_points();

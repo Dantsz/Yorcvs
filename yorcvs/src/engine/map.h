@@ -415,6 +415,6 @@ public:
     animation_system animation_sys;
     combat_system combat_sys;
     collision_system collision_sys;
-    std::vector<yorcvs::Entity> ysorted_tiles {};
+    std::vector<yorcvs::entity> ysorted_tiles {};
 };
 }

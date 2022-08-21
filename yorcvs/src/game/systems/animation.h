@@ -20,9 +20,9 @@ public:
      *
      * @param animation i
      */
-    void remove_animation(yorcvs::Entity, std::string animation);
+    void remove_animation(yorcvs::entity, std::string animation);
 
-    void remove_animation_frame(yorcvs::Entity, std::string animation, size_t index);
+    void remove_animation_frame(yorcvs::entity, std::string animation, size_t index);
 
     /**
      * @brief Set which animation to be used
@@ -61,7 +61,7 @@ public:
      * @param entity
      * @param animation_name
      */
-    static void set_animation_global(const yorcvs::Entity& entity, const std::string& animation_name)
+    static void set_animation_global(const yorcvs::entity& entity, const std::string& animation_name)
     {
         yorcvs::ECS* world = entity.parent;
         set_animation_global(world, entity.id, animation_name);
