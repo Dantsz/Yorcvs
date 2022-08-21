@@ -32,7 +32,7 @@ class application {
 public:
     application()
         : debug_info_widgets(this, &app_window, &map, &player_control, &map.collision_sys, &map.health_sys, &map.combat_sys, &lua_state)
-        , entity_interaction_widget(app_window, app_window, world, map.collision_sys, map.combat_sys, player_control)
+        , entity_inter_widget(app_window, app_window, world, map.collision_sys, map.combat_sys, player_control)
     {
         lua_state.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
         yorcvs::lua::bind_runtime(lua_state, &world);
@@ -148,7 +148,7 @@ public:
         render_map_tiles(map);
         sprite_sys.renderSprites(render_dimensions);
         debug_info_widgets.render(render_dimensions);
-        entity_interaction_widget.render(render_dimensions);
+        entity_inter_widget.render(render_dimensions);
         if (debug_info_widgets.is_debug_window_open()) {
             performance_widget.render();
         }
@@ -189,7 +189,7 @@ private:
     std::array<float, yorcvs::ui::performance_window::update_time_item::update_time_tracked> tracked_parameters;
 
     debug_info debug_info_widgets;
-    entity_interaction_widget<yorcvs::eventhandler_sdl2, yorcvs::sdl2_window> entity_interaction_widget;
+    entity_interaction_widget<yorcvs::eventhandler_sdl2, yorcvs::sdl2_window> entity_inter_widget;
     bool active = true;
 };
 } // namespace yorcvs
