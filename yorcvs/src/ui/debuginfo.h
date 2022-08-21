@@ -11,31 +11,31 @@
 #include "misc/cpp/imgui_stdlib.h"
 #include <optional>
 namespace yorcvs {
-class Application;
-class DebugInfo {
+class application;
+class debug_info {
 public:
-    DebugInfo() = delete;
-    DebugInfo(yorcvs::Application* parentAPP, yorcvs::sdl2_window* parentW, yorcvs::Map* map_object, PlayerMovementControl* pms, CollisionSystem* cols,
-        HealthSystem* healthS, CombatSystem* combat_sys, sol::state* lua)
+    debug_info() = delete;
+    debug_info(yorcvs::application* parentAPP, yorcvs::sdl2_window* parentW, yorcvs::map* map_object, player_movement_control* pms, collision_system* cols,
+        health_system* healthS, combat_system* combat_sys, sol::state* lua)
         : parentWindow(parentW)
         , appECS(map_object->ecs)
         , map(map_object)
         , lua_state(lua)
         , parent_app(parentAPP)
-        , player_move_system(pms)
-        , colission_system(cols)
-        , combat_system(combat_sys)
+        , player_move_sys(pms)
+        , colission_sys(cols)
+        , combat_sys(combat_sys)
     {
         attach(parentW, map_object, pms, cols, healthS, lua);
     }
-    ~DebugInfo() = default;
+    ~debug_info() = default;
 
-    DebugInfo(const DebugInfo& other) = delete;
-    DebugInfo(DebugInfo&& other) = delete;
-    DebugInfo operator=(const DebugInfo& other) = delete;
-    DebugInfo operator=(DebugInfo&& other) = delete;
+    debug_info(const debug_info& other) = delete;
+    debug_info(debug_info&& other) = delete;
+    debug_info operator=(const debug_info& other) = delete;
+    debug_info operator=(debug_info&& other) = delete;
 
-    void update(const float elapsed, yorcvs::Vec2<float>& render_dimensions)
+    void update(const float elapsed, yorcvs::vec2<float>& render_dimensions)
     {
         time_accumulator += elapsed;
         if (time_accumulator >= ui_controls_update_time) {
@@ -45,7 +45,7 @@ public:
                     time_accumulator = 0;
                 }
                 if (parentWindow->is_key_pressed(Events::Key::YORCVS_KEY_TILDE)) {
-                    player_move_system->controls_enable = !player_move_system->controls_enable;
+                    player_move_sys->controls_enable = !player_move_sys->controls_enable;
                     console_opened = !console_opened;
                     time_accumulator = 0;
                 }
@@ -61,7 +61,7 @@ public:
                 if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_C)) {
                     yorcvs::log("Saving player...");
                     std::ofstream out("assets/testPlayer.json");
-                    out << map->save_character((*player_move_system->entityList)[0]);
+                    out << map->save_character((*player_move_sys->entityList)[0]);
                     yorcvs::log("Done.");
                     time_accumulator = 0;
                 }
@@ -70,22 +70,22 @@ public:
                 }
             }
         }
-        if (!player_move_system->entityList->empty()) {
-            (*lua_state)["playerID"] = (*player_move_system->entityList)[0];
+        if (!player_move_sys->entityList->empty()) {
+            (*lua_state)["playerID"] = (*player_move_sys->entityList)[0];
         }
     }
 
-    void render_hitboxes(yorcvs::sdl2_window& window, const yorcvs::Vec2<float>& render_dimensions, const uint8_t r,
+    void render_hitboxes(yorcvs::sdl2_window& window, const yorcvs::vec2<float>& render_dimensions, const uint8_t r,
         const uint8_t g, const uint8_t b, const uint8_t a)
     {
-        yorcvs::Vec2<float> old_rs = window.get_render_scale();
+        yorcvs::vec2<float> old_rs = window.get_render_scale();
         window.set_render_scale(window.get_window_size() / render_dimensions);
-        yorcvs::Rect<float> rect {};
-        for (const auto& ID : *colission_system->entityList) {
-            rect.x = appECS->get_component<positionComponent>(ID).position.x + appECS->get_component<hitboxComponent>(ID).hitbox.x;
-            rect.y = appECS->get_component<positionComponent>(ID).position.y + appECS->get_component<hitboxComponent>(ID).hitbox.y;
-            rect.w = appECS->get_component<hitboxComponent>(ID).hitbox.w;
-            rect.h = appECS->get_component<hitboxComponent>(ID).hitbox.h;
+        yorcvs::rect<float> rect {};
+        for (const auto& ID : *colission_sys->entityList) {
+            rect.x = appECS->get_component<position_component>(ID).position.x + appECS->get_component<hitbox_component>(ID).hitbox.x;
+            rect.y = appECS->get_component<position_component>(ID).position.y + appECS->get_component<hitbox_component>(ID).hitbox.y;
+            rect.w = appECS->get_component<hitbox_component>(ID).hitbox.w;
+            rect.h = appECS->get_component<hitbox_component>(ID).hitbox.h;
             window.draw_rect(rect, r, g, b, a);
             draw_entity_health_bar(window, ID, rect);
             draw_entity_stamina_bar(window, ID, rect);
@@ -94,7 +94,7 @@ public:
         window.set_render_scale(old_rs);
     }
 
-    void render(yorcvs::Vec2<float>& render_dimensions)
+    void render(yorcvs::vec2<float>& render_dimensions)
     {
         if (debug_window_opened) {
             show_debug_window(render_dimensions);
@@ -117,21 +117,21 @@ public:
         }
     }
 
-    void attach(yorcvs::sdl2_window* parentW, yorcvs::Map* map_object, PlayerMovementControl* pms,
-        CollisionSystem* cols, HealthSystem* healthS, sol::state* lua)
+    void attach(yorcvs::sdl2_window* parentW, yorcvs::map* map_object, player_movement_control* pms,
+        collision_system* cols, health_system* healthS, sol::state* lua)
     {
         lua_state = lua;
         attach_lua();
         parentWindow = parentW;
         map = map_object;
         appECS = map->ecs;
-        player_move_system = pms;
-        colission_system = cols;
-        health_system = healthS;
+        player_move_sys = pms;
+        colission_sys = cols;
+        health_sys = healthS;
     }
     void attach_lua()
     {
-        lua_state->set_function("internal_log", &DebugInfo::add_log, this);
+        lua_state->set_function("internal_log", &debug_info::add_log, this);
         lua_state->script("function log(message) internal_log(tostring(message)) end");
         (*lua_state)["print"] = (*lua_state)["log"];
     }
@@ -144,29 +144,29 @@ public:
     }
 
 private:
-    void show_debug_window(yorcvs::Vec2<float>& render_dimensions)
+    void show_debug_window(yorcvs::vec2<float>& render_dimensions)
     {
         render_hitboxes(*parentWindow, render_dimensions, hitbox_color[0], hitbox_color[1], hitbox_color[2],
             hitbox_color[3]);
 
-        if (!player_move_system->entityList->empty()) {
-            const size_t ID = (*player_move_system->entityList)[0];
+        if (!player_move_sys->entityList->empty()) {
+            const size_t ID = (*player_move_sys->entityList)[0];
             ImGui::Begin("Player");
             show_entity_stats(ID, "Player : ");
-            if (appECS->has_components<animationComponent>(ID)) {
+            if (appECS->has_components<animation_component>(ID)) {
                 ui::show_current_animator_selector(appECS, ID);
             }
         }
     }
     void show_entity_stats(size_t ID, [[maybe_unused]] std::string pre_name = "Entity : ")
     {
-        if (appECS->has_components<identificationComponent>(ID)) {
-            pre_name += appECS->get_component<identificationComponent>(ID).name + " (" + std::to_string(ID) + ")";
+        if (appECS->has_components<identification_component>(ID)) {
+            pre_name += appECS->get_component<identification_component>(ID).name + " (" + std::to_string(ID) + ")";
         }
         ImGui::Text("%s", pre_name.c_str());
-        if (appECS->has_components<spriteComponent>(ID)) {
+        if (appECS->has_components<sprite_component>(ID)) {
             static constexpr float size_multiplier = 4.0f;
-            const spriteComponent& comp = appECS->get_component<spriteComponent>(ID);
+            const sprite_component& comp = appECS->get_component<sprite_component>(ID);
 
             int texture_size_x {};
             int texture_size_y {};
@@ -174,11 +174,11 @@ private:
             SDL_QueryTexture(parentWindow->assetm->load_from_file(comp.texture_path).get(), nullptr, nullptr,
                 &texture_size_x, &texture_size_y);
 
-            const yorcvs::Vec2<float> top_corner = {
+            const yorcvs::vec2<float> top_corner = {
                 static_cast<float>(comp.src_rect.x) / static_cast<float>(texture_size_x),
                 static_cast<float>(comp.src_rect.y) / static_cast<float>(texture_size_y)
             };
-            const yorcvs::Vec2<float> bottom_corner = {
+            const yorcvs::vec2<float> bottom_corner = {
                 static_cast<float>(comp.src_rect.x + comp.src_rect.w) / static_cast<float>(texture_size_x),
                 static_cast<float>(comp.src_rect.y + comp.src_rect.h) / static_cast<float>(texture_size_y)
             };
@@ -186,35 +186,35 @@ private:
                 { size_multiplier * comp.size.x, size_multiplier * comp.size.y }, { top_corner.x, top_corner.y },
                 { bottom_corner.x, bottom_corner.y });
         }
-        if (appECS->has_components<positionComponent>(ID)) {
-            ImGui::Text("Position: (%f,%f)", appECS->get_component<positionComponent>(ID).position.x,
-                appECS->get_component<positionComponent>(ID).position.y);
+        if (appECS->has_components<position_component>(ID)) {
+            ImGui::Text("Position: (%f,%f)", appECS->get_component<position_component>(ID).position.x,
+                appECS->get_component<position_component>(ID).position.y);
         }
-        if (appECS->has_components<velocityComponent>(ID)) {
-            ImGui::Text("Velocity: (%f,%f)", appECS->get_component<velocityComponent>(ID).vel.x,
-                appECS->get_component<velocityComponent>(ID).vel.y);
+        if (appECS->has_components<velocity_component>(ID)) {
+            ImGui::Text("Velocity: (%f,%f)", appECS->get_component<velocity_component>(ID).vel.x,
+                appECS->get_component<velocity_component>(ID).vel.y);
         }
-        if (appECS->has_components<healthComponent, healthStatsComponent>(ID)) {
-            auto& playerHealthC = appECS->get_component<healthComponent>(ID);
-            auto& playerHealthStatsC = appECS->get_component<healthStatsComponent>(ID);
+        if (appECS->has_components<health_component, health_stats_component>(ID)) {
+            auto& playerHealthC = appECS->get_component<health_component>(ID);
+            auto& playerHealthStatsC = appECS->get_component<health_stats_component>(ID);
             ImGui::Text("Health: (%f/%f)", playerHealthC.HP, playerHealthStatsC.max_HP);
         }
-        if (appECS->has_components<staminaComponent, staminaStatsComponent>(ID)) {
-            auto& playerStaminaC = appECS->get_component<staminaComponent>(ID);
-            auto& playerStamStatC = appECS->get_component<staminaStatsComponent>(ID);
+        if (appECS->has_components<stamina_component, stamina_stats_component>(ID)) {
+            auto& playerStaminaC = appECS->get_component<stamina_component>(ID);
+            auto& playerStamStatC = appECS->get_component<stamina_stats_component>(ID);
             ImGui::Text("Stamina: (%f/%f)", playerStaminaC.stamina, playerStamStatC.max_stamina);
         }
 
-        if (appECS->has_components<offensiveStatsComponent>(ID)) {
-            auto& offStatsC = appECS->get_component<offensiveStatsComponent>(ID);
+        if (appECS->has_components<offensive_stats_component>(ID)) {
+            auto& offStatsC = appECS->get_component<offensive_stats_component>(ID);
             ImGui::Text("Strength : (%f)", offStatsC.strength);
             ImGui::Text("Agility : (%f)", offStatsC.agility);
             ImGui::Text("Dexterity : (%f)", offStatsC.dexterity);
             ImGui::Text("Piercing : (%f)", offStatsC.piercing);
             ImGui::Text("Intellect : (%f)", offStatsC.intellect);
         }
-        if (appECS->has_components<defensiveStatsComponent>(ID)) {
-            auto& defstats = appECS->get_component<defensiveStatsComponent>(ID);
+        if (appECS->has_components<defensive_stats_component>(ID)) {
+            auto& defstats = appECS->get_component<defensive_stats_component>(ID);
             ImGui::Text("Defense : (%f)", defstats.defense);
             ImGui::Text("Block : (%f)", defstats.block);
             ImGui::Text("Dodge : (%f)", defstats.dodge);
@@ -235,7 +235,7 @@ private:
         ImGui::EndChild();
         ImGui::Separator();
         bool reclaim_focus = false;
-        if (ImGui::InputText("##", &console_text, input_text_flags, &DebugInfo::text_edit_callback_stub, (void*)this) && !console_text.empty()) {
+        if (ImGui::InputText("##", &console_text, input_text_flags, &debug_info::text_edit_callback_stub, (void*)this) && !console_text.empty()) {
             console_logs.push_back(console_text);
             history_pos = -1;
             console_previous_commands.push_back(console_text);
@@ -285,15 +285,15 @@ private:
             if (ImGui::BeginPopup("Entity")) {
                 ImGui::Text("%s", std::to_string(i).c_str());
                 show_entity_stats(i);
-                yorcvs::ui::show_entity_interaction_window(appECS, combat_system, get_first_player_id(), i);
+                yorcvs::ui::show_entity_interaction_window(appECS, combat_sys, get_first_player_id(), i);
                 ImGui::EndPopup();
             }
             ImGui::SameLine();
             ImGui::Text("%zu", i);
 
             ImGui::TableSetColumnIndex(1);
-            if (appECS->has_components<identificationComponent>(i)) {
-                ImGui::Text("%s", appECS->get_component<identificationComponent>(i).name.c_str());
+            if (appECS->has_components<identification_component>(i)) {
+                ImGui::Text("%s", appECS->get_component<identification_component>(i).name.c_str());
             } else {
                 ImGui::Text("%s", "Unknown");
             }
@@ -307,8 +307,8 @@ private:
             ImGui::Text("%s", signature.c_str());
 
             ImGui::TableSetColumnIndex(3);
-            if (appECS->has_components<positionComponent>(i)) {
-                const auto& position = appECS->get_component<positionComponent>(i).position;
+            if (appECS->has_components<position_component>(i)) {
+                const auto& position = appECS->get_component<position_component>(i).position;
                 ImGui::Text("%f/%f", position.x, position.y);
             } else {
                 ImGui::Text("(-/-)");
@@ -347,7 +347,7 @@ private:
     }
     static int text_edit_callback_stub(ImGuiInputTextCallbackData* data)
     {
-        auto* console = static_cast<DebugInfo*>(data->UserData);
+        auto* console = static_cast<debug_info*>(data->UserData);
         return console->text_edit_callback(data);
     }
 
@@ -385,43 +385,43 @@ private:
 
     size_t get_first_player_id()
     {
-        if (!player_move_system->entityList->empty()) {
-            return (*player_move_system->entityList)[0];
+        if (!player_move_sys->entityList->empty()) {
+            return (*player_move_sys->entityList)[0];
         }
         const size_t invalidID = appECS->create_entity_ID();
         appECS->destroy_entity(invalidID);
         return invalidID;
     }
-    void draw_entity_health_bar(yorcvs::sdl2_window& window, size_t ID, const yorcvs::Rect<float>& offset_rect)
+    void draw_entity_health_bar(yorcvs::sdl2_window& window, size_t ID, const yorcvs::rect<float>& offset_rect)
     {
-        if (appECS->has_components<healthComponent, healthStatsComponent>(ID)) {
+        if (appECS->has_components<health_component, health_stats_component>(ID)) {
             // draw health bar
-            yorcvs::Rect<float> healthBarRect {};
-            if (appECS->has_components<spriteComponent>(
+            yorcvs::rect<float> healthBarRect {};
+            if (appECS->has_components<sprite_component>(
                     ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
             {
-                healthBarRect.y = offset_rect.y - appECS->get_component<spriteComponent>(ID).size.y / 2;
+                healthBarRect.y = offset_rect.y - appECS->get_component<sprite_component>(ID).size.y / 2;
             } else {
                 healthBarRect.y = offset_rect.y - offset_rect.h;
             }
             healthBarRect.x = offset_rect.x - health_bar_x_offset + offset_rect.w / 2;
             healthBarRect.w = health_full_bar_dimension.x;
             healthBarRect.h = health_full_bar_dimension.y;
-            if (appECS->has_components<staminaComponent>(ID)) {
+            if (appECS->has_components<stamina_component>(ID)) {
                 healthBarRect.y -= health_full_bar_dimension.y * 2;
             }
-            draw_status_bar(window, healthBarRect, (appECS->get_component<healthComponent>(ID).HP / appECS->get_component<healthStatsComponent>(ID).max_HP),
+            draw_status_bar(window, healthBarRect, (appECS->get_component<health_component>(ID).HP / appECS->get_component<health_stats_component>(ID).max_HP),
                 health_bar_full_color, health_bar_empty_color);
         }
     }
-    void draw_entity_stamina_bar(yorcvs::sdl2_window& window, size_t ID, const yorcvs::Rect<float>& offset_rect)
+    void draw_entity_stamina_bar(yorcvs::sdl2_window& window, size_t ID, const yorcvs::rect<float>& offset_rect)
     {
-        if (appECS->has_components<staminaComponent, staminaStatsComponent>(ID)) {
-            yorcvs::Rect<float> staminaBarRect {};
-            if (appECS->has_components<spriteComponent>(
+        if (appECS->has_components<stamina_component, stamina_stats_component>(ID)) {
+            yorcvs::rect<float> staminaBarRect {};
+            if (appECS->has_components<sprite_component>(
                     ID)) // if the entity has a sprite component , render the health above it, not above the hitbox
             {
-                staminaBarRect.y = offset_rect.y - appECS->get_component<spriteComponent>(ID).size.y / 2;
+                staminaBarRect.y = offset_rect.y - appECS->get_component<sprite_component>(ID).size.y / 2;
             } else {
                 staminaBarRect.y = offset_rect.y - offset_rect.h;
             }
@@ -430,11 +430,11 @@ private:
 
             staminaBarRect.w = health_full_bar_dimension.x;
             staminaBarRect.h = health_full_bar_dimension.y;
-            draw_status_bar(window, staminaBarRect, (appECS->get_component<staminaComponent>(ID).stamina / appECS->get_component<staminaStatsComponent>(ID).max_stamina),
+            draw_status_bar(window, staminaBarRect, (appECS->get_component<stamina_component>(ID).stamina / appECS->get_component<stamina_stats_component>(ID).max_stamina),
                 stamina_bar_full_color, stamina_bar_empty_color);
         }
     }
-    static void draw_status_bar(yorcvs::sdl2_window& window, yorcvs::Rect<float> rect, float value, std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> full_color, std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> empty_color)
+    static void draw_status_bar(yorcvs::sdl2_window& window, yorcvs::rect<float> rect, float value, std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> full_color, std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> empty_color)
     {
         window.draw_rect(rect, std::get<0>(empty_color), std::get<1>(empty_color), std::get<2>(empty_color), std::get<3>(empty_color));
         rect.w = std::max(value * rect.w, 0.0f);
@@ -444,19 +444,19 @@ private:
     yorcvs::sdl2_window* parentWindow {};
 
     yorcvs::ECS* appECS {};
-    yorcvs::Map* map {};
+    yorcvs::map* map {};
     sol::state* lua_state {};
-    yorcvs::Application* parent_app;
+    yorcvs::application* parent_app;
     // console
     std::string console_text;
     std::vector<std::string> console_logs;
     std::vector<std::string> console_previous_commands;
     std::optional<size_t> select_target {};
-    PlayerMovementControl* player_move_system {};
+    player_movement_control* player_move_sys {};
 
-    CollisionSystem* colission_system {};
-    HealthSystem* health_system {};
-    CombatSystem* combat_system {};
+    collision_system* colission_sys {};
+    health_system* health_sys {};
+    combat_system* combat_sys {};
 
     // controls
     bool debug_window_opened = false;
@@ -464,7 +464,7 @@ private:
     float time_accumulator = 0;
     int history_pos = 0;
 
-    static constexpr yorcvs::Vec2<float> health_full_bar_dimension = { 32.0f, 4.0f };
+    static constexpr yorcvs::vec2<float> health_full_bar_dimension = { 32.0f, 4.0f };
 
     const std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> health_bar_full_color { 255, 0, 0, 255 };
     const std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> health_bar_empty_color { 100, 0, 0, 255 };

@@ -10,12 +10,12 @@ int main()
 {
     yorcvs::ECS world {};
     world.register_component<Transform>();
-    yorcvs::Entity position(&world);
+    yorcvs::entity position(&world);
 
     world.add_component<Transform>(position.id, { 1.0f, 1.0f });
 
-    yorcvs::Entity e1 { &world };
-    yorcvs::Entity e2 { &world };
+    yorcvs::entity e1 { &world };
+    yorcvs::entity e2 { &world };
     world.add_component<Transform>(e1.id, {});
     world.copy_components_to_from_entity(e2.id, e1.id);
     const auto& sig1 = world.get_entity_signature(e1.id);

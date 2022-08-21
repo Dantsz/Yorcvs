@@ -25,7 +25,7 @@ public:
         return 0;
     }
     yorcvs::ECS* parent {};
-    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    std::shared_ptr<yorcvs::entity_system_list> entityList;
 };
 
 int main()
@@ -35,7 +35,7 @@ int main()
     testSystem sys(&ecs);
     ecs.register_system(sys);
     ecs.add_criteria_for_iteration<testSystem, testComp>();
-    yorcvs::Entity enti { &ecs };
+    yorcvs::entity enti { &ecs };
     ecs.add_component<testComp>(enti.id, { 1, 69 });
     assert(sys.do_work() == 70);
     testSystem system2 {};

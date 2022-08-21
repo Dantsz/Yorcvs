@@ -10,7 +10,7 @@ int main()
 {
     yorcvs::ECS world {};
     world.register_component<Transform>();
-    yorcvs::Entity position(&world);
+    yorcvs::entity position(&world);
 
     world.add_component<Transform>(position.id, { 1.0f, 1.0f });
 

@@ -103,12 +103,12 @@ public:
         return keys[key_to_impl.at(key)] ? 1 : 0; // NOLINT
     }
 
-    yorcvs::Vec2<float> get_pointer_position()
+    yorcvs::vec2<float> get_pointer_position()
     {
         int x = 0;
         int y = 0;
         SDL_GetMouseState(&x, &y);
-        return yorcvs::Vec2<float> { static_cast<float>(x), static_cast<float>(y) };
+        return yorcvs::vec2<float> { static_cast<float>(x), static_cast<float>(y) };
     }
     [[nodiscard]] size_t add_callback_on_event(yorcvs::Events::Type type, const std::function<void(const yorcvs::event&)>& callback)
     {

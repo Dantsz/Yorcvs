@@ -4,9 +4,9 @@
 #include <deque>
 #include <string>
 namespace yorcvs::ui {
-class Performance_Window {
+class performance_window {
 public:
-    Performance_Window()
+    performance_window()
     {
         reset();
     }

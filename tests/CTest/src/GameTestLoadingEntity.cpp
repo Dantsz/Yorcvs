@@ -6,23 +6,23 @@
 int main(int argc, char** argv)
 {
     yorcvs::ECS world {};
-    yorcvs::Map map(&world);
-    yorcvs::Entity duck { &world };
+    yorcvs::map map(&world);
+    yorcvs::entity duck { &world };
     map.load_character_from_path(duck.id, TEST_TEMP_ENTITY_FILE);
-    bool duck_check = world.has_components<healthComponent>(duck.id);
+    bool duck_check = world.has_components<health_component>(duck.id);
     assert(duck_check == true);
-    duck_check = world.has_components<hitboxComponent>(duck.id);
+    duck_check = world.has_components<hitbox_component>(duck.id);
     assert(duck_check == true);
-    assert((world.get_component<hitboxComponent>(duck.id).hitbox == yorcvs::Rect<float> { 6, 6, 4, 4 }));
-    duck_check = world.has_components<spriteComponent>(duck.id);
+    assert((world.get_component<hitbox_component>(duck.id).hitbox == yorcvs::rect<float> { 6, 6, 4, 4 }));
+    duck_check = world.has_components<sprite_component>(duck.id);
     assert(duck_check == true);
-    assert((world.get_component<spriteComponent>(duck.id).src_rect == yorcvs::Rect<size_t> { 0, 0, 16, 16 }));
-    duck_check = world.has_components<animationComponent>(duck.id);
+    assert((world.get_component<sprite_component>(duck.id).src_rect == yorcvs::rect<size_t> { 0, 0, 16, 16 }));
+    duck_check = world.has_components<animation_component>(duck.id);
     assert(duck_check == true);
-    assert(world.get_component<animationComponent>(duck.id).animation_name_to_start_frame_index.size() == 4);
-    duck_check = world.has_components<velocityComponent>(duck.id);
+    assert(world.get_component<animation_component>(duck.id).animation_name_to_start_frame_index.size() == 4);
+    duck_check = world.has_components<velocity_component>(duck.id);
     assert(duck_check == true);
-    duck_check = world.has_components<hitboxComponent, spriteComponent, animationComponent, velocityComponent>(duck.id);
+    duck_check = world.has_components<hitbox_component, sprite_component, animation_component, velocity_component>(duck.id);
     assert(duck_check == true);
 
     return 0;

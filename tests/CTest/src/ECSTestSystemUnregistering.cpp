@@ -25,7 +25,7 @@ public:
             assert(parent->get_component<Transform>(i).id == 1);
         }
     }
-    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    std::shared_ptr<yorcvs::entity_system_list> entityList;
     yorcvs::ECS* parent;
 };
 
@@ -38,7 +38,7 @@ int main()
     world.add_criteria_for_iteration<TestSystem, Transform>();
 
     assert(world.is_system_registered<TestSystem>());
-    yorcvs::Entity en { &world };
+    yorcvs::entity en { &world };
     world.add_component<Transform>(en.id, { .id = 1 });
     assert(tester.entityList->size() == 1);
     tester.test_size_one_id_one();
@@ -46,7 +46,7 @@ int main()
     world.unregister_system<TestSystem>();
     assert(!world.is_system_registered<TestSystem>());
     assert(tester.entityList->empty());
-    yorcvs::Entity en2 { &world };
+    yorcvs::entity en2 { &world };
     world.add_component<Transform>(en2.id, { .id = 1 });
 
     world.register_system<TestSystem>(tester);

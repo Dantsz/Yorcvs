@@ -6,13 +6,13 @@
  * @brief Handles combat
  *
  */
-class CombatSystem {
+class combat_system {
 public:
-    explicit CombatSystem(yorcvs::ECS* parent)
+    explicit combat_system(yorcvs::ECS* parent)
         : world(parent)
     {
         world->register_system(*this);
-        world->add_criteria_for_iteration<CombatSystem, healthComponent, offensiveStatsComponent, defensiveStatsComponent>();
+        world->add_criteria_for_iteration<combat_system, health_component, offensive_stats_component, defensive_stats_component>();
     }
     /**
      * @brief attack
@@ -25,8 +25,8 @@ public:
         std::random_device rand_device {};
         std::uniform_real_distribution<float> gen { 0.0f, 1.0f };
 
-        const auto& source_stats = world->get_component<offensiveStatsComponent>(source);
-        const auto& target_stats = world->get_component<defensiveStatsComponent>(target);
+        const auto& source_stats = world->get_component<offensive_stats_component>(source);
+        const auto& target_stats = world->get_component<defensive_stats_component>(target);
 
         // add strength bonus
         float damage = calculate_strength_bonus(source_stats.strength);
@@ -46,7 +46,7 @@ public:
             damage /= block_multiplier;
         }
 
-        world->get_component<healthComponent>(target).HP -= damage;
+        world->get_component<health_component>(target).HP -= damage;
         return damage;
     }
     /**
@@ -116,7 +116,7 @@ public:
         }
         return agility / (agility + slope);
     }
-    std::shared_ptr<yorcvs::EntitySystemList> entityList = nullptr;
+    std::shared_ptr<yorcvs::entity_system_list> entityList = nullptr;
     yorcvs::ECS* world = nullptr;
     static constexpr float crititcal_multiplier = 2.0f;
     static constexpr float block_multiplier = 4.0f;

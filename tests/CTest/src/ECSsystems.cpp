@@ -25,7 +25,7 @@ public:
         }
     }
 
-    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    std::shared_ptr<yorcvs::entity_system_list> entityList;
     yorcvs::ECS* parent;
 };
 
@@ -43,7 +43,7 @@ public:
         }
     }
 
-    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    std::shared_ptr<yorcvs::entity_system_list> entityList;
     yorcvs::ECS* parent;
 };
 
@@ -62,7 +62,7 @@ int main()
     world.register_system<SecondTestSystem>(secontester);
     world.add_criteria_for_iteration<SecondTestSystem, Transform, Size>();
 
-    std::vector<yorcvs::Entity> entities {};
+    std::vector<yorcvs::entity> entities {};
     for (size_t i = 0; i < numberOfEntities; i++) {
         entities.emplace_back(&world);
         world.add_component<Transform>(entities[i].id, { 1.0f, 2.0f, 1 });

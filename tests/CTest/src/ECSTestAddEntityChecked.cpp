@@ -11,8 +11,8 @@ int main()
 {
     yorcvs::ECS world {};
     world.register_component<Transform>();
-    yorcvs::Entity ent { &world };
-    yorcvs::Entity ent2 { &world };
+    yorcvs::entity ent { &world };
+    yorcvs::entity ent2 { &world };
 
     world.add_component<Transform>(ent.id, { .x = 10.0f, .y = 15.0f, .id = 15 });
     const auto cmp = world.get_component_checked<Transform>(ent.id);

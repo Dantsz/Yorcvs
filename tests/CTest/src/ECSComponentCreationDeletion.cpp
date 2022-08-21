@@ -10,7 +10,7 @@ int main()
 {
     yorcvs::ECS world {};
     world.register_component<Transform>();
-    std::vector<yorcvs::Entity> entities {};
+    std::vector<yorcvs::entity> entities {};
     for (auto i = 0; i < nrentities; i++) {
         entities.emplace_back(&world);
         world.add_component<Transform>(entities[i].id, { 1.0f, 1.0f, i });

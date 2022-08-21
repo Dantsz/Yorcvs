@@ -9,8 +9,8 @@ struct testC {
 int main()
 {
     assert(1 == 1);
-    yorcvs::ComponentManager managerOriginal {};
-    yorcvs::ComponentManager managerNew {};
+    yorcvs::component_manager managerOriginal {};
+    yorcvs::component_manager managerNew {};
 
     managerOriginal.register_component<testC>();
     testC c { 1, 1 };

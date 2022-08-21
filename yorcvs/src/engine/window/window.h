@@ -34,8 +34,8 @@ public:
      * @param srcRect what part of the sprite to draw
      * @param angle  angle of the sprite
      */
-    void draw_texture(const std::string& path, const yorcvs::Rect<float>& dstRect,
-        const yorcvs::Rect<size_t>& srcRect, double angle = 0.0)
+    void draw_texture(const std::string& path, const yorcvs::rect<float>& dstRect,
+        const yorcvs::rect<size_t>& srcRect, double angle = 0.0)
     {
         static_cast<Window_Implementation*>(this)->draw_texture(path, dstRect, srcRect, angle);
     }
@@ -49,8 +49,8 @@ public:
      * @param srcRect what part of the sprite to draw
      * @param angle angle of the sprite
      */
-    void draw_texture(const std::string& path, const yorcvs::Vec2<float>& dstRectPos,
-        const yorcvs::Vec2<float>& dstRectSize, const yorcvs::Rect<size_t>& srcRect, double angle = 0.0)
+    void draw_texture(const std::string& path, const yorcvs::vec2<float>& dstRectPos,
+        const yorcvs::vec2<float>& dstRectSize, const yorcvs::rect<size_t>& srcRect, double angle = 0.0)
     {
         static_cast<Window_Implementation*>(this)->draw_texture(path, dstRectPos, dstRectSize, srcRect, angle);
     }
@@ -67,7 +67,7 @@ public:
      * @param charSize
      * @param lineLength
      */
-    void draw_text(const std::string& message, const std::string& path, const yorcvs::Rect<float>& dstRect, unsigned char r, unsigned char g,
+    void draw_text(const std::string& message, const std::string& path, const yorcvs::rect<float>& dstRect, unsigned char r, unsigned char g,
         unsigned char b, unsigned char a, size_t charSize, size_t lineLength)
     {
         static_cast<Window_Implementation*>(this)->draw_text(message, path, dstRect, r, g, b, a, charSize, lineLength);
@@ -81,7 +81,7 @@ public:
      * @param b - blue
      * @param a - alpha
      */
-    void draw_rect(const yorcvs::Rect<float>& rect, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+    void draw_rect(const yorcvs::rect<float>& rect, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
     {
         static_cast<Window_Implementation*>(this)->draw_rect(rect, r, g, b, a);
     }
@@ -90,20 +90,20 @@ public:
      *
      * @param viewport Area to be drawn
      */
-    void set_viewport(const yorcvs::Rect<float>& viewport);
+    void set_viewport(const yorcvs::rect<float>& viewport);
 
     /**
      * @brief Get the viewport
      *
      * @return yorcvs::Rect<float> the viewport
      */
-    yorcvs::Rect<float> get_viewport();
+    yorcvs::rect<float> get_viewport();
     /**
      * @brief Set the render scale
      *
      * @param scale The scale x and y
      */
-    void set_render_scale(const yorcvs::Vec2<float>& scale)
+    void set_render_scale(const yorcvs::vec2<float>& scale)
     {
         return static_cast<Window_Implementation*>(this)->set_render_scale(scale);
     }
@@ -113,7 +113,7 @@ public:
      *
      * @return yorcvs::Vec2<float> Render scale
      */
-    yorcvs::Vec2<float> get_render_scale()
+    yorcvs::vec2<float> get_render_scale()
     {
         return static_cast<Window_Implementation*>(this)->get_render_scale();
     }
@@ -123,19 +123,19 @@ public:
      *
      * @param newOffset the offset
      */
-    void set_drawing_offset(const yorcvs::Vec2<float>& newOffset);
+    void set_drawing_offset(const yorcvs::vec2<float>& newOffset);
 
     /**
      * @brief Get the drawing offset
      *
      * @return yorcvs::Vec2<float> the offset
      */
-    yorcvs::Vec2<float> get_drawing_offset()
+    yorcvs::vec2<float> get_drawing_offset()
     {
         return static_cast<Window_Implementation*>(this)->get_drawing_offset();
     }
 
-    yorcvs::Vec2<float> get_window_size()
+    yorcvs::vec2<float> get_window_size()
     {
         return static_cast<Window_Implementation*>(this)->get_window_size();
     }

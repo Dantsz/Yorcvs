@@ -6,13 +6,13 @@
  * @brief Handles Animation
  *
  */
-class AnimationSystem {
+class animation_system {
 public:
-    explicit AnimationSystem(yorcvs::ECS* parent)
+    explicit animation_system(yorcvs::ECS* parent)
         : world(parent)
     {
-        world->register_system<AnimationSystem>(*this);
-        world->add_criteria_for_iteration<AnimationSystem, animationComponent, spriteComponent>();
+        world->register_system<animation_system>(*this);
+        world->add_criteria_for_iteration<animation_system, animation_component, sprite_component>();
     }
 
     /**
@@ -20,9 +20,9 @@ public:
      *
      * @param animation i
      */
-    void remove_animation(yorcvs::Entity, std::string animation);
+    void remove_animation(yorcvs::entity, std::string animation);
 
-    void remove_animation_frame(yorcvs::Entity, std::string animation, size_t index);
+    void remove_animation_frame(yorcvs::entity, std::string animation, size_t index);
 
     /**
      * @brief Set which animation to be used
@@ -33,8 +33,8 @@ public:
      */
     static void set_animation_global(yorcvs::ECS* world, size_t entityID, const std::string& animation_name)
     {
-        const auto& anim_comp = world->get_component<animationComponent>(entityID);
-        if (!world->has_components<animationComponent>(entityID)) {
+        const auto& anim_comp = world->get_component<animation_component>(entityID);
+        if (!world->has_components<animation_component>(entityID)) {
             yorcvs::log("Entity doesn't have  an animation component", yorcvs::MSGSEVERITY::WARNING);
             return;
         }
@@ -51,9 +51,9 @@ public:
         if (anim->first == anim_comp.current_animation_name) {
             return;
         }
-        world->get_component<animationComponent>(entityID).current_elapsed_time = 0.0f;
-        world->get_component<animationComponent>(entityID).current_animation_name = animation_name;
-        world->get_component<animationComponent>(entityID).current_frame = anim->second;
+        world->get_component<animation_component>(entityID).current_elapsed_time = 0.0f;
+        world->get_component<animation_component>(entityID).current_animation_name = animation_name;
+        world->get_component<animation_component>(entityID).current_frame = anim->second;
     }
     /**
      * @brief Set which animation to be used
@@ -61,7 +61,7 @@ public:
      * @param entity
      * @param animation_name
      */
-    static void set_animation_global(const yorcvs::Entity& entity, const std::string& animation_name)
+    static void set_animation_global(const yorcvs::entity& entity, const std::string& animation_name)
     {
         yorcvs::ECS* world = entity.parent;
         set_animation_global(world, entity.id, animation_name);
@@ -74,19 +74,19 @@ public:
     void update(const float elapsed) const
     {
         for (const auto& ID : *entityList) {
-            auto& anim_comp = world->get_component<animationComponent>(ID);
+            auto& anim_comp = world->get_component<animation_component>(ID);
             if (anim_comp.frames.empty()) {
                 continue;
             }
-            world->get_component<animationComponent>(ID).current_elapsed_time += elapsed;
-            if (world->get_component<animationComponent>(ID).current_elapsed_time > std::get<2>(anim_comp.frames[anim_comp.current_frame])) {
-                world->get_component<animationComponent>(ID).current_elapsed_time = 0;
-                world->get_component<spriteComponent>(ID).src_rect = std::get<0>(anim_comp.frames[anim_comp.current_frame]);
+            world->get_component<animation_component>(ID).current_elapsed_time += elapsed;
+            if (world->get_component<animation_component>(ID).current_elapsed_time > std::get<2>(anim_comp.frames[anim_comp.current_frame])) {
+                world->get_component<animation_component>(ID).current_elapsed_time = 0;
+                world->get_component<sprite_component>(ID).src_rect = std::get<0>(anim_comp.frames[anim_comp.current_frame]);
                 anim_comp.current_frame = std::get<1>(anim_comp.frames[anim_comp.current_frame]);
             }
         }
     }
 
-    std::shared_ptr<yorcvs::EntitySystemList> entityList;
+    std::shared_ptr<yorcvs::entity_system_list> entityList;
     yorcvs::ECS* world;
 };
