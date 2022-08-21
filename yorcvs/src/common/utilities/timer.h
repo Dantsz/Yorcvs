@@ -5,7 +5,7 @@ namespace yorcvs {
  * @brief Class for measuring time intervals
  *
  */
-class Timer {
+class timer {
 public:
     using time_type = std::chrono::time_point<std::chrono::steady_clock>;
 

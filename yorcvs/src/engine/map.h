@@ -1,7 +1,7 @@
 #pragma once
 #include "../common/ecs.h"
 #include "../common/utilities.h"
-#include "../game/componentSerialization.h"
+#include "../game/component_serialization.h"
 #include "../game/systems.h"
 #include "entity_loader.h"
 #include "nlohmann/json.hpp"
@@ -15,27 +15,27 @@
 #include <filesystem>
 namespace json = nlohmann;
 namespace yorcvs {
-struct Tile {
-    yorcvs::Vec2<float> coords;
-    yorcvs::Rect<size_t> srcRect;
+struct tile {
+    yorcvs::vec2<float> coords;
+    yorcvs::rect<size_t> srcRect;
     std::string texture_path;
 };
 /**
  * @brief Loads tmx map data into the ecs
  *
  */
-class Map : public Entity_Loader<identificationComponent, healthComponent, healthStatsComponent, staminaComponent, staminaStatsComponent, hitboxComponent, spriteComponent, animationComponent, defensiveStatsComponent, offensiveStatsComponent> {
+class map : public entity_loader<identification_component, health_component, health_stats_component, stamina_component, stamina_stats_component, hitbox_component, sprite_component, animation_component, defensive_stats_component, offensive_stats_component> {
 public:
-    explicit Map(yorcvs::ECS* world)
-        : Entity_Loader(world, { "identification", "health", "health_stats", "stamina", "stamina_stats", "hitbox", "sprite", "animation", "defensive_stats", "offsensive_stats" })
+    explicit map(yorcvs::ECS* world)
+        : entity_loader(world, { "identification", "health", "health_stats", "stamina", "stamina_stats", "hitbox", "sprite", "animation", "defensive_stats", "offsensive_stats" })
         , ecs(world)
         , init_ecs(*world)
-        , health_system(world)
-        , sprint_system(world)
-        , velocity_system(world)
-        , animation_system(world)
-        , combat_system(world)
-        , collision_system(world)
+        , health_sys(world)
+        , sprint_sys(world)
+        , velocity_sys(world)
+        , animation_sys(world)
+        , combat_sys(world)
+        , collision_sys(world)
     {
     }
     /**
@@ -44,19 +44,19 @@ public:
      * @param path path to map file
      * @param world the ecs in which data shoudl be added
      */
-    Map(const std::string& path, yorcvs::ECS* world)
-        : Map(world)
+    map(const std::string& path, yorcvs::ECS* world)
+        : map(world)
     {
         load(world, path);
     }
-    Map(const Map& other) = delete;
-    Map(Map&& other) = delete;
-    ~Map()
+    map(const map& other) = delete;
+    map(map&& other) = delete;
+    ~map()
     {
         clear();
     }
-    Map& operator=(const Map& other) = delete;
-    Map& operator=(Map&& other) = delete;
+    map& operator=(const map& other) = delete;
+    map& operator=(map&& other) = delete;
     /**
      * @brief Loads data from path into the ecs
      *
@@ -136,7 +136,7 @@ private:
         const auto& chunks = tileLayer.getChunks();
         for (const auto& chunk : chunks) // parse chunks
         {
-            yorcvs::Vec2<float> chunk_position = { static_cast<float>(chunk.position.x),
+            yorcvs::vec2<float> chunk_position = { static_cast<float>(chunk.position.x),
                 static_cast<float>(chunk.position.y) };
             for (auto chunk_y = 0; chunk_y < chunk.size.y; chunk_y++) {
                 for (auto chunk_x = 0; chunk_x < chunk.size.x; chunk_x++) {
@@ -154,13 +154,13 @@ private:
                         }
                     }
                     // put the tile in the vector
-                    yorcvs::Tile tile {};
+                    yorcvs::tile tile {};
                     if (tile_set == nullptr) {
                         yorcvs::log("No tileset in map " + map.getWorkingDirectory() + "  contains tile: " + std::to_string(chunk.tiles[tileIndex].ID), yorcvs::MSGSEVERITY::ERROR);
                     } else {
                         tile.texture_path = tile_set->getImagePath();
                     }
-                    tile.coords = chunk_position * tilesSize + tilesSize * yorcvs::Vec2<float> { static_cast<float>(chunk_x), static_cast<float>(chunk_y) };
+                    tile.coords = chunk_position * tilesSize + tilesSize * yorcvs::vec2<float> { static_cast<float>(chunk_x), static_cast<float>(chunk_y) };
                     tile.srcRect = get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID);
                     tiles_chunks[std::make_tuple<intmax_t, intmax_t>(chunk.position.x / chunk.size.x,
                                      chunk.position.y / chunk.size.y)]
@@ -174,7 +174,7 @@ private:
         const auto& chunks = tileLayer.getChunks();
         for (const auto& chunk : chunks) // parse chunks
         {
-            yorcvs::Vec2<float> chunk_position = { static_cast<float>(chunk.position.x),
+            yorcvs::vec2<float> chunk_position = { static_cast<float>(chunk.position.x),
                 static_cast<float>(chunk.position.y) };
             for (auto chunk_y = 0; chunk_y < chunk.size.y; chunk_y++) {
                 for (auto chunk_x = 0; chunk_x < chunk.size.x; chunk_x++) {
@@ -195,10 +195,10 @@ private:
                     // add object
                     ysorted_tiles.emplace_back(ecs);
                     const size_t entity = ysorted_tiles[ysorted_tiles.size() - 1].id;
-                    ecs->add_component<positionComponent>(
+                    ecs->add_component<position_component>(
                         entity,
-                        { chunk_position * tilesSize + tilesSize * yorcvs::Vec2<float> { static_cast<float>(chunk_x), static_cast<float>(chunk_y) } });
-                    ecs->add_component<spriteComponent>(entity, { { 0, 0 }, { static_cast<float>(tile_set->getTileSize().x), static_cast<float>(tile_set->getTileSize().y) }, get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID), tile_set->getImagePath() });
+                        { chunk_position * tilesSize + tilesSize * yorcvs::vec2<float> { static_cast<float>(chunk_x), static_cast<float>(chunk_y) } });
+                    ecs->add_component<sprite_component>(entity, { { 0, 0 }, { static_cast<float>(tile_set->getTileSize().x), static_cast<float>(tile_set->getTileSize().y) }, get_src_rect_from_uid(map, chunk.tiles[tileIndex].ID), tile_set->getImagePath() });
                 }
             }
         }
@@ -213,11 +213,11 @@ private:
     {
         // Note: handles hitbox to object
         if (property.getName() == "collision" && property.getBoolValue()) {
-            ecs->add_component<hitboxComponent>(entity, { { 0, 0, object.getAABB().width, object.getAABB().height } });
+            ecs->add_component<hitbox_component>(entity, { { 0, 0, object.getAABB().width, object.getAABB().height } });
             // TILED HAS A WEIRD BEHAVIOUR THAT IF AN TILE IS INSERTED AS A OBJECT IT'S Y POSITION IS DIFFERENT
             // FROM AN RECTANGLE OBJECT AND DOESN'T LOOK LIKE IN THE EDITOR
-            if (!ecs->has_components<spriteComponent>(entity)) {
-                ecs->get_component<hitboxComponent>(entity).hitbox.y += object.getAABB().height;
+            if (!ecs->has_components<sprite_component>(entity)) {
+                ecs->get_component<hitbox_component>(entity).hitbox.y += object.getAABB().height;
             }
             return true;
         }
@@ -232,11 +232,11 @@ private:
     [[nodiscard]] bool object_handle_property_float(const size_t entity, const tmx::Property& property) const
     {
         if (property.getName() == "behaviourDT") {
-            if (!ecs->has_components<behaviourComponent>(entity)) {
-                ecs->add_component<behaviourComponent>(entity, {});
+            if (!ecs->has_components<behaviour_component>(entity)) {
+                ecs->add_component<behaviour_component>(entity, {});
             }
-            ecs->get_component<behaviourComponent>(entity).dt = property.getFloatValue();
-            ecs->get_component<behaviourComponent>(entity).accumulated = 0.0f;
+            ecs->get_component<behaviour_component>(entity).dt = property.getFloatValue();
+            ecs->get_component<behaviour_component>(entity).accumulated = 0.0f;
             return true;
         }
         return false;
@@ -252,13 +252,13 @@ private:
             return true;
         }
         if (property.getName() == "behaviour") {
-            ecs->add_component<behaviourComponent>(entity, {});
+            ecs->add_component<behaviour_component>(entity, {});
             if (filePath.empty()) {
                 yorcvs::log("Entity " + std::to_string(entity) + " has not been specified a valid behaviour, using default", yorcvs::MSGSEVERITY::ERROR);
-                ecs->get_component<behaviourComponent>(entity).code_path = directory_path + "scripts/behavior_chicken.lua";
+                ecs->get_component<behaviour_component>(entity).code_path = directory_path + "scripts/behavior_chicken.lua";
                 return true;
             }
-            ecs->get_component<behaviourComponent>(entity).code_path = directory_path + filePath;
+            ecs->get_component<behaviour_component>(entity).code_path = directory_path + filePath;
             return true;
         }
         return false;
@@ -277,13 +277,13 @@ private:
             // create entity
             entities.push_back(ecs->create_entity_ID());
             const size_t entity = entities[entities.size() - 1];
-            ecs->add_component<positionComponent>(
+            ecs->add_component<position_component>(
                 entity, { { object.getPosition().x, object.getPosition().y - object.getAABB().height } });
             if (object.getTileID() != 0 && object.visible()) {
                 const auto* tileSet = get_tileset_containing(map, object.getTileID());
                 // add sprite component
 
-                ecs->add_component<spriteComponent>(entity, { { 0, 0 }, { object.getAABB().width, object.getAABB().height }, get_src_rect_from_uid(map, object.getTileID()), tileSet->getImagePath() });
+                ecs->add_component<sprite_component>(entity, { { 0, 0 }, { object.getAABB().width, object.getAABB().height }, get_src_rect_from_uid(map, object.getTileID()), tileSet->getImagePath() });
             }
             /*
             Object properties
@@ -318,7 +318,7 @@ private:
             }
         }
     }
-    [[nodiscard]] yorcvs::Vec2<float> get_spawn_position() const
+    [[nodiscard]] yorcvs::vec2<float> get_spawn_position() const
     {
         return spawn_coord;
     }
@@ -326,23 +326,23 @@ private:
     {
         std::filesystem::path file = path;
         const std::string directory_path = file.remove_filename().generic_string();
-        if (world->has_components<spriteComponent>(entity_id)) {
-            const std::string sprite_path = directory_path + world->get_component<spriteComponent>(entity_id).texture_path;
-            world->get_component<spriteComponent>(entity_id).texture_path = sprite_path;
+        if (world->has_components<sprite_component>(entity_id)) {
+            const std::string sprite_path = directory_path + world->get_component<sprite_component>(entity_id).texture_path;
+            world->get_component<sprite_component>(entity_id).texture_path = sprite_path;
         }
         // These components should not be serialized as the position and velocity is relative to the map!!!
-        if (!world->has_components<positionComponent>(entity_id)) {
-            world->add_component<positionComponent>(entity_id, {});
+        if (!world->has_components<position_component>(entity_id)) {
+            world->add_component<position_component>(entity_id, {});
             const auto spawn_position = get_spawn_position();
-            world->get_component<positionComponent>(entity_id).position = spawn_position;
+            world->get_component<position_component>(entity_id).position = spawn_position;
         }
-        if (!world->has_components<velocityComponent>(entity_id)) {
-            world->add_component<velocityComponent>(entity_id, {});
+        if (!world->has_components<velocity_component>(entity_id)) {
+            world->add_component<velocity_component>(entity_id, {});
         }
-        world->get_component<velocityComponent>(entity_id) = { { 0.0f, 0.0f }, { false, false } };
+        world->get_component<velocity_component>(entity_id) = { { 0.0f, 0.0f }, { false, false } };
     }
     // NOTE: this can be a free function
-    static yorcvs::Rect<size_t> get_src_rect_from_uid(const tmx::Map& map, const size_t UID)
+    static yorcvs::rect<size_t> get_src_rect_from_uid(const tmx::Map& map, const size_t UID)
     {
         tmx::Tileset const* tile_set = nullptr;
         for (const auto& tileset : map.getTilesets()) {
@@ -355,7 +355,7 @@ private:
                 yorcvs::MSGSEVERITY::ERROR);
             return { 0, 0, 0, 0 };
         }
-        yorcvs::Rect<size_t> srcRect {};
+        yorcvs::rect<size_t> srcRect {};
         srcRect.x = ((UID - tile_set->getFirstGID()) % tile_set->getColumnCount()) * tile_set->getTileSize().x;
         srcRect.y = 0;
         size_t y_index = 0;
@@ -390,31 +390,31 @@ public:
         explicit ecs_Initializer(yorcvs::ECS& world)
         {
             // register components
-            world.register_component<identificationComponent>();
-            world.register_component<hitboxComponent, positionComponent, velocityComponent, healthComponent,
-                staminaComponent>();
-            world.register_component<playerMovementControlledComponent, behaviourComponent>();
-            world.register_component<spriteComponent, animationComponent>();
-            world.register_component<healthStatsComponent, staminaStatsComponent, offensiveStatsComponent, defensiveStatsComponent>();
+            world.register_component<identification_component>();
+            world.register_component<hitbox_component, position_component, velocity_component, health_component,
+                stamina_component>();
+            world.register_component<player_movement_controlled_component, behaviour_component>();
+            world.register_component<sprite_component, animation_component>();
+            world.register_component<health_stats_component, stamina_stats_component, offensive_stats_component, defensive_stats_component>();
         }
     };
     // class to initialize the ecs before systems are constructed
     ecs_Initializer init_ecs;
 
-    yorcvs::Vec2<float> tilesSize;
+    yorcvs::vec2<float> tilesSize;
 
     std::vector<size_t> entities {}; // not a vector of Entities because the map is not responsible for their lifetimes( they can be destroyed by other stuff)
-    HealthSystem health_system;
-    StaminaSystem sprint_system;
+    health_system health_sys;
+    stamina_system sprint_sys;
 
     std::string map_file_path;
-    std::unordered_map<std::tuple<intmax_t, intmax_t>, std::vector<yorcvs::Tile>> tiles_chunks {};
+    std::unordered_map<std::tuple<intmax_t, intmax_t>, std::vector<yorcvs::tile>> tiles_chunks {};
 
-    yorcvs::Vec2<float> spawn_coord;
-    VelocitySystem velocity_system;
-    AnimationSystem animation_system;
-    CombatSystem combat_system;
-    CollisionSystem collision_system;
-    std::vector<yorcvs::Entity> ysorted_tiles {};
+    yorcvs::vec2<float> spawn_coord;
+    velocity_system velocity_sys;
+    animation_system animation_sys;
+    combat_system combat_sys;
+    collision_system collision_sys;
+    std::vector<yorcvs::entity> ysorted_tiles {};
 };
 }

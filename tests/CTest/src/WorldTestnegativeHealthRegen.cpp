@@ -9,10 +9,10 @@ constexpr size_t number_of_additional_bleeding_ducks = 100;
 
 int main(int argc, char** argv)
 {
-    yorcvs::Timer timy {};
+    yorcvs::timer timy {};
     yorcvs::ECS world {};
     timy.start();
-    yorcvs::Map map { TEST_MAP_FILE, &world };
+    yorcvs::map map { TEST_MAP_FILE, &world };
 
     std::cout << "Loading map took " << timy.get_ticks() << "ms" << '\n';
     // deleting player
@@ -22,7 +22,7 @@ int main(int argc, char** argv)
     const size_t numberOfEntities = world.get_active_entities_number();
 
     // no more players
-    assert(world.get_entities_with_component<playerMovementControlledComponent>() == 0);
+    assert(world.get_entities_with_component<player_movement_controlled_component>() == 0);
     // add ducks(first create valid entity IDs  and test the performance) and then load ducks data into the entities
     // create valid entities
     const size_t first_ad_duck_entity = world.get_active_entities_number();
@@ -36,8 +36,8 @@ int main(int argc, char** argv)
     for (size_t i = 0; i < number_of_additional_bleeding_ducks; i++) {
         map.load_character_from_path(first_ad_duck_entity + i, TEST_TEMP_ENTITY_FILE);
         // remove the collision
-        if (world.has_components<hitboxComponent>(first_ad_duck_entity + i)) {
-            world.remove_component<hitboxComponent>(first_ad_duck_entity + i);
+        if (world.has_components<hitbox_component>(first_ad_duck_entity + i)) {
+            world.remove_component<hitbox_component>(first_ad_duck_entity + i);
         }
     }
 
@@ -51,11 +51,11 @@ int main(int argc, char** argv)
     float samples = 0.0f;
     timy.start();
     while (world.get_active_entities_number() != numberOfEntities - 1) {
-        const auto dt = HealthSystem::update_time;
-        map.collision_system.update(dt);
-        map.velocity_system.update(dt);
-        map.animation_system.update(dt);
-        map.health_system.update(dt);
+        const auto dt = health_system::update_time;
+        map.collision_sys.update(dt);
+        map.velocity_sys.update(dt);
+        map.animation_sys.update(dt);
+        map.health_sys.update(dt);
 
         timy.stop();
         update_time += timy.get_ticks();

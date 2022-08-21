@@ -14,7 +14,7 @@ set(YorcvsCORESFILES    "src/common/assetmanager.h"
                         "src/engine/map.h"
                         )
 set(YorcvsGAMEFILES     "src/game/components.h"
-                        "src/game/componentSerialization.h"
+                        "src/game/component_serialization.h"
                         "src/game/systems.h"
 
                         "src/game/systems/animation.h"

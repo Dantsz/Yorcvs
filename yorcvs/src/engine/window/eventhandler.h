@@ -70,7 +70,7 @@ public:
     {
         return static_cast<event_manager_implementation&>(*this).is_key_pressed(key);
     }
-    yorcvs::Vec2<float> get_pointer_position()
+    yorcvs::vec2<float> get_pointer_position()
     {
         return static_cast<event_manager_implementation&>(*this).get_pointer_position();
     }

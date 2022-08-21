@@ -15,19 +15,19 @@ namespace yorcvs {
  * @tparam assetType - the type of asset to manage
  */
 template <typename assetType>
-class AssetManager {
+class asset_manager {
 public:
-    AssetManager() = default;
-    AssetManager(const AssetManager& other) = delete;
-    AssetManager(AssetManager&& other) = delete;
-    AssetManager(std::function<std::shared_ptr<assetType>(const std::string& path)> pCtor, std::function<void(assetType*)> pDtor)
+    asset_manager() = default;
+    asset_manager(const asset_manager& other) = delete;
+    asset_manager(asset_manager&& other) = delete;
+    asset_manager(std::function<std::shared_ptr<assetType>(const std::string& path)> pCtor, std::function<void(assetType*)> pDtor)
         : ctor(pCtor)
         , dtor(pDtor)
     {
     }
-    AssetManager& operator=(const AssetManager& other) = delete;
-    AssetManager& operator=(AssetManager&& other) = delete;
-    ~AssetManager() = default;
+    asset_manager& operator=(const asset_manager& other) = delete;
+    asset_manager& operator=(asset_manager&& other) = delete;
+    ~asset_manager() = default;
 
     /**
      * @brief Loads the resource from the disk and returns a pointer to it.

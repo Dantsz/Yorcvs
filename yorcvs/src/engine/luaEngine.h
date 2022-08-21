@@ -65,36 +65,36 @@ inline void register_system_to_lua(sol::state& lua_state, const std::string& nam
  */
 inline void bind_basic_types(sol::state& lua_state)
 {
-    sol::usertype<yorcvs::Vec2<float>> vec2f = lua_state.new_usertype<yorcvs::Vec2<float>>(
-        "vec2f", "x", &yorcvs::Vec2<float>::x, "y", &yorcvs::Vec2<float>::y);
-    sol::usertype<yorcvs::Vec2<bool>> vec2b = lua_state.new_usertype<yorcvs::Vec2<bool>>("vec2b", "x", &yorcvs::Vec2<bool>::x, "y", &yorcvs::Vec2<bool>::y);
-    sol::usertype<yorcvs::Rect<float>> rect2f = lua_state.new_usertype<yorcvs::Rect<float>>(
-        "rect2f", "x", &yorcvs::Rect<float>::x, "y", &yorcvs::Rect<float>::y, "w", &yorcvs::Rect<float>::w, "h",
-        &yorcvs::Rect<float>::h);
+    sol::usertype<yorcvs::vec2<float>> vec2f = lua_state.new_usertype<yorcvs::vec2<float>>(
+        "vec2f", "x", &yorcvs::vec2<float>::x, "y", &yorcvs::vec2<float>::y);
+    sol::usertype<yorcvs::vec2<bool>> vec2b = lua_state.new_usertype<yorcvs::vec2<bool>>("vec2b", "x", &yorcvs::vec2<bool>::x, "y", &yorcvs::vec2<bool>::y);
+    sol::usertype<yorcvs::rect<float>> rect2f = lua_state.new_usertype<yorcvs::rect<float>>(
+        "rect2f", "x", &yorcvs::rect<float>::x, "y", &yorcvs::rect<float>::y, "w", &yorcvs::rect<float>::w, "h",
+        &yorcvs::rect<float>::h);
 }
 inline void bind_map_functions(sol::state& lua_state)
 {
-    sol::usertype<yorcvs::Map> map_type = lua_state.new_usertype<yorcvs::Map>("Map");
+    sol::usertype<yorcvs::map> map_type = lua_state.new_usertype<yorcvs::map>("Map");
     // lua_state["create_map"] = []() {};
-    lua_state["Map"]["load_content"] = [](yorcvs::Map& map, const std::string& path) // loads alll tiles and object from the path to the map
+    lua_state["Map"]["load_content"] = [](yorcvs::map& map, const std::string& path) // loads alll tiles and object from the path to the map
     {
         map.load(map.ecs, path);
     };
-    lua_state["Map"]["load_entity_from_string"] = [](yorcvs::Map& map, const size_t entityID, const std::string& path) { // creates a new entity and assigns components from the file
+    lua_state["Map"]["load_entity_from_string"] = [](yorcvs::map& map, const size_t entityID, const std::string& path) { // creates a new entity and assigns components from the file
         map.load_character_from_path(entityID, path);
         return entityID;
     };
-    lua_state["Map"]["load_entity_from_path"] = [](yorcvs::Map& map, const size_t entityID, const std::string& path) { // creates a new entity and assigns components from the file
+    lua_state["Map"]["load_entity_from_path"] = [](yorcvs::map& map, const size_t entityID, const std::string& path) { // creates a new entity and assigns components from the file
         map.load_character_from_path(entityID, path);
         return entityID;
     };
-    lua_state["Map"]["save_entity"] = [](yorcvs::Map& map, const size_t ID) {
+    lua_state["Map"]["save_entity"] = [](yorcvs::map& map, const size_t ID) {
         return map.save_character(ID);
     };
 }
 inline void bind_system_entity_list(sol::state& lua_state)
 {
-    sol::usertype<EntitySystemList> entsl = lua_state.new_usertype<EntitySystemList>("EntitySystemList");
+    sol::usertype<entity_system_list> entsl = lua_state.new_usertype<entity_system_list>("EntitySystemList");
 }
 /**
  * @brief Gives the lua state accest to the running ECS and components
@@ -133,56 +133,56 @@ inline bool bind_runtime(sol::state& lua_state, yorcvs::ECS* ecs)
         return names.size();
     };
     bind_system_entity_list(lua_state);
-    register_component_to_lua<healthComponent>(lua_state, "healthComponent",
-        "HP", &healthComponent::HP);
-    register_component_to_lua<healthStatsComponent>(lua_state, "healthStatsComponent",
-        "max_HP", &healthStatsComponent::max_HP,
-        "health_regen", &healthStatsComponent::health_regen);
-    register_component_to_lua<identificationComponent>(lua_state, "identificationComponent",
-        "name", &identificationComponent::name);
-    register_component_to_lua<hitboxComponent>(lua_state,
+    register_component_to_lua<health_component>(lua_state, "healthComponent",
+        "HP", &health_component::HP);
+    register_component_to_lua<health_stats_component>(lua_state, "healthStatsComponent",
+        "max_HP", &health_stats_component::max_HP,
+        "health_regen", &health_stats_component::health_regen);
+    register_component_to_lua<identification_component>(lua_state, "identificationComponent",
+        "name", &identification_component::name);
+    register_component_to_lua<hitbox_component>(lua_state,
         "hitboxComponent",
-        "hitbox", &hitboxComponent::hitbox);
-    register_component_to_lua<positionComponent>(lua_state, "positionComponent",
-        "position", &positionComponent::position);
-    register_component_to_lua<velocityComponent>(lua_state, "velocityComponent",
-        "vel", &velocityComponent::vel,
-        "facing", &velocityComponent::facing);
-    register_component_to_lua<staminaComponent>(lua_state, "staminaComponent",
-        "stamina", &staminaComponent::stamina);
-    register_component_to_lua<staminaStatsComponent>(lua_state, "staminaStatsComponent",
-        "max_stamina", &staminaStatsComponent::max_stamina,
-        "stamina_regen", &staminaStatsComponent::stamina_regen);
-    register_component_to_lua<spriteComponent>(lua_state, "spriteComponent",
-        "offset", &spriteComponent::offset,
-        "size", &spriteComponent::size,
-        "src_rect", &spriteComponent::src_rect,
-        "texture_path", &spriteComponent::texture_path);
-    register_component_to_lua<animationComponent>(
+        "hitbox", &hitbox_component::hitbox);
+    register_component_to_lua<position_component>(lua_state, "positionComponent",
+        "position", &position_component::position);
+    register_component_to_lua<velocity_component>(lua_state, "velocityComponent",
+        "vel", &velocity_component::vel,
+        "facing", &velocity_component::facing);
+    register_component_to_lua<stamina_component>(lua_state, "staminaComponent",
+        "stamina", &stamina_component::stamina);
+    register_component_to_lua<stamina_stats_component>(lua_state, "staminaStatsComponent",
+        "max_stamina", &stamina_stats_component::max_stamina,
+        "stamina_regen", &stamina_stats_component::stamina_regen);
+    register_component_to_lua<sprite_component>(lua_state, "spriteComponent",
+        "offset", &sprite_component::offset,
+        "size", &sprite_component::size,
+        "src_rect", &sprite_component::src_rect,
+        "texture_path", &sprite_component::texture_path);
+    register_component_to_lua<animation_component>(
         lua_state, "animationComponent",
-        "animations", &animationComponent::animation_name_to_start_frame_index,
-        "cur_frame", &animationComponent::current_frame, "frames", &animationComponent::frames);
-    register_component_to_lua<defensiveStatsComponent>(
+        "animations", &animation_component::animation_name_to_start_frame_index,
+        "cur_frame", &animation_component::current_frame, "frames", &animation_component::frames);
+    register_component_to_lua<defensive_stats_component>(
         lua_state, "defensiveStatsComponent",
-        "defense", &defensiveStatsComponent::defense,
-        "block", &defensiveStatsComponent::block,
-        "dodge", &defensiveStatsComponent::dodge,
-        "spirit", &defensiveStatsComponent::spirit);
-    register_component_to_lua<offensiveStatsComponent>(
+        "defense", &defensive_stats_component::defense,
+        "block", &defensive_stats_component::block,
+        "dodge", &defensive_stats_component::dodge,
+        "spirit", &defensive_stats_component::spirit);
+    register_component_to_lua<offensive_stats_component>(
         lua_state, "offensiveStatsComponent",
-        "strength", &offensiveStatsComponent::strength,
-        "agility", &offensiveStatsComponent::agility,
-        "dexterity", &offensiveStatsComponent::dexterity,
-        "piercing", &offensiveStatsComponent::piercing,
-        "intellect", &offensiveStatsComponent::intellect);
-    register_component_to_lua<playerMovementControlledComponent>(lua_state, "playerMovementControl");
-    register_component_to_lua<behaviourComponent>(lua_state, "behaviourComponent", &behaviourComponent::code_path, "code_path");
+        "strength", &offensive_stats_component::strength,
+        "agility", &offensive_stats_component::agility,
+        "dexterity", &offensive_stats_component::dexterity,
+        "piercing", &offensive_stats_component::piercing,
+        "intellect", &offensive_stats_component::intellect);
+    register_component_to_lua<player_movement_controlled_component>(lua_state, "playerMovementControl");
+    register_component_to_lua<behaviour_component>(lua_state, "behaviourComponent", &behaviour_component::code_path, "code_path");
     return true;
 }
 
 } // namespace yorcvs::lua
 namespace sol {
 template <>
-struct is_container<yorcvs::EntitySystemList> : std::true_type {
+struct is_container<yorcvs::entity_system_list> : std::true_type {
 };
 }
