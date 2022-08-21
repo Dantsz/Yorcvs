@@ -136,7 +136,7 @@ public:
 
             lag -= msPF;
             tracked_parameters[yorcvs::ui::performance_window::update_time_item::overall] = update_loop_timer.get_ticks<float, std::chrono::nanoseconds>();
-            performance_window.record_update_time<yorcvs::ui::performance_window::update_time_item::health,
+            performance_widget.record_update_time<yorcvs::ui::performance_window::update_time_item::health,
                 yorcvs::ui::performance_window::update_time_item::behaviour,
                 yorcvs::ui::performance_window::update_time_item::collision,
                 yorcvs::ui::performance_window::update_time_item::velocity,
@@ -150,7 +150,7 @@ public:
         debug_info_widgets.render(render_dimensions);
         entity_interaction_widget.render(render_dimensions);
         if (debug_info_widgets.is_debug_window_open()) {
-            performance_window.render();
+            performance_widget.render();
         }
         ImGui::Render();
         ImGuiSDL::Render(ImGui::GetDrawData());
@@ -185,7 +185,7 @@ private:
     player_movement_control player_control { map.ecs, &app_window };
     behaviour_system behaviour_sys { map.ecs, &lua_state };
 
-    yorcvs::ui::performance_window performance_window;
+    yorcvs::ui::performance_window performance_widget;
     std::array<float, yorcvs::ui::performance_window::update_time_item::update_time_tracked> tracked_parameters;
 
     debug_info debug_info_widgets;
