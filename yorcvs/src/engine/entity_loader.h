@@ -44,7 +44,6 @@ public:
             }
         }
         (std::make_index_sequence<sizeof...(Components)>());
-        OnCharacterDeserialized(entity_id, path);
     }
     /**
      * @brief Serializes an entities components and returns the string reprezentation
@@ -110,7 +109,7 @@ protected:
         }
     }
 
-    virtual void OnCharacterDeserialized([[maybe_unused]] size_t entity_id, [[maybe_unused]] const std::string& path) {};
+   
     yorcvs::ECS* world;
     const std::array<std::string, sizeof...(Components)> json_names {};
 };

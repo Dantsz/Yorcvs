@@ -113,7 +113,15 @@ public:
             }
         }
     }
-
+    void load_character_from_path(size_t entity_id, const std::string& path)
+    {
+        load_entity_from_path(entity_id, path);
+        OnCharacterDeserialized(entity_id, path);
+    }
+    [[nodiscard]] std::string save_character(const size_t entity_id) const
+    {
+        return save_entity(entity_id);
+    }
     /**
      * @brief Removes all entitites and tiles loaded by this map
      *
@@ -322,7 +330,7 @@ private:
     {
         return spawn_coord;
     }
-    void OnCharacterDeserialized(size_t entity_id, const std::string& path) override
+    void OnCharacterDeserialized(size_t entity_id, const std::string& path)
     {
         std::filesystem::path file = path;
         const std::string directory_path = file.remove_filename().generic_string();
