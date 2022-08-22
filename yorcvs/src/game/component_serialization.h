@@ -183,7 +183,16 @@ inline void from_json(const json::json& j, defensive_stats_component& comp)
         comp.spirit = j["spirit"];
     }
 }
-
+inline void to_json(json::json& j, const item_component& comp)
+{
+    j["quality"] = comp.quality;
+}
+inline void from_json(const json::json& j, item_component& comp)
+{
+    if (j.contains("quality")) {
+        comp.quality = j["quality"];
+    }
+}
 namespace yorcvs::components {
 
 // TEMPLATES//
