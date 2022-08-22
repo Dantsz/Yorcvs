@@ -222,4 +222,31 @@ template <typename T>
     return true;
 }
 
+template <>
+json::json serialize([[maybe_unused]] yorcvs::ECS* world, const inventory_component& comp)
+{
+    /*TODO:
+     *component contains an array of entities
+     *serialize each entity
+     *add to array
+     *return
+     */
+    return {};
+}
+template <>
+[[nodiscard]] bool deserialize([[maybe_unused]] yorcvs::ECS* world, inventory_component& dst, const json::json& j)
+{
+    try {
+        /*TODO:
+         *create new entities for each item
+         *assign each entity an item_component
+         */
+
+    } catch (...) {
+        yorcvs::log("failed to deserialize component");
+        return false;
+    }
+
+    return true;
+}
 } // namespace yorcvs::components

@@ -27,7 +27,7 @@ public:
      * @param entity_id id of the entity
      * @param path path to the json file
      */
-    void load_character_from_path(size_t entity_id, const std::string& path)
+    void load_entity_from_path(size_t entity_id, const std::string& path)
     {
         std::ifstream entityIN(path);
         std::string entityDATA { (std::istreambuf_iterator<char>(entityIN)), (std::istreambuf_iterator<char>()) };
@@ -52,7 +52,7 @@ public:
      * @param entity
      * @return std::string
      */
-    [[nodiscard]] std::string save_character(const size_t entity_id) const
+    [[nodiscard]] std::string save_entity(const size_t entity_id) const
     {
         return [&]<size_t... I>([[maybe_unused]] std::index_sequence<I...> seq)
         {
