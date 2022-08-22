@@ -81,15 +81,15 @@ inline void bind_map_functions(sol::state& lua_state)
         map.load(map.ecs, path);
     };
     lua_state["Map"]["load_entity_from_string"] = [](yorcvs::map& map, const size_t entityID, const std::string& path) { // creates a new entity and assigns components from the file
-        map.load_character_from_path(entityID, path);
+        map.load_entity_from_path(entityID, path);
         return entityID;
     };
     lua_state["Map"]["load_entity_from_path"] = [](yorcvs::map& map, const size_t entityID, const std::string& path) { // creates a new entity and assigns components from the file
-        map.load_character_from_path(entityID, path);
+        map.load_entity_from_path(entityID, path);
         return entityID;
     };
     lua_state["Map"]["save_entity"] = [](yorcvs::map& map, const size_t ID) {
-        return map.save_character(ID);
+        return map.save_entity(ID);
     };
 }
 inline void bind_system_entity_list(sol::state& lua_state)

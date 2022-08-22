@@ -248,7 +248,7 @@ private:
         const std::string directory_path = map_file.remove_filename().generic_string();
 
         if (property.getName() == "entityPath") {
-            load_character_from_path(entity, directory_path + filePath);
+            load_entity_from_path(entity, directory_path + filePath);
             return true;
         }
         if (property.getName() == "behaviour") {
