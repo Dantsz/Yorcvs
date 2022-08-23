@@ -1,11 +1,10 @@
 #pragma once
 #include "../common/ecs.h"
 #include "../common/utilities/log.h"
+#include "../engine/serialization.h"
 #include "components.h"
 #include <filesystem>
-#include <nlohmann/json.hpp>
 #include <string>
-namespace json = nlohmann;
 
 namespace yorcvs {
 template <typename T>
@@ -194,43 +193,6 @@ inline void from_json(const json::json& j, item_component& comp)
     }
 }
 namespace yorcvs::components {
-
-// TEMPLATES//
-// Serialization to json
-/**
- * @brief Template definition for serializing a component to json
- *
- * @tparam T
- * @return json::json
- */
-template <typename T>
-json::json serialize([[maybe_unused]] yorcvs::ECS* world, const T& comp)
-{
-    json::json j = comp;
-    return j;
-}
-
-// Deserialization from json
-/**
- * @brief Template definition for deserialize from json
- *
- * @tparam T
- * @param dst destination
- * @return returns fals on failure
- */
-template <typename T>
-[[nodiscard]] bool deserialize([[maybe_unused]] yorcvs::ECS* world, T& dst, const json::json& j)
-{
-    try {
-        dst = j;
-    } catch (...) {
-        yorcvs::log("failed to deserialize component");
-        return false;
-    }
-
-    return true;
-}
-
 template <>
 json::json serialize([[maybe_unused]] yorcvs::ECS* world, const inventory_component& comp)
 {
@@ -240,7 +202,11 @@ json::json serialize([[maybe_unused]] yorcvs::ECS* world, const inventory_compon
      *add to array
      *return
      */
-    return {};
+    json::json j;
+    for (const auto& item : comp.items) {
+        j.push_back("");
+    }
+    return j;
 }
 template <>
 [[nodiscard]] bool deserialize([[maybe_unused]] yorcvs::ECS* world, inventory_component& dst, const json::json& j)

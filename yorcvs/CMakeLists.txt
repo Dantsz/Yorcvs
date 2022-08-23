@@ -9,7 +9,7 @@ set(YorcvsCORESFILES    "src/common/assetmanager.h"
                         "src/common/utilities/ulamspiral.h"
                         "src/common/utilities/log.h"
 
-
+                        "src/engine/serialization.h"
                         "src/engine/luaEngine.h"
                         "src/engine/map.h"
                         )
