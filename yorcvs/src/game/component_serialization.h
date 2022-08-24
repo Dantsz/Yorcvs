@@ -223,11 +223,12 @@ template <>
         size_t item_index = 0;
         for (const auto& item : j) {
             dst.items[item_index] = world->create_entity_ID();
-            loader.load_entity_from_string(dst.items[item_index].value(), item);
+            const size_t item_id = dst.items[item_index].value();
+            loader.load_entity_from_string(item_id, item.dump());
             item_index++;
         }
-    } catch (...) {
-        yorcvs::log("failed to deserialize component");
+    } catch (std::exception& e) {
+        yorcvs::log(std::string("failed to deserialize component: ") + e.what());
         return false;
     }
 

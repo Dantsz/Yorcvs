@@ -35,7 +35,6 @@ public:
     }
     void load_entity_from_string(size_t entity_id, const std::string& data)
     {
-
         auto entityJSON = json::json::parse(data, nullptr, false); // don't throw exception
         if (entityJSON.is_discarded()) {
             yorcvs::log("Failed to load entity data " + data);
@@ -44,7 +43,7 @@ public:
         [&]<std::size_t... I>([[maybe_unused]] std::index_sequence<I...> seq)
         {
             if (!(deserialize_component_from_json<Components>(entity_id, entityJSON, std::get<I>(json_names)) && ...)) {
-                yorcvs::log("Entity could not be serialized!" + data);
+                yorcvs::log("Entity could not be deserialized!" + data);
                 return;
             }
         }
@@ -86,7 +85,7 @@ protected:
             T comp {};
             if (!yorcvs::components::deserialize(world, comp,
                     json_entity_obj[component_name])) {
-                yorcvs::log(component_name + " could not be serialized! ", yorcvs::MSGSEVERITY::ERROR);
+                yorcvs::log(component_name + " could not be deserialized! ", yorcvs::MSGSEVERITY::ERROR);
                 return false;
             }
             if (!world->has_components<T>(entity_id)) {

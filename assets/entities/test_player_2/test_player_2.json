@@ -207,5 +207,5 @@
         "max": 5.0,
         "regen": 0.10000000149011612
     },
-	"inventory":[]
+    "inventory":[{"identification":{"name":"first item ever"}}]
 }
