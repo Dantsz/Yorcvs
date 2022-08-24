@@ -1,5 +1,5 @@
 #include "../common/ecs.h"
-#include "../game/component_serialization.h"
+#include "serialization.h"
 #include <array>
 #include <filesystem>
 #include <fstream>
@@ -31,15 +31,20 @@ public:
     {
         std::ifstream entityIN(path);
         std::string entityDATA { (std::istreambuf_iterator<char>(entityIN)), (std::istreambuf_iterator<char>()) };
-        auto entityJSON = json::json::parse(entityDATA, nullptr, false); // don't throw exception
+        load_entity_from_string(entity_id, entityDATA);
+    }
+    void load_entity_from_string(size_t entity_id, const std::string& data)
+    {
+
+        auto entityJSON = json::json::parse(data, nullptr, false); // don't throw exception
         if (entityJSON.is_discarded()) {
-            yorcvs::log("Failed to load entity data " + path);
+            yorcvs::log("Failed to load entity data " + data);
             return;
         }
         [&]<std::size_t... I>([[maybe_unused]] std::index_sequence<I...> seq)
         {
             if (!(deserialize_component_from_json<Components>(entity_id, entityJSON, std::get<I>(json_names)) && ...)) {
-                yorcvs::log("Entity" + path + " could not be serialized!");
+                yorcvs::log("Entity could not be serialized!" + data);
                 return;
             }
         }
@@ -109,7 +114,6 @@ protected:
         }
     }
 
-   
     yorcvs::ECS* world;
     const std::array<std::string, sizeof...(Components)> json_names {};
 };

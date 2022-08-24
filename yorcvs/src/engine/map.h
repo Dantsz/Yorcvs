@@ -24,10 +24,17 @@ struct tile {
  * @brief Loads tmx map data into the ecs
  *
  */
-class map : public entity_loader<identification_component, health_component, health_stats_component, stamina_component, stamina_stats_component, hitbox_component, sprite_component, animation_component, defensive_stats_component, offensive_stats_component> {
+class map : public entity_loader<identification_component,
+                health_component, health_stats_component,
+                stamina_component, stamina_stats_component,
+                hitbox_component,
+                sprite_component,
+                animation_component,
+                defensive_stats_component, offensive_stats_component,
+                inventory_component> {
 public:
     explicit map(yorcvs::ECS* world)
-        : entity_loader(world, { "identification", "health", "health_stats", "stamina", "stamina_stats", "hitbox", "sprite", "animation", "defensive_stats", "offsensive_stats" })
+        : entity_loader(world, { "identification", "health", "health_stats", "stamina", "stamina_stats", "hitbox", "sprite", "animation", "defensive_stats", "offsensive_stats", "inventory" })
         , ecs(world)
         , init_ecs(*world)
         , health_sys(world)
@@ -256,7 +263,7 @@ private:
         const std::string directory_path = map_file.remove_filename().generic_string();
 
         if (property.getName() == "entityPath") {
-            load_entity_from_path(entity, directory_path + filePath);
+            load_character_from_path(entity, directory_path + filePath);
             return true;
         }
         if (property.getName() == "behaviour") {
@@ -404,6 +411,7 @@ public:
             world.register_component<player_movement_controlled_component, behaviour_component>();
             world.register_component<sprite_component, animation_component>();
             world.register_component<health_stats_component, stamina_stats_component, offensive_stats_component, defensive_stats_component>();
+            world.register_component<inventory_component>();
         }
     };
     // class to initialize the ecs before systems are constructed

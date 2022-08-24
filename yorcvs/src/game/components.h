@@ -102,9 +102,6 @@ struct offensive_stats_component {
     float piercing;
     float intellect;
 };
-struct owned_component {
-    size_t owner_id;
-};
 struct item_component {
     size_t quality;
 };

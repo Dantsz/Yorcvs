@@ -176,7 +176,8 @@ inline bool bind_runtime(sol::state& lua_state, yorcvs::ECS* ecs)
         "piercing", &offensive_stats_component::piercing,
         "intellect", &offensive_stats_component::intellect);
     register_component_to_lua<player_movement_controlled_component>(lua_state, "playerMovementControl");
-    register_component_to_lua<behaviour_component>(lua_state, "behaviourComponent", &behaviour_component::code_path, "code_path");
+    register_component_to_lua<behaviour_component>(lua_state, "behaviourComponent", "code_path", &behaviour_component::code_path);
+    register_component_to_lua<inventory_component>(lua_state, "inventoryComponent", "items", &inventory_component::items);
     return true;
 }
 
