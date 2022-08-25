@@ -206,7 +206,7 @@ json::json serialize([[maybe_unused]] yorcvs::ECS* world, const inventory_compon
     entity_loader<identification_component, health_stats_component, stamina_stats_component, offensive_stats_component, defensive_stats_component, sprite_component> loader { world, { "identification", "health_stats", "stamina_stats", "offsensive_stats", "defensive_stats", "sprite" } };
     for (const auto& item : comp.items) {
         if (item.has_value()) {
-            j.push_back(loader.save_entity(item.value()));
+            j.push_back(json::json::parse(loader.save_entity(item.value())));
         }
     }
     return j;

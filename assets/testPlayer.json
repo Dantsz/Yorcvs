@@ -9,7 +9,7 @@
             "walkingR": 1
         },
         "current_animation_name": "idleR",
-        "current_elapsed_time": 41.599998474121094,
+        "current_elapsed_time": 0.0,
         "current_frame": 0,
         "frames": [
             {
@@ -161,7 +161,7 @@
         "spirit": 0.0
     },
     "health": {
-        "current": 2.8999993801116943
+        "current": 5.0
     },
     "health_stats": {
         "max": 5.0,
@@ -176,7 +176,13 @@
     "identification": {
         "name": "Danctz"
     },
-    "inventory": null,
+    "inventory": [
+        {
+            "identification": {
+                "name": "first item ever"
+            }
+        }
+    ],
     "offsensive_stats": {
         "agility": 1000.0,
         "dexterity": 0.0,
@@ -202,7 +208,7 @@
         }
     },
     "stamina": {
-        "current": 2.8999993801116943
+        "current": 5.0
     },
     "stamina_stats": {
         "max": 5.0,
