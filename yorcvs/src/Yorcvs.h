@@ -47,7 +47,7 @@ public:
         // test_map:load_content("assets/map.tmx")
         lua_state.safe_script(R"(        
             test_map:load_content("assets/map.tmx")
-            local pl = test_map:load_entity_from_path(world:create_entity(),"assets/entities/test_player_2/test_player_2.json")
+            local pl = test_map:load_character_from_path(world:create_entity(),"assets/entities/test_player_2/test_player_2.json")
             world:add_playerMovementControl(pl)
             )");
         [[maybe_unused]] const auto callback_id = app_window.add_callback_on_event(yorcvs::Events::Type::WINDOW_QUIT, [&app_active = active](const yorcvs::event&) { app_active = false; });

@@ -80,16 +80,16 @@ inline void bind_map_functions(sol::state& lua_state)
     {
         map.load(map.ecs, path);
     };
-    lua_state["Map"]["load_entity_from_string"] = [](yorcvs::map& map, const size_t entityID, const std::string& path) { // creates a new entity and assigns components from the file
+    lua_state["Map"]["load_character_from_path"] = [](yorcvs::map& map, const size_t entityID, const std::string& path) { // creates a new entity and assigns components from the file
         map.load_character_from_path(entityID, path);
         return entityID;
     };
-    lua_state["Map"]["load_entity_from_path"] = [](yorcvs::map& map, const size_t entityID, const std::string& path) { // creates a new entity and assigns components from the file
-        map.load_character_from_path(entityID, path);
-        return entityID;
-    };
+    //    lua_state["Map"]["load_entity_from_path"] = [](yorcvs::map& map, const size_t entityID, const std::string& path) { // creates a new entity and assigns components from the file
+    //        map.load_entity_from_path(entityID, path);
+    //        return entityID;
+    //    };
     lua_state["Map"]["save_entity"] = [](yorcvs::map& map, const size_t ID) {
-        return map.save_character(ID);
+        return map.save_entity(ID);
     };
 }
 inline void bind_system_entity_list(sol::state& lua_state)
@@ -176,7 +176,8 @@ inline bool bind_runtime(sol::state& lua_state, yorcvs::ECS* ecs)
         "piercing", &offensive_stats_component::piercing,
         "intellect", &offensive_stats_component::intellect);
     register_component_to_lua<player_movement_controlled_component>(lua_state, "playerMovementControl");
-    register_component_to_lua<behaviour_component>(lua_state, "behaviourComponent", &behaviour_component::code_path, "code_path");
+    register_component_to_lua<behaviour_component>(lua_state, "behaviourComponent", "code_path", &behaviour_component::code_path);
+    register_component_to_lua<inventory_component>(lua_state, "inventoryComponent", "items", &inventory_component::items);
     return true;
 }
 

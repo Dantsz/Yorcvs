@@ -34,7 +34,7 @@ int main(int argc, char** argv)
     timy.start();
 
     for (size_t i = 0; i < number_of_additional_bleeding_ducks; i++) {
-        map.load_character_from_path(first_ad_duck_entity + i, TEST_TEMP_ENTITY_FILE);
+        map.load_entity_from_path(first_ad_duck_entity + i, TEST_TEMP_ENTITY_FILE);
         // remove the collision
         if (world.has_components<hitbox_component>(first_ad_duck_entity + i)) {
             world.remove_component<hitbox_component>(first_ad_duck_entity + i);

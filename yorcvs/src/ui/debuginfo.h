@@ -61,7 +61,7 @@ public:
                 if (parentWindow->is_key_pressed(yorcvs::Events::Key::YORCVS_KEY_C)) {
                     yorcvs::log("Saving player...");
                     std::ofstream out("assets/testPlayer.json");
-                    out << map->save_character((*player_move_sys->entityList)[0]);
+                    out << map->save_entity((*player_move_sys->entityList)[0]);
                     yorcvs::log("Done.");
                     time_accumulator = 0;
                 }

@@ -161,7 +161,7 @@
         "spirit": 0.0
     },
     "health": {
-        "current": 1.0
+        "current": 5.0
     },
     "health_stats": {
         "max": 5.0,
@@ -176,6 +176,13 @@
     "identification": {
         "name": "Danctz"
     },
+    "inventory": [
+        {
+            "identification": {
+                "name": "first item ever"
+            }
+        }
+    ],
     "offsensive_stats": {
         "agility": 1000.0,
         "dexterity": 0.0,
@@ -201,11 +208,10 @@
         }
     },
     "stamina": {
-        "current": 1.0
+        "current": 5.0
     },
     "stamina_stats": {
         "max": 5.0,
         "regen": 0.10000000149011612
-    },
-    "inventory":[{"identification":{"name":"first item ever"}}]
+    }
 }

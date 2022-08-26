@@ -1,5 +1,5 @@
 #include "../common/ecs.h"
-#include "../game/component_serialization.h"
+#include "serialization.h"
 #include <array>
 #include <filesystem>
 #include <fstream>
@@ -27,24 +27,27 @@ public:
      * @param entity_id id of the entity
      * @param path path to the json file
      */
-    void load_character_from_path(size_t entity_id, const std::string& path)
+    void load_entity_from_path(size_t entity_id, const std::string& path)
     {
         std::ifstream entityIN(path);
         std::string entityDATA { (std::istreambuf_iterator<char>(entityIN)), (std::istreambuf_iterator<char>()) };
-        auto entityJSON = json::json::parse(entityDATA, nullptr, false); // don't throw exception
+        load_entity_from_string(entity_id, entityDATA);
+    }
+    void load_entity_from_string(size_t entity_id, const std::string& data)
+    {
+        auto entityJSON = json::json::parse(data, nullptr, false); // don't throw exception
         if (entityJSON.is_discarded()) {
-            yorcvs::log("Failed to load entity data " + path);
+            yorcvs::log("Failed to load entity data " + data);
             return;
         }
         [&]<std::size_t... I>([[maybe_unused]] std::index_sequence<I...> seq)
         {
             if (!(deserialize_component_from_json<Components>(entity_id, entityJSON, std::get<I>(json_names)) && ...)) {
-                yorcvs::log("Entity" + path + " could not be serialized!");
+                yorcvs::log("Entity could not be deserialized!" + data);
                 return;
             }
         }
         (std::make_index_sequence<sizeof...(Components)>());
-        OnCharacterDeserialized(entity_id, path);
     }
     /**
      * @brief Serializes an entities components and returns the string reprezentation
@@ -52,7 +55,7 @@ public:
      * @param entity
      * @return std::string
      */
-    [[nodiscard]] std::string save_character(const size_t entity_id) const
+    [[nodiscard]] std::string save_entity(const size_t entity_id) const
     {
         return [&]<size_t... I>([[maybe_unused]] std::index_sequence<I...> seq)
         {
@@ -80,9 +83,9 @@ protected:
     {
         if (json_entity_obj.contains(component_name)) {
             T comp {};
-            if (!yorcvs::components::deserialize(comp,
+            if (!yorcvs::components::deserialize(world, comp,
                     json_entity_obj[component_name])) {
-                yorcvs::log(component_name + " could not be serialized! ", yorcvs::MSGSEVERITY::ERROR);
+                yorcvs::log(component_name + " could not be deserialized! ", yorcvs::MSGSEVERITY::ERROR);
                 return false;
             }
             if (!world->has_components<T>(entity_id)) {
@@ -106,11 +109,10 @@ protected:
     {
         if (world->has_components<T>(entity_id)) {
             transform(json_obj, world->get_component<T>(entity_id));
-            json_obj[component_name] = yorcvs::components::serialize(world->get_component<T>(entity_id));
+            json_obj[component_name] = yorcvs::components::serialize(world, world->get_component<T>(entity_id));
         }
     }
 
-    virtual void OnCharacterDeserialized([[maybe_unused]] size_t entity_id, [[maybe_unused]] const std::string& path) {};
     yorcvs::ECS* world;
     const std::array<std::string, sizeof...(Components)> json_names {};
 };

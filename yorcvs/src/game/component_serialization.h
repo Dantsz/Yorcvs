@@ -1,10 +1,10 @@
 #pragma once
+#include "../common/ecs.h"
 #include "../common/utilities/log.h"
+#include "../engine/entity_loader.h"
 #include "components.h"
 #include <filesystem>
-#include <nlohmann/json.hpp>
 #include <string>
-namespace json = nlohmann;
 
 namespace yorcvs {
 template <typename T>
@@ -182,43 +182,56 @@ inline void from_json(const json::json& j, defensive_stats_component& comp)
         comp.spirit = j["spirit"];
     }
 }
-
-namespace yorcvs::components {
-
-// TEMPLATES//
-// Serialization to json
-/**
- * @brief Template definition for serializing a component to json
- *
- * @tparam T
- * @return json::json
- */
-template <typename T>
-json::json serialize(const T& comp)
+inline void to_json(json::json& j, const item_component& comp)
 {
-    json::json j = comp;
+    j["quality"] = comp.quality;
+}
+inline void from_json(const json::json& j, item_component& comp)
+{
+    if (j.contains("quality")) {
+        comp.quality = j["quality"];
+    }
+}
+namespace yorcvs::components {
+template <>
+json::json serialize([[maybe_unused]] yorcvs::ECS* world, const inventory_component& comp)
+{
+    /*TODO:
+     *component contains an array of entities
+     *serialize each entity
+     *add to array
+     *return
+     */
+    json::json j;
+    entity_loader<identification_component, health_stats_component, stamina_stats_component, offensive_stats_component, defensive_stats_component, sprite_component> loader { world, { "identification", "health_stats", "stamina_stats", "offsensive_stats", "defensive_stats", "sprite" } };
+    for (const auto& item : comp.items) {
+        if (item.has_value()) {
+            j.push_back(json::json::parse(loader.save_entity(item.value())));
+        }
+    }
     return j;
 }
-
-// Deserialization from json
-/**
- * @brief Template definition for deserialize from json
- *
- * @tparam T
- * @param dst destination
- * @return returns fals on failure
- */
-template <typename T>
-[[nodiscard]] bool deserialize(T& dst, const json::json& j)
+template <>
+[[nodiscard]] bool deserialize([[maybe_unused]] yorcvs::ECS* world, inventory_component& dst, const json::json& j)
 {
     try {
-        dst = j;
-    } catch (...) {
-        yorcvs::log("failed to deserialize component");
+        /*TODO:
+         *create new entities for each item
+         *assign each entity an item_component
+         */
+        entity_loader<identification_component, health_stats_component, stamina_stats_component, offensive_stats_component, defensive_stats_component, sprite_component> loader { world, { "identification", "health_stats", "stamina_stats", "offsensive_stats", "defensive_stats", "sprite" } };
+        size_t item_index = 0;
+        for (const auto& item : j) {
+            dst.items[item_index] = world->create_entity_ID();
+            const size_t item_id = dst.items[item_index].value();
+            loader.load_entity_from_string(item_id, item.dump());
+            item_index++;
+        }
+    } catch (std::exception& e) {
+        yorcvs::log(std::string("failed to deserialize component: ") + e.what());
         return false;
     }
 
     return true;
 }
-
 } // namespace yorcvs::components

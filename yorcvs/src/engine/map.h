@@ -24,10 +24,17 @@ struct tile {
  * @brief Loads tmx map data into the ecs
  *
  */
-class map : public entity_loader<identification_component, health_component, health_stats_component, stamina_component, stamina_stats_component, hitbox_component, sprite_component, animation_component, defensive_stats_component, offensive_stats_component> {
+class map : public entity_loader<identification_component,
+                health_component, health_stats_component,
+                stamina_component, stamina_stats_component,
+                hitbox_component,
+                sprite_component,
+                animation_component,
+                defensive_stats_component, offensive_stats_component,
+                inventory_component> {
 public:
     explicit map(yorcvs::ECS* world)
-        : entity_loader(world, { "identification", "health", "health_stats", "stamina", "stamina_stats", "hitbox", "sprite", "animation", "defensive_stats", "offsensive_stats" })
+        : entity_loader(world, { "identification", "health", "health_stats", "stamina", "stamina_stats", "hitbox", "sprite", "animation", "defensive_stats", "offsensive_stats", "inventory" })
         , ecs(world)
         , init_ecs(*world)
         , health_sys(world)
@@ -113,7 +120,15 @@ public:
             }
         }
     }
-
+    void load_character_from_path(size_t entity_id, const std::string& path)
+    {
+        load_entity_from_path(entity_id, path);
+        OnCharacterDeserialized(entity_id, path);
+    }
+    [[nodiscard]] std::string save_character(const size_t entity_id) const
+    {
+        return save_entity(entity_id);
+    }
     /**
      * @brief Removes all entitites and tiles loaded by this map
      *
@@ -322,7 +337,7 @@ private:
     {
         return spawn_coord;
     }
-    void OnCharacterDeserialized(size_t entity_id, const std::string& path) override
+    void OnCharacterDeserialized(size_t entity_id, const std::string& path)
     {
         std::filesystem::path file = path;
         const std::string directory_path = file.remove_filename().generic_string();
@@ -396,6 +411,7 @@ public:
             world.register_component<player_movement_controlled_component, behaviour_component>();
             world.register_component<sprite_component, animation_component>();
             world.register_component<health_stats_component, stamina_stats_component, offensive_stats_component, defensive_stats_component>();
+            world.register_component<inventory_component>();
         }
     };
     // class to initialize the ecs before systems are constructed
