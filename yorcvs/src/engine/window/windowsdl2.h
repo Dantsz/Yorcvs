@@ -91,6 +91,7 @@ public:
                 return std::shared_ptr<SDL_Texture> { tex, [](SDL_Texture* p) { SDL_DestroyTexture(p); } };
             },
             [](SDL_Texture* p) { SDL_DestroyTexture(p); });
+        assetm->load_folder_as_link("assets/textures");
         // adding minimization
         [[maybe_unused]] const auto minimized_id = add_callback_on_event(yorcvs::Events::Type::WINDOW_MINIMIZED, [&isMinimized = this->isMinimized](const yorcvs::event&) { isMinimized = true; });
         [[maybe_unused]] const auto restored_id = add_callback_on_event(yorcvs::Events::Type::WINDOW_RESTORED, [&isMinimized = this->isMinimized](const yorcvs::event&) { isMinimized = false; });
