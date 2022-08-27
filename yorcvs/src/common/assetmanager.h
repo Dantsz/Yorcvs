@@ -3,9 +3,9 @@
 #include <string>
 #include <unordered_map>
 
-#include <functional> //TODO : MAYBE REPLACE std::function
-
 #include "utilities.h"
+#include <filesystem>
+#include <functional> //TODO : MAYBE REPLACE std::function
 
 namespace yorcvs {
 
@@ -41,6 +41,11 @@ public:
         if (path.empty()) {
             yorcvs::log("Attempt to pass an empty string to an assetManager", yorcvs::MSGSEVERITY::ERROR);
             return nullptr;
+        }
+        // search if path is in link table
+        const auto link_rez = file_links.find(path.c_str());
+        if (link_rez != file_links.end()) {
+            return load_from_file(link_rez->second);
         }
         // search for the texture in the map
         const auto rez = assetMap.find(path.c_str());
@@ -83,6 +88,21 @@ public:
     {
         return assetMap;
     }
+    void load_folder_as_link(const std::string& path_to_folder)
+    {
+        std::filesystem::path dir_path { path_to_folder };
+        if (!std::filesystem::is_directory(dir_path)) {
+            yorcvs::log("Non directory path " + path_to_folder + " passed to load_folder_as_link ");
+            return;
+        }
+        // iterate over all files in folders
+        for (const auto& dir_entry : std::filesystem::directory_iterator { dir_path }) {
+            if (dir_entry.is_regular_file()) { // for normal files make an alias
+                file_links.insert({ dir_entry.path().filename().string(), dir_entry.path().string() }); // take only the name and make it point to path
+            } else {
+            }
+        }
+    }
 
 private:
     /**
@@ -96,5 +116,6 @@ private:
      */
     std::function<void(assetType*)> dtor;
     std::unordered_map<std::string, std::shared_ptr<assetType>> assetMap;
+    std::unordered_map<std::string, std::string> file_links;
 };
 } // namespace yorcvs
