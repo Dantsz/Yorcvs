@@ -8,6 +8,7 @@
 #include "assetmanagerviewer.h"
 #include "entityinteraction.h"
 #include "imgui.h"
+#include "inventory.h"
 #include "misc/cpp/imgui_stdlib.h"
 #include <optional>
 namespace yorcvs {
@@ -156,6 +157,8 @@ private:
             if (appECS->has_components<animation_component>(ID)) {
                 ui::show_current_animator_selector(appECS, ID);
             }
+            ImGui::Begin("Inventory");
+            yorcvs::ui::show_entity_inventory(appECS, ID);
         }
     }
     void show_entity_stats(size_t ID, [[maybe_unused]] std::string pre_name = "Entity : ")
