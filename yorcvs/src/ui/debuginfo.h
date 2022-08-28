@@ -158,7 +158,7 @@ private:
                 ui::show_current_animator_selector(appECS, ID);
             }
             ImGui::Begin("Inventory");
-            yorcvs::ui::show_entity_inventory(appECS, ID);
+            yorcvs::ui::show_entity_inventory(*parentWindow, appECS, ID);
         }
     }
     void show_entity_stats(size_t ID, [[maybe_unused]] std::string pre_name = "Entity : ")
