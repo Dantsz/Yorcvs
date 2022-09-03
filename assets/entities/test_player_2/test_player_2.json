@@ -209,7 +209,24 @@
     },
     "inventory":[
 	{"identification":{"name":"first item ever"}},
-	{"identification":{"name":"second item"},    "sprite": {
+	{"identification":{"name":"Bread"},    "sprite": {
+        "offset": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "size": {
+            "x": 32.0,
+            "y": 32.0
+        },
+        "spriteName": "bread.png",
+        "srcRect": {
+            "h": 64,
+            "w": 64,
+            "x": 0,
+            "y": 0
+        }
+    }},
+	{"identification":{"name":"Bread"},    "sprite": {
         "offset": {
             "x": 0.0,
             "y": 0.0

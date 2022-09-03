@@ -158,7 +158,14 @@ private:
                 ui::show_current_animator_selector(appECS, ID);
             }
             ImGui::Begin("Inventory");
-            yorcvs::ui::show_entity_inventory(*parentWindow, appECS, ID);
+            yorcvs::ui::show_entity_inventory(*parentWindow, appECS, ID, [&](size_t item_id) {
+                if (appECS->has_components<identification_component>(item_id)) {
+                    ImGui::Text(appECS->get_component<identification_component>(item_id).name.c_str());
+                }
+                if (ImGui::Button("Drop")) {
+                    // TODO:make use of a function from an item_system in order to remove the item from holder inventory and give it components necessary to be put on the ground
+                }
+            });
         }
     }
     void show_entity_stats(size_t ID, [[maybe_unused]] std::string pre_name = "Entity : ")
