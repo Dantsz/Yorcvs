@@ -158,12 +158,23 @@ private:
                 ui::show_current_animator_selector(appECS, ID);
             }
             ImGui::Begin("Inventory");
-            yorcvs::ui::show_entity_inventory(*parentWindow, appECS, ID, [&](size_t item_id) {
+            yorcvs::ui::show_entity_inventory(*parentWindow, appECS, ID, [&](size_t item_id, size_t owner_id, size_t index_in_owner_inventory) {
                 if (appECS->has_components<identification_component>(item_id)) {
                     ImGui::Text(appECS->get_component<identification_component>(item_id).name.c_str());
                 }
                 if (ImGui::Button("Drop")) {
                     // TODO:make use of a function from an item_system in order to remove the item from holder inventory and give it components necessary to be put on the ground
+                    auto inventory = appECS->get_component_checked<inventory_component>(owner_id);
+                    for (size_t i = index_in_owner_inventory; i < inventory->get().items.size(); i++) {
+                        if (i + 1 == inventory->get().items.size()) {
+                            inventory->get().items[i] = {};
+                            break;
+                        }
+                        inventory->get().items[i] = inventory->get().items[i + 1];
+                    }
+                    appECS->add_component<position_component>(item_id, appECS->get_component_checked<position_component>(owner_id).value());
+                    appECS->add_component<hitbox_component>(item_id, { .hitbox = { 0, 0, static_cast<float>(appECS->get_component_checked<sprite_component>(item_id).value().get().size.x), static_cast<float>(appECS->get_component_checked<sprite_component>(item_id).value().get().size.y) } });
+                    appECS->add_component<velocity_component>(item_id, { .vel = { 0.0f, 0.0f } }); // makes item on the ground non-solid
                 }
             });
         }

@@ -220,8 +220,8 @@
         },
         "spriteName": "bread.png",
         "srcRect": {
-            "h": 64,
-            "w": 64,
+            "h": 8,
+            "w": 8,
             "x": 0,
             "y": 0
         }
@@ -232,8 +232,8 @@
             "y": 0.0
         },
         "size": {
-            "x": 32.0,
-            "y": 32.0
+            "x": 8.0,
+            "y": 8.0
         },
         "spriteName": "bread.png",
         "srcRect": {

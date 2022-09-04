@@ -6,7 +6,7 @@
 #include <functional>
 namespace yorcvs::ui {
 
-void show_entity_inventory(yorcvs::sdl2_window& window, [[maybe_unused]] yorcvs::ECS* appECS, [[maybe_unused]] size_t ID, std::function<void(size_t)> on_item_clicked)
+void show_entity_inventory(yorcvs::sdl2_window& window, [[maybe_unused]] yorcvs::ECS* appECS, [[maybe_unused]] size_t ID, std::function<void(size_t, size_t, size_t)> on_item_clicked)
 {
     constexpr size_t inventory_collumns = 4;
     constexpr ImVec2 icon_size = { 32, 32 };
@@ -25,7 +25,7 @@ void show_entity_inventory(yorcvs::sdl2_window& window, [[maybe_unused]] yorcvs:
                     ImGui::Text("%s", appECS->get_component<identification_component>(item_id).name.c_str());
                 }
                 if (ImGui::BeginPopup("Item")) {
-                    on_item_clicked(inventory->get().items[i].value());
+                    on_item_clicked(inventory->get().items[i].value(), ID, i);
                     ImGui::EndPopup();
                 }
                 ImGui::PopID();
