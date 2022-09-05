@@ -41,6 +41,9 @@ static inline bool show_entity_interaction_window(yorcvs::ECS* world, combat_sys
             return true;
         }
     }
+    if (ImGui::Button("close")) {
+        return true;
+    }
     return false;
 }
 }
@@ -55,7 +58,7 @@ public:
         , combat_sys(&combat_system)
         , player_move_sys(&player_move_system)
         , entity_is_clicked_callback(event_handler.add_callback_on_event(yorcvs::Events::Type::MOUSE_CLICKED,
-              [widget = this](const yorcvs::event&) {
+              [widget = this, this](const yorcvs::event&) {
                   yorcvs::vec2<float> old_rs = widget->window->get_render_scale();
                   widget->window->set_render_scale(widget->window->get_window_size() / widget->render_dimensions);
                   bool clicked_any_entity = false;
@@ -138,6 +141,6 @@ private:
     yorcvs::vec2<float> target_window_position {};
     yorcvs::vec2<float> render_dimensions {};
     std::optional<size_t> targetID = 0;
-    static constexpr yorcvs::vec2<float> target_window_size { 150, 100 };
+    static constexpr yorcvs::vec2<float> target_window_size { 150, 150 };
     static constexpr float target_window_alpha = 0.5f;
 };
