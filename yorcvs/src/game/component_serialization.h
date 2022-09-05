@@ -215,6 +215,7 @@ template <>
             dst.items[item_index] = world->create_entity_ID();
             const size_t item_id = dst.items[item_index].value();
             loader.load_entity_from_string(item_id, item.dump());
+            world->add_component<item_component>(item_id, {});
             item_index++;
         }
     } catch (std::exception& e) {
