@@ -58,7 +58,7 @@ public:
         , combat_sys(&combat_system)
         , player_move_sys(&player_move_system)
         , entity_is_clicked_callback(event_handler.add_callback_on_event(yorcvs::Events::Type::MOUSE_CLICKED,
-              [widget = this, this](const yorcvs::event&) {
+              [widget = this](const yorcvs::event&) {
                   yorcvs::vec2<float> old_rs = widget->window->get_render_scale();
                   widget->window->set_render_scale(widget->window->get_window_size() / widget->render_dimensions);
                   bool clicked_any_entity = false;
