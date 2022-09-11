@@ -197,7 +197,7 @@ template <>
 json::json serialize([[maybe_unused]] yorcvs::ECS* world, const inventory_component& comp)
 {
     json::json j;
-    entity_loader<identification_component, health_stats_component, stamina_stats_component, offensive_stats_component, defensive_stats_component, sprite_component> loader { world, { "identification", "health_stats", "stamina_stats", "offsensive_stats", "defensive_stats", "sprite" } };
+    entity_loader<identification_component, health_stats_component, stamina_stats_component, offensive_stats_component, defensive_stats_component, sprite_component, item_component> loader { world, { "identification", "health_stats", "stamina_stats", "offsensive_stats", "defensive_stats", "sprite", "item" } };
     for (const auto& item : comp.items) {
         if (item.has_value()) {
             j.push_back(json::json::parse(loader.save_entity(item.value())));
@@ -209,13 +209,12 @@ template <>
 [[nodiscard]] bool deserialize([[maybe_unused]] yorcvs::ECS* world, inventory_component& dst, const json::json& j)
 {
     try {
-        entity_loader<identification_component, health_stats_component, stamina_stats_component, offensive_stats_component, defensive_stats_component, sprite_component> loader { world, { "identification", "health_stats", "stamina_stats", "offsensive_stats", "defensive_stats", "sprite" } };
+        entity_loader<identification_component, health_stats_component, stamina_stats_component, offensive_stats_component, defensive_stats_component, sprite_component, item_component> loader { world, { "identification", "health_stats", "stamina_stats", "offsensive_stats", "defensive_stats", "sprite", "item" } };
         size_t item_index = 0;
         for (const auto& item : j) {
             dst.items[item_index] = world->create_entity_ID();
             const size_t item_id = dst.items[item_index].value();
             loader.load_entity_from_string(item_id, item.dump());
-            world->add_component<item_component>(item_id, {});
             item_index++;
         }
     } catch (std::exception& e) {

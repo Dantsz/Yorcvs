@@ -209,7 +209,8 @@
     },
     "inventory":[
 	{"identification":{"name":"first item ever"}},
-	{"identification":{"name":"Bread"},    "sprite": {
+	{"identification":{"name":"Bread"},
+	   "sprite": {
         "offset": {
             "x": 0.0,
             "y": 0.0
@@ -225,8 +226,13 @@
             "x": 0,
             "y": 0
         }
-    }},
-	{"identification":{"name":"Bread"},    "sprite": {
+		},
+	"item":
+	{
+		"quality" : 10
+	}},
+	{"identification":{"name":"Bread"},    
+	 "sprite": {
         "offset": {
             "x": 0.0,
             "y": 0.0
@@ -242,5 +248,9 @@
             "x": 0,
             "y": 0
         }
-    }}]
+    },
+	"item":
+	{
+		"quality" : 10
+	}}]
 }
