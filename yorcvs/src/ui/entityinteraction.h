@@ -7,13 +7,28 @@
 #include "../game/systems/playercontrol.h"
 #include "imgui.h"
 namespace yorcvs::ui {
-static inline void show_entity_interaction_window(yorcvs::ECS* world, combat_system* combat_system, size_t sender, size_t target)
+static inline bool show_entity_interaction_window(yorcvs::ECS* world, combat_system* combat_system, size_t sender, size_t target)
 {
     if (ImGui::Button("go to") && world->has_components<position_component>(target) && world->has_components<position_component>(target)) {
         world->get_component<position_component>(sender).position = world->get_component<position_component>(target).position;
+        return true;
     }
     if (ImGui::Button("teleport here") && world->has_components<position_component>(target) && world->has_components<position_component>(target)) {
         world->get_component<position_component>(target).position = world->get_component<position_component>(sender).position;
+        return true;
+    }
+    if (world->has_components<inventory_component>(sender) && world->has_components<item_component>(target) && ImGui::Button("pick up")) {
+        world->remove_component<hitbox_component>(target);
+        world->remove_component<velocity_component>(target);
+        world->remove_component<position_component>(target);
+
+        auto inventory = world->get_component_checked<inventory_component>(sender);
+        for (size_t i = 0; i < inventory.value().get().items.size(); i++) {
+            if (!inventory->get().items[i].has_value()) {
+                inventory->get().items[i] = target;
+                return true;
+            }
+        }
     }
     if (world->has_components<offensive_stats_component>(sender) && world->has_components<health_component>(target) && world->has_components<defensive_stats_component>(target) && ImGui::Button("attack")) {
         const auto damage = combat_system->attack(sender, target);
@@ -23,8 +38,13 @@ static inline void show_entity_interaction_window(yorcvs::ECS* world, combat_sys
         if (sender_state.has_value() && sender_vel.has_value()) {
             sender_state->get().current_state = (!sender_vel->get().facing.x) ? player_movement_controlled_component::PLAYER_ATTACK_R : player_movement_controlled_component::PLAYER_ATTACK_L;
             sender_state->get().update_time = 0.0f;
+            return true;
         }
     }
+    if (ImGui::Button("close")) {
+        return true;
+    }
+    return false;
 }
 }
 template <typename eventhandler_impl, typename window_impl>
@@ -58,6 +78,7 @@ public:
                   }
                   if (!clicked_any_entity) {
                       widget->targetID.reset();
+                      clicked_any_entity = false;
                   }
                   widget->window->set_render_scale(old_rs);
               }))
@@ -76,14 +97,18 @@ public:
         if (targetID.has_value() && world->is_valid_entity(targetID.value()) && select_target_opened) {
             ImGui::SetNextWindowPos({ target_window_position.x, target_window_position.y });
             ImGui::SetNextWindowSize({ target_window_size.x, target_window_size.y });
-            ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+            ImGuiWindowFlags window_flags = ImGuiWindowFlags_Popup | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
             ImGui::SetNextWindowBgAlpha(target_window_alpha);
-            ImGui::Begin("Target", &select_target_opened, window_flags);
-            if (world->has_components<identification_component>(targetID.value())) {
-                ImGui::Text("Name: %s", world->get_component<identification_component>(targetID.value()).name.c_str());
+            if (select_target_opened) {
+                ImGui::OpenPopup("Target");
             }
-            yorcvs::ui::show_entity_interaction_window(world, combat_sys, get_last_player_id().value(), targetID.value());
-            ImGui::End();
+            if (ImGui::BeginPopup("Target", window_flags)) {
+                if (world->has_components<identification_component>(targetID.value())) {
+                    ImGui::Text("Name: %s", world->get_component<identification_component>(targetID.value()).name.c_str());
+                }
+                select_target_opened &= !yorcvs::ui::show_entity_interaction_window(world, combat_sys, get_last_player_id().value(), targetID.value());
+                ImGui::EndPopup();
+            }
         } else {
             targetID.reset();
         }
@@ -116,6 +141,6 @@ private:
     yorcvs::vec2<float> target_window_position {};
     yorcvs::vec2<float> render_dimensions {};
     std::optional<size_t> targetID = 0;
-    static constexpr yorcvs::vec2<float> target_window_size { 150, 100 };
+    static constexpr yorcvs::vec2<float> target_window_size { 150, 150 };
     static constexpr float target_window_alpha = 0.5f;
 };

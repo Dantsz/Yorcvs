@@ -207,5 +207,49 @@
         "max": 5.0,
         "regen": 0.10000000149011612
     },
-    "inventory":[{"identification":{"name":"first item ever"}}]
+    "inventory":[
+	{"identification":{"name":"Bread"},
+	   "sprite": {
+        "offset": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "size": {
+            "x": 8.0,
+            "y": 8.0
+        },
+        "spriteName": "bread.png",
+        "srcRect": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 0
+        }
+		},
+	"item":
+	{
+		"quality" : 10
+	}},
+	{"identification":{"name":"Bread"},    
+	 "sprite": {
+        "offset": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "size": {
+            "x": 8.0,
+            "y": 8.0
+        },
+        "spriteName": "bread.png",
+        "srcRect": {
+            "h": 64,
+            "w": 64,
+            "x": 0,
+            "y": 0
+        }
+    },
+	"item":
+	{
+		"quality" : 10
+	}}]
 }

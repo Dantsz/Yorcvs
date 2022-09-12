@@ -33,7 +33,8 @@ set(YorcvsUIFILES "src/ui/debuginfo.h"
                   "src/ui/performancewindow.h"
                   "src/ui/assetmanagerviewer.h"
                   "src/ui/animationeditor.h"
-                  "src/ui/entityinteraction.h")
+                  "src/ui/entityinteraction.h"
+                  "src/ui/inventory.h")
 set(YORCVSENGINEFILES   "src/engine/window/window.h"
                         "src/engine/window/eventhandler.h"
                         "src/engine/window/windowsdl2"

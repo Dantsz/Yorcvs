@@ -196,14 +196,8 @@ namespace yorcvs::components {
 template <>
 json::json serialize([[maybe_unused]] yorcvs::ECS* world, const inventory_component& comp)
 {
-    /*TODO:
-     *component contains an array of entities
-     *serialize each entity
-     *add to array
-     *return
-     */
     json::json j;
-    entity_loader<identification_component, health_stats_component, stamina_stats_component, offensive_stats_component, defensive_stats_component, sprite_component> loader { world, { "identification", "health_stats", "stamina_stats", "offsensive_stats", "defensive_stats", "sprite" } };
+    entity_loader<identification_component, health_stats_component, stamina_stats_component, offensive_stats_component, defensive_stats_component, sprite_component, item_component> loader { world, { "identification", "health_stats", "stamina_stats", "offsensive_stats", "defensive_stats", "sprite", "item" } };
     for (const auto& item : comp.items) {
         if (item.has_value()) {
             j.push_back(json::json::parse(loader.save_entity(item.value())));
@@ -215,11 +209,7 @@ template <>
 [[nodiscard]] bool deserialize([[maybe_unused]] yorcvs::ECS* world, inventory_component& dst, const json::json& j)
 {
     try {
-        /*TODO:
-         *create new entities for each item
-         *assign each entity an item_component
-         */
-        entity_loader<identification_component, health_stats_component, stamina_stats_component, offensive_stats_component, defensive_stats_component, sprite_component> loader { world, { "identification", "health_stats", "stamina_stats", "offsensive_stats", "defensive_stats", "sprite" } };
+        entity_loader<identification_component, health_stats_component, stamina_stats_component, offensive_stats_component, defensive_stats_component, sprite_component, item_component> loader { world, { "identification", "health_stats", "stamina_stats", "offsensive_stats", "defensive_stats", "sprite", "item" } };
         size_t item_index = 0;
         for (const auto& item : j) {
             dst.items[item_index] = world->create_entity_ID();
