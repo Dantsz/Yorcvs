@@ -208,7 +208,6 @@
         "regen": 0.10000000149011612
     },
     "inventory":[
-	{"identification":{"name":"first item ever"}},
 	{"identification":{"name":"Bread"},
 	   "sprite": {
         "offset": {
