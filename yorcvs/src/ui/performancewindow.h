@@ -12,20 +12,20 @@ public:
     }
     enum update_time_item : size_t {
         collision = 0,
-        health = 1,
-        stamina = 2,
-        velocity = 3,
-        animation = 4,
-        behaviour = 5,
-        overall = 6,
+        health,
+        stamina,
+        velocity,
+        animation,
+        behaviour,
+        overall,
         update_time_tracked
     };
     // samples , max , min , avg
     enum update_time_sample_tuple_element : size_t {
         samples = 0,
-        max = 1,
-        min = 2,
-        avg = 3,
+        max,
+        min,
+        avg,
         update_time_sample_tuple_elements
     };
     enum history_plotting : int {
