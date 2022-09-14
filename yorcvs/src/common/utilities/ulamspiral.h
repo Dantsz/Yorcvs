@@ -70,19 +70,19 @@ namespace spiral {
         const intmax_t prev = (edgelen - 1) * (edgelen - 1);
         if (x == loop && y < loop) {
             // right edge
-            return prev - y + (loop - 1);
+            return static_cast<size_t>(prev - y + (loop - 1));
         }
         if (y == -loop) {
             // top edge
-            return prev + loop - x + edgelen - 1;
+            return static_cast<size_t>(prev + loop - x + edgelen - 1);
         }
         if (x == -1 * loop) {
             // left edge
-            return prev + loop + y + 2 * edgelen - 1;
+            return static_cast<size_t>(prev + loop + y + 2 * edgelen - 1);
         }
         if (y == loop) {
             // bottom edge
-            return prev + x + loop + 3 * edgelen - 1;
+            return static_cast<size_t>(prev + x + loop + 3 * edgelen - 1);
         }
         return 0;
     }
