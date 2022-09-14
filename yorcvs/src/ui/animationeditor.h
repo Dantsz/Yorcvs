@@ -5,7 +5,7 @@
 #include "imgui.h"
 namespace yorcvs::ui {
 
-void show_current_animator_selector([[maybe_unused]] yorcvs::ECS* appECS, [[maybe_unused]] size_t ID)
+inline void show_current_animator_selector([[maybe_unused]] yorcvs::ECS* appECS, [[maybe_unused]] size_t ID)
 {
     const animation_component& anim_comp = appECS->get_component<animation_component>(ID);
     static std::string current_item {};

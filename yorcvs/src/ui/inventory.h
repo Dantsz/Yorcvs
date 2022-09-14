@@ -6,7 +6,7 @@
 #include <functional>
 namespace yorcvs::ui {
 
-void show_entity_inventory(yorcvs::sdl2_window& window, [[maybe_unused]] yorcvs::ECS* appECS, [[maybe_unused]] size_t ID, std::function<void(size_t, size_t, size_t)> on_item_clicked)
+inline void show_entity_inventory(yorcvs::sdl2_window& window, [[maybe_unused]] yorcvs::ECS* appECS, [[maybe_unused]] size_t ID, std::function<void(size_t, size_t, size_t)> on_item_clicked)
 {
     constexpr size_t inventory_collumns = 4;
     constexpr ImVec2 icon_size = { 32, 32 };
