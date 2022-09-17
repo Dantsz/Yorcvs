@@ -57,11 +57,12 @@ public:
      */
     [[nodiscard]] std::string save_entity(const size_t entity_id) const
     {
+        constexpr size_t indent = 4;
         return [&]<size_t... I>([[maybe_unused]] std::index_sequence<I...> seq)
         {
             json::json j;
             (serialize_component_to_json<Components>(entity_id, std::get<I>(json_names), j), ...);
-            return j.dump(4);
+            return j.dump(indent);
         }
         (std::make_index_sequence<sizeof...(Components)>());
     }
