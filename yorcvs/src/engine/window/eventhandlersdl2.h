@@ -99,7 +99,7 @@ public:
 
     bool is_key_pressed(yorcvs::Events::Key key)
     {
-        keys = SDL_GetKeyboardState(nullptr);
+        static auto keys = SDL_GetKeyboardState(nullptr);
         return keys[key_to_impl.at(key)] ? 1 : 0; // NOLINT
     }
 
@@ -129,7 +129,6 @@ public:
 private:
     SDL_Event sdl_event {};
     yorcvs::event_sdl2 i_event {};
-
     size_t unassigned_callback_id = 0;
     /**
      * @brief Holds callbacks to be called when a type of event happens
@@ -137,6 +136,5 @@ private:
     std::array<std::unordered_map<size_t, std::function<void(const yorcvs::event&)>>, yorcvs::Events::Type::TYPES> callbacks {};
     std::unordered_map<yorcvs::Events::Key, SDL_Scancode> key_to_impl {};
     std::unordered_map<SDL_Scancode, yorcvs::Events::Key> impl_to_key {};
-    unsigned char const* keys {};
 };
 }
