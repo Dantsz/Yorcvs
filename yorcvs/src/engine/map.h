@@ -123,7 +123,7 @@ public:
     void load_character_from_path(size_t entity_id, const std::string& path)
     {
         load_entity_from_path(entity_id, path);
-        OnCharacterDeserialized(entity_id, path);
+        OnCharacterDeserialized(entity_id);
     }
     [[nodiscard]] std::string save_character(const size_t entity_id) const
     {
@@ -337,15 +337,8 @@ private:
     {
         return spawn_coord;
     }
-    void OnCharacterDeserialized(size_t entity_id, const std::string& path)
+    void OnCharacterDeserialized(size_t entity_id)
     {
-        //        std::filesystem::path file = path;
-        //        const std::string directory_path = file.remove_filename().generic_string();
-        //        if (world->has_components<sprite_component>(entity_id)) {
-        //            const std::string sprite_path = directory_path + world->get_component<sprite_component>(entity_id).texture_path;
-        //            world->get_component<sprite_component>(entity_id).texture_path = sprite_path;
-        //        }
-        // These components should not be serialized as the position and velocity is relative to the map!!!
         if (!world->has_components<position_component>(entity_id)) {
             world->add_component<position_component>(entity_id, {});
             const auto spawn_position = get_spawn_position();
