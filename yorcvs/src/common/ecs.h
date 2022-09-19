@@ -52,7 +52,7 @@ using entity_system_list = std::vector<size_t>;
 // must have a vector of size_t
 template <typename systemt>
 concept systemT = requires(systemt sys)
-{   
+{
     { (*sys.entityList)[0] };
     { sys.entityList->size() };
 };
@@ -570,7 +570,7 @@ public:
      * @brief unregister_component
      * @return true if an entry was removed from the list
      */
-    template <typename T>
+    template <systemT T>
     bool unregister_system()
     {
         const char* system_name = typeid(T).name();
@@ -1060,7 +1060,7 @@ public:
      * @tparam T The system type
      * @param sys Reference to an instance of type system
      */
-    template <typename T>
+    template <systemT T>
     void register_system(T& sys)
     {
         // if registering the system succeded
@@ -1072,7 +1072,7 @@ public:
      * @brief Deletes the system data present in the ECS
      * @return ture if the data was deleted, false if it didn't found what to delete
      */
-    template <typename T>
+    template <systemT T>
     bool unregister_system()
     {
         return systemmanager->unregister_system<T>();

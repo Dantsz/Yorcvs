@@ -38,13 +38,13 @@ public:
         auto entityJSON = json::json::parse(data, nullptr, false); // don't throw exception
         if (entityJSON.is_discarded()) {
             yorcvs::log("Failed to load entity data " + data);
-            return;
+            std::abort();
         }
         [&]<std::size_t... I>([[maybe_unused]] std::index_sequence<I...> seq)
         {
             if (!(deserialize_component_from_json<Components>(entity_id, entityJSON, std::get<I>(json_names)) && ...)) {
                 yorcvs::log("Entity could not be deserialized!" + data);
-                return;
+                std::abort();
             }
         }
         (std::make_index_sequence<sizeof...(Components)>());
@@ -57,11 +57,12 @@ public:
      */
     [[nodiscard]] std::string save_entity(const size_t entity_id) const
     {
+        constexpr size_t indent = 4;
         return [&]<size_t... I>([[maybe_unused]] std::index_sequence<I...> seq)
         {
             json::json j;
             (serialize_component_to_json<Components>(entity_id, std::get<I>(json_names), j), ...);
-            return j.dump(4);
+            return j.dump(indent);
         }
         (std::make_index_sequence<sizeof...(Components)>());
     }
