@@ -12,6 +12,6 @@ int main(int argc, char** argv)
     map.load_entity_from_path(entity.id, TEST_LOAD_ENTITY_FILE);
     const auto ok = world.has_components<identification_component, hitbox_component, health_component, sprite_component>(entity.id);
     assert(ok);
-    map.load_entity_from_path(entity.id, "file does not exist");
+    // map.load_entity_from_path(entity.id, "file does not exist");
     return 0;
 }
