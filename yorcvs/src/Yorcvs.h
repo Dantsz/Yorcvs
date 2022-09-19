@@ -70,7 +70,7 @@ public:
     }
     void render_map_tiles(yorcvs::map& p_map)
     {
-        yorcvs::vec2<float> render_scale = app_window.get_render_scale();
+        const yorcvs::vec2<float> render_scale = app_window.get_render_scale();
         app_window.set_render_scale(app_window.get_window_size() / render_dimensions);
         // get player position
         if (player_control.entityList->empty()) {
