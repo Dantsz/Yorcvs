@@ -189,7 +189,7 @@ private:
         const auto& chunks = tileLayer.getChunks();
         for (const auto& chunk : chunks) // parse chunks
         {
-            yorcvs::vec2<float> chunk_position = { static_cast<float>(chunk.position.x),
+            const yorcvs::vec2<float> chunk_position = { static_cast<float>(chunk.position.x),
                 static_cast<float>(chunk.position.y) };
             for (auto chunk_y = 0; chunk_y < chunk.size.y; chunk_y++) {
                 for (auto chunk_x = 0; chunk_x < chunk.size.x; chunk_x++) {
