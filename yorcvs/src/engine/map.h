@@ -43,6 +43,7 @@ public:
         , animation_sys(world)
         , combat_sys(world)
         , collision_sys(world)
+        , item_sys(world)
     {
     }
     /**
@@ -421,6 +422,7 @@ public:
     animation_system animation_sys;
     combat_system combat_sys;
     collision_system collision_sys;
+    item_system item_sys;
     std::vector<yorcvs::entity> ysorted_tiles {};
 };
 }

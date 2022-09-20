@@ -60,7 +60,7 @@ concept systemT = requires(systemt sys)
 template <typename systemt>
 concept systemNotifiedOnEntityRemovalT = systemT<systemt> && requires(systemt sys)
 {
-    { sys.on_entity_remove(0) };
+    { sys.on_entity_removed(0) };
 };
 /**
  * @brief Manages entity ids
@@ -574,7 +574,7 @@ public:
             type_to_on_entity_removed_callback.insert(
                 { systemType,
                     [&](size_t removed_entity_id) {
-                        system.on_entity_remove(removed_entity_id);
+                        system.on_entity_removed(removed_entity_id);
                     } });
         }
         return true;
@@ -668,6 +668,10 @@ public:
             it.second->erase(
                 std::remove(it.second->begin(), it.second->end(), entityID),
                 it.second->end());
+            auto removed_callback = type_to_on_entity_removed_callback.find(it.first);
+            if (removed_callback != type_to_on_entity_removed_callback.end()) {
+                removed_callback->second(entityID);
+            }
         }
     }
 
@@ -689,6 +693,10 @@ public:
             } else {
                 system->erase(std::remove(system->begin(), system->end(), entityID),
                     system->end());
+                auto removed_callback = type_to_on_entity_removed_callback.find(it.first);
+                if (removed_callback != type_to_on_entity_removed_callback.end()) {
+                    removed_callback->second(entityID);
+                }
             }
         }
     }
