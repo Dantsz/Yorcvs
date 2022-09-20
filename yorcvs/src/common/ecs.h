@@ -11,6 +11,7 @@
 #pragma once
 #include "utilities.h"
 #include <algorithm>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <queue>
@@ -55,6 +56,11 @@ concept systemT = requires(systemt sys)
 {
     { (*sys.entityList)[0] };
     { sys.entityList->size() };
+};
+template <typename systemt>
+concept systemNotifiedOnEntityRemovalT = systemT<systemt> && requires(systemt sys)
+{
+    { sys.on_entity_remove(0) };
 };
 /**
  * @brief Manages entity ids
@@ -564,6 +570,13 @@ public:
         type_to_system.insert({ systemType, systemEVec });
         set_signature<T>(std::vector<bool> {});
         system.entityList = systemEVec;
+        if constexpr (systemNotifiedOnEntityRemovalT<T>) {
+            type_to_on_entity_removed_callback.insert(
+                { systemType,
+                    [&](size_t removed_entity_id) {
+                        system.on_entity_remove(removed_entity_id);
+                    } });
+        }
         return true;
     }
     /**
@@ -729,6 +742,8 @@ public:
     std::unordered_map<const char*, std::vector<bool>> type_to_signature {};
     // get the system based on type
     std::unordered_map<const char*, std::shared_ptr<entity_system_list>> type_to_system {};
+    // stores callbacks for sysems that should be notified when an entity is removed from it
+    std::unordered_map<const char*, std::function<void(size_t)>> type_to_on_entity_removed_callback {};
 };
 
 /**

@@ -14,16 +14,6 @@ public:
         world->register_system<animation_system>(*this);
         world->add_criteria_for_iteration<animation_system, animation_component, sprite_component>();
     }
-
-    /**
-     * @brief Removes an animation from the entity. Currently unecessary, might be useful for editing entities
-     *
-     * @param animation i
-     */
-    void remove_animation(yorcvs::entity, std::string animation);
-
-    void remove_animation_frame(yorcvs::entity, std::string animation, size_t index);
-
     /**
      * @brief Set which animation to be used
      *
@@ -54,17 +44,6 @@ public:
         world->get_component<animation_component>(entityID).current_elapsed_time = 0.0f;
         world->get_component<animation_component>(entityID).current_animation_name = animation_name;
         world->get_component<animation_component>(entityID).current_frame = anim->second;
-    }
-    /**
-     * @brief Set which animation to be used
-     *
-     * @param entity
-     * @param animation_name
-     */
-    static void set_animation_global(const yorcvs::entity& entity, const std::string& animation_name)
-    {
-        yorcvs::ECS* world = entity.parent;
-        set_animation_global(world, entity.id, animation_name);
     }
     void set_animation(size_t entityID, const std::string& animation_name)
     {

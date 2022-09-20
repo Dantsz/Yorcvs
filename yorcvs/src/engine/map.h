@@ -398,13 +398,10 @@ public:
         explicit ecs_Initializer(yorcvs::ECS& world)
         {
             // register components
-            world.register_component<identification_component>();
-            world.register_component<hitbox_component, position_component, velocity_component, health_component,
-                stamina_component>();
-            world.register_component<player_movement_controlled_component, behaviour_component>();
-            world.register_component<sprite_component, animation_component>();
-            world.register_component<health_stats_component, stamina_stats_component, offensive_stats_component, defensive_stats_component>();
-            world.register_component<inventory_component>();
+            world.register_component<identification_component, hitbox_component, position_component, velocity_component, health_component,
+                stamina_component, player_movement_controlled_component, behaviour_component,
+                sprite_component, animation_component, health_stats_component, stamina_stats_component,
+                offensive_stats_component, defensive_stats_component, inventory_component>();
         }
     };
     // class to initialize the ecs before systems are constructed
