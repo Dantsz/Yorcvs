@@ -592,6 +592,7 @@ public:
             type_to_system.at(system_name)->clear(); // clear the entities the system holds
             type_to_system.erase(system_name);
             type_to_signature.erase(system_name);
+            type_to_on_entity_removed_callback.erase(system_name);
             return true;
 
         } else {
