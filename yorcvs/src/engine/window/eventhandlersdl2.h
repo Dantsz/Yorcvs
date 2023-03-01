@@ -1,7 +1,7 @@
 #pragma once
 #include "../../common/utilities.h"
 #include "eventhandler.h"
-#include "imgui_impl_sdl.h"
+#include "imgui_impl_sdl2.h"
 #include <SDL.h>
 #include <SDL_events.h>
 #include <SDL_mouse.h>
