@@ -24,11 +24,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: seanmiddleditch/gha-setup-ninja@master
-    - uses: lukka/run-vcpkg@v10
+    - uses: lukka/run-vcpkg@v11
       with:
-        vcpkgGitCommitId: 'ba4aea932f843ae0c37f571dcb86e91871cee103'
+        vcpkgGitCommitId: 'cf4ebef2294e164875ce17d7937f44d3e3ea156e'
     - name: build
-      uses: lukka/run-cmake@v10
+      uses: lukka/run-cmake@v11
       with:
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           configurePreset: 'ninja-multi-vcpkg'
@@ -65,8 +65,10 @@ jobs:
         include:
           - compiler: gcc
             config: 'ninja-multi-gcc'
+            cxxflags: -std=c++20
           - compiler: clang
             config: 'ninja-multi-clang'
+            cxxflags: -std=c++20
     steps:
     - uses: actions/checkout@v2
     - uses: seanmiddleditch/gha-setup-ninja@master
@@ -86,7 +88,9 @@ jobs:
     - name: install sdl2-ttf
       run: sudo apt-get install libsdl2-ttf-dev
     - name: build
-      uses: lukka/run-cmake@v10
+      uses: lukka/run-cmake@v11
+      env:
+          CXXFLAGS: ${{ matrix.cxxflags }}
       with:
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           configurePreset: ${{matrix.config}}
