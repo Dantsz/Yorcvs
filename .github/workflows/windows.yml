@@ -20,9 +20,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: lukka/run-vcpkg@v10
+    - uses: lukka/run-vcpkg@v11
       with:
-        vcpkgGitCommitId: 'ba4aea932f843ae0c37f571dcb86e91871cee103'
+        vcpkgGitCommitId: 'cf4ebef2294e164875ce17d7937f44d3e3ea156e'
     - name: build
       uses: lukka/run-cmake@v10
       with:
