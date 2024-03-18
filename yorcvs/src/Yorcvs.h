@@ -163,8 +163,10 @@ public:
         return active;
     }
 
-    ~application() = default;
-
+    ~application()
+    {
+        ImGui_ImplSDL2_Shutdown();
+    }
 private:
     static constexpr yorcvs::vec2<float> default_render_dimensions = { 240.0f, 120.0f };
     static constexpr float msPF = 41.6f;
