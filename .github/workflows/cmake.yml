@@ -24,9 +24,11 @@ jobs:
         - compiler: gcc
           ccompiler: gcc
           cxxcompiler: g++
+          cxxflags: -std=c++20
         - compiler: clang
           ccompiler: clang
           cxxcompiler: clang++  
+          cxxflags: -stdlib=libc++ -std=c++20
     steps:
     - uses: actions/checkout@v2
     - name: reps
@@ -50,6 +52,7 @@ jobs:
       env:
        C: ${{ matrix.ccompiler }}
        CXX: ${{ matrix.cxxcompiler }}
+       CXXFLAGS: ${{ matrix.cxxflags }}
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
     - name: Build
       # Build your program with the given configuration
